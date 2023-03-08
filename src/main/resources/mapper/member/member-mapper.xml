@@ -1,0 +1,37 @@
+mapper xml
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper
+                PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.Spring_Project.mapper.MemberMapper">
+
+    <insert id="signUp" parameterType="com.example.Spring_Project.dto.MemberDTO">
+        insert into
+        member
+        values (
+        m_seq.nextval,
+        #{id},
+        #{pw},
+        #{name},
+        #{email},
+        #{phone},
+        #{postcode},
+        #{roadAddress},
+        #{jibunAddress},
+        #{detailAddress, jdbcType=VARCHAR},
+        sysdate,
+        #{oriname},
+        #{sysname},
+        #{savePath},
+        'Y')
+
+    </insert>
+
+    <select id="idDupleCheck" resultType="Integer">
+        select *
+        from member
+        where id=#{id}
+    </select>
+
+</mapper>
