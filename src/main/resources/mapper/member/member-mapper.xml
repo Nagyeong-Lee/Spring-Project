@@ -24,13 +24,48 @@
         #{sysname},
         #{savePath},
         'Y')
-
     </insert>
 
     <select id="idDupleCheck" resultType="Integer">
-        select *
+        select count(*)
         from member
-        where id=#{id}
+        where id=#{id} and status='Y'
     </select>
 
+    <select id="emailDupleCheck" resultType="Integer">
+        select count(*)
+        from member
+        where email=#{email} and status='Y'
+    </select>
+
+    <select id="login" resultType="Integer">
+        select count(*)
+        from member
+        where id=#{id} and pw=#{pw}
+                and status='Y'
+    </select>
+
+    <delete id="delete">
+        update member
+        set status='N'
+        where id=#{id}
+    </delete>
+
+    <select id="memberInfo" resultType="com.example.Spring_Project.dto.MemberDTO">
+        select *
+        from member
+        where id=#{id} and status='Y'
+    </select>
+
+    <select id="searchId" resultType="String">
+        select id
+        from member
+        where email=#{email} and status='Y'
+    </select>
+
+    <select id="searchPw" resultType="String">
+        select pw
+        from member
+        where id=#{id} and status='Y'
+    </select>
 </mapper>
