@@ -65,7 +65,7 @@ public class MemberController {
         return service.emailDupleCheck(email);
     }
 
-    @PostMapping("/login")  //로그인 (성공->마이페이지 / 실패->alert,메인페이지로 이동)
+    @PostMapping("/login")  //로그인 (성공->마이페이지 / 실패->메인페이지로 이동)
     public String login(Model model, @RequestParam String id, @RequestParam String pw) throws Exception {
         System.out.println("id : " + id);
         System.out.println("pw : " + pw);
@@ -80,7 +80,7 @@ public class MemberController {
             result = "/member/myPage";
         } else {
             System.out.println("로그인 실패");
-            result = "redirect:/member/main";
+            result = "redirect:/";
         }
         return result;
     }
@@ -107,10 +107,10 @@ public class MemberController {
         System.out.println("pw : " + memberDTO.getPw());
         System.out.println("name : " + memberDTO.getName());
         System.out.println("emil : " + memberDTO.getEmail());
-        System.out.println("id : " + memberDTO.getPostcode());
-        System.out.println("id : " + memberDTO.getRoadAddress());
-        System.out.println("id : " + memberDTO.getJibunAddress());
-        System.out.println("id : " + memberDTO.getDetailAddress());
+        System.out.println("postcode : " + memberDTO.getPostcode());
+        System.out.println("roadAddress : " + memberDTO.getRoadAddress());
+        System.out.println("jibunAddress : " + memberDTO.getJibunAddress());
+        System.out.println("detailAddress : " + memberDTO.getDetailAddress());
         return "/member/updateForm";
     }
 

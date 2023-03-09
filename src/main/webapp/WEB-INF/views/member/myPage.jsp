@@ -15,7 +15,6 @@
 </c:if>
 </div>
 <button type="button" id="board">커뮤니티로</button>
-<button type="button" id="admin">관리자페이지로</button>
 <button type="button" id="update">정보수정하기</button>
 <button type="button" id="delete">탈퇴하기</button>
 <button type="button" id="logout">로그아웃</button>
