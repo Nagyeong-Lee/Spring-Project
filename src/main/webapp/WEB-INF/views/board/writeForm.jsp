@@ -25,20 +25,36 @@
 
     <script>
         $(function () {
-            $('#summernote').summernote();
+             $(".summernote").summernote({
+                           height: 300,                 // 에디터 높이
+                           minHeight: null,             // 최소 높이
+                           maxHeight: null,             // 최대 높이
+                           focus: true,                  // 에디터 로딩후 포커스를 맞출지 여부
+                           lang: "ko-KR",					// 한글 설정
+                           placeholder: '글을 입력하세요.'	//placeholder 설정
+             });
         });
     </script>
 </head>
 <body>
     <form action="/board/insert" method="post">
         <div class="title">
-            <input type="text" id="title" name="title">
+           제목 <input type="text" id="title" name="title">
         </div>
         <div class="writer">
-            <input type="text" id="writer" name="writer">
+           작성자 : ${id}
         </div>
-        <textarea id="summernote" name="editordata"></textarea>
+        <textarea id="content" name="content" class="summernote"></textarea>
         <button type="submit">글작성</button>
+        <button type="button" id="toMain">목록으로</button>
+
+        <input type="hidden" value="${id}" id="writer" name="writer">
     </form>
+
+    <script>
+      $("#toMain").on("click",function(){  //게시글 메인 페이지로 이동
+            location.href="/board/list?currentPage=1&count=10";
+        });
+    </script>
 </body>
 </html>

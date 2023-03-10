@@ -12,23 +12,54 @@
         #{writer},
         #{content},
         sysdate,
-        #{category},
+        #{category, jdbcType=VARCHAR},
         0,
         'Y',
-        #{parent_seq},
-        sysdate
+        #{parent_seq, jdbcType=NUMERIC},
+        #{update_date, jdbcType=TIMESTAMP}
         )
     </insert>
 
     <select id="select" resultType="com.example.Spring_Project.dto.BoardDTO">
-        select *
-        from board
-        where status='Y'
+        SELECT *
+        FROM(SELECT ROWNUM rn, b.*
+        FROM (   SELECT b_seq,title,writer,content,write_date,count,update_date,status
+                 FROM board
+                 where status='Y'
+                 ORDER BY write_date desc) b)
+        where rn between #{start} and #{end}
     </select>
 
     <select id="getBoardDetail" resultType="com.example.Spring_Project.dto.BoardDTO">
         select *
         from board
         where b_seq=#{b_seq} and status='Y'
+    </select>
+
+    <update id="count">
+        update board
+        set count=count+1
+        where b_seq=#{b_seq}
+        and status = 'Y'
+    </update>
+
+    <update id="delete">
+        update board
+        set status='N'
+        where b_seq=#{b_seq}
+    </update>
+
+    <update id="update">
+        update board
+        set title=#{title},
+            content=#{content},
+            update_date=sysdate
+        where b_seq=#{b_seq} and status='Y'
+    </update>
+
+    <select id="countPost" resultType="Integer">
+        select count(*)
+        from board
+        where status='Y'
     </select>
 </mapper>

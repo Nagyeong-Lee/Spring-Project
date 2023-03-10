@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.Spring_Project.mapper.CommentMapper">
+    <insert id="insert" parameterType="com.example.Spring_Project.dto.CommentDTO" >
+        insert into
+        cmt
+        values(
+        cmt_seq.nextval,
+        #{b_seq},
+        #{content},
+        #{writer},
+        sysdate,
+        #{update_date ,jdbcType=TIMESTAMP},
+        'Y',
+        0
+        )
+    </insert>
+    
+    <select id="getComment" resultType="com.example.Spring_Project.dto.CommentDTO">
+        select *
+        from cmt
+        where b_seq=#{b_seq}
+              and status='Y'
+    </select>
+</mapper>
