@@ -58,7 +58,7 @@
             <div>
                 <button type="button" id="updateBtn">수정하기</button>
                 <a href="/">
-                    <button type="button">취소
+                    <button type="button">취소</button>
                 </a>
             </div>
         </form>

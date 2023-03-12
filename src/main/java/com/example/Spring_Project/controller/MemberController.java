@@ -5,14 +5,12 @@ import com.example.Spring_Project.encryption.AES256;
 import com.example.Spring_Project.mailSender.MailDTO;
 import com.example.Spring_Project.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @Controller
@@ -85,7 +83,7 @@ public class MemberController {
         return result;
     }
 
-    @GetMapping("/logout")
+    @GetMapping("/logout")  //로그아웃
     public String logout(@RequestParam String id) throws Exception {
         session.invalidate();
         return "redirect:/member/main";
@@ -129,30 +127,30 @@ public class MemberController {
     @ResponseBody
     @PostMapping("/searchId")
     public String searchId(@RequestParam String email) throws Exception {
-        String id=service.searchId(email);
-        if(id == null){
+        String id = service.searchId(email);
+        if (id == null) {
             id = "NONE";
         }
-        System.out.println("id찾기 : "+id);
+        System.out.println("id찾기 : " + id);
         return id;
     }
 
     //pw 찾기 페이지로 이동
     @GetMapping("/toSearchPwForm")
-    public String toSearchPwForm() throws Exception{
+    public String toSearchPwForm() throws Exception {
         return "/member/searchPw";
     }
 
     //pw 찾기
     @ResponseBody
     @PostMapping("/searchPw")
-    public String searchPw(@RequestParam String id) throws Exception{
-        String result="";
+    public String searchPw(@RequestParam String id) throws Exception {
+        String result = "";
         String pw = service.searchPw(id);
-        if(pw == null){
-            result="NONE";
+        if (pw == null) {
+            result = "NONE";
         }
-        result=aes256.decrypt(pw);
+        result = aes256.decrypt(pw);
         return result;
     }
 
