@@ -66,22 +66,29 @@
 
 <div>${paging}</div>
 
-<form action="/board/list">
-    <div class="btn">
-        <select name="searchType">
-            <option value="title">제목</option>
-            <option value="writer">작성자</option>
-            <option value="content">내용</option>
-        </select>
-        <input type="text" id="keyword" name="keyword">
-        <button type="submit" id="searchBtn">글 검색</button>
-        <button type="button" id="writeBtn">글 작성</button>
-    </div>
-</form>
+<div class="btn">
+    <select name="searchType" id="searchType">
+        <option value="title">제목</option>
+        <option value="writer">작성자</option>
+        <option value="content">내용</option>
+    </select>
+    <input type="text" id="keyword" name="keyword">
+    <button type="button" id="searchBtn">글 검색</button>
+    <button type="button" id="writeBtn">글 작성</button>
+</div>
 
 <script>
     $("#writeBtn").on("click", function () {  //글작성 폼으로 이동
         location.href = "/board/toWriteForm";
+    });
+
+    // 검색
+    $("#searchBtn").on('click', function () {
+        var url = "/board/list?currentPage=1&count=10";
+        url = url + "?searchType=" + $('#searchType').val();
+        url = url + "&keyword=" + $('#keyword').val();
+        location.href = url;
+        console.log(url);
     });
 </script>
 </body>

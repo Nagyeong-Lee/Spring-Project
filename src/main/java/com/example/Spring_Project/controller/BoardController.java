@@ -32,8 +32,8 @@ public class BoardController {
     public String toBoard(Model model,
                           @RequestParam Integer currentPage,
                           @RequestParam Integer count,
-                          @RequestParam(value = "searchType",required = false, defaultValue = "title") String searchType,
-                          @RequestParam(value = "keyword",required = false, defaultValue = "") String keyword) throws Exception {
+                          @RequestParam(value = "searchType",required = false,defaultValue = "title") String searchType,
+                          @RequestParam(value = "keyword",required = false) String keyword) throws Exception {
         if (currentPage == null) {
             currentPage = 1;
         }
@@ -42,12 +42,18 @@ public class BoardController {
         if (count == null) {
             count = 10;
         }
+
+        System.out.println(searchType);
+        System.out.println(keyword);
+        System.out.println(currentPage);
+        System.out.println(count);
+
+
         Integer boardListCount = service.countPost(); // 전체 글 개수
         Integer start = currentPage * count - 9; //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
 
-        System.out.println(searchType);
-        System.out.println(keyword);
+
         List<BoardDTO> list = service.select(start, end,searchType,keyword); //검색
         String paging = service.getBoardPageNavi(currentPage, count);
 
