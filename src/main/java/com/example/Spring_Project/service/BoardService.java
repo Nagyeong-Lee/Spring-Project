@@ -20,8 +20,9 @@ public class BoardService {
         mapper.insert(boardDTO);
     }
 
-    public List<BoardDTO> select(Integer start, Integer end) throws Exception{   //게시글 리스트 출력
-        return mapper.select(start,end);
+    public List<BoardDTO> select(@RequestParam Integer start, @RequestParam Integer end,
+                                 @RequestParam String searchType, @RequestParam String keyword) throws Exception{   //게시글 리스트 출력 (검색)
+        return mapper.select(start,end,searchType,keyword);
     }
 
     public BoardDTO getBoardDetail(@RequestParam Integer b_seq) throws Exception{  //게시글 상세정보 출력
@@ -41,9 +42,11 @@ public class BoardService {
         mapper.update(title, content, b_seq);
     }
 
-    public Integer countPost() throws Exception{
+    public Integer countPost() throws Exception{  //게시글 총 개수
         return mapper.countPost();
     }
+
+
 
 
     //페이징 처리

@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
     <title>게시판</title>
@@ -14,17 +14,18 @@
             box-sizing: border-box;
         }
 
-        #myTable{
+        #myTable {
             border: 1px solid black;
         }
-         /*제목 길이 넘치는거 자름*/
-                .title {
-                      overflow: hidden;
-                      white-space: nowrap;
-                      word-break: break-word;
-                      text-overflow: ellipsis;
-                      max-width: 270px;
-                }
+
+        /*제목 길이 넘치는거 자름*/
+        .title {
+            overflow: hidden;
+            white-space: nowrap;
+            word-break: break-word;
+            text-overflow: ellipsis;
+            max-width: 270px;
+        }
     </style>
 </head>
 <body>
@@ -45,9 +46,9 @@
                     <td><fmt:formatDate pattern='yyyy-MM-dd hh:mm' value="${i.write_date}"/></td>
                     <td>
                         <c:choose>
-                        <c:when test="${not empty i.update_date}">
-                           <fmt:formatDate pattern='yyyy-MM-dd hh:mm' value="${i.update_date}"/>
-                        </c:when>
+                            <c:when test="${not empty i.update_date}">
+                                <fmt:formatDate pattern='yyyy-MM-dd hh:mm' value="${i.update_date}"/>
+                            </c:when>
                         </c:choose>
                     </td>
                     <td>${i.count}</td>
@@ -65,24 +66,22 @@
 
 <div>${paging}</div>
 
-<div class="btn">
-    <select name="selectType">
-        <option value="title">제목</option>
-        <option value="writer">작성자</option>
-        <option value="content">내용</option>
-    </select>
-    <input type="text" id="keyword" name="keyword">
-    <button type="button" id="searchBtn">글 검색</button>
-    <button type="button" id="writeBtn">글 작성</button>
-</div>
+<form action="/board/list">
+    <div class="btn">
+        <select name="searchType">
+            <option value="title">제목</option>
+            <option value="writer">작성자</option>
+            <option value="content">내용</option>
+        </select>
+        <input type="text" id="keyword" name="keyword">
+        <button type="submit" id="searchBtn">글 검색</button>
+        <button type="button" id="writeBtn">글 작성</button>
+    </div>
+</form>
 
 <script>
     $("#writeBtn").on("click", function () {  //글작성 폼으로 이동
         location.href = "/board/toWriteForm";
-    });
-
-    $("#searchBtn").on("click",function(){  // 게시글 검색
-        location.href="/board/search";
     });
 </script>
 </body>

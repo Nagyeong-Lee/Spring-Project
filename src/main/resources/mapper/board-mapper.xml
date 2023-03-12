@@ -20,16 +20,6 @@
         )
     </insert>
 
-    <select id="select" resultType="com.example.Spring_Project.dto.BoardDTO">
-        SELECT *
-        FROM(SELECT ROWNUM rn, b.*
-        FROM (   SELECT b_seq,title,writer,content,write_date,count,update_date,status
-                 FROM board
-                 where status='Y'
-                 ORDER BY write_date desc) b)
-        where rn between #{start} and #{end}
-    </select>
-
     <select id="getBoardDetail" resultType="com.example.Spring_Project.dto.BoardDTO">
         select *
         from board
@@ -61,5 +51,24 @@
         select count(*)
         from board
         where status='Y'
+    </select>
+
+    <select id="select" resultType="com.example.Spring_Project.dto.BoardDTO">
+        SELECT *
+        FROM(SELECT ROWNUM rn, b.*
+        FROM (   SELECT b_seq,title,writer,content,write_date,count,update_date,status
+        FROM board
+        where status='Y'
+        <if test="searchType == title">
+            and title like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType == writer">
+            and writer like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType == content">
+            and content like '%'||#{keyword}||'%'
+        </if>
+        ORDER BY write_date desc) b)
+        where rn between #{start} and #{end}
     </select>
 </mapper>

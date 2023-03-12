@@ -60,7 +60,7 @@
             <button type="button" id="btn">회원가입</button>
 
             <a href="/">
-                <button type="button">취소
+                <button type="button">취소</button>
             </a>
         </div>
     </form>
@@ -79,7 +79,7 @@
 
         //아이디 입력 안했을 때
         if (id.length == 0) {
-            $(".idDupleCheck").text("아이디를 입력해주세요.");
+            alert("아이디를 입력해주세요.");
             return false;
         }
         $(".idDupleCheck").text("");

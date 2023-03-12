@@ -7,6 +7,13 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
+
+    <style>
+        img{
+            width: 200px;
+            height: 200px;
+        }
+    </style>
 </head>
 <body>
 <c:if test="${not empty memberDTO}">
@@ -52,8 +59,10 @@
                    value=${memberDTO.getDetailAddress()}>
 
             <div>프로필 사진<br>
+                <div>
+                    <img src="/resources/img/${memberDTO.sysname}">
+                </div>
                 <input type="file" id="file" name="file"><br>
-                <span id="isFileExist" name="isFileExist"></span>
             </div>
             <div>
                 <button type="button" id="updateBtn">수정하기</button>

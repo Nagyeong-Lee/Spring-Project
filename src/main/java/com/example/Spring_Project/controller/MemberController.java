@@ -48,7 +48,7 @@ public class MemberController {
         System.out.println("savePath : " + memberDTO.getSavePath());
         service.signUp(memberDTO, mailDTO, file, request);
 
-        return "redirect:/member/main";
+        return "redirect:/member/index";
     }
 
     @ResponseBody
