@@ -45,9 +45,9 @@
            작성자 : ${id}
         </div>
         <textarea id="content" name="content" class="summernote"></textarea>
+        <input type="file">
         <button type="submit">글작성</button>
         <button type="button" id="toMain">목록으로</button>
-
         <input type="hidden" value="${id}" id="writer" name="writer">
     </form>
 

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.sound.midi.Soundbank;
+
 @Controller
 @RequestMapping("/comment")
 public class CommentController {
@@ -33,5 +35,18 @@ public class CommentController {
 
         service.insert(commentDTO);
         return commentDTO;
+    }
+
+    @ResponseBody
+    @PostMapping("/reply")
+    public String reply(@RequestParam String writer, @RequestParam String content, @RequestParam Integer b_seq,
+                        @RequestParam Integer parent_cmt_seq) throws Exception{
+
+        System.out.println("writer : "+writer);
+        System.out.println("content : "+content);
+        System.out.println("b_seq : "+b_seq);
+        System.out.println("parent_cmt_seq : "+parent_cmt_seq);
+        service.reply(writer,content,b_seq,parent_cmt_seq);
+        return "insert";
     }
 }

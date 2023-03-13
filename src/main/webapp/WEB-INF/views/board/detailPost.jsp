@@ -56,9 +56,15 @@
             height: 10%;
         }
 
-
-        .b_contents {
+        .box,.b_contents {
             border: 1px solid black;
+        }
+
+        /*대댓글*/
+        .replyDiv{
+            border:1px solid black;
+            width:70%;
+            height:5%;
         }
     </style>
 
@@ -71,6 +77,9 @@
 
         <input type="hidden" name="b_seq" id="b_seq" value="${boardDTO.b_seq}">
         <input type="hidden" name="writer" id="writer" value="${boardDTO.writer}">
+        <input type="hidden" name="write_date" id="write_date" value="${boardDTO.write_date}">
+        <input type="hidden" name="id" id="id" value="${id}">
+
 
         <div class="title">제목 :
             <input type="text" id="title" name="title" value="${boardDTO.title}" readonly="readonly"></div>
@@ -94,9 +103,16 @@
             <c:choose>
                 <c:when test="${not empty commentList}">
                     <c:forEach var="i" items="${commentList}">
-                        <div class="row">
+                        <div class="content">
                                 ${i.content}
+                        <button type="button" class="cmt" onclick="cmtOpen('${i.cmt_seq}')">대댓글 달기</button>
                         </div>
+                        <div class="info">
+                            ${i.writer}
+                            <fmt:formatDate pattern='YYYY-MM-dd hh:mm'
+                                value="${i.write_date}"/>
+                        </div>
+                        <div class="cmtBox" id="${i.cmt_seq}"></div>
                     </c:forEach>
                 </c:when>
             </c:choose>
@@ -186,15 +202,51 @@
                 }
         }).done(function (resp) {
             let comment = $("<div></div>");
-            let button = $("<button>대댓글 작성하기</button>");
-            button.attr("type", "button");
             comment.text(content);   //댓글 작성
             $("#comment").val('');   //댓글 작성칸 초기화
+
+            let info=$("<div></div>");
+            let infoText=writer+" "+$("#write_date").val();
+            info.text(infoText);
+            console.log(infoText);
             $(".showComments").append(comment);
-            $(".showComments").append(button);
+            $(".showComments").append(info);
         });
     });
 
+    //대댓글
+    function cmtOpen(cmtNum){
+                    $(".cmt").remove();
+                    let btn = $('<button>대댓글 작성완료</button>')
+                    btn.addClass("completeCmt");
+                    btn.attr("id","complete");
+
+                    let div = $('<textarea></textarea>');
+                    div.addClass("box");
+                    div.attr("id","textArea");
+                    div.attr("name","textArea");
+
+                    $("#"+cmtNum).append(div); //textarea
+                    $("#"+cmtNum).append(btn); //작성완료 btn
+
+    }
+
+   $("#complete").on("click",function(){
+        writeReply();
+   });
+
+
+    function writeReply(){
+
+       let writer=$("#id").val();
+       let content=$("#textArea").val();
+       let  b_seq=$("#b_seq").val();
+
+       console.log(writer);
+       console.log(content);
+       console.log(b_seq);
+
+    }
 
 </script>
 </body>

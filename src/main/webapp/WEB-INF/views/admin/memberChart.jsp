@@ -41,7 +41,7 @@
         // ②차트의 데이터(Object)
         data: {
             // ③x축에 들어갈 이름들(Array)
-            labels: ['6개월전','3개월전','1개월전','현재'],
+            labels: ['6개월전','3개월전','1개월전','3월'],
             // ④실제 차트에 표시할 데이터들(Array), dataset객체들을 담고 있다.
             datasets: [{
                 // ⑤dataset의 이름(String)

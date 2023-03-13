@@ -19,9 +19,34 @@
     </insert>
     
     <select id="getComment" resultType="com.example.Spring_Project.dto.CommentDTO">
-        select *
-        from cmt
-        where b_seq=#{b_seq}
-              and status='Y'
+        SELECT
+        LPAD(' ', 4*(LEVEL-1)) || content AS content,
+        cmt_seq,
+        b_seq,
+        writer,
+        write_date,
+        parent_cmt_seq ,
+        LEVEL
+        FROM cmt
+        where status='Y'
+        and b_seq=#{b_seq}
+        START WITH parent_cmt_seq = 0
+        CONNECT BY PRIOR cmt_seq = parent_cmt_seq
+        order by b_seq ,cmt_seq
     </select>
+
+    <insert id="reply">
+        insert into
+        cmt
+        values(
+        cmt_seq.nextval,
+        #{b_seq},
+        #{content},
+        #{writer},
+        sysdate,
+        #{update_date ,jdbcType=TIMESTAMP},
+        'Y',
+        #{parent_cmt_seq}
+        )
+    </insert>
 </mapper>

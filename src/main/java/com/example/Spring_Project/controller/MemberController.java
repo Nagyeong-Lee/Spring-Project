@@ -48,7 +48,7 @@ public class MemberController {
         System.out.println("savePath : " + memberDTO.getSavePath());
         service.signUp(memberDTO, mailDTO, file, request);
 
-        return "redirect:/member/index";
+        return "/member/index";
     }
 
     @ResponseBody
@@ -72,7 +72,10 @@ public class MemberController {
         session.setAttribute("id", id);  //아이디 세션 부여
 
         Integer login = service.login(id, pw);
-        if (login == 1) {
+        if(id.equals("admin123")){
+            return "redirect:/admin/main";
+        }
+        if (login == 1 && !id.equals("admin123")) {
             System.out.println("로그인 성공");
             model.addAttribute("session", session.getAttribute("id"));
             result = "/member/myPage";
@@ -86,14 +89,14 @@ public class MemberController {
     @GetMapping("/logout")  //로그아웃
     public String logout(@RequestParam String id) throws Exception {
         session.invalidate();
-        return "redirect:/member/main";
+        return "/member/index";
     }
 
     @GetMapping("/delete")   //탈퇴하기
     public String delete(@RequestParam String id) throws Exception {
         session.invalidate();
         service.delete(id);
-        return "redirect:/member/main";
+        return "/member/index";
     }
 
     @GetMapping("/toUpdateForm")    //회원 정보 수정 페이지로 이동 (회원정보 뿌리기)
