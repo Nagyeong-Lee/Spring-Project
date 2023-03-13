@@ -51,6 +51,15 @@
         select count(*)
         from board
         where status='Y'
+        <if test="searchType eq 'title'.toString() and keyword != null">
+            and title like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType == 'writer'.toString() and keyword !=null">
+            and writer like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType == 'content'.toString() and keyword !=null">
+            and content like '%'||#{keyword}||'%'
+        </if>
     </select>
 
     <select id="select" resultType="com.example.Spring_Project.dto.BoardDTO">
@@ -59,13 +68,13 @@
         FROM (   SELECT b_seq,title,writer,content,write_date,count,update_date,status
         FROM board
         where status='Y'
-        <if test="searchType == title">
+        <if test="searchType eq 'title'.toString() and keyword != null">
             and title like '%'||#{keyword}||'%'
         </if>
-        <if test="searchType == writer">
+        <if test="searchType == 'writer'.toString() and keyword !=null">
             and writer like '%'||#{keyword}||'%'
         </if>
-        <if test="searchType == content">
+        <if test="searchType == 'content'.toString() and keyword !=null">
             and content like '%'||#{keyword}||'%'
         </if>
         ORDER BY write_date desc) b)

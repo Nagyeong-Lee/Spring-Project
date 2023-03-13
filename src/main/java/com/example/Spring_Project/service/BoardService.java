@@ -42,16 +42,16 @@ public class BoardService {
         mapper.update(title, content, b_seq);
     }
 
-    public Integer countPost() throws Exception{  //게시글 총 개수
-        return mapper.countPost();
+    public Integer countPost(@RequestParam String searchType, @RequestParam String keyword) throws Exception{  //게시글 총 개수
+        return mapper.countPost(searchType,keyword);
     }
 
 
 
 
     //페이징 처리
-    public String getBoardPageNavi(int currentPage, Integer count) throws Exception {
-        int postTotalCount = this.countPost();
+    public String getBoardPageNavi(int currentPage, Integer count,String searchType, String keyword) throws Exception {
+        int postTotalCount = this.countPost(searchType,keyword);
 
         int recordCountPerPage = count; // 페이지 당 게시글 개수
         int naviCountPerPage = 10; // 내비 개수
@@ -85,20 +85,20 @@ public class BoardService {
         StringBuilder sb = new StringBuilder();
 
         if(needPrev) {
-            sb.append("<a href='/board/list?currentPage="+(startNavi-1)+"&count="+count+"'><</a> ");
+            sb.append("<a href='/board/list?currentPage="+(startNavi-1)+"&count="+count+"&searchType="+searchType+"&keyword="+keyword+"'><</a> ");
         }
 
         for(int i = startNavi; i <= endNavi; i++) {
             if(currentPage == i){
-                sb.append("<a href='/board/list?currentPage="+i+"&count="+count+"'><b>" + i + "</b></a> ");
+                sb.append("<a href='/board/list?currentPage="+i+"&count="+count+"&searchType="+searchType+"&keyword="+keyword+"'><b>" + i + "</b></a> ");
 
             }else {
-                sb.append("<a href='/board/list?currentPage="+i+"&count="+count+"'>" + i + "</a> ");
+                sb.append("<a href='/board/list?currentPage="+i+"&count="+count+"&searchType="+searchType+"&keyword="+keyword+"'>" + i + "</a> ");
 
             }
         }
         if(needNext) {
-            sb.append("<a href='/board/list?currentPage="+(endNavi+1)+"&count="+count+"'>></a> ");
+            sb.append("<a href='/board/list?currentPage="+(endNavi+1)+"&count="+count+"&searchType="+searchType+"&keyword="+keyword+"'>></a> ");
         }
         return sb.toString();
     }

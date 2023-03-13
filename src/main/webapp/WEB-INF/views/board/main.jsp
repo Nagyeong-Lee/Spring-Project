@@ -67,14 +67,19 @@
 <div>${paging}</div>
 
 <div class="btn">
+<form action="/board/list?" method="get">
+    <input type=hidden value="1" name="currentPage" id="currentPage">
+    <input type=hidden value="10" name="count" id="count">
+
     <select name="searchType" id="searchType">
-        <option value="title">제목</option>
+        <option value="title" selected>제목</option>
         <option value="writer">작성자</option>
         <option value="content">내용</option>
     </select>
     <input type="text" id="keyword" name="keyword">
-    <button type="button" id="searchBtn">글 검색</button>
+    <button type="submit" id="searchBtn">글 검색</button>
     <button type="button" id="writeBtn">글 작성</button>
+</form>
 </div>
 
 <script>
@@ -82,14 +87,6 @@
         location.href = "/board/toWriteForm";
     });
 
-    // 검색
-    $("#searchBtn").on('click', function () {
-        var url = "/board/list?currentPage=1&count=10";
-        url = url + "?searchType=" + $('#searchType').val();
-        url = url + "&keyword=" + $('#keyword').val();
-        location.href = url;
-        console.log(url);
-    });
 </script>
 </body>
 </html>

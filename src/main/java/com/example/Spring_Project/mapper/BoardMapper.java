@@ -22,7 +22,6 @@ public interface BoardMapper {
 
     void delete(@Param("b_seq")Integer b_seq);  //게시글 삭제
     void update(@Param("title") String title, @Param("content") String content, @Param("b_seq") Integer b_seq); //게시글 수정
-    Integer countPost();  //게시글 총 개수
-    Integer countBySearchType(@Param("searchType") String searchType, @Param("keyword") String keyword);  // 검색 조건별 게시글 개수
+    Integer countPost(@Param("searchType") String searchType, @Param("keyword") String keyword);  //게시글 총 개수
 
 }
