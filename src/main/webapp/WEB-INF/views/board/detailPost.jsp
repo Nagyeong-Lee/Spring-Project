@@ -217,36 +217,77 @@
     //대댓글
     function cmtOpen(cmtNum){
                     $(".cmt").remove();
-                    let btn = $('<button>대댓글 작성완료</button>')
+                    /*let btn = $('<button>대댓글 작성완료</button>')
                     btn.addClass("completeCmt");
-                    btn.attr("id","complete");
+                    btn.attr("id","complete");*/
 
-                    let div = $('<textarea></textarea>');
+                    /*let div = $('<textarea></textarea>');
                     div.addClass("box");
                     div.attr("id","textArea");
-                    div.attr("name","textArea");
+                    div.attr("name","textArea");*/
+
+                    let btn  =  '<button type="button" class="completeCmt" id="complete" onClick="writeReply()">대댓글 작성완료</button>'
+                    let div  =  '<textarea class="box" id="textArea" name="textArea"></textarea>'
 
                     $("#"+cmtNum).append(div); //textarea
                     $("#"+cmtNum).append(btn); //작성완료 btn
 
     }
 
-   $("#complete").on("click",function(){
+   /* $(document).on("click","#textArea",function(){
         writeReply();
-   });
-
+    })*/
 
     function writeReply(){
 
        let writer=$("#id").val();
        let content=$("#textArea").val();
-       let  b_seq=$("#b_seq").val();
+       let b_seq=$("#b_seq").val();
 
        console.log(writer);
        console.log(content);
        console.log(b_seq);
 
     }
+
+
+        $("#complete").on("click",function(){
+
+            $.ajax({
+
+                url:"/comment/reply".
+                type: "post",
+                dataType:'json',
+                data : {
+                    "writer":writer,
+                    "content":content,
+                    "b_seq",b_seq
+                }.done(function(){
+                    $(".showComments").remove();
+                    let showComments=
+                            '<div class="showComments">
+                                 <c:choose>
+                                     <c:when test="${not empty commentList}">
+                                         <c:forEach var="i" items="${commentList}">
+                                             <div class="content">
+                                                     ${i.content}
+                                             <button type="button" class="cmt" onclick="cmtOpen('${i.cmt_seq}')">대댓글 달기</button>
+                                             </div>
+                                             <div class="info">
+                                                 ${i.writer}
+                                                 <fmt:formatDate pattern='YYYY-MM-dd hh:mm'
+                                                     value="${i.write_date}"/>
+                                             </div>
+                                             <div class="cmtBox" id="${i.cmt_seq}"></div>
+                                         </c:forEach>
+                                     </c:when>
+                                 </c:choose>
+                             </div>'
+                });
+
+            });
+
+    });
 
 </script>
 </body>
