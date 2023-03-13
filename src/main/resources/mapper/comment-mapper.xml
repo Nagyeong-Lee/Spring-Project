@@ -44,7 +44,7 @@
         #{content},
         #{writer},
         sysdate,
-        #{update_date ,jdbcType=TIMESTAMP},
+        null,
         'Y',
         #{parent_cmt_seq}
         )

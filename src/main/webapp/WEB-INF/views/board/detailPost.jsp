@@ -56,15 +56,15 @@
             height: 10%;
         }
 
-        .box,.b_contents {
+        .box, .b_contents {
             border: 1px solid black;
         }
 
         /*대댓글*/
-        .replyDiv{
-            border:1px solid black;
-            width:70%;
-            height:5%;
+        .replyDiv {
+            border: 1px solid black;
+            width: 70%;
+            height: 5%;
         }
     </style>
 
@@ -105,12 +105,13 @@
                     <c:forEach var="i" items="${commentList}">
                         <div class="content">
                                 ${i.content}
-                        <button type="button" class="cmt" onclick="cmtOpen('${i.cmt_seq}')">대댓글 달기</button>
+                            <button type="button" class="cmt" onclick="cmtOpen('${i.cmt_seq}')">대댓글 달기</button>
+                            <input type="hidden" value="${i.cmt_seq}" class="p_cmt">
                         </div>
                         <div class="info">
-                            ${i.writer}
+                                ${i.writer}
                             <fmt:formatDate pattern='YYYY-MM-dd hh:mm'
-                                value="${i.write_date}"/>
+                                            value="${i.write_date}"/>
                         </div>
                         <div class="cmtBox" id="${i.cmt_seq}"></div>
                     </c:forEach>
@@ -139,6 +140,8 @@
 </form>
 
 <script>
+    let no = '${boardDTO.write_date}';
+
     $("#updBtn").on("click", function () {
 
         console.log('버튼클릭');
@@ -205,8 +208,8 @@
             comment.text(content);   //댓글 작성
             $("#comment").val('');   //댓글 작성칸 초기화
 
-            let info=$("<div></div>");
-            let infoText=writer+" "+$("#write_date").val();
+            let info = $("<div></div>");
+            let infoText = writer + " " + $("#write_date").val();
             info.text(infoText);
             console.log(infoText);
             $(".showComments").append(comment);
@@ -215,80 +218,58 @@
     });
 
     //대댓글
-    function cmtOpen(cmtNum){
-                    $(".cmt").remove();
-                    /*let btn = $('<button>대댓글 작성완료</button>')
-                    btn.addClass("completeCmt");
-                    btn.attr("id","complete");*/
+    function cmtOpen(cmtNum) {
 
-                    /*let div = $('<textarea></textarea>');
-                    div.addClass("box");
-                    div.attr("id","textArea");
-                    div.attr("name","textArea");*/
+        $(".cmt").remove();
+        let parent_cmt_seq = cmtNum;
 
-                    let btn  =  '<button type="button" class="completeCmt" id="complete" onClick="writeReply()">대댓글 작성완료</button>'
-                    let div  =  '<textarea class="box" id="textArea" name="textArea"></textarea>'
+        let btn = '<button type="button" class="completeCmt" id="complete" onClick="writeReply(' + cmtNum + ')">대댓글 작성완료</button>'
+        let div = '<textarea class="box" id="textArea" name="textArea"></textarea>'
 
-                    $("#"+cmtNum).append(div); //textarea
-                    $("#"+cmtNum).append(btn); //작성완료 btn
-
-    }
-
-   /* $(document).on("click","#textArea",function(){
-        writeReply();
-    })*/
-
-    function writeReply(){
-
-       let writer=$("#id").val();
-       let content=$("#textArea").val();
-       let b_seq=$("#b_seq").val();
-
-       console.log(writer);
-       console.log(content);
-       console.log(b_seq);
+        $("#" + cmtNum).append(div); //textarea
+        $("#" + cmtNum).append(btn); //작성완료 btn
 
     }
 
 
-        $("#complete").on("click",function(){
+    //대댓글 작성 함수
+    function writeReply(parent_cmt_seq) {
 
-            $.ajax({
+        console.log('parent_cmt_seq : ' + parent_cmt_seq);
+        let writer = $("#id").val();
+        let content = $("#textArea").val();
+        let b_seq = $("#b_seq").val();
 
-                url:"/comment/reply".
-                type: "post",
-                dataType:'json',
-                data : {
-                    "writer":writer,
-                    "content":content,
-                    "b_seq",b_seq
-                }.done(function(){
-                    $(".showComments").remove();
-                    let showComments=
-                            '<div class="showComments">
-                                 <c:choose>
-                                     <c:when test="${not empty commentList}">
-                                         <c:forEach var="i" items="${commentList}">
-                                             <div class="content">
-                                                     ${i.content}
-                                             <button type="button" class="cmt" onclick="cmtOpen('${i.cmt_seq}')">대댓글 달기</button>
-                                             </div>
-                                             <div class="info">
-                                                 ${i.writer}
-                                                 <fmt:formatDate pattern='YYYY-MM-dd hh:mm'
-                                                     value="${i.write_date}"/>
-                                             </div>
-                                             <div class="cmtBox" id="${i.cmt_seq}"></div>
-                                         </c:forEach>
-                                     </c:when>
-                                 </c:choose>
-                             </div>'
-                });
+    }
 
-            });
+    $(document).on("click", ".completeCmt", function () {
+        console.log('클릭');
+        let writer = $("#id").val();
+        let content = $("#textArea").val();
+        let b_seq = $("#b_seq").val();
+        let parent_cmt_seq = $(".p_cmt").val();
 
-    });
+        console.log("writer : " + writer);
+        console.log("content : " + content);
+        console.log("b_seq : " + b_seq);
+        console.log("parent_cmt_seq : " + parent_cmt_seq);
 
+        $.ajax({
+            url: "/comment/reply",
+            type: "post",
+            dataType: 'json',
+            data: {
+                "writer": writer,
+                "content": content,
+                "b_seq": b_seq,
+                "parent_cmt_seq": parent_cmt_seq
+            }
+        }).done(function (resp) {
+                console.log('eoeoeo');
+                $(".showComments").empty();
+                //
+            })
+    })
 </script>
 </body>
 </html>

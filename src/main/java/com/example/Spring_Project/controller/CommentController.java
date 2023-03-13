@@ -47,6 +47,6 @@ public class CommentController {
         System.out.println("b_seq : "+b_seq);
         System.out.println("parent_cmt_seq : "+parent_cmt_seq);
         service.reply(writer,content,b_seq,parent_cmt_seq);
-        return "insert";
+        return "완";
     }
 }
