@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.Spring_Project.mapper.AdminMapper">
+    <select id="selectMemberList" resultType="com.example.Spring_Project.dto.MemberDTO">
+        select *
+        from member
+        where id not in ('admin123')
+    </select>
+
+    <select id="select1" resultType="Integer">
+        select count(*)
+        from member
+        where signup_date
+        between to_date('2023-01-01', 'YYYY-MM-DD')
+        and to_date('2023-03-31', 'YYYY-MM-DD')
+        and id not in ('admin123')
+    </select>
+
+    <select id="select2" resultType="Integer">
+        select count(*)
+        from member
+        where signup_date
+        between to_date('2023-04-01', 'YYYY-MM-DD')
+        and to_date('2023-06-30', 'YYYY-MM-DD')
+        and id not in ('admin123')
+    </select>
+
+    <select id="select3" resultType="Integer">
+        select count(*)
+        from member
+        where signup_date
+        between to_date('2023-07-01', 'YYYY-MM-DD')
+        and to_date('2023-09-30', 'YYYY-MM-DD')
+        and id not in ('admin123')
+    </select>
+
+    <select id="select4" resultType="Integer">
+        select count(*)
+        from member
+        where signup_date
+        between to_date('2023-10-01', 'YYYY-MM-DD')
+        and to_date('2023-12-31', 'YYYY-MM-DD')
+        and id not in ('admin123')
+    </select>
+
+</mapper>

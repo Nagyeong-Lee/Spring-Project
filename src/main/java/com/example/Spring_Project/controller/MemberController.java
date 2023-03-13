@@ -69,13 +69,13 @@ public class MemberController {
         System.out.println("pw : " + pw);
         String result = "";
 
-        session.setAttribute("id", id);  //아이디 세션 부여
-
         Integer login = service.login(id, pw);
         if(id.equals("admin123")){
+            session.setAttribute("admin",id); //관리자 세션 부여
             return "redirect:/admin/main";
         }
         if (login == 1 && !id.equals("admin123")) {
+            session.setAttribute("id", id);  //아이디 세션 부여
             System.out.println("로그인 성공");
             model.addAttribute("session", session.getAttribute("id"));
             result = "/member/myPage";

@@ -29,9 +29,18 @@
 <%--차트를 그릴 영역으로 canvas태그를 사용한다.--%>
 <div class="chart">
     <canvas id="myChart" width="10px" ; height="10px" ;></canvas>
+    <input type="hidden" value="${list.get(0)}" id="count1">
+    <input type="hidden" value="${list.get(1)}" id="count2">
+    <input type="hidden" value="${list.get(2)}" id="count3">
+    <input type="hidden" value="${list.get(3)}" id="count4">
 </div>
 
 <script>
+
+    let count1=$("#count1").val();
+    let count2=$("#count2").val();
+    let count3=$("#count3").val();
+    let count4=$("#count4").val();
     // 차트를 그럴 영역을 dom요소로 가져온다.
     var chartArea = document.getElementById('myChart').getContext('2d');
     // 차트를 생성한다.
@@ -41,13 +50,13 @@
         // ②차트의 데이터(Object)
         data: {
             // ③x축에 들어갈 이름들(Array)
-            labels: ['6개월전','3개월전','1개월전','3월'],
+            labels: ['1-3','4-6','7-9','10-12'],
             // ④실제 차트에 표시할 데이터들(Array), dataset객체들을 담고 있다.
             datasets: [{
                 // ⑤dataset의 이름(String)
                 label: '# of Votes',
                 // ⑥dataset값(Array)
-                data: [12, 19, 3, 5, 2, 3],
+                data: [count1, count2, count3, count4],
                 // ⑦dataset의 배경색(rgba값을 String으로 표현)
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 // ⑧dataset의 선 색(rgba값을 String으로 표현)

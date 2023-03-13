@@ -19,11 +19,11 @@
         </div>
         <div class="idDupleCheck"></div>
         <div>비밀번호
-            <input type="text" id="pw" name="pw" placeholder="영어,숫자,~,!,@,$,^ 8~15자">
+            <input type="password" id="pw" name="pw" placeholder="영어,숫자,~,!,@,$,^ 8~15자">
             <span id="checkPw"></span>
         </div>
         <div>비밀번호 확인
-            <input type="text" id="checkPwOk" name="checkPwOk">
+            <input type="password" id="checkPwOk" name="checkPwOk">
             <span id="equalPw"></span>
         </div>
         <div>
