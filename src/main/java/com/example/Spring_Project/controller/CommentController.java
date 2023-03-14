@@ -7,6 +7,7 @@ import com.example.Spring_Project.service.CommentService;
 import com.example.Spring_Project.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -49,4 +50,11 @@ public class CommentController {
         service.reply(writer,content,b_seq,parent_cmt_seq);
         return "완";
     }
+
+//    @RequestMapping("/deleteCmt") //댓글 삭제되면 대댓글 까지 모두 삭제
+//    public String deleteComment(@RequestParam Integer cmt_seq) throws Exception{
+//        System.out.println("cmt_seq : "+cmt_seq);
+//        service.deleteCommnet(cmt_seq);
+//        return 'd';
+//    }
 }
