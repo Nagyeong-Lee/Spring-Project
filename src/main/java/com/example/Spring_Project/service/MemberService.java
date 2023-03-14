@@ -1,10 +1,10 @@
 package com.example.Spring_Project.service;
 
 import com.example.Spring_Project.dto.MemberDTO;
-import com.example.Spring_Project.encryption.AES256;
 import com.example.Spring_Project.mailSender.MailDTO;
 import com.example.Spring_Project.mapper.MemberMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,13 +14,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.UUID;
 
-import static org.apache.tomcat.util.net.openssl.ciphers.Encryption.AES256;
 
 @Service
 public class MemberService {
 
     @Autowired
-    private AES256 aes256;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     private MemberMapper mapper;
 
@@ -50,7 +49,7 @@ public class MemberService {
         memberDTO.setSysname(sysname);
         memberDTO.setSavePath(savePath);
 
-        memberDTO.setPw(aes256.encrypt(memberDTO.getPw()));  //비밀번호 암호화
+        memberDTO.setPw(bCryptPasswordEncoder.encode(memberDTO.getPw()));  //비밀번호 암호화
         mapper.signUp(memberDTO);
     }
 
@@ -65,7 +64,7 @@ public class MemberService {
     }
     //로그인
     public Integer login(@RequestParam String id, @RequestParam String pw) throws Exception{
-        return mapper.login(id, aes256.encrypt(pw));
+        return mapper.login(id, bCryptPasswordEncoder.encode(pw));
     }
 
     //탈퇴하기
@@ -88,4 +87,15 @@ public class MemberService {
         return mapper.searchPw(id);
     }
 
+    public MemberDTO selectById(@RequestParam String id) throws Exception{
+        return mapper.selectById(id);
+    }
+
+    public MemberDTO selectByEmail(@RequestParam String email) throws Exception{
+        return mapper.selectByEmail(email);
+    }
+
+    public void tempPw(@RequestParam String email,@RequestParam String pw) throws Exception{
+         mapper.tempPw(email,bCryptPasswordEncoder.encode(pw));
+    }
 }

@@ -218,16 +218,23 @@
     });
 
     //대댓글
+    let replyCmtNum; //대댓글의 cmt_seq
+
     function cmtOpen(cmtNum) {
+
+        replyCmtNum = cmtNum;
 
         $(".cmt").remove();
         let parent_cmt_seq = cmtNum;
+
 
         let btn = '<button type="button" class="completeCmt" id="complete" onClick="writeReply(' + cmtNum + ')">대댓글 작성완료</button>'
         let div = '<textarea class="box" id="textArea" name="textArea"></textarea>'
 
         $("#" + cmtNum).append(div); //textarea
         $("#" + cmtNum).append(btn); //작성완료 btn
+
+        console.log("대댓글의 cmt_seq : " + replyCmtNum);
 
     }
 
@@ -247,29 +254,28 @@
         let writer = $("#id").val();
         let content = $("#textArea").val();
         let b_seq = $("#b_seq").val();
-        let parent_cmt_seq = $(".p_cmt").val();
+        let parent_cmt_seq = replyCmtNum;
 
         console.log("writer : " + writer);
         console.log("content : " + content);
         console.log("b_seq : " + b_seq);
-        console.log("parent_cmt_seq : " + parent_cmt_seq);
+        console.log("parent_cmt_seq : " + replyCmtNum);
 
         $.ajax({
             url: "/comment/reply",
             type: "post",
-            dataType: 'json',
             data: {
                 "writer": writer,
                 "content": content,
                 "b_seq": b_seq,
-                "parent_cmt_seq": parent_cmt_seq
+                "parent_cmt_seq": replyCmtNum
             }
         }).done(function (resp) {
-                console.log('eoeoeo');
-                $(".showComments").empty();
-                //
-            })
+            console.log('eoeoeo');
+            location.href = "/board/list?currentPage=1&count=10";
+        });
     })
 </script>
 </body>
 </html>
+

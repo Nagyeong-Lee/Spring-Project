@@ -68,4 +68,21 @@
         from member
         where id=#{id} and status='Y'
     </select>
+
+    <select id="selectById" resultType="com.example.Spring_Project.dto.MemberDTO">
+    select * from member
+        where id=#{id} and status='Y'
+    </select>
+
+    <select id="selectByEmail" resultType="com.example.Spring_Project.dto.MemberDTO">
+        select * from member
+        where email=#{email}
+    </select>
+
+    <update id="tempPw">
+        update member
+        set pw=#{pw}
+        where email=#{email}
+        and status='Y'
+    </update>
 </mapper>

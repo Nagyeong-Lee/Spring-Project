@@ -5,6 +5,7 @@ import com.example.Spring_Project.dto.MemberDTO;
 import com.example.Spring_Project.mailSender.MailDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,4 +36,10 @@ public interface MemberMapper {
 
     //pw 찾기
     String searchPw(@Param("id") String id);
+
+    MemberDTO selectById(@Param("id") String id );
+
+    MemberDTO selectByEmail(@Param("email") String email );
+
+    void tempPw(@Param("email") String email, @Param("pw") String pw);
 }

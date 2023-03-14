@@ -17,10 +17,14 @@
     </script>
 </head>
 <body>
-회원 리스트<br>
-<form action="/admin/download">
-    <button type="submit">excel download</button>
+회원 리스트
+<br>
+
+<form action="/admin/upload" enctype="multipart/form-data" method="post" id="frm">
+    <input type="file" id="fileExcel" name="fileExcel">
+    <button type="button" id="uploadBtn">excel upload</button>
 </form>
+
 <table border="1px solid black">
     <c:choose>
         <c:when test="${not empty list}">
@@ -28,7 +32,6 @@
                 <tr>
                     <th>이름</th>
                     <th>아이디</th>
-                    <th>비밀번호</th>
                     <th>이메일</th>
                     <th>전화번호</th>
                     <th>가입일자</th>
@@ -36,7 +39,6 @@
                 <tr>
                     <td>${i.name}</td>
                     <td>${i.id}</td>
-                    <td>${i.pw}</td>
                     <td>${i.email}</td>
                     <td>${i.phone}</td>
                     <td><fmt:formatDate pattern="YYYY-MM-dd hh:mm" value="${i.signup_date}"/></td>
@@ -48,9 +50,57 @@
         </c:otherwise>
     </c:choose>
 </table>
-
+<button type="button" id="downloadBtn">excel download</button>
 <a href="/admin/chart">
     <button type="button">월별 회원가입 차트</button>
 </a>
+
+<script>
+    $("#downloadBtn").on("click", function () {
+        location.href = "/admin/download";
+    });
+
+    //엑셀 업로드
+    function checkFileType(filePath) {
+        var fileFormat = filePath.split(".");
+
+        if (fileFormat.indexOf("xls") > -1 || fileFormat.indexOf("xlsx") > -1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function check() {
+
+        var file = $("#fileExcel").val();
+
+        if (file == "" || file == null) {
+            alert("파일을 선택해주세요.");
+
+            return false;
+        } else if (!checkFileType(file)) {
+            alert("엑셀 파일만 업로드 가능합니다.");
+
+            return false;
+        }
+
+        if (confirm("업로드 하시겠습니까?")) {
+
+            var options = {
+
+                success: function (data) {
+                    alert("모든 데이터가 업로드 되었습니다.");
+
+                },
+                type: "POST"
+            };
+
+            $("#frm").ajaxSubmit(options);
+        }
+    }
+
+
+</script>
 </body>
 </html>

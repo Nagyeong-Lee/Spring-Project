@@ -20,19 +20,18 @@
     
     <select id="getComment" resultType="com.example.Spring_Project.dto.CommentDTO">
         SELECT
-        LPAD(' ', 4*(LEVEL-1)) || content AS content,
-        cmt_seq,
+        LPAD(' ', 2*(LEVEL-1)) || content AS content,
         b_seq,
         writer,
         write_date,
-        parent_cmt_seq ,
+        parent_cmt_seq,
+        cmt_seq ,
         LEVEL
         FROM cmt
-        where status='Y'
-        and b_seq=#{b_seq}
+        where b_seq=#{b_seq}
+        and status='Y'
         START WITH parent_cmt_seq = 0
         CONNECT BY PRIOR cmt_seq = parent_cmt_seq
-        order by b_seq ,cmt_seq
     </select>
 
     <insert id="reply">

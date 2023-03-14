@@ -1,10 +1,11 @@
 package com.example.Spring_Project.controller;
 
+import com.example.Spring_Project.SecurityConfig;
 import com.example.Spring_Project.dto.MemberDTO;
-import com.example.Spring_Project.encryption.AES256;
 import com.example.Spring_Project.mailSender.MailDTO;
 import com.example.Spring_Project.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ import javax.servlet.http.HttpSession;
 public class MemberController {
 
     @Autowired
-    private AES256 aes256;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
     private MemberService service;
@@ -66,15 +67,20 @@ public class MemberController {
     @PostMapping("/login")  //로그인 (성공->마이페이지 / 실패->메인페이지로 이동)
     public String login(Model model, @RequestParam String id, @RequestParam String pw) throws Exception {
         System.out.println("id : " + id);
-        System.out.println("pw : " + pw);
+        String encodedPw = bCryptPasswordEncoder.encode(pw);
+        System.out.println("encodedPw : " + encodedPw);
         String result = "";
 
-        Integer login = service.login(id, pw);
-        if(id.equals("admin123")){
-            session.setAttribute("admin",id); //관리자 세션 부여
-            return "redirect:/admin/main";
-        }
-        if (login == 1 && !id.equals("admin123")) {
+        MemberDTO memberDTO = service.selectById(id);
+
+        if (memberDTO == null) {
+            System.out.println("로그인 실패");
+            result = "redirect:/";
+        } else if (bCryptPasswordEncoder.matches(pw,memberDTO.getPw()) && id.equals("admin123")) {
+            System.out.println("관리자 로그인");
+            session.setAttribute("admin", id); //관리자 세션 부여
+            result= "redirect:/admin/main";
+        } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && !id.equals("admin123")) {
             session.setAttribute("id", id);  //아이디 세션 부여
             System.out.println("로그인 성공");
             model.addAttribute("session", session.getAttribute("id"));
@@ -145,16 +151,13 @@ public class MemberController {
     }
 
     //pw 찾기
+
+
     @ResponseBody
     @PostMapping("/searchPw")
-    public String searchPw(@RequestParam String id) throws Exception {
-        String result = "";
-        String pw = service.searchPw(id);
-        if (pw == null) {
-            result = "NONE";
-        }
-        result = aes256.decrypt(pw);
-        return result;
+    public String searchPw(@RequestParam String email,@RequestParam String pw) throws Exception {
+        MemberDTO memberDTO = service.selectByEmail(email);
+        service.tempPw(email,pw);
+        return pw;
     }
-
 }
