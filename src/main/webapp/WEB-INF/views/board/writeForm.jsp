@@ -119,24 +119,47 @@
     //
     //     });
 
-    let arr = [];
+    let arr = [];  //새로운 파일
+
     $("#file").on("change", function () {
-        console.log('파일 change');
+        const dataTransfer = new DataTransfer();
         let inputFile = $('input[name="file"]');
         let files = inputFile[0].files;
         console.log(files.length);  //파일개수
         for (let i = 0; i < files.length; i++) {
             console.log(files[i].name); //파일 이름
-            let str = "<div>" + files[i].name + "<button type='button' onclick='removeFile()'>x</button>" + "</div>";
+            arr.push(files[0].name);
+
+            dataTransfer.items.add(files[i]);
+
+            let str = '<div id="i">' + files[i].name + '<button type="button" onclick="removeFile(' + i + ')">x</button>' + '</div>';
             $(".fileDiv").append(str);
         }
+        document.getElementById("file").files = dataTransfer.files;
+        console.log("dataTransfer =>", dataTransfer.files);
+        console.log("input FIles =>", document.getElementById("file").files);
     });
 
-    function removeFile() {
-        console.log(0);
+    function removeFile(i) {   // x버튼 클릭 시 삭제
+        console.log("i : " + i)
+        const dataTransfer = new DataTransfer();
+        $("#i").remove();
+        let files = $('#file')[0].files;	//사용자가 입력한 파일을 변수에 할당
+
+        let fileArray = Array.from(files);	//변수에 할당된 파일을 배열로 변환(FileList -> Array)
+
+        fileArray.splice(i, 1);	//해당하는 index의 파일을 배열에서 제거
+        let size = files.length;
+        console.log("files size : " + size);
+        fileArray.forEach(file => {
+            dataTransfer.items.add(file);
+        });
+        //남은 배열을 dataTransfer로 처리(Array -> FileList)
+
+        $('#file')[0].files = dataTransfer.files;	//제거 처리된 FileList를 돌려줌
+        console.log(files);
     }
 
-    // 파일 명 보여주기
     // 파일 삭제
     // 파일 다운가능
 </script>
