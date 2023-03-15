@@ -7,6 +7,7 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
     <style>
         img{
@@ -18,50 +19,42 @@
 <body>
 <c:if test="${not empty memberDTO}">
     <div class="updateInfoBox">
-        <form action="/member/update" method="post" id="frm">
+        <form action="/member/update" method="post" id="frm" enctype="multipart/form-data">
             <div>아이디
-                <input type="text" id="id" name="id" placeholder="영어,숫자 6~10자" value=${memberDTO.getId()}>
+                <input type="hidden" id="id" name="id" value="${memberDTO.id}">
+                <input type="text" disabled="disabled"  placeholder="영어,숫자 6~10자" value=${memberDTO.getId()}>
                 <span id="checkId"></span>
             </div>
             <div class="idDupleCheck"></div>
-            <div>
-                <button type="button" id="tempPwBtn">임시 비밀번호 받기</button>
+            <div>비밀번호
+                <input type="password" id="pw" name="pw" placeholder="영어,숫자,~,!,@,$,^ 8~15자">
+                <span id="checkPw"></span>
             </div>
-            <div>임시 비밀번호
-                <input type="text" id="tempPw" name="tempPw">
-                <span id="changedPw"></span>
+            <div>비밀번호 확인
+                <input type="password" id="checkPwOk" name="checkPwOk">
+                <span id="equalPw"></span>
             </div>
             <div>
-                이름<input type="text" id="name" name="name" placeholder="2~5자" value=${memberDTO.getName()}>
+                이름<input type="text" id="name" name="name" placeholder="2~5자">
                 <span id="checkName"></span>
             </div>
             <div>
-                이메일<input type="text" id="email" name="email" value=${memberDTO.getEmail()}>
+                <input type="hidden" id="email" name="email" value="${memberDTO.email}">
+                이메일<input type="text"  value="${memberDTO.email}" disabled="disabled">
                 <span id="checkEmail"></span><br>
-                <input type="button" id="authenticBtn" name="authenticBtn" value="인증하기">
             </div>
             <div>
-                인증번호<input type="text" id="authenticNum" name="authenticNum" placeholder="인증번호 입력">
-                <span id="checkAuthenticNum" name="checkAuthenticNum"></span>
-            </div>
-            <div>
-                전화번호<input type="text" id="phone" name="phone" placeholder="숫자만 입력" value=${memberDTO.getPhone()}>
+                전화번호<input type="text" id="phone" name="phone" placeholder="숫자만 입력">
                 <span id="checkPhone"></span>
             </div>
 
-            <input type="text" id="postcode" name="postcode" placeholder="우편번호" value=${memberDTO.getPostcode()}>
+            <input type="text" id="postcode" name="postcode" placeholder="우편번호">
             <input type="button" onclick="sample4_execDaumPostcode()" value="우편번호 찾기"><br>
-            <input type="text" id="roadAddress" name="roadAddress" placeholder="도로명주소"
-                   value=${memberDTO.getRoadAddress()}><br>
-            <input type="text" id="jibunAddress" name="jibunAddress" placeholder="지번주소"
-                   value=${memberDTO.getJibunAddress()}><br>
-            <input type="text" id="detailAddress" name="detailAddress" placeholder="상세주소"
-                   value=${memberDTO.getDetailAddress()}>
+            <input type="text" id="roadAddress" name="roadAddress" placeholder="도로명주소"><br>
+            <input type="text" id="jibunAddress" name="jibunAddress" placeholder="지번주소"><br>
+            <input type="text" id="detailAddress" name="detailAddress" placeholder="상세주소">
 
             <div>프로필 사진<br>
-                <div>
-                    <img src="/resources/img/${memberDTO.sysname}">
-                </div>
                 <input type="file" id="file" name="file"><br>
             </div>
             <div>
@@ -77,10 +70,13 @@
 
 <script>
 
-    //8글자 랜덤 숫자 생성
+    //pw 일치 여부
+    let pwOk = false;
+
+    //6글자 랜덤 숫자 생성
     function randomString() {
         const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
-        const stringLength = 8;
+        const stringLength = 6;
         let randomstring = '';
         for (let i = 0; i < stringLength; i++) {
             const rnum = Math.floor(Math.random() * chars.length);
@@ -89,31 +85,143 @@
         return randomstring;
     }
 
-    // 임시 비번 발송
+    let msg = randomString();
+    console.log(msg);
 
-    let tempPw = randomString();
-    let email = $("#email").val();
+    //유효성 검사
+    $('#updateBtn').on('click', function () {
 
-    $("#tempPwBtn").on("click", function () {
-        $.ajax({
-            url: "/mail",
-            type: "post",
-            data: {
-                "address": email,
-                "title": '임시 비밀번호',
-                "tempPw": tempPw
+        let pw = $("#pw").val();
+        let checkPwOk = $("#checkPwOk").val();
+        let name = $("#name").val();
+        let phone = $("#phone").val();
+        let postcode = $("#postcode").val();
+        let roadAddress = $("#roadAddress").val();
+        let jibunAddress = $("#jibunAddress").val();
+        let file = $("#file").val();
+
+        console.log("pw :" + pw);
+        console.log("checkPwOk :" + checkPwOk);
+        console.log("name :" + name);
+        console.log("phone :" + phone);
+        console.log("postcode :" + postcode);
+        console.log("roadAddress :" + roadAddress);
+        console.log("jibunAddress :" + jibunAddress);
+        console.log("file :" + file);
+
+        //정규식
+        let regexPw = /^[a-zA-Z0-9\~\!\@\$\^]{8,15}$/;
+        let regexName = /^[가-힣]{2,5}$/;
+        let regexPhone = /^010\d{4}\d{4}$/;
+
+        //pw 공백
+        if (pw == '') {
+            alert("비밀번호를 입력해주세요");
+            return false;
+        }
+
+        //pw 유효성
+        if (regexPw.test(pw) == false) {
+            alert("비밀번호 형식이 맞지 않습니다.");
+            return false;
+        }
+
+        //비밀번호 확인칸 공백
+        if (checkPwOk == '') {
+            alert("비밀번호를 확인해주세요.");
+            return false;
+        }
+
+        //pw 불일치
+        if (pw != checkPwOk) {
+            alert("비밀번호가 일치하지 않습니다.");
+            return false;
+        }
+
+        //이름 공백
+        if (name == '') {
+            alert("이름을 입력해주세요.");
+            return false;
+        }
+
+        //이름 유효성
+        if (regexName.test(name) == false) {
+            alert("이름 형식이 맞지 않습니다.");
+            return false;
+        }
+
+        //전화번호 공백
+        if (phone == '') {
+            alert("전화번호를 입력해주세요.");
+            return false;
+        }
+
+        //전화번호 유효성
+        if (regexPhone.test(phone) == false) {
+            $("#checkPhone").text("전화번호 형식이 맞지 않습니다.");
+            alert("전화번호 형식이 맞지 않습니다.");
+            return false;
+        }
+
+        //우편번호 공백
+        if (postcode == '') {
+            console.log(postcode);
+            alert("우편번호를 입력해주세요.");
+            return false;
+        }
+        //도로명 주소 공백
+        if (roadAddress == '') {
+            alert("도로명주소를 입력해주세요.");
+            return false;
+        }
+        //지번주소 공백
+        if (jibunAddress == '') {
+            alert("지번주소를 입력해주세요.");
+            return false;
+        }
+
+        // 파일 없을 때
+        if (file == '') {
+            alert("파일을 첨부해주세요.");
+            return false;
+        }
+
+        $('#frm').submit();
+    });
+
+    //카카오 우편번호 api
+    function sample4_execDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function (data) {
+                // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+                // 도로명 주소의 노출 규칙에 따라 주소를 표시한다.
+                // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+                var roadAddr = data.roadAddress; // 도로명 주소 변수
+                var extraRoadAddr = ''; // 참고 항목 변수
+
+                // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                    extraRoadAddr += data.bname;
+                }
+                // 건물명이 있고, 공동주택일 경우 추가한다.
+                if (data.buildingName !== '' && data.apartment === 'Y') {
+                    extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                }
+                // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                if (extraRoadAddr !== '') {
+                    extraRoadAddr = ' (' + extraRoadAddr + ')';
+                }
+
+                // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                document.getElementById('postcode').value = data.zonecode;
+                document.getElementById("roadAddress").value = roadAddr;
+                document.getElementById("jibunAddress").value = data.jibunAddress;
             }
-        }).done(function (resp) {
-            alert("임시 비밀번호를 발송했습니다.");
-        });
-    });
+        }).open();
+    }
 
-
-    $("#updateBtn").on("click", function () {
-
-
-        $("#frm").submit();
-    });
 </script>
 </body>
 </html>

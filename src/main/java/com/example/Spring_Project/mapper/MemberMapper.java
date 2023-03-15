@@ -45,4 +45,5 @@ public interface MemberMapper {
     Integer isEmailExist(@Param("email") String email);
 
     void tempPw(@Param("email") String email, @Param("pw") String pw);
+    void update(MemberDTO memberDTO); //정보수정
 }

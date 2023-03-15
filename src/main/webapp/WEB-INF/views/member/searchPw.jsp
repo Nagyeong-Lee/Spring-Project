@@ -81,6 +81,8 @@
     $("#author").on("click", function () {
         let email = $("#email").val();
         let pw = msg; // pw를 임시비번으로
+
+        let temp=$("#tempNum").val();
         console.log("msg : " + msg);
         console.log("email : " + email);
 
@@ -93,8 +95,11 @@
             }
         }).done(function (resp) {
             console.log("resp : " + resp);
-            if (resp == msg) {
+            if (temp == msg) {
                 alert('임시비밀번호로 변경되었습니다.');
+            }else{
+                alert('인증번호가 일치하지 않습니다.');
+                $("#tempNum").val('');
             }
         });
     });

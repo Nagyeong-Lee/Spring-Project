@@ -42,7 +42,7 @@
         select count(*)
         from member
         where id=#{id} and pw=#{pw}
-                and status='Y'
+        and status='Y'
     </select>
 
     <delete id="delete">
@@ -70,7 +70,7 @@
     </select>
 
     <select id="selectById" resultType="com.example.Spring_Project.dto.MemberDTO">
-    select * from member
+        select * from member
         where id=#{id} and status='Y'
     </select>
 
@@ -89,6 +89,23 @@
         update member
         set pw=#{pw}
         where email=#{email}
+        and status='Y'
+    </update>
+
+    <update id="update" parameterType="com.example.Spring_Project.dto.MemberDTO">
+
+        update member
+            set pw=#{pw},
+            name=#{name},
+            phone=#{phone},
+            postcode=#{postcode},
+            roadAddress=#{roadAddress},
+            jibunAddress=#{jibunAddress},
+            detailAddress=#{detailAddress, jdbcType=VARCHAR},
+            oriname=#{oriname},
+            sysname=#{sysname},
+            savePath=#{savePath}
+        where id=#{id}
         and status='Y'
     </update>
 </mapper>

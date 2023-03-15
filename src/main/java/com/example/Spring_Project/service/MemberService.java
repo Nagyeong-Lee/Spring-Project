@@ -82,4 +82,8 @@ public class MemberService {
     public void tempPw(@RequestParam String email,@RequestParam String pw) throws Exception{
          mapper.tempPw(email,bCryptPasswordEncoder.encode(pw));
     }
+
+    public void update(MemberDTO memberDTO) throws Exception {
+         mapper.update(memberDTO); //정보수정
+    }
 }

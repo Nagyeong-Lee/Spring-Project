@@ -145,10 +145,45 @@ public class MemberController {
         return "/member/updateForm";
     }
 
-//    @PostMapping("/update")
-//    public String update(@RequestParam MemberDTO memberDTO) throws Exception{
-//
-//    }
+    @PostMapping("/update")  //정보수정
+    public String update(MemberDTO memberDTO,@RequestParam("file") MultipartFile file) throws Exception{
+
+        String path = "C:/PROFILE/";  //파일이 저장될 경로 설정
+        File dir = new File(path);
+        if (!dir.isDirectory()) {
+            dir.mkdirs();
+        }
+
+        String oriname = file.getOriginalFilename();
+
+        // 파일 이름 변경
+        UUID uuid = UUID.randomUUID();
+        String sysname = uuid + "_" + oriname; //서버상의 파일이름이 겹치는것을 방지
+
+        String savePath = path + sysname; //저장될 파일 경로
+        file.transferTo(new File(savePath)); //파일 저장
+
+        memberDTO.setSavePath(savePath);
+        memberDTO.setOriname(oriname);
+        memberDTO.setSysname(sysname);
+
+        System.out.println("수정");
+        System.out.println("id : " + memberDTO.getId());
+        System.out.println("pw : " + memberDTO.getPw());
+        System.out.println("name : " + memberDTO.getName());
+        System.out.println("emil : " + memberDTO.getEmail());
+        System.out.println("postcode : " + memberDTO.getPostcode());
+        System.out.println("roadAddress : " + memberDTO.getRoadAddress());
+        System.out.println("jibunAddress : " + memberDTO.getJibunAddress());
+        System.out.println("detailAddress : " + memberDTO.getDetailAddress());
+        System.out.println("savePath : " + savePath);
+        System.out.println("oriname : " + oriname);
+        System.out.println("sysname : " + sysname);
+
+        memberDTO.setPw(bCryptPasswordEncoder.encode(memberDTO.getPw()));
+        service.update(memberDTO);
+        return "redirect:/";
+    }
 
     @GetMapping("/toSearchIdForm")  //id 찾기 페이지로 이동
     public String toSearchIdForm() throws Exception {
