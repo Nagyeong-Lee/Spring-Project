@@ -79,6 +79,12 @@
         where email=#{email}
     </select>
 
+    <select id="isEmailExist" resultType="Integer">
+        select count(*)
+        from member
+        where email=#{email}
+    </select>
+
     <update id="tempPw">
         update member
         set pw=#{pw}

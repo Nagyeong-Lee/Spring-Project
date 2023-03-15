@@ -40,7 +40,27 @@
     }
 
     let msg = randomString();
-    console.log("msg : "+msg);
+    console.log("msg : " + msg);
+
+    $("#author").hide();
+    $("#authenticBtn").hide();
+    //이메일 입력했을때
+    $("#email").on("change", function () {
+        $.ajax({
+            url: "/member/emailExist",
+            type: "post",
+            data: {
+                "email": $("#email").val()
+            }
+        }).done(function (resp) {
+            if (resp == 'none') {
+                alert('존재하지 않는 이메일입니다.');
+            } else {
+                $("#author").show();
+                $("#authenticBtn").show();
+            }
+        });
+    });
 
     //인증번호 전송 클릭 시
     $("#authenticBtn").on("click", function () {
@@ -60,9 +80,9 @@
 
     $("#author").on("click", function () {
         let email = $("#email").val();
-        let pw=msg;
-        console.log("msg : "+msg);
-        console.log("email : "+email);
+        let pw = msg; // pw를 임시비번으로
+        console.log("msg : " + msg);
+        console.log("email : " + email);
 
         $.ajax({
             url: "/member/searchPw",
@@ -72,11 +92,9 @@
                 "pw": pw
             }
         }).done(function (resp) {
-            console.log("resp : "+resp);
+            console.log("resp : " + resp);
             if (resp == msg) {
                 alert('임시비밀번호로 변경되었습니다.');
-            }else{
-                alert('임시비밀번호가 일치하지 않습니다.');
             }
         });
     });

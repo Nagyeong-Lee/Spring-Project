@@ -42,6 +42,7 @@ public interface MemberMapper {
     MemberDTO selectById(@Param("id") String id );
 
     MemberDTO selectByEmail(@Param("email") String email );
+    Integer isEmailExist(@Param("email") String email);
 
     void tempPw(@Param("email") String email, @Param("pw") String pw);
 }

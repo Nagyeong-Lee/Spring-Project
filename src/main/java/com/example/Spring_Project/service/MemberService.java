@@ -30,25 +30,6 @@ public class MemberService {
     public void signUp(MemberDTO memberDTO,MailDTO mailDTO,
                        @RequestParam("file") MultipartFile file, MultipartHttpServletRequest request) throws Exception{  // 회원가입
 
-//        String path="/resources/img/";
-//        String savePath=request.getServletContext().getRealPath(path); //웹어플리케이션이 설치된 곳의 경로
-//        System.out.println("savePath : "+savePath);
-//        File fileSavePath = new File(savePath);
-//
-//        if(!fileSavePath.exists()){
-//            fileSavePath.mkdir();
-//        }
-//
-//        String oriname=file.getOriginalFilename(); //원래 파일 이름
-//        System.out.println("oriname : "+oriname);
-//        String sysname= UUID.randomUUID()+"_"+file.getOriginalFilename();
-//
-//        file.transferTo(new File(fileSavePath+"/"+sysname));
-//
-//        memberDTO.setOriname(oriname);
-//        memberDTO.setSysname(sysname);
-//        memberDTO.setSavePath(savePath);
-
         memberDTO.setPw(bCryptPasswordEncoder.encode(memberDTO.getPw()));  //비밀번호 암호화
         mapper.signUp(memberDTO);
     }
@@ -93,6 +74,9 @@ public class MemberService {
 
     public MemberDTO selectByEmail(@RequestParam String email) throws Exception{
         return mapper.selectByEmail(email);
+    }
+    public Integer isEmailExist(@RequestParam String email) throws Exception{
+        return mapper.isEmailExist(email);
     }
 
     public void tempPw(@RequestParam String email,@RequestParam String pw) throws Exception{
