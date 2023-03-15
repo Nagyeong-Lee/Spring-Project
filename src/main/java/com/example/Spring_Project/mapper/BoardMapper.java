@@ -5,10 +5,12 @@ import com.example.Spring_Project.dto.BoardDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.relational.core.sql.In;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
+@Repository
 @Mapper
 public interface BoardMapper {
 
@@ -23,5 +25,6 @@ public interface BoardMapper {
     void delete(@Param("b_seq")Integer b_seq);  //게시글 삭제
     void update(@Param("title") String title, @Param("content") String content, @Param("b_seq") Integer b_seq); //게시글 수정
     Integer countPost(@Param("searchType") String searchType, @Param("keyword") String keyword);  //게시글 총 개수
+    Integer getNetVal();
 
 }

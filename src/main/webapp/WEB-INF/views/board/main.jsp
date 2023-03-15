@@ -43,6 +43,7 @@
                 <tr>
                     <td>${i.writer}</td>
                     <td class="title"><a href="/board/detail?b_seq=${i.b_seq}">${i.title}</a></td>
+                    <input type="hidden" value="${i.b_seq}"  class="b_seq">
                     <td><fmt:formatDate pattern='yyyy-MM-dd hh:mm' value="${i.write_date}"/></td>
                     <td>
                         <c:choose>
@@ -83,8 +84,9 @@
 </div>
 
 <script>
+    let b_seq=$(".b_seq").val();
     $("#writeBtn").on("click", function () {  //글작성 폼으로 이동
-        location.href = "/board/toWriteForm";
+        location.href = "/board/toWriteForm?b_seq="+b_seq;
     });
 
 </script>

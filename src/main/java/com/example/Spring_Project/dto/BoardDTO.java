@@ -22,4 +22,5 @@ public class BoardDTO {
     private String status;
     private Integer parent_seq;
     private Timestamp update_date;
+
 }

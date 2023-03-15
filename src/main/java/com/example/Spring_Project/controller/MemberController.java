@@ -13,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/member")
@@ -36,6 +38,7 @@ public class MemberController {
     public String signUp(MemberDTO memberDTO, MailDTO mailDTO,
                          MultipartFile file, MultipartHttpServletRequest request) throws Exception {
 
+
         System.out.println("id : " + memberDTO.getId());
         System.out.println("pw : " + memberDTO.getPw());
         System.out.println("email : " + memberDTO.getEmail());
@@ -49,7 +52,35 @@ public class MemberController {
         System.out.println("savePath : " + memberDTO.getSavePath());
         service.signUp(memberDTO, mailDTO, file, request);
 
+        if (!file.isEmpty()) {  //파일 있으면
+            String path = "C:/PROFILE/";  //파일이 저장될 경로 설정
+            File dir = new File(path);
+            if (!dir.isDirectory()) {
+                dir.mkdirs();
+            }
+
+
+            String oriname = file.getOriginalFilename();
+
+            // 파일 이름 변경
+            UUID uuid = UUID.randomUUID();
+            String sysname = uuid + "_" + oriname; //서버상의 파일이름이 겹치는것을 방지
+
+            String savePath = path + sysname; //저장될 파일 경로
+            System.out.println("savePath : " + savePath);
+            System.out.println("oriname : " + oriname);
+            System.out.println("sysname: " + sysname);
+
+            memberDTO.setOriname(oriname);
+            memberDTO.setSysname(sysname);
+
+            //파일 저장
+            file.transferTo(new File(savePath));
+
+        }
+
         return "/member/index";
+
     }
 
     @ResponseBody
@@ -76,10 +107,10 @@ public class MemberController {
         if (memberDTO == null) {
             System.out.println("로그인 실패");
             result = "redirect:/";
-        } else if (bCryptPasswordEncoder.matches(pw,memberDTO.getPw()) && id.equals("admin123")) {
+        } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && id.equals("admin123")) {
             System.out.println("관리자 로그인");
             session.setAttribute("admin", id); //관리자 세션 부여
-            result= "redirect:/admin/main";
+            result = "redirect:/admin/main";
         } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && !id.equals("admin123")) {
             session.setAttribute("id", id);  //아이디 세션 부여
             System.out.println("로그인 성공");
@@ -155,9 +186,9 @@ public class MemberController {
 
     @ResponseBody
     @PostMapping("/searchPw")
-    public String searchPw(@RequestParam String email,@RequestParam String pw) throws Exception {
+    public String searchPw(@RequestParam String email, @RequestParam String pw) throws Exception {
         MemberDTO memberDTO = service.selectByEmail(email);
-        service.tempPw(email,pw);
+        service.tempPw(email, pw);
         return pw;
     }
 }

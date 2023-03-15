@@ -6,9 +6,11 @@ import com.example.Spring_Project.mailSender.MailDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.security.core.parameters.P;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+@Repository
 @Mapper
 public interface MemberMapper {
 

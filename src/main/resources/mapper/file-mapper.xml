@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.Spring_Project.mapper.FileMapper">
+<!--    <insert id="insert" parameterMap="java.util.HashMap">-->
+<!--        insert into-->
+<!--        file_info-->
+<!--        values(-->
+<!--        f_seq,nextval,-->
+<!--        <foreach collection="list" item="i">-->
+<!--        #{i.oriname},-->
+<!--        #{i.sysname},-->
+<!--        'Y',-->
+<!--        #{i.b_seq}-->
+<!--        </foreach>-->
+<!--        )-->
+<!--    </insert>-->
+
+    <insert id="insert" parameterType="java.util.List">
+
+        insert all
+        <foreach collection="list" item="i" separator=",">
+            into
+                file_info
+                values
+            (   f_seq.nextval,
+                #{i.oriname},
+                #{i.sysname},
+                'Y',
+                #{i.b_seq}
+                )
+        </foreach>
+        SELECT * FROM DUAL
+    </insert>
+
+    <insert id="insertMap" parameterType="java.util.HashMap">
+        insert
+            into
+            file_info
+            values
+            (
+            f_seq.nextval,
+            #{oriname},
+            #{sysname},
+            'Y',
+            #{b_seq}
+            )
+    </insert>
+</mapper>

@@ -72,7 +72,7 @@
 <body>
 
 <%--작성자==로그인 아이디 일때 삭제.수정 보여주기--%>
-<form action="/board/update" id="frm" method="post">
+<form action="/board/update" id="frm" method="post" enctype="multipart/form-data">
     <div class="container">
 
         <input type="hidden" name="b_seq" id="b_seq" value="${boardDTO.b_seq}">
@@ -97,8 +97,10 @@
             <div class="b_contents">${boardDTO.content}</div>
         </div>
 
+
+        <input type="file" id="file" name="file" multiple="multiple">
+        <br>
         <!--댓글 보이는 영역-->
-        <hr>
         <div class="showComments">
             <c:choose>
                 <c:when test="${not empty commentList}">
@@ -106,9 +108,6 @@
                         <div class="content">
                                 ${i.content}
                             <button type="button" class="cmt" onclick="cmtOpen('${i.cmt_seq}')">대댓글 달기</button>
-                            <c:if test="${i.writer eq id}">
-                                <button type="button" class="deleteCmt" onclick="deleteCmt('${i.cmt_seq}')" >댓글 삭제</button>  <!--댓글 작성자, 로그인 아이디 같으면 댓글 삭제 버튼 있게-->
-                            </c:if>
                             <input type="hidden" value="${i.cmt_seq}" class="p_cmt">
                         </div>
                         <div class="info">
@@ -121,6 +120,8 @@
                 </c:when>
             </c:choose>
         </div>
+
+
         <hr>
 
         <!--댓글 작성 영역-->
@@ -239,11 +240,6 @@
 
         console.log("대댓글의 cmt_seq : " + replyCmtNum);
 
-    }
-
-    //댓글 삭제 함수
-    function deleteCmt(cmt_seq){
-        location.href="/comment/delete?cmt_seq="+cmt_seq;
     }
 
 

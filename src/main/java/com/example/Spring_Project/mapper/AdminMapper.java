@@ -3,10 +3,13 @@ package com.example.Spring_Project.mapper;
 import com.example.Spring_Project.dto.MemberDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 
+
+@Repository
 @Mapper
 public interface AdminMapper {
 

@@ -7,7 +7,7 @@
         insert
         into board
         values(
-        b_seq.nextval,
+        b_seq.currval,
         #{title},
         #{writer},
         #{content},
@@ -79,5 +79,9 @@
         </if>
         ORDER BY write_date desc) b)
         where rn between #{start} and #{end}
+    </select>
+
+    <select  id="getNetVal" resultType="Integer">
+        select b_seq.NEXTVAL from dual
     </select>
 </mapper>

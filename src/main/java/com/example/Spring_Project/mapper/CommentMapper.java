@@ -3,10 +3,12 @@ package com.example.Spring_Project.mapper;
 import com.example.Spring_Project.dto.CommentDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
+@Repository
 @Mapper
 public interface CommentMapper {
 
