@@ -36,9 +36,9 @@ public class MemberController {
 
     @PostMapping("/signUp")  //회원가입
     public String signUp(MemberDTO memberDTO, MailDTO mailDTO,
-                         MultipartFile file, MultipartHttpServletRequest request) throws Exception {
+                         @RequestParam("file") MultipartFile file, MultipartHttpServletRequest request) throws Exception {
 
-
+        System.out.println("fileName: " + file.getOriginalFilename());
         System.out.println("id : " + memberDTO.getId());
         System.out.println("pw : " + memberDTO.getPw());
         System.out.println("email : " + memberDTO.getEmail());
@@ -47,41 +47,35 @@ public class MemberController {
         System.out.println("road : " + memberDTO.getRoadAddress());
         System.out.println("jibun : " + memberDTO.getJibunAddress());
         System.out.println("상세주소 : " + memberDTO.getDetailAddress());
-        System.out.println("ori : " + memberDTO.getOriname());
-        System.out.println("sys : " + memberDTO.getSysname());
-        System.out.println("savePath : " + memberDTO.getSavePath());
-        service.signUp(memberDTO, mailDTO, file, request);
 
-        if (!file.isEmpty()) {  //파일 있으면
-            String path = "C:/PROFILE/";  //파일이 저장될 경로 설정
-            File dir = new File(path);
-            if (!dir.isDirectory()) {
-                dir.mkdirs();
-            }
-
-
-            String oriname = file.getOriginalFilename();
-
-            // 파일 이름 변경
-            UUID uuid = UUID.randomUUID();
-            String sysname = uuid + "_" + oriname; //서버상의 파일이름이 겹치는것을 방지
-
-            String savePath = path + sysname; //저장될 파일 경로
-            System.out.println("savePath : " + savePath);
-            System.out.println("oriname : " + oriname);
-            System.out.println("sysname: " + sysname);
-
-            memberDTO.setOriname(oriname);
-            memberDTO.setSysname(sysname);
-
-            //파일 저장
-            file.transferTo(new File(savePath));
-
+        String path = "C:/PROFILE/";  //파일이 저장될 경로 설정
+        File dir = new File(path);
+        if (!dir.isDirectory()) {
+            dir.mkdirs();
         }
 
-        return "/member/index";
+        String oriname = file.getOriginalFilename();
 
-    }
+        // 파일 이름 변경
+        UUID uuid = UUID.randomUUID();
+        String sysname = uuid + "_" + oriname; //서버상의 파일이름이 겹치는것을 방지
+
+        String savePath = path + sysname; //저장될 파일 경로
+        System.out.println("savePath : " + savePath);
+        System.out.println("oriname : " + oriname);
+        System.out.println("sysname: " + sysname);
+
+        memberDTO.setSavePath(savePath);
+        memberDTO.setOriname(oriname);
+        memberDTO.setSysname(sysname);
+
+        //파일 저장
+        file.transferTo(new File(savePath));
+        service.signUp(memberDTO, mailDTO, file, request);
+
+        return"/member/index";
+
+}
 
     @ResponseBody
     @PostMapping("/idDupleCheck")   //아이디 중복 체크
