@@ -60,10 +60,10 @@ public class AdminService {
 
         //헤더 스타일
         CellStyle headStyle = workbook.createCellStyle();
-        headStyle.setFillForegroundColor(HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex());
-        headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        //headStyle.setFillForegroundColor(HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex());
+        //headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         Font font = workbook.createFont();
-        font.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex());
+        //font.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex());
         font.setFontHeightInPoints((short) 13);
         headStyle.setFont(font);
 
@@ -145,21 +145,21 @@ public class AdminService {
     }
 
     //엑셀 업로드
-    public void excelUpload(File destFile) {
+    public void excelUpload(MultipartFile fileExcel) throws Exception {
 
-        ExcelReadOption excelReadOption = new ExcelReadOption();
+        List<Map<String, Object>>excelContent = ExcelRead.read(fileExcel);
 
-//		파일경로 추가
-        excelReadOption.setFilePath(destFile.getAbsolutePath());
-//      추출할 컬럼 명 추가
-        excelReadOption.setOutputColumns("name","id","email","phone","signUp_date");
-        // 시작 행
-        excelReadOption.setStartRow(2);
+        System.out.println("excelContent : ");
+        System.out.println(excelContent);
 
-        List<Map<String, String>>excelContent = ExcelRead.read(excelReadOption);
+
+        System.out.println("List 사이즈 : "+excelContent.size());
 
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("excelContent", excelContent);
+
+        System.out.println("paraMap : ");
+        System.out.println(paramMap);
 
         try {
             adminMapper.insertExcel(paramMap);

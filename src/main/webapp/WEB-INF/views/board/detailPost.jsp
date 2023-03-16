@@ -97,8 +97,14 @@
             <div class="b_contents">${boardDTO.content}</div>
         </div>
 
-
-        <input type="file" id="file" name="file" multiple="multiple">
+        <c:choose>
+            <c:when test="${not empty file}">
+                <c:forEach var="i" items="${file}">
+                    <button type="button" onclick="fileDown('${i.f_seq}')">${i.oriname}</button>
+                    <%--<input type="file" id="file" name="file" multiple="multiple" value="${i.oriname}">--%>
+                </c:forEach>
+            </c:when>
+        </c:choose>
         <br>
         <!--댓글 보이는 영역-->
         <div class="showComments">
@@ -135,10 +141,12 @@
             <c:if test="${boardDTO.writer ne id}">
                 <button type="button"><a href="/board/list?currentPage=1&count=10">목록으로</a></button>
             </c:if>
-            <button type="button"><a href="/board/list?currentPage=1&count=10">목록으로</a></button>
-            <button type="button"><a
-                    href="/board/delete?b_seq=${boardDTO.b_seq}">삭제하기</a></button>
-            <button id="updBtn" type="button">게시글 수정하기</button>
+            <c:if test="${boardDTO.writer eq id}">
+                <button type="button"><a href="/board/list?currentPage=1&count=10">목록으로</a></button>
+                <button type="button"><a
+                        href="/board/delete?b_seq=${boardDTO.b_seq}">삭제하기</a></button>
+                <button id="updBtn" type="button">게시글 수정하기</button>
+            </c:if>
         </div>
     </div>
 </form>
@@ -279,6 +287,23 @@
             location.href = "/board/list?currentPage=1&count=10";
         });
     })
+
+    function fileDown(key) {   /// 파일 다운로드
+
+        let f_seq = key;
+        console.log("key : "+f_seq);
+
+        $.ajax({
+            url:"/file/download",
+            type:"post",
+            data:{
+                "f_seq":f_seq
+            }
+        }).done(function (resp) {
+            alert('파일 다운로드 성공');
+        });
+
+    }
 </script>
 </body>
 </html>

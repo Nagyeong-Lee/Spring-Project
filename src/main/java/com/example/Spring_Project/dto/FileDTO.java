@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class fileDTO {
+public class FileDTO {
 
     private Integer f_seq;
     private String oriname;

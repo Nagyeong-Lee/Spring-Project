@@ -3,6 +3,7 @@ package com.example.Spring_Project.controller;
 
 import com.example.Spring_Project.dto.BoardDTO;
 import com.example.Spring_Project.dto.CommentDTO;
+import com.example.Spring_Project.dto.FileDTO;
 import com.example.Spring_Project.service.BoardService;
 import com.example.Spring_Project.service.CommentService;
 import com.example.Spring_Project.service.FileService;
@@ -78,20 +79,23 @@ public class BoardController {
         return "/board/writeForm";
     }
 
+    @ResponseBody
     @PostMapping("/insert")  //글 작성 (파일 업로드 같이)
     public String insert(BoardDTO boardDTO, List<MultipartFile> file) throws Exception {
         Integer b_seq = service.getNetVal();   //b_seq nextval
         System.out.println("nextVal : " + b_seq);
         boardDTO.setB_seq(b_seq);
-        service.insert(boardDTO);
-        System.out.println("file.size : " + file.size());
-
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         boolean flag = true;
 
-        if (!file.isEmpty()) {  //파일 있으면
+        if (file.isEmpty()) { //파일 없을때
+            service.insert(boardDTO);
+            System.out.println("file_name : " + file.get(0).getName());
+            System.out.println("file.size : " + file.size());
 
-            String path = "C:/storage/";  //파일이 저장될 경로 설정
+        } else if (!file.isEmpty()) {  //파일 있으면
+            service.insert(boardDTO);
+            String path = "D:/storage/";  //파일이 저장될 경로 설정
             File dir = new File(path);
             if (!dir.isDirectory()) {
                 dir.mkdirs();
@@ -122,14 +126,14 @@ public class BoardController {
                 map.put("sysname", sysname);
                 list.add(map);
             }
-            if (flag==true) {
-                for (int i = 0; i < list.size(); i++) {
-                    fileService.insertMap(list.get(i));
-                }
+//            if (flag==true) {
+            for (int i = 0; i < list.size(); i++) {
+                System.out.println(i + ":" + list.get(i));
+                fileService.insertMap(list.get(i));
             }
+//            }
         }
-        return "redirect:/board/list?currentPage=1&count=10";
-//        return"";
+        return "1";
     }
 
     @GetMapping("/detail")   //게시글 상세페이지
@@ -137,9 +141,11 @@ public class BoardController {
         service.count(b_seq);   //조회수 증가
         BoardDTO boardDTO = service.getBoardDetail(b_seq);   //게시글 상세 정보 가져오기
         List<CommentDTO> commentList = commentService.getComment(b_seq);
+        List<FileDTO> list = fileService.getFile(b_seq);
 
         model.addAttribute("boardDTO", boardDTO);
         model.addAttribute("commentList", commentList); //댓글 가져오기
+        model.addAttribute("file", list);
         return "/board/detailPost";
     }
 

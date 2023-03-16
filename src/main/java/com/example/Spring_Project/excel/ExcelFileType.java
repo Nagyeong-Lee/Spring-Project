@@ -26,7 +26,7 @@ public class ExcelFileType {  //확장자 구분
 
         if (filePath.toUpperCase().endsWith(".XLS")) {
             try {
-                wb = new HSSFWorkbook(fis);
+                wb = new XSSFWorkbook(fis);
             } catch (IOException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }

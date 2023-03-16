@@ -12,9 +12,9 @@
 <head>
     <title>관리자 메인페이지</title>
     <!--jQuery-->
-    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
-            integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
-    </script>
+<%--    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>--%>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+    <script src="https://malsup.github.io/jquery.form.js"></script>
 </head>
 <body>
 회원 리스트
@@ -22,7 +22,7 @@
 
 <form action="/admin/upload" enctype="multipart/form-data" method="post" id="frm">
     <input type="file" id="fileExcel" name="fileExcel">
-    <button type="button" id="uploadBtn">excel upload</button>
+    <button type="button" id="uploadBtn" onclick="check()">excel upload</button>
 </form>
 
 <table border="1px solid black">
@@ -61,19 +61,10 @@
     });
 
     //엑셀 업로드
-    function checkFileType(filePath) {
-        var fileFormat = filePath.split(".");
-
-        if (fileFormat.indexOf("xls") > -1 || fileFormat.indexOf("xlsx") > -1) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     function check() {
 
         var file = $("#fileExcel").val();
+        console.log("file : "+file);
 
         if (file == "" || file == null) {
             alert("파일을 선택해주세요.");
@@ -99,6 +90,18 @@
             $("#frm").ajaxSubmit(options);
         }
     }
+
+    function checkFileType(filePath) {
+        var fileFormat = filePath.split(".");
+
+        if (fileFormat.indexOf("xls") > -1 || fileFormat.indexOf("xlsx") > -1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
 
 
 </script>

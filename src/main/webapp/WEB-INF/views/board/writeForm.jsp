@@ -60,6 +60,8 @@
     </script>
 </head>
 <body>
+<input type="file" id="file" name="file" multiple="multiple" style="display: none;">
+
 <form action="/board/insert" method="post" enctype="multipart/form-data" id="frm">
     <div class="title">
         제목 <input type="text" id="title" name="title">
@@ -69,99 +71,98 @@
     </div>
     <textarea id="content" name="content" class="summernote"></textarea>
 
-    <input type="hidden" id="b_seq" name="b_seq" value="${b_seq}">
-    <input type="file" id="file" name="file" multiple="multiple">
-
     <div class="fileDiv"></div>
-
-    <button type="submit">글작성</button>
-
+    <button type="button" id="fileBtn" onclick="$('#file').click();">첨부파일</button>
+    <button type="button" id="writeBtn">글작성</button>
     <button type="button" id="toMain">목록으로</button>
     <input type="hidden" value="${id}" id="writer" name="writer">
 </form>
 
 
+
 <script>
+
     $("#toMain").on("click", function () {  //게시글 메인 페이지로 이동
         location.href = "/board/list?currentPage=1&count=10";
     });
 
-    // let formData = new FormData();
-    // let b_seq = $("#b_seq").val();
-    //
-    // $("#upload").on("click", function () {
-    //
-    //     formData.append('b_seq', b_seq);
-    //     let inputFile = $('input[name="file"]');
-    //     let files = inputFile[0].files;
-    //     console.log(files);
-    //     for (let i = 0; i < files.length; i++) {
-    //         formData.append('file', files[i]);
-    //     }
-    //     console.log("form-data : " + formData);
-    //     $.ajax({
-    //         type: "POST",
-    //         enctype: 'multipart/form-data',
-    //         url: '/file/insert',
-    //         data: formData,
-    //         processData: false,
-    //         contentType: false,
-    //         cache: false
-    //     }).done(function (resp) {
-    //         console.log('파일 업로드 완료');
-    //         if (resp.size() > 0) {
-    //             for (let i = 0; i < resp.size(); i++) {
-    //                 let sysname = resp.get(i).get("sysname");
-    //                 let str = '<div>sysname<button type=button id="removeBtn" onclick="removeFile()">X</button></div>';
-    //                 $(".fileNameDiv").append(str);
-    //             }
-    //         }
-    //
-    //     });
-
-    let arr = [];  //새로운 파일
+    let arr = [];  //복사한 파일 배열
+    let file = []; //보낼 파일 배열
 
     $("#file").on("change", function () {
-        const dataTransfer = new DataTransfer();
         let inputFile = $('input[name="file"]');
         let files = inputFile[0].files;
-        console.log(files.length);  //파일개수
         for (let i = 0; i < files.length; i++) {
             console.log(files[i].name); //파일 이름
-            arr.push(files[0].name);
-
-            dataTransfer.items.add(files[i]);
+            arr.push(files[i]);
 
             let str = '<div id="i">' + files[i].name + '<button type="button" onclick="removeFile(' + i + ')">x</button>' + '</div>';
             $(".fileDiv").append(str);
         }
-        document.getElementById("file").files = dataTransfer.files;
-        console.log("dataTransfer =>", dataTransfer.files);
-        console.log("input FIles =>", document.getElementById("file").files);
+        console.log("arr : " + arr);
+        file = arr;  //복사
+        $('input[name="file"]').val("");  //인풋 초기화
     });
 
-    function removeFile(i) {   // x버튼 클릭 시 삭제
-        console.log("i : " + i)
-        const dataTransfer = new DataTransfer();
+    function removeFile(i) {   //x버튼 클릭 시 삭제
         $("#i").remove();
-        let files = $('#file')[0].files;	//사용자가 입력한 파일을 변수에 할당
+        let splice = arr.splice(i, 1);
+        console.log("splice: " + splice);
+        console.log("arr: " + arr);
+        console.log("arr_length : " + arr.length);
+        file = arr;
+        console.log("file length : " + file.length);
+        console.log("file : " + file);
+        let str = '';
+        $(".fileDiv").empty();
+        for(let i = 0 ; i < file.length ; i++){
+            console.log("file_name : " + file[i]);
+            str += '<div id="i">' + file[i].name + '<button type="button" onclick="removeFile(' + i + ')">x</button>' + '</div>';
+        }
+        $(".fileDiv").append(str);
 
-        let fileArray = Array.from(files);	//변수에 할당된 파일을 배열로 변환(FileList -> Array)
-
-        fileArray.splice(i, 1);	//해당하는 index의 파일을 배열에서 제거
-        let size = files.length;
-        console.log("files size : " + size);
-        fileArray.forEach(file => {
-            dataTransfer.items.add(file);
-        });
-        //남은 배열을 dataTransfer로 처리(Array -> FileList)
-
-        $('#file')[0].files = dataTransfer.files;	//제거 처리된 FileList를 돌려줌
-        console.log(files);
     }
 
-    // 파일 삭제
-    // 파일 다운가능
+    let writer = $("#writer").val();
+    let content = $("#content").val();
+    let title = $("#title").val();
+
+    $("#writeBtn").on("click", function () {
+
+        let frm = $('#frm')[0];
+
+        // Create an FormData object
+        let data = new FormData(frm);
+
+        for (var i = 0; i < file.length; i++) {1
+            console.log(file[i].name);
+            data.append("file", file[i]);
+        }
+        console.log("form file : " + data.get("file"))
+
+
+        data.append("writer", writer);
+        data.append("content", content);
+        data.append("title", title);
+        alert('TEST');
+
+        $.ajax({
+            url: "/board/insert"
+            , type: "POST"
+            , enctype: 'multipart/form-data'
+            , data: data
+            , processData: false
+            , contentType: false
+            , cache: false
+            , isModal: true
+            , isModalEnd: true
+            , success: function (data) {
+                location.href="/board/list?currentPage=1&count=10"
+            }, error: function (e) {
+
+            }
+        });
+    });
 </script>
 </body>
 </html>

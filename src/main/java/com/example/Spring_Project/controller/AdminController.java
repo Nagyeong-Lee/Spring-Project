@@ -3,6 +3,8 @@ package com.example.Spring_Project.controller;
 import com.example.Spring_Project.SecurityConfig;
 import com.example.Spring_Project.dto.MemberDTO;
 import com.example.Spring_Project.service.AdminService;
+import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.io.IOUtils;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -16,12 +18,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -68,20 +75,26 @@ public class AdminController {
         adminService.downloadList(response);
     }
 
-    @ResponseBody
+    @ResponseBody  //엑셀 업로드
     @PostMapping("/upload")
-    public ModelAndView excelUploadAjax(MultipartFile testFile, MultipartHttpServletRequest request) throws Exception {
+    public ModelAndView excelUploadAjax(MultipartFile fileExcel, MultipartHttpServletRequest request) throws Exception {
 
         System.out.println("업로드 진행");
 
-        MultipartFile excelFile = request.getFile("excelFile");
+        MultipartFile excelFile = request.getFile("fileExcel");
+
+        System.out.println("excle File : " + excelFile.getOriginalFilename());
 
         if (excelFile == null || excelFile.isEmpty()) {
 
             throw new RuntimeException("엑셀파일을 선택 해 주세요.");
         }
 
-        File destFile = new File("C:\\" + excelFile.getOriginalFilename());
+        File destFile = new File("D:\\" + excelFile.getOriginalFilename());
+
+        System.out.println("destFile : "+destFile);
+
+        System.out.println("oriname : "+excelFile.getOriginalFilename());
 
         try {
             //내가 설정한 위치에 내가 올린 파일을 만들고
@@ -91,8 +104,16 @@ public class AdminController {
             throw new RuntimeException(e.getMessage(), e);
         }
 
+        DiskFileItem fileItem = new DiskFileItem("file", Files.probeContentType(destFile.toPath()), false, destFile.getName(), (int) destFile.length() , destFile.getParentFile());
+
+        InputStream input = new FileInputStream(destFile);
+        OutputStream os = fileItem.getOutputStream();
+        IOUtils.copy(input, os);
+
+        MultipartFile multipartFile = new CommonsMultipartFile(fileItem);
+
         //업로드를 진행하고 다시 지우기
-        adminService.excelUpload(destFile);
+        adminService.excelUpload(multipartFile);
 
         destFile.delete();
         //		FileUtils.delete(destFile.getAbsolutePath());

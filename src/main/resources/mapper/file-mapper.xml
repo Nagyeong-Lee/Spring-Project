@@ -47,4 +47,18 @@
             #{b_seq}
             )
     </insert>
+
+    <select id="getFile" resultType="com.example.Spring_Project.dto.FileDTO">
+        select *
+        from file_info
+        where b_seq=#{b_seq}
+        and status='Y'
+    </select>
+
+    <select id="getFileInfo" resultType="com.example.Spring_Project.dto.FileDTO">
+        select *
+        from file_info
+        where f_seq=#{f_seq}
+    </select>
+
 </mapper>

@@ -45,22 +45,22 @@
         and id not in ('admin123')
     </select>
 
-<!--    <insert id="insertExcel" parameterMap="hashMap">-->
-<!--        insert into member(-->
-<!--        name-->
-<!--        id,-->
-<!--        email,-->
-<!--        phone,-->
-<!--        signUp_date-->
-<!--        )values-->
-<!--        <foreach collection="excelContent" item="item" separator=",">-->
-<!--            (-->
-<!--            #{item.name},-->
-<!--            #{item.id},-->
-<!--            #{item.email},-->
-<!--            #{item.phone},-->
-<!--            #{item.signUp_date},-->
-<!--            )-->
-<!--        </foreach>-->
-<!--    </insert>-->
+    <insert id="insertExcel" parameterType="java.util.HashMap">
+        insert into member(
+        name
+        id,
+        email,
+        phone,
+        signUp_date
+        )values
+        <foreach collection="excelContent" item="item" separator=",">
+            (
+            #{item.name},
+            #{item.id},
+            #{item.mail},
+            #{item.num},
+            #{item.date},
+            )
+        </foreach>
+    </insert>
 </mapper>

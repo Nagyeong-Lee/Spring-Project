@@ -108,4 +108,8 @@
         where id=#{id}
         and status='Y'
     </update>
+
+
+
+
 </mapper>
