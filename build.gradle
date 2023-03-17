@@ -40,6 +40,7 @@ dependencies {
 	implementation 'commons-io:commons-io:2.4'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'com.google.code.gson:gson:2.9.0'
+	implementation group: 'org.bgee.log4jdbc-log4j2', name:'log4jdbc-log4j2-jdbc4.1', version: '1.16'
 
 }
 

@@ -42,8 +42,8 @@
     <update id="update">
         update board
         set title=#{title},
-            content=#{content},
-            update_date=sysdate
+        content=#{content},
+        update_date=sysdate
         where b_seq=#{b_seq} and status='Y'
     </update>
 
@@ -65,7 +65,7 @@
     <select id="select" resultType="com.example.Spring_Project.dto.BoardDTO">
         SELECT *
         FROM(SELECT ROWNUM rn, b.*
-        FROM (   SELECT b_seq,title,writer,content,write_date,count,update_date,status
+        FROM ( SELECT b_seq,title,writer,content,write_date,count,update_date,status
         FROM board
         where status='Y'
         <if test="searchType eq 'title'.toString() and keyword != null">
@@ -81,7 +81,27 @@
         where rn between #{start} and #{end}
     </select>
 
-    <select  id="getNetVal" resultType="Integer">
+    <select id="getNetVal" resultType="Integer">
         select b_seq.NEXTVAL from dual
     </select>
+
+    <update id="updateFileStatus" parameterType="java.util.List">
+        update
+        file_info
+        set status='N'
+        where
+        b_seq= #{b_seq}
+            and f_seq in
+        <foreach collection="status" item="item" separator="," open="(" close=")">
+        #{item,jdbcType=VARCHAR}
+        </foreach>
+    </update>
+
+    <update id="updateStatus" parameterType="java.util.HashMap">
+        update file_info
+        set status='N'
+        where
+        b_seq=#{b_seq}
+        and f_seq=#{f_seq}
+    </update>
 </mapper>

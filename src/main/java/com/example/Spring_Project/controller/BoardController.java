@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +40,9 @@ public class BoardController {
 
     @Autowired
     private FileService fileService;
+
+    @Autowired
+    private HttpSession session;
 
     @RequestMapping("/list") // 메인 , 게시글 리스트
     public String toBoard(Model model,
@@ -70,6 +74,8 @@ public class BoardController {
 
         model.addAttribute("list", list);
         model.addAttribute("paging", paging);
+        System.out.println("회원 세션 : " + session.getAttribute("id"));
+        model.addAttribute("id", session.getAttribute("id"));
         return "/board/main";
     }
 
@@ -81,16 +87,18 @@ public class BoardController {
 
     @ResponseBody
     @PostMapping("/insert")  //글 작성 (파일 업로드 같이)
-    public String insert(BoardDTO boardDTO, @RequestParam (required = false) List<MultipartFile> file) throws Exception {
+    public String insert(BoardDTO boardDTO, @RequestParam(required = false) List<MultipartFile> file) throws Exception {
         Integer b_seq = service.getNetVal();   //b_seq nextval
         System.out.println("nextVal : " + b_seq);
         boardDTO.setB_seq(b_seq);
+
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         boolean flag = true;
 
         if (file == null) { //파일 없을때
             System.out.println("파일 없이 글 작성");
             service.insert(boardDTO);
+            System.out.println("작성자: " + session.getAttribute("id"));
 
         } else if (file != null) {  //파일 있으면
             service.insert(boardDTO);
@@ -154,11 +162,133 @@ public class BoardController {
         return "redirect:/board/list?currentPage=1&count=10";
     }
 
+    @ResponseBody
     @PostMapping("/update")  //게시글 수정
-    public String update(@RequestParam String title, @RequestParam String content, @RequestParam Integer b_seq
-            , List<MultipartFile> file) throws Exception {
-        service.update(title, content, b_seq);
-        return "redirect:/board/list?currentPage=1&count=10";
+    public String update(@RequestParam Integer b_seq,
+                         @RequestParam String title,
+                         @RequestParam String content,
+                         @RequestParam(required = false) List<MultipartFile> file,
+                         @RequestParam(required = false) List<Integer> deleteSeq) throws Exception {
+
+        System.out.println("!! file name : " + file.get(0).getOriginalFilename());
+        System.out.println("!! deleteSeq size : " + deleteSeq);
+
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>(); // insert
+        List<Map<String, Object>> status = new ArrayList<>();   //status 변경
+
+        service.update(b_seq, title, content); //board update
+        boolean flag = true;
+        if (file == null && deleteSeq != null) {
+//            Map<String,Object>map1=new HashMap<>();
+//            map1.put("b_seq", b_seq);
+//            map1.put("deleteSeq",deleteSeq);
+//            status.add(map1);
+//            System.out.println("status = " + status.get(0));
+//            service.updateFileStatus(status.get(0)); //file update  status y/n
+
+
+            for (int i = 0; i < deleteSeq.size(); i++) {
+                HashMap<String, Object>
+                        arr = new HashMap<>();
+                arr.put("b_seq", b_seq);
+                System.out.println("del_seq : "+deleteSeq.get(i));
+                int f_seq=deleteSeq.get(i);
+                arr.put("f_seq", f_seq);
+                service.updateStatus(arr);
+            }
+        } else if (file != null && deleteSeq != null) {
+//            Map<String,Object>map1=new HashMap<>();
+//            map1.put("b_seq", b_seq);
+//            map1.put("deleteSeq",deleteSeq);
+//            status.add(map1);
+//            System.out.println("status = " + status.get(0));
+//            service.updateFileStatus(status.get(0)); //file update  status y/n
+
+            for (int i = 0; i < deleteSeq.size(); i++) {
+                HashMap<String, Object>
+                        arr = new HashMap<>();
+                arr.put("b_seq", b_seq);
+                System.out.println("del_seq : "+deleteSeq.get(i));
+                int f_seq=deleteSeq.get(i);
+                arr.put("f_seq", f_seq);
+                service.updateStatus(arr);
+            }
+
+            String path = "D:/storage/";  //파일이 저장될 경로 설정
+            File dir = new File(path);
+            if (!dir.isDirectory()) {
+                dir.mkdirs();
+            }
+
+            for (MultipartFile f : file) {
+                Map<String, Object> map = new HashMap<>();
+                //파일 이름을 String 값으로 반환한다
+                System.out.println("파일 이름(uploadfile.getOriginalFilename()) : " + f.getOriginalFilename());
+
+                String oriname = f.getOriginalFilename();
+                if (oriname.equals("")) {
+                    flag = false;
+                }
+
+                // 파일 이름 변경
+                UUID uuid = UUID.randomUUID();
+                String sysname = uuid + "_" + oriname; //서버상의 파일이름이 겹치는것을 방지
+                String savePath = path + sysname; //저장될 파일 경로
+                System.out.println("savePath : " + savePath);
+                System.out.println("oriname : " + oriname);
+                System.out.println("sysname: " + sysname);
+
+                //파일 저장
+                f.transferTo(new File(savePath));
+                map.put("b_seq", b_seq);
+                map.put("oriname", oriname);
+                map.put("sysname", sysname);
+                list.add(map);
+            }
+//            if (flag==true) {
+            for (int i = 0; i < list.size(); i++) {
+                System.out.println(i + ":" + list.get(i));
+                fileService.insertMap(list.get(i));
+            }
+        } else if (file != null && deleteSeq == null) {
+            String path = "D:/storage/";  //파일이 저장될 경로 설정
+            File dir = new File(path);
+            if (!dir.isDirectory()) {
+                dir.mkdirs();
+            }
+
+            for (MultipartFile f : file) {
+                Map<String, Object> map = new HashMap<>();
+                //파일 이름을 String 값으로 반환한다
+                System.out.println("파일 이름(uploadfile.getOriginalFilename()) : " + f.getOriginalFilename());
+
+                String oriname = f.getOriginalFilename();
+                if (oriname.equals("")) {
+                    flag = false;
+                }
+
+                // 파일 이름 변경
+                UUID uuid = UUID.randomUUID();
+                String sysname = uuid + "_" + oriname; //서버상의 파일이름이 겹치는것을 방지
+                String savePath = path + sysname; //저장될 파일 경로
+                System.out.println("savePath : " + savePath);
+                System.out.println("oriname : " + oriname);
+                System.out.println("sysname: " + sysname);
+
+                //파일 저장
+                f.transferTo(new File(savePath));
+                map.put("b_seq", b_seq);
+                map.put("oriname", oriname);
+                map.put("sysname", sysname);
+                list.add(map);
+            }
+//            if (flag==true) {
+            for (int i = 0; i < list.size(); i++) {
+                System.out.println(i + ":" + list.get(i));
+                fileService.insertMap(list.get(i));
+            }
+        }
+        return "게시글 수정";
     }
 
     @PostMapping("/img")
@@ -166,9 +296,6 @@ public class BoardController {
     public String uploadSummernoteImageFile(@RequestParam("file") MultipartFile multipartFile, HttpServletRequest
             request) {
         JsonObject jsonObject = new JsonObject();
-        /*
-         * String fileRoot = "C:\\summernote_image\\"; // 외부경로로 저장을 희망할때.
-         */
 
         // 내부경로로 저장
         String contextRoot = new HttpServletRequestWrapper(request).getRealPath("/");

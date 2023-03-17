@@ -106,8 +106,9 @@ public class MemberController {
             result = "redirect:/admin/main";
         } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && !id.equals("admin123")) {
             session.setAttribute("id", id);  //아이디 세션 부여
-            System.out.println("로그인 성공");
-            model.addAttribute("session", session.getAttribute("id"));
+            System.out.println("회원 로그인 성공");
+            System.out.println("회원 세션 : "+session.getAttribute("id"));
+            model.addAttribute("id", session.getAttribute("id"));
             result = "/member/myPage";
         } else {
             System.out.println("로그인 실패");

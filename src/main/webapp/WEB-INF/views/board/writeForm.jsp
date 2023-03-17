@@ -75,7 +75,7 @@
     <button type="button" id="fileBtn" onclick="$('#file').click();">첨부파일</button>
     <button type="button" id="writeBtn">글작성</button>
     <button type="button" id="toMain">목록으로</button>
-    <input type="hidden" value="${id}" id="writer" name="writer">
+    <input type="hidden" value="${id}" id="writer" name="writer" disabled>
 </form>
 
 
@@ -123,28 +123,32 @@
 
     }
 
-    let writer = $("#writer").val();
-    let content = $("#content").val();
-    let title = $("#title").val();
 
     $("#writeBtn").on("click", function () {
+
+        let writer = $("#writer").val();
+        let content = $("#content").val();
+        let title = $("#title").val();
+
+        console.log("title : "+title);
+        console.log("content : "+content);
 
         let frm = $('#frm')[0];
 
         // Create an FormData object
         let data = new FormData(frm);
 
-        for (var i = 0; i < file.length; i++) {1
+        for (var i = 0; i < file.length; i++) {
             console.log(file[i].name);
             data.append("file", file[i]);
         }
-        console.log("form file : " + data.get("file"))
+        console.log("form file : " + data.get("file"));
 
 
         data.append("writer", writer);
         data.append("content", content);
         data.append("title", title);
-        alert('TEST');
+        alert('글 작성 완료');
 
         $.ajax({
             url: "/board/insert"

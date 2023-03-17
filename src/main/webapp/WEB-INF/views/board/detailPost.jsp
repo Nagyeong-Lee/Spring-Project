@@ -66,13 +66,17 @@
             width: 70%;
             height: 5%;
         }
+
     </style>
 
 </head>
 <body>
+<input type="file" id="file" name="file" multiple="multiple" class="file" style="display: none">
+
 
 <%--작성자==로그인 아이디 일때 삭제.수정 보여주기--%>
 <form action="/board/update" id="frm" method="post" enctype="multipart/form-data">
+
     <div class="container">
 
         <input type="hidden" name="b_seq" id="b_seq" value="${boardDTO.b_seq}">
@@ -100,11 +104,15 @@
         <c:choose>
             <c:when test="${not empty file}">
                 <c:forEach var="i" items="${file}">
-                    <button type="button" onclick="fileDown('${i.f_seq}')">${i.oriname}</button>
-                    <%--<input type="file" id="file" name="file" multiple="multiple" value="${i.oriname}">--%>
+                    <button type="button" onclick="fileDown(${i.f_seq})" class="down"
+                            id="fileName${i.f_seq}">${i.oriname}</button>
+                    <button type="button" onclick="deleteFile(${i.f_seq})" class="deleteFile" id="${i.f_seq}">x</button>
+                    <input type="hidden" value="${i.oriname}" id="${i.f_seq}" class="oriname" disabled>
+                    <br>
                 </c:forEach>
             </c:when>
         </c:choose>
+
         <br>
         <!--댓글 보이는 영역-->
         <div class="showComments">
@@ -114,6 +122,7 @@
                         <div class="content">
                                 ${i.content}
                             <button type="button" class="cmt" onclick="cmtOpen('${i.cmt_seq}')">대댓글 달기</button>
+
                             <input type="hidden" value="${i.cmt_seq}" class="p_cmt">
                         </div>
                         <div class="info">
@@ -137,6 +146,13 @@
         </div>
         <br>
 
+        <%--새로운 파일--%>
+        <div class="fileDiv"></div>
+
+
+        <button type="button" onclick="$('#file').click();">첨부파일</button>
+        <button type="button" id="check">체크</button>
+
         <div class="btns">
             <c:if test="${boardDTO.writer ne id}">
                 <button type="button"><a href="/board/list?currentPage=1&count=10">목록으로</a></button>
@@ -152,15 +168,28 @@
 </form>
 
 <script>
+
+    $(".fileDiv").hide();
+    $(".deleteFile").hide();
+
+    //파일 수정
+    let deleteSeq = []; //삭제할 파일 f_seq
+    let file = []; //실제 보낼 파일
+    let arr = [];
+
+
     let no = '${boardDTO.write_date}';
+
 
     $("#updBtn").on("click", function () {
 
-        console.log('버튼클릭');
+        $(".fileDiv").show();
+        $("#file").show();
+        $(".deleteFile").show();
 
         $("#title").attr("readonly", false);
 
-        let completeUpdBtn = $("<button>수정완료</button>");
+        let completeUpdBtn = $("<button type='button' >수정완료</button>");
         completeUpdBtn.attr("id", "completeUpdBtn");
         $(".btns").append(completeUpdBtn);
 
@@ -190,8 +219,108 @@
 
     });
 
-    $("#completeUpdBtn").on("click", function () {
-        $("#frm").submit();
+
+    $("#file").on("change", function () {
+        let inputFile = $("#file");
+        let files = inputFile[0].files;
+        for (let i = 0; i < files.length; i++) {
+            console.log(files[i].name); //파일 이름
+            arr.push(files[i]);
+
+            let str = '<div id="i">' + files[i].name + '<button type="button" onclick="removeFile(' + i + ')">x</button>' + '</div>';
+            $(".fileDiv").append(str);
+        }
+        console.log("arr : " + arr);
+        file = arr;  //복사
+        $('input[name="file"]').val("");  //인풋 초기화
+    });
+
+
+    console.log("file : " + file);
+    console.log("arr : " + arr);
+
+
+    function deleteFile(i) {
+        console.log('x버튼 클릭');
+        console.log(i);
+        $("#" + i).remove();  //x 버튼 삭제
+        $("#fileName" + i).remove(); //파일 이름 버튼 삭제
+
+        deleteSeq.push(i);  //삭제한거 전달해서 status=n으로 변경
+
+        console.log("deleteSeq : " + deleteSeq);
+
+    }
+
+    function removeFile(i) {   //x버튼 클릭 시 삭제
+        $("#i").remove();
+        let splice = arr.splice(i, 1);
+        console.log("splice: " + splice);
+        console.log("arr: " + arr);
+        console.log("arr_length : " + arr.length);
+        file = arr;
+        console.log("file length : " + file.length);
+        console.log("file : " + file);
+        let str = '';
+        $(".fileDiv").empty();
+        for (let i = 0; i < file.length; i++) {
+            console.log("file_name : " + file[i]);
+            str += '<div id="i">' + file[i].name + '<button type="button" onclick="removeFile(' + i + ')">x</button>' + '</div>';
+        }
+        $(".fileDiv").append(str);
+        console.log("deleteSeq : " + deleteSeq);
+        console.log("file : " + file);
+    }
+
+
+    //수정완료 버튼 클릭시 배열보내기
+    $(document).on("click", "#completeUpdBtn", function () {  //동적으로 생긴 요소
+
+        console.log("수정완료 버튼 클릭");
+        let b_seq = $("#b_seq").val();
+        let content = $("#content").val();
+        let title = $("#title").val();
+
+        console.log("b_seq : " + b_seq);
+        console.log("title : " + title);
+        console.log("content : " + content);
+
+        let frm = $('#frm')[0];
+
+        // Create an FormData object
+        let data = new FormData(frm);
+
+        for (var i = 0; i < file.length; i++) {
+            console.log("file[i],name : " + file[i].name);
+            data.append("file", file[i]);
+        }
+        console.log("form file : " + data.get("file"));
+
+        data.append("b_seq", b_seq);
+        data.append("content", content);
+        data.append("title", title);
+
+        data.append("deleteSeq", deleteSeq);
+        alert('글 작성 완료');
+
+
+        $.ajax({
+            url: "/board/update"
+            , type: "POST"
+            , enctype: 'multipart/form-data'
+            , data: data
+            , processData: false
+            , contentType: false
+            , cache: false
+            , isModal: true
+            , isModalEnd: true
+            , async: false
+            , success: function (data) {
+                console.log('게시글 수정 완료');
+                location.href = "/board/list?currentPage=1&count=10"
+            }, error: function (e) {
+            }
+        });
     });
 
     //댓글 작성
@@ -291,19 +420,24 @@
     function fileDown(key) {   /// 파일 다운로드
 
         let f_seq = key;
-        console.log("key : "+f_seq);
+        console.log("key : " + f_seq);
 
         $.ajax({
-            url:"/file/download",
-            type:"post",
-            data:{
-                "f_seq":f_seq
+            url: "/file/download",
+            type: "post",
+            data: {
+                "f_seq": f_seq
             }
         }).done(function (resp) {
             alert('파일 다운로드 성공');
         });
 
     }
+
+    $("#check").on("click", function () {
+        console.log("deleteSeq : " + deleteSeq);
+        console.log("file : " + file);
+    });
 </script>
 </body>
 </html>
