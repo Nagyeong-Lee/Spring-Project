@@ -53,11 +53,11 @@ public class ExcelRead {
                         break;
                         case 1 : dataMap.put("id" , cellvalue);
                             break;
-                        case 2 : dataMap.put("mail" , cellvalue);
+                        case 2 : dataMap.put("email" , cellvalue);
                             break;
-                        case 3 : dataMap.put("num" , cellvalue);
+                        case 3 : dataMap.put("phone" , cellvalue);
                             break;
-                        case 4 : dataMap.put("date" , cellvalue);
+                        case 4 : dataMap.put("signUp_date" , cellvalue);
                             break;
                     }
 

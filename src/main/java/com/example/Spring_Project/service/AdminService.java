@@ -8,10 +8,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,13 +56,17 @@ public class AdminService {
         int rowNo = 0;
 
         //헤더 스타일
-        CellStyle headStyle = workbook.createCellStyle();
+//        CellStyle headStyle = workbook.createCellStyle();
         //headStyle.setFillForegroundColor(HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex());
         //headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        // 배경색
+        XSSFCellStyle style = (XSSFCellStyle) workbook.createCellStyle();
+        style.setFillForegroundColor(IndexedColors.YELLOW.getIndex());  // 배경색
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         Font font = workbook.createFont();
         //font.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex());
         font.setFontHeightInPoints((short) 13);
-        headStyle.setFont(font);
+//        headStyle.setFont(font);
 
         Row headerRow = sheet.createRow(rowNo++);
         headerRow.createCell(0).
@@ -86,7 +87,7 @@ public class AdminService {
 
 
         for (int i = 0; i <= 4; i++) {
-            headerRow.getCell(i).setCellStyle(headStyle);
+            headerRow.getCell(i).setCellStyle(style);
         }
 
         List<MemberDTO> list = this.selectMemberList();
@@ -147,22 +148,22 @@ public class AdminService {
     //엑셀 업로드
     public void excelUpload(MultipartFile fileExcel) throws Exception {
 
-        List<Map<String, Object>>excelContent = ExcelRead.read(fileExcel);
+        List<Map<String, Object>> excelContent = ExcelRead.read(fileExcel);
 
         System.out.println("excelContent : ");
         System.out.println(excelContent);
 
 
-        System.out.println("List 사이즈 : "+excelContent.size());
+        System.out.println("List 사이즈 : " + excelContent.size());
 
-        Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("excelContent", excelContent);
-
-        System.out.println("paraMap : ");
-        System.out.println(paramMap);
+//        Map<String, Object> paramMap = new HashMap<String, Object>();
+//        paramMap.put("excelContent", excelContent);
+//
+//        System.out.println("paramMap : ");
+//        System.out.println(paramMap);
 
         try {
-            adminMapper.insertExcel(paramMap);
+            adminMapper.insertExcel(excelContent);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

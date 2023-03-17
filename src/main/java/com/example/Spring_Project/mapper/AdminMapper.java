@@ -4,6 +4,7 @@ import com.example.Spring_Project.dto.MemberDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,6 @@ public interface AdminMapper {
     Integer select2(); //4-6
     Integer select3(); //7-9
     Integer select4(); //10-12
-    void insertExcel(@Param("paramMap") Map<String, Object> paramMap);
+    void insertExcel(@Param("excelContent")  List<Map<String, Object>> excelContent);
 
 }

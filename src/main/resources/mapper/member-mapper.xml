@@ -23,7 +23,8 @@
         #{oriname},
         #{sysname},
         #{savePath},
-        'Y')
+        'Y',
+        1)
     </insert>
 
     <select id="idDupleCheck" resultType="Integer">

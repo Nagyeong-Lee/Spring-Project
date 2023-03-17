@@ -81,19 +81,18 @@ public class BoardController {
 
     @ResponseBody
     @PostMapping("/insert")  //글 작성 (파일 업로드 같이)
-    public String insert(BoardDTO boardDTO, List<MultipartFile> file) throws Exception {
+    public String insert(BoardDTO boardDTO, @RequestParam (required = false) List<MultipartFile> file) throws Exception {
         Integer b_seq = service.getNetVal();   //b_seq nextval
         System.out.println("nextVal : " + b_seq);
         boardDTO.setB_seq(b_seq);
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         boolean flag = true;
 
-        if (file.isEmpty()) { //파일 없을때
+        if (file == null) { //파일 없을때
+            System.out.println("파일 없이 글 작성");
             service.insert(boardDTO);
-            System.out.println("file_name : " + file.get(0).getName());
-            System.out.println("file.size : " + file.size());
 
-        } else if (!file.isEmpty()) {  //파일 있으면
+        } else if (file != null) {  //파일 있으면
             service.insert(boardDTO);
             String path = "D:/storage/";  //파일이 저장될 경로 설정
             File dir = new File(path);
