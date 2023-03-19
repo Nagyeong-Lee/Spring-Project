@@ -110,7 +110,11 @@
         and status='Y'
     </update>
 
-
-
+    <select id="getUserType" resultType="Integer">
+        select
+            type
+        from member
+        where id=#{idSession}
+    </select>
 
 </mapper>

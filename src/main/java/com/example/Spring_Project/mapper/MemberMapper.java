@@ -46,4 +46,6 @@ public interface MemberMapper {
 
     void tempPw(@Param("email") String email, @Param("pw") String pw);
     void update(MemberDTO memberDTO); //정보수정
+
+    Integer getUserType(@Param ("idSession") String idSession);  //인터셉터
 }

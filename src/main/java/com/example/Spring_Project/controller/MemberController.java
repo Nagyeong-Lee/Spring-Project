@@ -107,7 +107,7 @@ public class MemberController {
         } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && !id.equals("admin123")) {
             session.setAttribute("id", id);  //아이디 세션 부여
             System.out.println("회원 로그인 성공");
-            System.out.println("회원 세션 : "+session.getAttribute("id"));
+            System.out.println("회원 세션 : " + session.getAttribute("id"));
             model.addAttribute("id", session.getAttribute("id"));
             result = "/member/myPage";
         } else {
@@ -147,7 +147,7 @@ public class MemberController {
     }
 
     @PostMapping("/update")  //정보수정
-    public String update(MemberDTO memberDTO,@RequestParam("file") MultipartFile file) throws Exception{
+    public String update(MemberDTO memberDTO, @RequestParam("file") MultipartFile file) throws Exception {
 
         String path = "C:/PROFILE/";  //파일이 저장될 경로 설정
         File dir = new File(path);

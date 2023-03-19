@@ -97,6 +97,7 @@
             console.log("resp : " + resp);
             if (temp == msg) {
                 alert('임시비밀번호로 변경되었습니다.');
+                location.href="/";
             }else{
                 alert('인증번호가 일치하지 않습니다.');
                 $("#tempNum").val('');

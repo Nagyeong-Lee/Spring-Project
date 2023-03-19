@@ -86,4 +86,9 @@ public class MemberService {
     public void update(MemberDTO memberDTO) throws Exception {
          mapper.update(memberDTO); //정보수정
     }
+
+    //인터셉터
+    public Integer getUserType(@RequestParam String idSession) throws Exception{
+        return mapper.getUserType(idSession);
+    }
 }
