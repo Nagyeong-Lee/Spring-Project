@@ -28,5 +28,5 @@ public class MemberDTO {
     private String sysname;
     private String savePath;
     private String status;
-    private Integer type;
+    private String type;
 }

@@ -1,4 +1,4 @@
-package com.example.Spring_Project.interceptor;
+package com.example.Spring_Project;
 
 import com.example.Spring_Project.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -24,7 +24,7 @@
         #{sysname},
         #{savePath},
         'Y',
-        1)
+        'ROLE_MEMBER')
     </insert>
 
     <select id="idDupleCheck" resultType="Integer">
