@@ -54,11 +54,6 @@ public class BoardController {
             count = 10;
         }
 
-        System.out.println(searchType);
-        System.out.println(keyword);
-        System.out.println(currentPage);
-        System.out.println(count);
-
         service.countPost(searchType, keyword); // 전체 글 개수
         Integer start = currentPage * count - 9; //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
@@ -69,7 +64,6 @@ public class BoardController {
 
         model.addAttribute("list", list);
         model.addAttribute("paging", paging);
-        System.out.println("회원 세션 : " + session.getAttribute("id"));
         model.addAttribute("id", session.getAttribute("id"));
         return "/board/main";
     }
@@ -85,17 +79,13 @@ public class BoardController {
     public String insert(BoardDTO boardDTO, @RequestParam(required = false) List<MultipartFile> file) throws Exception {
 
         Integer b_seq = service.getNetVal();   //b_seq nextval
-        System.out.println("nextVal : " + b_seq);
         boardDTO.setB_seq(b_seq);
 
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         boolean flag = true;
 
         if (file == null) { //파일 없을때
-            System.out.println("파일 없이 글 작성");
             service.insert(boardDTO);
-            System.out.println("작성자: " + boardDTO.getWriter());
-
         } else if (file != null) {  //파일 있을때
             service.insert(boardDTO);
             String path = "D:/storage/";
@@ -106,7 +96,6 @@ public class BoardController {
 
             for (MultipartFile f : file) {
                 Map<String, Object> map = new HashMap<>();
-                System.out.println("파일 이름(uploadfile.getOriginalFilename()) : " + f.getOriginalFilename());
 
                 String oriname = f.getOriginalFilename();
                 if (oriname.equals("")) {
@@ -114,11 +103,8 @@ public class BoardController {
                 }
 
                 UUID uuid = UUID.randomUUID();
-                String sysname = uuid + "_" + oriname; //서버상의 파일이름이 겹치는것을 방지
-                String savePath = path + sysname; //저장될 파일 경로
-                System.out.println("savePath : " + savePath);
-                System.out.println("oriname : " + oriname);
-                System.out.println("sysname: " + sysname);
+                String sysname = uuid + "_" + oriname;
+                String savePath = path + sysname;
 
                 f.transferTo(new File(savePath));
                 map.put("b_seq", b_seq);
@@ -127,7 +113,6 @@ public class BoardController {
                 list.add(map);
             }
             for (int i = 0; i < list.size(); i++) {
-                System.out.println(i + ":" + list.get(i));
                 fileService.insertMap(list.get(i));
             }
         }
@@ -163,10 +148,7 @@ public class BoardController {
                          @RequestParam(required = false) List<MultipartFile> file,
                          @RequestParam(required = false) List<Integer> deleteSeq) throws Exception {
 
-        System.out.println("!! file name : " + file.get(0).getOriginalFilename());
-        System.out.println("!! deleteSeq size : " + deleteSeq);
-
-        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>(); // insert
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();    // insert
         List<Map<String, Object>> status = new ArrayList<>();   //status 변경
 
         service.update(b_seq, title, content); //board update
@@ -177,7 +159,6 @@ public class BoardController {
                 HashMap<String, Object>
                         arr = new HashMap<>();
                 arr.put("b_seq", b_seq);
-                System.out.println("del_seq : " + deleteSeq.get(i));
                 int f_seq = deleteSeq.get(i);
                 arr.put("f_seq", f_seq);
                 service.updateStatus(arr);
@@ -188,7 +169,6 @@ public class BoardController {
                 HashMap<String, Object>
                         arr = new HashMap<>();
                 arr.put("b_seq", b_seq);
-                System.out.println("del_seq : " + deleteSeq.get(i));
                 int f_seq = deleteSeq.get(i);
                 arr.put("f_seq", f_seq);
                 service.updateStatus(arr);
@@ -202,23 +182,15 @@ public class BoardController {
 
             for (MultipartFile f : file) {
                 Map<String, Object> map = new HashMap<>();
-                //파일 이름을 String 값으로 반환한다
-                System.out.println("파일 이름(uploadfile.getOriginalFilename()) : " + f.getOriginalFilename());
-
                 String oriname = f.getOriginalFilename();
                 if (oriname.equals("")) {
                     flag = false;
                 }
 
-                // 파일 이름 변경
                 UUID uuid = UUID.randomUUID();
-                String sysname = uuid + "_" + oriname; //서버상의 파일이름이 겹치는것을 방지
-                String savePath = path + sysname; //저장될 파일 경로
-                System.out.println("savePath : " + savePath);
-                System.out.println("oriname : " + oriname);
-                System.out.println("sysname: " + sysname);
+                String sysname = uuid + "_" + oriname;
+                String savePath = path + sysname;
 
-                //파일 저장
                 f.transferTo(new File(savePath));
                 map.put("b_seq", b_seq);
                 map.put("oriname", oriname);
@@ -226,11 +198,10 @@ public class BoardController {
                 list.add(map);
             }
             for (int i = 0; i < list.size(); i++) {
-                System.out.println(i + ":" + list.get(i));
                 fileService.insertMap(list.get(i));
             }
         } else if (file != null && deleteSeq == null) {
-            String path = "D:/storage/";  //파일이 저장될 경로 설정
+            String path = "D:/storage/";
             File dir = new File(path);
             if (!dir.isDirectory()) {
                 dir.mkdirs();
@@ -238,7 +209,6 @@ public class BoardController {
 
             for (MultipartFile f : file) {
                 Map<String, Object> map = new HashMap<>();
-                System.out.println("파일 이름(uploadfile.getOriginalFilename()) : " + f.getOriginalFilename());
 
                 String oriname = f.getOriginalFilename();
                 if (oriname.equals("")) {
@@ -248,9 +218,6 @@ public class BoardController {
                 UUID uuid = UUID.randomUUID();
                 String sysname = uuid + "_" + oriname;
                 String savePath = path + sysname;
-                System.out.println("savePath : " + savePath);
-                System.out.println("oriname : " + oriname);
-                System.out.println("sysname: " + sysname);
 
                 f.transferTo(new File(savePath));
                 map.put("b_seq", b_seq);
@@ -259,7 +226,6 @@ public class BoardController {
                 list.add(map);
             }
             for (int i = 0; i < list.size(); i++) {
-                System.out.println(i + ":" + list.get(i));
                 fileService.insertMap(list.get(i));
             }
         }
@@ -274,14 +240,10 @@ public class BoardController {
 
         String contextRoot = new HttpServletRequestWrapper(request).getRealPath("/");
         String fileRoot = contextRoot + "resources/img/";
-        System.out.println("contextRoot : " + contextRoot);
-        System.out.println("fileRoot : " + fileRoot);
 
         String originalFileName = multipartFile.getOriginalFilename();
-        System.out.println("originalFileName : " + originalFileName);
         String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
         String savedFileName = UUID.randomUUID() + extension;
-        System.out.println("savedFileName : " + savedFileName);
         File targetFile = new File(fileRoot + savedFileName);
         try {
             InputStream fileStream = multipartFile.getInputStream();
@@ -292,7 +254,6 @@ public class BoardController {
             e.printStackTrace();
         }
         String path = "/resources/img/" + savedFileName;
-        System.out.println("리턴 이미지 경로 : " + path);
         return path;
     }
 }

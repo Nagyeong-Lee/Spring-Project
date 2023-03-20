@@ -44,8 +44,6 @@
 </form>
 
 <script>
-
-
     $("#toMain").on("click", function () {  //게시글 메인 페이지로 이동
         location.href = "/board/list?currentPage=1&count=10";
     });
@@ -57,12 +55,10 @@
         let inputFile = $('input[name="file"]');
         let files = inputFile[0].files;
         for (let i = 0; i < files.length; i++) {
-            console.log(files[i].name); //파일 이름
             arr.push(files[i]);
             let str = '<div id="i">' + files[i].name + '<button type="button" onclick="removeFile(' + i + ')">x</button>' + '</div>';
             $(".fileDiv").append(str);
         }
-        console.log("arr : " + arr);
         file = arr;  //복사
         $('input[name="file"]').val("");  //input 초기화
     });
@@ -74,14 +70,13 @@
         let str = '';
         $(".fileDiv").empty();
         for (let i = 0; i < file.length; i++) {
-            console.log("file_name : " + file[i]);
             str += '<div id="i">' + file[i].name + '<button type="button" onclick="removeFile(' + i + ')">x</button>' + '</div>';
         }
         $(".fileDiv").append(str);
     }
 
 
-    $("#writeBtn").on("click", function () {
+    $("#writeBtn").on("click", function () {  //글 작성 버튼 클릭 시
 
         let writer = $("#writer").val();
         let content = $("#content").val();
@@ -92,10 +87,8 @@
         let data = new FormData(frm);
 
         for (var i = 0; i < file.length; i++) {
-            console.log(file[i].name);
             data.append("file", file[i]);
         }
-
         alert('글 작성 완료');
 
         $.ajax({
@@ -144,12 +137,10 @@
             enctype: 'multipart/form-data',
             processData: false,
             success: function (img_name) {
-                console.log("img_name : " + img_name);
                 $(el).summernote('editor.insertImage', img_name);
             }
         });
     }
-
 </script>
 </body>
 </html>

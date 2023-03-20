@@ -1,13 +1,9 @@
 package com.example.Spring_Project.controller;
 
-import com.example.Spring_Project.SecurityConfig;
 import com.example.Spring_Project.dto.MemberDTO;
 import com.example.Spring_Project.service.AdminService;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -21,7 +17,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
@@ -29,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller
@@ -77,13 +71,9 @@ public class AdminController {
 
     @ResponseBody  //엑셀 업로드
     @PostMapping("/upload")
-    public ModelAndView excelUploadAjax(@RequestParam MultipartFile fileExcel,MultipartHttpServletRequest request) throws Exception {
-
-        System.out.println("업로드 진행");
+    public String excelUploadAjax(@RequestParam MultipartFile fileExcel,MultipartHttpServletRequest request) throws Exception {
 
         MultipartFile excelFile = request.getFile("fileExcel");
-
-        System.out.println("excle File : " + excelFile.getOriginalFilename());
 
         if (excelFile == null || excelFile.isEmpty()) {
 
@@ -99,12 +89,7 @@ public class AdminController {
 
         File destFile = new File(path + excelFile.getOriginalFilename());
 
-        System.out.println("destFile : "+destFile);
-
-        System.out.println("oriname : "+excelFile.getOriginalFilename());
-
         try {
-            //내가 설정한 위치에 내가 올린 파일을 만들고
             excelFile.transferTo(destFile);
 
         } catch (Exception e) {
@@ -126,7 +111,7 @@ public class AdminController {
 
         view.setViewName("/admin/main");
 
-        return view;
+        return "";
     }
 }
 

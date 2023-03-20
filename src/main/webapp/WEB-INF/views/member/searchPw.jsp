@@ -40,7 +40,6 @@
     }
 
     let msg = randomString();
-    console.log("msg : " + msg);
 
     $("#author").hide();
     $("#authenticBtn").hide();
@@ -64,7 +63,6 @@
 
     //인증번호 전송 클릭 시
     $("#authenticBtn").on("click", function () {
-        console.log('버튼 클릭');
         $.ajax({
             url: "/mail",
             type: "post",
@@ -83,8 +81,6 @@
         let pw = msg; // pw를 임시비번으로
 
         let temp=$("#tempNum").val();
-        console.log("msg : " + msg);
-        console.log("email : " + email);
 
         $.ajax({
             url: "/member/searchPw",
@@ -94,7 +90,6 @@
                 "pw": pw
             }
         }).done(function (resp) {
-            console.log("resp : " + resp);
             if (temp == msg) {
                 alert('임시비밀번호로 변경되었습니다.');
                 location.href="/";

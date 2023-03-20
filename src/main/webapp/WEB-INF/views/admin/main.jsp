@@ -12,7 +12,7 @@
 <head>
     <title>관리자 메인페이지</title>
     <!--jQuery-->
-<%--    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>--%>
+    <%--    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>--%>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
     <script src="https://malsup.github.io/jquery.form.js"></script>
 </head>
@@ -65,7 +65,6 @@
     function check() {
 
         var file = $("#fileExcel").val();
-        console.log("file : "+file);
 
         if (file == "" || file == null) {
             alert("파일을 선택해주세요.");

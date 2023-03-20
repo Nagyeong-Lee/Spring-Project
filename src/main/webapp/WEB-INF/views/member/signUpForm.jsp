@@ -136,11 +136,9 @@
     }
 
     let msg = randomString();
-    console.log(msg);
 
     //메일 인증하기 클릭 시
     $("#authenticBtn").on("click", function () {
-        console.log('버튼 클릭');
         $.ajax({
             url: "/mail",
             type: "post",
@@ -169,18 +167,6 @@
         let roadAddress = $("#roadAddress").val();
         let jibunAddress = $("#jibunAddress").val();
         let file = $("#file").val();
-
-        console.log("id :" + id);
-        console.log("pw :" + pw);
-        console.log("checkPwOk :" + checkPwOk);
-        console.log("name :" + name);
-        console.log("email :" + email);
-        console.log("authenticEmail :" + authenticEmail);
-        console.log("phone :" + phone);
-        console.log("postcode :" + postcode);
-        console.log("roadAddress :" + roadAddress);
-        console.log("jibunAddress :" + jibunAddress);
-        console.log("file :" + file);
 
         //정규식
         let regexId = /^[a-zA-Z0-9]{6,10}$/;
@@ -272,7 +258,6 @@
 
         //인증번호 다를때
         if ($("#authenticNum").val() != msg) {
-            console.log("인증번호 불일치");
             alert("인증번호가 일치하지 않습니다.");
             return false;
         }
@@ -292,7 +277,6 @@
 
         //우편번호 공백
         if (postcode == '') {
-            console.log(postcode);
             alert("우편번호를 입력해주세요.");
             return false;
         }

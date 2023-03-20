@@ -14,11 +14,8 @@ import java.util.*;
 @Repository
 public class ExcelRead {
 
-    @Autowired
-    private static BCryptPasswordEncoder bCryptPasswordEncoder;
-
     public static List<Map<String, Object>> read(MultipartFile fileExcel) throws Exception {
-        OPCPackage opcPackage = OPCPackage.open(fileExcel.getInputStream()); // 파일 읽어옴
+        OPCPackage opcPackage = OPCPackage.open(fileExcel.getInputStream()); // 파일 읽어오기
         Workbook workbook = WorkbookFactory.create(opcPackage);
         Sheet firstSheet = workbook.getSheetAt(0);
         Iterator<Row> iterator = firstSheet.iterator();
@@ -41,7 +38,7 @@ public class ExcelRead {
                     cellvalue = "" + cell.getNumericCellValue();
                 } else if (cell.getCellType() == Cell.CELL_TYPE_BOOLEAN) {
                     cellvalue = "" + cell.getBooleanCellValue();
-                } else if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {      //수식일 경우 변환
+                } else if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
                     if (cell.getCachedFormulaResultType() == Cell.CELL_TYPE_NUMERIC) {
                         cellvalue = "" + cell.getNumericCellValue();
                     } else if (cell.getCachedFormulaResultType() == Cell.CELL_TYPE_STRING) {

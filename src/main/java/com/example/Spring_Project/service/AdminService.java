@@ -60,18 +60,11 @@ public class AdminService {
         Sheet sheet = workbook.createSheet("member_list"); //시트 생성
         int rowNo = 0;
 
-        //헤더 스타일
-//        CellStyle headStyle = workbook.createCellStyle();
-        //headStyle.setFillForegroundColor(HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex());
-        //headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        // 배경색
         XSSFCellStyle style = (XSSFCellStyle) workbook.createCellStyle();
         style.setFillForegroundColor(IndexedColors.YELLOW.getIndex());  // 배경색
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         Font font = workbook.createFont();
-        //font.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex());
         font.setFontHeightInPoints((short) 13);
-//        headStyle.setFont(font);
 
         Row headerRow = sheet.createRow(rowNo++);
         headerRow.createCell(0).
@@ -165,16 +158,9 @@ public class AdminService {
         }
         System.out.println("List 사이즈 : " + excelContent.size());
 
-//        Map<String, Object> paramMap = new HashMap<String, Object>();
-//        paramMap.put("excelContent", excelContent);
-//
-//        System.out.println("paramMap : ");
-//        System.out.println(paramMap);
-
         try {
             adminMapper.insertExcel(excelContent);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

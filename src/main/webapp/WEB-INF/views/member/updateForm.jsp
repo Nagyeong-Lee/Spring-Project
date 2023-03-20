@@ -86,7 +86,6 @@
     }
 
     let msg = randomString();
-    console.log(msg);
 
     //유효성 검사
     $('#updateBtn').on('click', function () {
@@ -99,15 +98,6 @@
         let roadAddress = $("#roadAddress").val();
         let jibunAddress = $("#jibunAddress").val();
         let file = $("#file").val();
-
-        console.log("pw :" + pw);
-        console.log("checkPwOk :" + checkPwOk);
-        console.log("name :" + name);
-        console.log("phone :" + phone);
-        console.log("postcode :" + postcode);
-        console.log("roadAddress :" + roadAddress);
-        console.log("jibunAddress :" + jibunAddress);
-        console.log("file :" + file);
 
         //정규식
         let regexPw = /^[a-zA-Z0-9\~\!\@\$\^]{8,15}$/;
@@ -165,7 +155,6 @@
 
         //우편번호 공백
         if (postcode == '') {
-            console.log(postcode);
             alert("우편번호를 입력해주세요.");
             return false;
         }

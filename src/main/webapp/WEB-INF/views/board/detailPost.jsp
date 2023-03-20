@@ -79,13 +79,10 @@
 <form action="/board/update" id="frm" method="post" enctype="multipart/form-data">
 
     <div class="container">
-
         <input type="hidden" name="b_seq" id="b_seq" value="${boardDTO.b_seq}">
         <input type="hidden" name="writer" id="writer" value="${boardDTO.writer}">
         <input type="hidden" name="write_date" id="write_date" value="${boardDTO.write_date}">
         <input type="hidden" name="id" id="id" value="${id}">
-
-
         <div class="title">제목 :
             <input type="text" id="title" name="title" value="${boardDTO.title}" readonly="readonly"></div>
         <div class="info">
@@ -101,7 +98,6 @@
         <div class="board_contents_div">
             <div class="b_contents">${boardDTO.content}</div>
         </div>
-
         <c:choose>
             <c:when test="${not empty file}">
                 <c:forEach var="i" items="${file}">
@@ -113,9 +109,8 @@
                 </c:forEach>
             </c:when>
         </c:choose>
-
         <br>
-        <!--댓글 보이는 영역-->
+        <!--댓글 영역-->
         <div class="showComments">
             <c:choose>
                 <c:when test="${not empty commentList}">
@@ -149,10 +144,7 @@
                 </c:when>
             </c:choose>
         </div>
-
-
         <hr>
-
         <!--댓글 작성 영역-->
         <input type="hidden" id="cmtWriter" value="${id}">
         <div id="b_comments" name="b_comments">
@@ -160,10 +152,8 @@
             <button type="button" id="replyBtn">댓글달기</button>
         </div>
         <br>
-
         <%--새로운 파일--%>
         <div class="fileDiv"></div>
-
         <div class="btns">
             <c:if test="${boardDTO.writer ne id}">
                 <button type="button"><a href="/board/list?currentPage=1&count=10">목록으로</a></button>
@@ -178,20 +168,20 @@
         </div>
     </div>
 </form>
-
 <script>
     $("#attach").hide();
     $(".fileDiv").hide();
     $(".deleteFile").hide();
 
     //파일 수정
+
     let deleteSeq = []; //삭제할 파일 f_seq
     let file = []; //실제 보낼 파일
     let arr = [];
 
     let no = '${boardDTO.write_date}';
 
-    $("#updBtn").on("click", function () {
+    $("#updBtn").on("click", function () { //게시글 수정하기 클릭 시
 
         $("#attach").show();
         $(".fileDiv").show();
@@ -207,8 +197,6 @@
         $("hr").remove();
         $(".showComments").remove();
         $("#b_comments").remove();
-
-
         $("#updBtn").remove();
         $(".b_contents").remove();
 
@@ -227,15 +215,12 @@
             lang: "ko-KR",					// 한글 설정
             placeholder: '글을 입력하세요.'	//placeholder 설정
         });
-
     });
-
 
     $("#file").on("change", function () {
         let inputFile = $("#file");
         let files = inputFile[0].files;
         for (let i = 0; i < files.length; i++) {
-            console.log(files[i].name); //파일 이름
             arr.push(files[i]);
             let str = '<div id="i">' + files[i].name + '<button type="button" onclick="removeFile(' + i + ')">x</button>' + '</div>';
             $(".fileDiv").append(str);
@@ -244,14 +229,10 @@
         $('input[name="file"]').val("");  //인풋 초기화
     });
 
-
     function deleteFile(i) {
         $("#" + i).remove();  //x 버튼 삭제
         $("#fileName" + i).remove(); //파일 이름 버튼 삭제
-
         deleteSeq.push(i);  //status=n으로 변경
-
-        console.log("deleteSeq : " + deleteSeq);
     }
 
     function removeFile(i) {   //x버튼 클릭 시 삭제
@@ -261,26 +242,19 @@
         let str = '';
         $(".fileDiv").empty();
         for (let i = 0; i < file.length; i++) {
-            console.log("file_name : " + file[i]);
             str += '<div id="i">' + file[i].name + '<button type="button" onclick="removeFile(' + i + ')">x</button>' + '</div>';
         }
         $(".fileDiv").append(str);
     }
 
-
-    //수정완료 버튼 클릭시 배열보내기
-    $(document).on("click", "#completeUpdBtn", function () {
+    $(document).on("click", "#completeUpdBtn", function () { //수정완료 버튼 클릭시 배열보내기
 
         let b_seq = $("#b_seq").val();
         let content = $("#content").val();
         let title = $("#title").val();
-
         let frm = $('#frm')[0];
-
         let data = new FormData(frm);
-
         for (var i = 0; i < file.length; i++) {
-            console.log("file[i],name : " + file[i].name);
             data.append("file", file[i]);
         }
 
@@ -303,7 +277,6 @@
             , isModalEnd: true
             , async: false
             , success: function (data) {
-                console.log('게시글 수정 완료');
                 location.href = "/board/list?currentPage=1&count=10"
             }, error: function (e) {
             }
@@ -312,8 +285,6 @@
 
     //댓글 작성
     $("#replyBtn").on("click", function () {
-        console.log('댓글작성버튼 클릭');
-
         let content = $("#comment").val(); //댓글내용
         let writer = $("#cmtWriter").val(); //작성자
         let b_seq = $("#b_seq").val(); //게시글 번호
@@ -340,14 +311,6 @@
         });
     });
 
-
-    //대댓글 작성 함수
-    function writeReply(parent_cmt_seq) {
-        let writer = $("#id").val();
-        let content = $("#textArea").val();
-        let b_seq = $("#b_seq").val();
-    }
-
     //대댓글
     let replyCmtNum; //대댓글의 cmt_seq
 
@@ -370,7 +333,6 @@
 
         let cmt_seq = cmtNum;
 
-        console.log("cmt_seq : " + cmt_seq);
         $.ajax({
             url: "/comment/deleteCmt",
             type: "post",
@@ -412,7 +374,6 @@
                 "cmt_seq": cmt_seq
             }
         }).done(function (resp) {
-            console.log('댓글 수정 완료');
             location.href = "/board/list?currentPage=1&count=10";
         });
     })
@@ -428,7 +389,6 @@
     }
 
     $(document).on("click", ".completeCmt", function () {
-        console.log('클릭');
         let writer = $("#id").val();
         let content = $("#textArea").val();
         let b_seq = $("#b_seq").val();
@@ -444,19 +404,18 @@
                 "parent_cmt_seq": replyCmtNum
             }
         }).done(function (resp) {
-            console.log('eoeoeo');
             location.href = "/board/list?currentPage=1&count=10";
         });
     })
 
-    function fileDown(key) {   /// 파일 다운로드
+    function fileDown(key) {   // 파일 다운로드 (ajax말고 form 만들어서 submit)
 
         let f_seq = key;
 
         let form = document.createElement("form");
         form.setAttribute("charset", "UTF-8");
-        form.setAttribute("method", "Post");  //Post 방식
-        form.setAttribute("action", "/file/download"); //요청 보낼 주소
+        form.setAttribute("method", "Post");
+        form.setAttribute("action", "/file/download");
 
         let hiddenField = document.createElement("input");
         hiddenField.setAttribute("type", "hidden");

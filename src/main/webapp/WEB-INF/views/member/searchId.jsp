@@ -27,12 +27,9 @@
             data:{"email" : email},
             async:false
         }).done(function(data){
-            console.log("data : " + data);
-            console.log("data!=null : " + (data!=null));
             if(data != 'NONE'){
                 $("#text").text("ID : "+data);
             }else{
-                console.log('ELSE test');
                 $("#text").text("아이디가 존재하지 않습니다.");
             }
 

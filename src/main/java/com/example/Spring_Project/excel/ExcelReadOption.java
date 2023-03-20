@@ -8,12 +8,10 @@ import java.util.List;
 @Repository
 public class ExcelReadOption {
 
-    //	엑셀파일의 경로
-    private String filePath;
-    //  추출할 컬럼 명
-    private List<String> outputColumns;
-    //  추출을 시작할 행 번호
-    private int startRow;
+
+    private String filePath; //	엑셀파일 경로
+    private List<String> outputColumns; //열 이름
+    private int startRow;//행 번호
 
     public String getFilePath() {
         return filePath;
@@ -33,7 +31,6 @@ public class ExcelReadOption {
 
     public void setOutputColumns(List<String> outputColumns) {
 
-        //    	이걸 A,B,C,D 이런 식으로 추가하던데
         List<String> temp = new ArrayList<String>();
         temp.addAll(outputColumns);
 
