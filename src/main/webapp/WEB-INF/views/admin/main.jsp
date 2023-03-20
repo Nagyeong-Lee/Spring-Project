@@ -51,6 +51,7 @@
     </c:choose>
 </table>
 <button type="button" id="downloadBtn">excel download</button>
+<br>
 <a href="/admin/chart">
     <button type="button">월별 회원가입 차트</button>
 </a>

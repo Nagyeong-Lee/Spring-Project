@@ -20,16 +20,16 @@
     
     <select id="getComment" resultType="com.example.Spring_Project.dto.CommentDTO">
         SELECT
-        LPAD(' ', 2*(LEVEL-1)) || content AS content,
-        b_seq,
-        writer,
-        write_date,
-        parent_cmt_seq,
-        cmt_seq ,
-        LEVEL
+            LPAD(' ', 2*(LEVEL-1)) || content AS content,
+            b_seq,
+            writer,
+            write_date,
+            parent_cmt_seq,
+            cmt_seq ,
+            LEVEL,
+            status
         FROM cmt
         where b_seq=#{b_seq}
-        and status='Y'
         START WITH parent_cmt_seq = 0
         CONNECT BY PRIOR cmt_seq = parent_cmt_seq
     </select>
@@ -38,14 +38,40 @@
         insert into
         cmt
         values(
-        cmt_seq.nextval,
-        #{b_seq},
-        #{content},
-        #{writer},
-        sysdate,
-        null,
-        'Y',
-        #{parent_cmt_seq}
+            cmt_seq.nextval,
+            #{b_seq},
+            #{content},
+            #{writer},
+            sysdate,
+            null,
+            'Y',
+            #{parent_cmt_seq}
         )
     </insert>
+
+    <update id="deleteCmt">
+        update cmt
+        set status = 'N'
+        where cmt_seq=#{cmt_seq}
+    </update>
+
+    <update id="deleteAllCmt">
+        update cmt
+        set status = 'N'
+        where parent_cmt_seq=#{cmt_seq}
+    </update>
+
+    <update id="updateCmt">
+        update cmt
+        set content=#{content},
+        update_date = sysdate
+        where b_seq=#{b_seq}
+        and cmt_seq=#{cmt_seq}
+    </update>
+
+    <select id="getParentSeq" resultType="Integer">
+        select parent_cmt_seq
+        from cmt
+        where cmt_seq=#{cmt_seq}
+    </select>
 </mapper>

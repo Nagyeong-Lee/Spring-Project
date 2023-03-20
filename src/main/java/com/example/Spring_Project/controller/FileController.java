@@ -3,18 +3,18 @@ package com.example.Spring_Project.controller;
 import com.example.Spring_Project.dto.FileDTO;
 import com.example.Spring_Project.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
 
@@ -77,36 +77,83 @@ public class FileController {
 
     @ResponseBody
     @PostMapping("/download")   //파일 다운로드
-    public String download(@RequestParam Integer f_seq, HttpServletResponse response) throws Exception {
+    public void download(@RequestParam Integer f_seq, HttpServletResponse response, HttpServletRequest request) throws Exception {
         try {
             FileDTO fileDTO = fileService.getFileInfo(f_seq);
+            String fileName = fileDTO.getOriname();
             String oriname = fileDTO.getOriname();
-            String path = "D:\\storage\\"+ fileDTO.getSysname(); // 경로에 접근할 때 역슬래시('\') 사용
-
+            String path = "D:\\storage\\" + fileDTO.getSysname(); // 경로에 접근할 때 역슬래시('\') 사용
+            System.out.println("path : " + path);
             File file = new File(path);
             if (!file.isDirectory()) {
                 file.mkdirs();
             }
 
-            // file 다운로드 설정
+            System.out.println(file);
+            System.out.println(file.getName());
+
+            fileName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1"); //한글
+            response.setContentType("application/octet-stream;");
+            response.setContentLength((int) file.length());
+            response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ";");
+            response.setHeader("Content-Transfer-Encoding", "binary;");
+            response.setHeader("Pragma", "no-cache;");
+            response.setHeader("Expires", "-1;");
+
+            byte readByte[] = new byte[4096];
+
+            try {
+
+                InputStream bufferedinputstream = new FileInputStream(file);
+
+                int i;
+
+                while ((i = bufferedinputstream.read(readByte, 0, 4096)) != -1) {
+                    response.getOutputStream().write(readByte, 0, i);
+                }
+                bufferedinputstream.close();
+
+            } catch (Exception _ex) {
+                _ex.printStackTrace();
+            } finally {
+                response.getOutputStream().flush();
+                response.getOutputStream().close();
+            }
+            System.out.println("TEST LOG");
+
+
+
+
+
+
+
+
+
+
+
+
+            /*// file 다운로드 설정
             response.setContentType("application/download");
             response.setContentLength((int)file.length());
             response.setHeader("Content-disposition", "attachment;filename=\"" + file.getName() + "\"");
+            // response 객체를 통해서 서버로부터 파일 다운로드
+            OutputStream os = response.getOutputStream();
+            // 파일 입력 객체 생성
+            FileInputStream fis = new FileInputStream(file);
+            FileCopyUtils.copy(fis, os);
+            fis.close();
+            os.close();*/
+
+
+            // file 다운로드 설정
+            /*response.setContentType("application/download");
+            response.setContentLength((int) file.length());
+            fileName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1"); //한글
+            response.setHeader("Content-disposition", "attachment;filename=\"" + fileName + "\"");
+
             // 파일 입력 객체 생성
             FileInputStream fileInputStream = new FileInputStream(path); // 파일 읽어오기
             OutputStream out = response.getOutputStream();
-            int read = 0;
-            byte[] buffer = new byte[1024];
-            while ((read = fileInputStream.read(buffer)) != -1) { // 1024바이트씩 계속 읽으면서 outputStream에 저장, -1이 나오면 더이상 읽을 파일이 없음
-                out.write(buffer, 0, read);
-            }
-
-            /*response.setHeader("Content-Disposition", "attachment;filename=" + file.getName()); // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
-            System.out.println("path : "+path);
-
-            FileInputStream fileInputStream = new FileInputStream(path); // 파일 읽어오기
-            OutputStream out = response.getOutputStream();
-
             int read = 0;
             byte[] buffer = new byte[1024];
             while ((read = fileInputStream.read(buffer)) != -1) { // 1024바이트씩 계속 읽으면서 outputStream에 저장, -1이 나오면 더이상 읽을 파일이 없음
@@ -117,6 +164,5 @@ public class FileController {
             e.printStackTrace();
             throw new Exception("download error");
         }
-        return "다운로드 성공";
     }
 }

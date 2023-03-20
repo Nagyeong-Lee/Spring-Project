@@ -30,6 +30,7 @@
 </head>
 <body>
 <table id="myTable">
+
     <tr>
         <th>작성자</th>
         <th>제목</th>
@@ -41,9 +42,9 @@
         <c:when test="${not empty list}">
             <c:forEach var="i" items="${list}">
                 <tr>
-                    <td>${id}</td>
+                    <td>${i.writer}</td>
                     <td class="title"><a href="/board/detail?b_seq=${i.b_seq}">${i.title}</a></td>
-                    <input type="hidden" value="${i.b_seq}"  class="b_seq">
+                    <input type="hidden" value="${i.b_seq}" class="b_seq">
                     <td><fmt:formatDate pattern='yyyy-MM-dd hh:mm' value="${i.write_date}"/></td>
                     <td>
                         <c:choose>
@@ -68,25 +69,25 @@
 <div>${paging}</div>
 
 <div class="btn">
-<form action="/board/list?" method="get">
-    <input type=hidden value="1" name="currentPage" id="currentPage">
-    <input type=hidden value="10" name="count" id="count">
+    <form action="/board/list?" method="get">
+        <input type=hidden value="1" name="currentPage" id="currentPage">
+        <input type=hidden value="10" name="count" id="count">
 
-    <select name="searchType" id="searchType">
-        <option value="title" selected>제목</option>
-        <option value="writer">작성자</option>
-        <option value="content">내용</option>
-    </select>
-    <input type="text" id="keyword" name="keyword">
-    <button type="submit" id="searchBtn">글 검색</button>
-    <button type="button" id="writeBtn">글 작성</button>
-</form>
+        <select name="searchType" id="searchType">
+            <option value="title" selected>제목</option>
+            <option value="writer">작성자</option>
+            <option value="content">내용</option>
+        </select>
+        <input type="text" id="keyword" name="keyword">
+        <button type="submit" id="searchBtn">글 검색</button>
+        <button type="button" id="writeBtn">글 작성</button>
+    </form>
 </div>
 
 <script>
-    let b_seq=$(".b_seq").val();
+    let b_seq = $(".b_seq").val();
     $("#writeBtn").on("click", function () {  //글작성 폼으로 이동
-        location.href = "/board/toWriteForm?b_seq="+b_seq;
+        location.href = "/board/toWriteForm?b_seq=" + b_seq;
     });
 
 </script>

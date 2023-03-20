@@ -4,7 +4,22 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.Spring_Project.mapper.AdminMapper">
     <select id="selectMemberList" resultType="com.example.Spring_Project.dto.MemberDTO">
-        select *
+        select
+            id,
+            pw,
+            name,
+            email,
+            phone,
+            postcode,
+            roadAddress,
+            jibunAddress,
+            detailAddress,
+            signUp_date,
+            oriname,
+            sysname,
+            savePath,
+            status,
+            type
         from member
         where id not in ('admin123')
     </select>
@@ -49,20 +64,26 @@
         insert all
         <foreach collection="excelContent" item="item" separator=",">
             into member
+            values
             (
-                name,
-                id,
-                email,
-                phone,
-                signUp_date
-            )values
-                (
-                #{item.name},
+                m_seq.nextval,
                 #{item.id},
+                #{item.pw},
+                #{item.name},
                 #{item.email},
                 #{item.phone},
-                #{item.signUp_date},
-                )
+                #{item.postcode},
+                #{item.roadAddress},
+                #{item.jibunAddress},
+                #{item.detailAddress, jdbcType=VARCHAR},
+                sysdate,
+                #{item.oriname},
+                #{item.sysname},
+                #{item.savePath},
+                'Y',
+                'ROLE_MEMBER'
+            )
         </foreach>
+        select * from dual
     </insert>
 </mapper>

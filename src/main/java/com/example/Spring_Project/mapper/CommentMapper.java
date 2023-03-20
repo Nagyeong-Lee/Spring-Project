@@ -16,4 +16,12 @@ public interface CommentMapper {
     List<CommentDTO> getComment(@Param("b_seq") Integer b_seq); //댓글 출력
     void reply(@Param("writer")String writer, @Param("content")String content,@Param("b_seq")Integer b_seq,
                @Param("parent_cmt_seq") Integer parent_cmt_seq);  //대댓글 insert
+
+    void deleteCmt(@Param("cmt_seq") Integer cmt_seq); //댓글 삭제
+    void updateCmt(@Param("content") String content,
+                   @Param("b_seq") Integer b_seq,
+                   @Param("cmt_seq") Integer cmt_seq); //댓글 수정
+
+    Integer getParentSeq(@Param("cmt_seq") Integer cmt_seq);
+    void deleteAllCmt(@Param("cmt_seq") Integer cmt_seq);
 }

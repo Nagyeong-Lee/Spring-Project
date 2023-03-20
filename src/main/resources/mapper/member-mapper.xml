@@ -24,7 +24,7 @@
         #{sysname},
         #{savePath},
         'Y',
-        'ROLE_MEMBER')
+        1)
     </insert>
 
     <select id="idDupleCheck" resultType="Integer">
@@ -110,11 +110,7 @@
         and status='Y'
     </update>
 
-    <select id="getUserType" resultType="Integer">
-        select
-            type
-        from member
-        where id=#{idSession}
-    </select>
+
+
 
 </mapper>

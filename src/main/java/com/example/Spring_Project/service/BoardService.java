@@ -3,40 +3,34 @@ package com.example.Spring_Project.service;
 
 import com.example.Spring_Project.dto.BoardDTO;
 import com.example.Spring_Project.mapper.BoardMapper;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
 @Service
 public class BoardService {
 
     @Autowired
     private BoardMapper mapper;
 
-    public void insert(BoardDTO boardDTO) throws Exception {  //게시글 insert
+    public void insert(BoardDTO boardDTO) throws Exception {
         mapper.insert(boardDTO);
     }
 
-    public void updateFileStatus(@RequestParam Map<String,Object> status) throws Exception{
+    public void updateFileStatus(@RequestParam Map<String, Object> status) throws Exception {
         System.out.println("service status = " + status);
         mapper.updateFileStatus(status);
     }
-    public void updateFile(@RequestParam List<MultipartFile> file,@RequestParam List<Integer> deleteSeq) throws Exception{
-        mapper.updateFile(file,deleteSeq);
+
+    public void updateFile(@RequestParam List<MultipartFile> file, @RequestParam List<Integer> deleteSeq) throws Exception {
+        mapper.updateFile(file, deleteSeq);
     }
 
-    public void updateStatus(Map<String,Object>arr) throws Exception{
+    public void updateStatus(Map<String, Object> arr) throws Exception {
         mapper.updateStatus(arr);
     }
-
 
     public List<BoardDTO> select(@RequestParam Integer start, @RequestParam Integer end,
                                  @RequestParam String searchType, @RequestParam String keyword) throws Exception {   //게시글 리스트 출력 (검색)
@@ -56,7 +50,7 @@ public class BoardService {
         mapper.delete(b_seq);
     }
 
-    public void update(@RequestParam Integer b_seq,@RequestParam String title, @RequestParam String content) throws Exception {  //게시글 수정
+    public void update(@RequestParam Integer b_seq, @RequestParam String title, @RequestParam String content) throws Exception {  //게시글 수정
         mapper.update(b_seq, title, content);
     }
 
@@ -123,10 +117,8 @@ public class BoardService {
         return sb.toString();
     }
 
-    public Integer getNetVal() throws Exception{
+    public Integer getNetVal() throws Exception {
         return mapper.getNetVal();
     }
-
-
 
 }

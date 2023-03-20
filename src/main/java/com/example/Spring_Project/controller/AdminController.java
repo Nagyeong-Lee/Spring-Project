@@ -77,7 +77,7 @@ public class AdminController {
 
     @ResponseBody  //엑셀 업로드
     @PostMapping("/upload")
-    public ModelAndView excelUploadAjax(MultipartFile fileExcel, MultipartHttpServletRequest request) throws Exception {
+    public ModelAndView excelUploadAjax(@RequestParam MultipartFile fileExcel,MultipartHttpServletRequest request) throws Exception {
 
         System.out.println("업로드 진행");
 
@@ -87,10 +87,17 @@ public class AdminController {
 
         if (excelFile == null || excelFile.isEmpty()) {
 
-            throw new RuntimeException("엑셀파일을 선택 해 주세요.");
+            throw new RuntimeException("엑셀파일을 선택해 주세요.");
         }
 
-        File destFile = new File("D:\\" + excelFile.getOriginalFilename());
+        String path = "D:\\memberUpload\\"; // 경로에 접근할 때 역슬래시('\') 사용
+        File dir = new File(path);
+        if (!dir.isDirectory()) {
+            dir.mkdirs();
+        }
+
+
+        File destFile = new File(path + excelFile.getOriginalFilename());
 
         System.out.println("destFile : "+destFile);
 
@@ -112,11 +119,8 @@ public class AdminController {
 
         MultipartFile multipartFile = new CommonsMultipartFile(fileItem);
 
-        //업로드를 진행하고 다시 지우기
-        adminService.excelUpload(multipartFile);
 
-        destFile.delete();
-        //		FileUtils.delete(destFile.getAbsolutePath());
+        adminService.excelUpload(multipartFile);
 
         ModelAndView view = new ModelAndView();
 

@@ -10,9 +10,9 @@
 </head>
 <body>
 <div>
-<c:if test="${id != null}">
-    ${id}님 안녕하세요.
-</c:if>
+    <c:if test="${id != null}">
+        ${id}님 안녕하세요.
+    </c:if>
 </div>
 <button type="button" id="board">커뮤니티로</button>
 <button type="button" id="update">정보수정하기</button>
@@ -22,29 +22,29 @@
 
 <script>
 
-//커뮤니티로 이동
-$("#board").on("click",function(){
-    location.href="/board/list?currentPage=1&count=10&searchType=''&keyword=''";
-});
+    //커뮤니티로 이동
+    $("#board").on("click", function () {
+        location.href = "/board/list?currentPage=1&count=10&searchType=''&keyword=''";
+    });
 
-//계정 탈퇴
-$("#delete").on("click",function(){
-    if(confirm("탈퇴하시겠습니까?")){
-        location.href="/member/delete?id=${id}";
-    }
-});
+    //계정 탈퇴
+    $("#delete").on("click", function () {
+        if (confirm("탈퇴하시겠습니까?")) {
+            location.href = "/member/delete?id=${id}";
+        }
+    });
 
-//로그아웃
-$("#logout").on("click",function(){
-    if(confirm("로그아웃하시겠습니까?")){
-        location.href="/member/logout?id=${id}";
-    }
-});
+    //로그아웃
+    $("#logout").on("click", function () {
+        if (confirm("로그아웃하시겠습니까?")) {
+            location.href = "/member/logout?id=${id}";
+        }
+    });
 
-//정보 수정 페이지로 이동
-$("#update").on("click",function(){
-   location.href="/member/toUpdateForm?id=${id}";
-});
+    //정보 수정 페이지로 이동
+    $("#update").on("click", function () {
+        location.href = "/member/toUpdateForm?id=${id}";
+    });
 
 </script>
 </body>

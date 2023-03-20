@@ -12,8 +12,8 @@
 
 <div class="loginBox">
     <form action="/member/login" method="post">
-        아이디  &nbsp&nbsp&nbsp<input type="text" id="id" name="id"> <br>
-        비밀번호   <input type="password" id="pw" name="pw">
+        아이디 &nbsp&nbsp&nbsp<input type="text" id="id" name="id"> <br>
+        비밀번호 <input type="password" id="pw" name="pw">
         <br>
         <br>
         <a href="/member/toSignUpForm"><input type="button" value="회원가입"></a>
@@ -24,12 +24,12 @@
 </div>
 
 <script>
-    $("#searchIdBtn").on("click",function(){
-        location.href="/member/toSearchIdForm";
+    $("#searchIdBtn").on("click", function () {
+        location.href = "/member/toSearchIdForm";
     });
 
-    $("#searchPwBtn").on("click",function(){
-        location.href="/member/toSearchPwForm";
+    $("#searchPwBtn").on("click", function () {
+        location.href = "/member/toSearchPwForm";
     });
 </script>
 </body>

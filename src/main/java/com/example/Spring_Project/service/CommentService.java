@@ -25,4 +25,19 @@ public class CommentService {
                     ,@RequestParam Integer parent_cmt_seq)throws Exception {
         mapper.reply(writer, content, b_seq,parent_cmt_seq);   // 대댓글 insert
     }
+
+    public void deleteCmt(@RequestParam Integer cmt_seq) throws Exception{
+       mapper.deleteCmt(cmt_seq);
+    }
+    public void deleteAllCmt(@RequestParam Integer cmt_seq) throws Exception{
+       mapper.deleteAllCmt(cmt_seq);
+    }
+    public void updateCmt(@RequestParam String content, @RequestParam Integer b_seq, @RequestParam Integer cmt_seq) throws Exception{
+        mapper.updateCmt(content,b_seq,cmt_seq);
+    }
+
+    public Integer getParentSeq(@RequestParam Integer cmt_seq) throws Exception{
+        return mapper.getParentSeq(cmt_seq);
+    }
+
 }

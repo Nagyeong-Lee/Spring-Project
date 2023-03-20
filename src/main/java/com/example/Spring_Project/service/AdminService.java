@@ -10,7 +10,9 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -27,6 +29,9 @@ import java.util.Map;
 public class AdminService {
     @Autowired
     private AdminMapper adminMapper;
+
+    @Autowired
+    private static BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public List<MemberDTO> selectMemberList() throws Exception {  //회원 리스트 출력
         return adminMapper.selectMemberList();
@@ -146,14 +151,18 @@ public class AdminService {
     }
 
     //엑셀 업로드
-    public void excelUpload(MultipartFile fileExcel) throws Exception {
+    public void excelUpload(@RequestParam MultipartFile fileExcel) throws Exception {
 
         List<Map<String, Object>> excelContent = ExcelRead.read(fileExcel);
 
         System.out.println("excelContent : ");
         System.out.println(excelContent);
 
-
+        for(int i=0; i<excelContent.size(); i++){
+            String pw = (String)excelContent.get(i).get("pw");
+            bCryptPasswordEncoder.encode(pw);
+            System.out.println(excelContent.get(i).get("pw"));
+        }
         System.out.println("List 사이즈 : " + excelContent.size());
 
 //        Map<String, Object> paramMap = new HashMap<String, Object>();

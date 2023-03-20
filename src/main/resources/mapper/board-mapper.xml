@@ -16,12 +16,23 @@
         0,
         'Y',
         #{parent_seq, jdbcType=NUMERIC},
-        #{update_date, jdbcType=TIMESTAMP}
+        #{update_date, jdbcType=TIMESTAMP},
+        #{oriname, jdbcType=TIMESTAMP},
+        #{sysname, jdbcType=TIMESTAMP},
+        #{path, jdbcType=TIMESTAMP}
         )
     </insert>
 
     <select id="getBoardDetail" resultType="com.example.Spring_Project.dto.BoardDTO">
-        select *
+        select
+            b_seq,
+            title,
+            writer,
+            content,
+            write_date,
+            count,
+            status,
+            update_date
         from board
         where b_seq=#{b_seq} and status='Y'
     </select>
@@ -63,7 +74,15 @@
     </select>
 
     <select id="select" resultType="com.example.Spring_Project.dto.BoardDTO">
-        SELECT *
+        SELECT
+            b_seq,
+            title,
+            writer,
+            content,
+            write_date,
+            count,
+            status,
+            update_date
         FROM(SELECT ROWNUM rn, b.*
         FROM ( SELECT b_seq,title,writer,content,write_date,count,update_date,status
         FROM board
