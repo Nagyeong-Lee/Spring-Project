@@ -41,7 +41,7 @@
                     <td>${i.id}</td>
                     <td>${i.email}</td>
                     <td>${i.phone}</td>
-                    <td><fmt:formatDate pattern="YYYY-MM-dd hh:mm" value="${i.signup_date}"/></td>
+                    <td><fmt:formatDate pattern="YYYY-MM-dd" value="${i.signup_date}"/></td>
                 </tr>
             </c:forEach>
         </c:when>

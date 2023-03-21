@@ -82,16 +82,17 @@
         <input type="hidden" name="b_seq" id="b_seq" value="${boardDTO.b_seq}">
         <input type="hidden" name="writer" id="writer" value="${boardDTO.writer}">
         <input type="hidden" name="write_date" id="write_date" value="${boardDTO.write_date}">
+        <input type="hidden" name="update_date" id="update_date" value="${boardDTO.update_date}">
         <input type="hidden" name="id" id="id" value="${id}">
         <div class="title">제목 :
             <input type="text" id="title" name="title" value="${boardDTO.title}" readonly="readonly"></div>
         <div class="info">
             작성자 : ${boardDTO.writer}<br>
             조회수 : ${boardDTO.count}<br>
-            작성 시간 : <fmt:formatDate pattern="yyyy-MM-dd HH:mm"
+            작성 시간 : <fmt:formatDate pattern="yyyy-MM-dd"
                                     value="${boardDTO.write_date}"/><br>
             <c:if test="${boardDTO.update_date != null}">
-                수정 시간 : <fmt:formatDate pattern="yyyy-MM-dd HH:mm"
+                수정 시간 : <fmt:formatDate pattern="yyyy-MM-dd"
                                         value="${boardDTO.update_date}"/>
             </c:if>
         </div>
@@ -120,7 +121,7 @@
                                 ${i.content}
                             </c:if>
                             <c:if test="${i.status eq 'N'}">
-                                *삭제된 댓글입니다.*
+                                =============삭제된 댓글입니다.=============
                             </c:if>
                             <c:if test="${i.status eq 'Y' }">
                                 <button type="button" class="cmt" onclick="cmtOpen('${i.cmt_seq}')">대댓글 달기</button>
@@ -135,8 +136,8 @@
                         <div class="info" id="info${i.cmt_seq}">
                             <c:if test="${i.status eq 'Y' }">
                                 ${i.writer}
-                                <fmt:formatDate pattern='YYYY-MM-dd hh:mm'
-                                                value="${i.write_date}"/>
+                                    <fmt:formatDate pattern='YYYY-MM-dd'
+                                                    value="${i.write_date}"/>
                             </c:if>
                         </div>
                         <div class="cmtBox" id="${i.cmt_seq}"></div>
@@ -251,6 +252,7 @@
     $(document).on("click", "#completeUpdBtn", function () { //수정완료 버튼 클릭시 배열보내기
 
         let b_seq = $("#b_seq").val();
+        let writer = $("#id").val();
         let content = $("#content").val();
         let title = $("#title").val();
         let frm = $('#frm')[0];
@@ -260,9 +262,7 @@
         }
 
         data.append("b_seq", b_seq);
-        data.append("content", content);
-        data.append("title", title);
-
+        data.append("writer", writer);
         data.append("deleteSeq", deleteSeq);
         alert('글 수정 완료');
 
