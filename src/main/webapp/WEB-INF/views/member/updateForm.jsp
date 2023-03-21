@@ -22,12 +22,12 @@
         <form action="/member/update" method="post" id="frm" enctype="multipart/form-data">
             <div>아이디
                 <input type="hidden" id="id" name="id" value="${memberDTO.id}">
-                <input type="text" disabled="disabled" placeholder="영어,숫자 6~10자" value=${memberDTO.getId()}>
+                <input type="text" disabled="disabled" placeholder="영어,숫자 6-10" value=${memberDTO.getId()}>
                 <span id="checkId"></span>
             </div>
             <div class="idDupleCheck"></div>
             <div>비밀번호
-                <input type="password" id="pw" name="pw" placeholder="영어,숫자,~,!,@,$,^ 8~15자">
+                <input type="password" id="pw" name="pw" placeholder="영어,숫자,~,!,@,$,^ 8-15">
                 <span id="checkPw"></span>
             </div>
             <div>비밀번호 확인
@@ -198,7 +198,6 @@
                     extraRoadAddr = ' (' + extraRoadAddr + ')';
                 }
 
-                // 우편번호와 주소 정보를 해당 필드에 넣는다.
                 document.getElementById('postcode').value = data.zonecode;
                 document.getElementById("roadAddress").value = roadAddr;
                 document.getElementById("jibunAddress").value = data.jibunAddress;

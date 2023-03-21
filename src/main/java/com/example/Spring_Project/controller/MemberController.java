@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.util.UUID;
@@ -98,6 +99,7 @@ public class MemberController {
         return result;
     }
 
+
     @GetMapping("/logout")  //로그아웃
     public String logout(@RequestParam String id) throws Exception {
         session.invalidate();
@@ -180,4 +182,10 @@ public class MemberController {
         service.tempPw(email, pw);
         return pw;
     }
+
+    @RequestMapping("/myPage")
+    public String toMyPage() throws Exception {
+        return "/member/myPage";
+    }
+
 }

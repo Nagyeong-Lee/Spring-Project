@@ -15,7 +15,7 @@
                  <button type="button" id="searchIdBtn">찾기</button>
             </div>
             <div class="text" id="text"></div>
-            <a href="/"><button type="button">목록으로</div></button>
+        <a href="/"><button type="button">목록으로</button></a>
     </div>
 
     <script>
@@ -32,7 +32,6 @@
             }else{
                 $("#text").text("아이디가 존재하지 않습니다.");
             }
-
         });
     });
     </script>

@@ -26,7 +26,6 @@
     </style>
 </head>
 <body>
-<%--차트를 그릴 영역으로 canvas태그를 사용한다.--%>
 <div class="chart">
     <canvas id="myChart" width="10px" ; height="10px" ;></canvas>
     <input type="hidden" value="${list.get(0)}" id="count1">

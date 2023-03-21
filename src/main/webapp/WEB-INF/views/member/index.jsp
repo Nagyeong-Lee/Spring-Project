@@ -31,6 +31,7 @@
     $("#searchPwBtn").on("click", function () {
         location.href = "/member/toSearchPwForm";
     });
+
 </script>
 </body>
 </html>

@@ -14,12 +14,12 @@
     <form action="/member/signUp" method="post" id="frm" name="signUp_form" enctype="multipart/form-data">
 
         <div>아이디
-            <input type="text" id="id" name="id" placeholder="영어,숫자 6~10자">
+            <input type="text" id="id" name="id" placeholder="영어,숫자 6-10">
             <span id="checkId"></span>
         </div>
         <div class="idDupleCheck"></div>
         <div>비밀번호
-            <input type="password" id="pw" name="pw" placeholder="영어,숫자,~,!,@,$,^ 8~15자">
+            <input type="password" id="pw" name="pw" placeholder="영어,숫자,~,!,@,$,^ 8-15">
             <span id="checkPw"></span>
         </div>
         <div>비밀번호 확인
@@ -152,7 +152,6 @@
         });
     });
 
-
     //유효성 검사
     $('#btn').on('click', function () {
 
@@ -174,7 +173,6 @@
         let regexName = /^[가-힣]{2,5}$/;
         let regexEmail = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.com/;
         let regexPhone = /^010\d{4}\d{4}$/;
-
 
         //아이디 공백
         if (id == '') {
@@ -249,7 +247,6 @@
             return false;
         }
 
-
         //이메일 인증 칸 공백
         if (authenticEmail == '') {
             alert("인증번호를 입력해주세요.");
@@ -296,7 +293,6 @@
             alert("파일을 첨부해주세요.");
             return false;
         }
-
         $('#frm').submit();
     });
 
@@ -319,7 +315,6 @@
                     extraRoadAddr = ' (' + extraRoadAddr + ')';
                 }
 
-                // 우편번호와 주소 정보를 해당 필드에 넣는다.
                 document.getElementById('postcode').value = data.zonecode;
                 document.getElementById("roadAddress").value = roadAddr;
                 document.getElementById("jibunAddress").value = data.jibunAddress;

@@ -43,6 +43,7 @@
 
     $("#author").hide();
     $("#authenticBtn").hide();
+
     //이메일 입력했을때
     $("#email").on("change", function () {
         $.ajax({
