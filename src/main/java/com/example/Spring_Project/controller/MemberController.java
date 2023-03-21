@@ -54,6 +54,7 @@ public class MemberController {
         memberDTO.setSavePath(savePath);
         memberDTO.setOriname(oriname);
         memberDTO.setSysname(sysname);
+        memberDTO.setPw(bCryptPasswordEncoder.encode(memberDTO.getPw())); //pw 암호화
 
         service.signUp(memberDTO, mailDTO, file, request);
 
@@ -75,19 +76,22 @@ public class MemberController {
 
     @PostMapping("/login")  //로그인 (성공->마이페이지 / 실패->메인페이지로 이동)
     public String login(Model model, @RequestParam String id, @RequestParam String pw) throws Exception {
-        String encodedPw = bCryptPasswordEncoder.encode(pw);
         String result = "";
 
         MemberDTO memberDTO = service.selectById(id);
+        String type = memberDTO.getType();
 
         if (memberDTO == null) {
             result = "redirect:/";
-        } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && id.equals("admin123")) {
-            session.setAttribute("admin", id); //관리자 세션 부여
+        } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && type.equals("ROLE_ADMIN")) {  //ADMIN일때 타입일때
+            session.setAttribute("id", id); //관리자 세션 부여
+            session.setAttribute("admin" , true);
+            System.out.println("memberController : " + session.getAttribute("admin"));
             result = "redirect:/admin/main";
-        } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && !id.equals("admin123")) {
+        } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && !type.equals("ROLE_ADMIN")) {
             if (service.login(memberDTO.getId(), memberDTO.getPw()) == 1) { //로그인 성공
                 session.setAttribute("id", id);  //아이디 세션 부여
+                session.setAttribute("admin" , false);
                 model.addAttribute("id", session.getAttribute("id"));
                 result = "/member/myPage";
             } else {
@@ -179,7 +183,7 @@ public class MemberController {
     @PostMapping("/searchPw")   //pw 찾기
     public String searchPw(@RequestParam String email, @RequestParam String pw) throws Exception {
         MemberDTO memberDTO = service.selectByEmail(email);
-        service.tempPw(email, pw);
+        service.tempPw(email, bCryptPasswordEncoder.encode(pw));
         return pw;
     }
 

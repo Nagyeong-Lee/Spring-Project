@@ -20,6 +20,6 @@ public interface AdminMapper {
     Integer select2(); //4-6
     Integer select3(); //7-9
     Integer select4(); //10-12
-    void insertExcel(@Param("excelContent") List<Map<String, Object>> excelContent); //엑셀 insert
+    void insertExcel(Map<String, Object> excelContent); //엑셀 insert
 
 }

@@ -17,12 +17,6 @@ import javax.servlet.http.HttpSession;
 @AllArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private PathService service;
-
-    @Autowired
-    private HttpSession session;
-
     @Bean
     public BCryptPasswordEncoder encodePwd() {
         return new BCryptPasswordEncoder();

@@ -83,26 +83,24 @@
 <!--        </foreach>-->
 <!--        SELECT * FROM DUAL-->
 <!--    </insert>-->
-    <insert id="insertExcel" parameterType="java.util.List">
-    <foreach collection="excelContent" item="item" index="index" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL">
-        INTO member VALUES(
-                        m_seq.nextval,
-                        #{item.id},
-                        #{item.pw},
-                        #{item.name},
-                        #{item.email},
-                        #{item.phone},
-                        #{item.postcode},
-                        #{item.roadAddress},
-                        #{item.jibunAddress},
-                        #{item.detailAddress, jdbcType=VARCHAR},
+    <insert id="insertExcel" parameterType="java.util.HashMap">
+        insert into member
+        values
+        (               m_seq.nextval,
+                        #{id},
+                        #{pw},
+                        #{name},
+                        #{email},
+                        #{phone},
+                        #{postcode},
+                        #{roadAddress},
+                        #{jibunAddress},
+                        #{detailAddress, jdbcType=VARCHAR},
                         sysdate,
-                        #{item.oriname},
-                        #{item.sysname},
-                        #{item.savePath},
+                        #{oriname},
+                        #{sysname},
+                        #{savePath},
                         'Y',
-                        'ROLE_MEMBER'
-        )
-    </foreach>
+                        'ROLE_MEMBER')
     </insert>
 </mapper>

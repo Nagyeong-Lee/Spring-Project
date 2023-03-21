@@ -158,4 +158,10 @@
         where id=#{id}
         and status='Y'
     </update>
+
+    <select id="getUserType" resultType="String">
+        select type
+        from member
+        where id=#{id}
+    </select>
 </mapper>

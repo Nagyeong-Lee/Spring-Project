@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -94,8 +95,8 @@ public class AdminService {
             id = id.substring(0, length) + "***";  // 뒷 2자리 ***
             //이름
             String name = dto.getName();
-            String name2=dto.getName();
-            String str="";
+            String name2 = dto.getName();
+            String str = "";
             if (name.length() == 2) {
                 length = name.length() - 1;
                 name = name.substring(0, length) + "*";  // 뒷 1자리 *
@@ -104,8 +105,8 @@ public class AdminService {
             } else {
                 length = name.length() - 2;
                 name = name.substring(0, length);
-                for(int i=length; i<name2.length(); i++){
-                    str+="*";
+                for (int i = length; i < name2.length(); i++) {
+                    str += "*";
                 }
             }
             //이메일
@@ -120,7 +121,7 @@ public class AdminService {
             //전화번호
             String phone = dto.getPhone().substring(0, 3) + "****" + dto.getPhone().substring(7, 11);
 
-            row.createCell(0).setCellValue(name+str);
+            row.createCell(0).setCellValue(name + str);
             row.createCell(1).setCellValue(id);
             row.createCell(2).setCellValue(email);
             row.createCell(3).setCellValue(phone);
@@ -146,16 +147,12 @@ public class AdminService {
     public void excelUpload(@RequestParam MultipartFile fileExcel) throws Exception {
 
         List<Map<String, Object>> excelContent = excelRead.read(fileExcel);
-//
-//        System.out.println("excelContent size : "+excelContent.size());
-//        for(int i=0; i<excelContent.size(); i++){
-//            String pw = (String)excelContent.get(i).get("pw");
-//            System.out.println("pw : "+pw);
-//            pw=bCryptPasswordEncoder.encode(pw);
-//        }
 
         try {
-            adminMapper.insertExcel(excelContent);
+            for (int i = 0; i < excelContent.size(); i++) {
+                System.out.println(excelContent.get(i));
+                adminMapper.insertExcel(excelContent.get(i));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

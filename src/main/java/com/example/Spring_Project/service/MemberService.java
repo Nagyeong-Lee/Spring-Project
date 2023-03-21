@@ -3,6 +3,7 @@ package com.example.Spring_Project.service;
 import com.example.Spring_Project.dto.MemberDTO;
 import com.example.Spring_Project.mailSender.MailDTO;
 import com.example.Spring_Project.mapper.MemberMapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,14 +16,11 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 public class MemberService {
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-    @Autowired
     private MemberMapper mapper;
 
     //회원가입
     public void signUp(MemberDTO memberDTO, MailDTO mailDTO,
                        @RequestParam("file") MultipartFile file, MultipartHttpServletRequest request) throws Exception {
-        memberDTO.setPw(bCryptPasswordEncoder.encode(memberDTO.getPw()));  //비밀번호 암호화
         mapper.signUp(memberDTO);
     }
 
@@ -68,7 +66,7 @@ public class MemberService {
 
     //임시 pw
     public void tempPw(@RequestParam String email, @RequestParam String pw) throws Exception {
-        mapper.tempPw(email, bCryptPasswordEncoder.encode(pw));
+        mapper.tempPw(email,pw);
     }
 
     //정보 수정
@@ -81,5 +79,8 @@ public class MemberService {
         return mapper.login(id, pw);
     }
 
-
+    //인터셉터
+    public String getUserType(@Param("id") String id) throws Exception{
+        return mapper.getUserType(id);
+    }
 }
