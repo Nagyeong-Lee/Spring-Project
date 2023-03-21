@@ -304,6 +304,9 @@
             comment.text(content);   //댓글 작성
             $("#comment").val('');   //댓글 작성칸 초기화
 
+            let str="<button>대댓글 달기</button><button>댓글 삭제</button><button>댓글 수정</button>";
+
+            comment.append(str);
             let info = $("<div></div>");
             let infoText = writer + " " + $("#write_date").val();
             info.text(infoText);
