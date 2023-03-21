@@ -45,11 +45,11 @@
                     <td>${i.writer}</td>
                     <td class="title"><a href="/board/detail?b_seq=${i.b_seq}">${i.title}</a></td>
                     <input type="hidden" value="${i.b_seq}" class="b_seq">
-                    <td><fmt:formatDate pattern='yyyy-MM-dd' value="${i.write_date}"/></td>
+                    <td><fmt:formatDate pattern='yyyy-MM-dd hh:mm' value="${i.write_date}"/></td>
                     <td>
                         <c:choose>
                             <c:when test="${not empty i.update_date}">
-                                <fmt:formatDate pattern='yyyy-MM-dd' value="${i.update_date}"/>
+                                <fmt:formatDate pattern='yyyy-MM-dd hh:mm' value="${i.update_date}"/>
                             </c:when>
                         </c:choose>
                     </td>

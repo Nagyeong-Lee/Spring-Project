@@ -47,7 +47,7 @@ public class ExcelRead {
                         cellvalue = "" + cell.getBooleanCellValue();
                     }
                 }
-                System.out.print(cellvalue + " ");
+
 
                 if (cell.getRowIndex() > 0) {
                     switch (cell.getColumnIndex()) {

@@ -89,10 +89,10 @@
         <div class="info">
             작성자 : ${boardDTO.writer}<br>
             조회수 : ${boardDTO.count}<br>
-            작성 시간 : <fmt:formatDate pattern="yyyy-MM-dd"
+            작성 시간 : <fmt:formatDate pattern="yyyy-MM-dd hh:mm"
                                     value="${boardDTO.write_date}"/><br>
             <c:if test="${boardDTO.update_date != null}">
-                수정 시간 : <fmt:formatDate pattern="yyyy-MM-dd"
+                수정 시간 : <fmt:formatDate pattern="yyyy-MM-dd hh:mm"
                                         value="${boardDTO.update_date}"/>
             </c:if>
         </div>
@@ -132,13 +132,13 @@
                                 </c:if>
                             </c:if>
                             <input type="hidden" value="${i.cmt_seq}" class="p_cmt"><br>
-                        </div>
-                        <div class="info" id="info${i.cmt_seq}">
-                            <c:if test="${i.status eq 'Y' }">
-                                ${i.writer}
-                                    <fmt:formatDate pattern='YYYY-MM-dd'
+                            <div class="info" id="info${i.cmt_seq}">
+                                <c:if test="${i.status eq 'Y' }">
+                                    ${i.writer}
+                                    <fmt:formatDate pattern='YYYY-MM-dd hh:mm'
                                                     value="${i.write_date}"/>
-                            </c:if>
+                                </c:if>
+                            </div>
                         </div>
                         <div class="cmtBox" id="${i.cmt_seq}"></div>
                     </c:forEach>
@@ -359,6 +359,7 @@
 
     }
 
+    //댓글 수정 완료 클릭 시
     $(document).on("click", ".upd", function () {
 
         let writer = $("#id").val();

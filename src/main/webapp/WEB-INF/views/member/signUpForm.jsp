@@ -136,7 +136,6 @@
     }
 
     let msg = randomString();
-    console.log(msg);
 
     //메일 인증하기 클릭 시
     $("#authenticBtn").on("click", function () {

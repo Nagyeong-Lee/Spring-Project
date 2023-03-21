@@ -64,7 +64,7 @@
     <update id="updateCmt">
         update cmt
         set content=#{content},
-        update_date = sysdate
+        write_date = sysdate
         where b_seq=#{b_seq}
         and cmt_seq=#{cmt_seq}
     </update>
