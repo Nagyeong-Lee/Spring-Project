@@ -84,9 +84,8 @@ public class MemberController {
         if (memberDTO == null) {
             result = "redirect:/";
         } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && type.equals("ROLE_ADMIN")) {  //ADMIN일때 타입일때
-            session.setAttribute("id", id); //관리자 세션 부여
-            session.setAttribute("admin" , true);
-            System.out.println("memberController : " + session.getAttribute("admin"));
+            session.setAttribute("id", id);
+            session.setAttribute("admin" , true);  //관리자 세션 부여
             result = "redirect:/admin/main";
         } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && !type.equals("ROLE_ADMIN")) {
             if (service.login(memberDTO.getId(), memberDTO.getPw()) == 1) { //로그인 성공

@@ -150,7 +150,6 @@ public class AdminService {
 
         try {
             for (int i = 0; i < excelContent.size(); i++) {
-                System.out.println(excelContent.get(i));
                 adminMapper.insertExcel(excelContent.get(i));
             }
         } catch (Exception e) {

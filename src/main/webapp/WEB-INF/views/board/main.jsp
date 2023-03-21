@@ -81,6 +81,7 @@
         <input type="text" id="keyword" name="keyword">
         <button type="submit" id="searchBtn">글 검색</button>
         <button type="button" id="writeBtn">글 작성</button>
+        <a href="/member/myPage"><button type="button" id="toMyPage">마이페이지로 이동</button></a>
     </form>
 </div>
 

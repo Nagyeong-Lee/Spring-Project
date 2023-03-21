@@ -17,14 +17,13 @@
     <script src="https://malsup.github.io/jquery.form.js"></script>
 </head>
 <body>
-회원 리스트
-<br>
 
 <form action="/admin/upload" enctype="multipart/form-data" method="post" id="frm">
     <input type="file" id="fileExcel" name="fileExcel">
     <button type="button" id="uploadBtn" onclick="check()">excel upload</button>
 </form>
 
+회원 리스트
 <table border="1px solid black">
     <c:choose>
         <c:when test="${not empty list}">

@@ -42,7 +42,7 @@
     let count4=$("#count4").val();
     var chartArea = document.getElementById('myChart').getContext('2d');
     var myChart = new Chart(chartArea, {
-        type: 'line',
+        type: 'bar',
         data: {
             labels: ['1-3','4-6','7-9','10-12'],
             datasets: [{

@@ -59,7 +59,7 @@
             </div>
             <div>
                 <button type="button" id="updateBtn">수정하기</button>
-                <a href="/">
+                <a href="/member/myPage">
                     <button type="button">취소</button>
                 </a>
             </div>
