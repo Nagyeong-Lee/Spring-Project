@@ -64,7 +64,6 @@ public class ExcelRead {
                             dataMap.put("email", cellvalue);
                             break;
                         case 4:
-                            System.out.println("phone : " + cellvalue);
                             String[] arr = cellvalue.split("-");
                             cellvalue = "";
                             for (String str : arr) {

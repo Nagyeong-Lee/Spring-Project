@@ -87,9 +87,13 @@ public class MemberController {
             session.setAttribute("admin", id); //관리자 세션 부여
             result = "redirect:/admin/main";
         } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && !id.equals("admin123")) {
-            session.setAttribute("id", id);  //아이디 세션 부여
-            model.addAttribute("id", session.getAttribute("id"));
-            result = "/member/myPage";
+            if (service.login(memberDTO.getId(), memberDTO.getPw()) == 1) { //로그인 성공
+                session.setAttribute("id", id);  //아이디 세션 부여
+                model.addAttribute("id", session.getAttribute("id"));
+                result = "/member/myPage";
+            } else {
+                result = "redirect:/";
+            }
         } else {
             result = "redirect:/";
         }

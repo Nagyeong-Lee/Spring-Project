@@ -148,15 +148,11 @@ public class AdminService {
 
         List<Map<String, Object>> excelContent = ExcelRead.read(fileExcel);
 
-        System.out.println("excelContent : ");
-        System.out.println(excelContent);
 
         for(int i=0; i<excelContent.size(); i++){
             String pw = (String)excelContent.get(i).get("pw");
             bCryptPasswordEncoder.encode(pw);
-            System.out.println(excelContent.get(i).get("pw"));
         }
-        System.out.println("List 사이즈 : " + excelContent.size());
 
         try {
             adminMapper.insertExcel(excelContent);

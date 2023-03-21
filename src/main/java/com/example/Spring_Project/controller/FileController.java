@@ -70,7 +70,6 @@ public class FileController {
             String fileName = fileDTO.getOriname();
             String oriname = fileDTO.getOriname();
             String path = "D:\\storage\\" + fileDTO.getSysname();
-            System.out.println("path : " + path);
             File file = new File(path);
             if (!file.isDirectory()) {
                 file.mkdirs();

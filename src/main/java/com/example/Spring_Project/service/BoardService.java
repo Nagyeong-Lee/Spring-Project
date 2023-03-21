@@ -20,7 +20,6 @@ public class BoardService {
     }
 
     public void updateFileStatus(@RequestParam Map<String, Object> status) throws Exception {
-        System.out.println("service status = " + status);
         mapper.updateFileStatus(status);
     }
 
