@@ -2,13 +2,9 @@ package com.example.Spring_Project.mapper;
 
 
 import com.example.Spring_Project.dto.MemberDTO;
-import com.example.Spring_Project.mailSender.MailDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 @Repository
 @Mapper
@@ -44,7 +40,7 @@ public interface MemberMapper {
     MemberDTO selectByEmail(@Param("email") String email );
     Integer isEmailExist(@Param("email") String email);
 
-    void tempPw(@Param("email") String email, @Param("pw") String pw);
+    void tempPw(@Param("email") String email, @Param("pw") String pw); //임시 pw
     void update(MemberDTO memberDTO); //정보수정
 
     Integer getUserType(@Param ("idSession") String idSession);  //인터셉터

@@ -24,7 +24,7 @@
         #{sysname},
         #{savePath},
         'Y',
-        1)
+        'ROLE_MEMBER')
     </insert>
 
     <select id="idDupleCheck" resultType="Integer">
@@ -53,7 +53,23 @@
     </delete>
 
     <select id="memberInfo" resultType="com.example.Spring_Project.dto.MemberDTO">
-        select *
+        select
+            m_seq,
+            id,
+            pw,
+            name,
+            email,
+            phone,
+            postcode,
+            roadAddress,
+            jibunAddress,
+            detailAddress,
+            signup_date,
+            oriname,
+            sysname,
+            savePath,
+            status,
+            type
         from member
         where id=#{id} and status='Y'
     </select>
@@ -71,12 +87,46 @@
     </select>
 
     <select id="selectById" resultType="com.example.Spring_Project.dto.MemberDTO">
-        select * from member
+        select
+            m_seq,
+            id,
+            pw,
+            name,
+            email,
+            phone,
+            postcode,
+            roadAddress,
+            jibunAddress,
+            detailAddress,
+            signup_date,
+            oriname,
+            sysname,
+            savePath,
+            status,
+            type
+        from member
         where id=#{id} and status='Y'
     </select>
 
     <select id="selectByEmail" resultType="com.example.Spring_Project.dto.MemberDTO">
-        select * from member
+        select
+            m_seq,
+            id,
+            pw,
+            name,
+            email,
+            phone,
+            postcode,
+            roadAddress,
+            jibunAddress,
+            detailAddress,
+            signup_date,
+            oriname,
+            sysname,
+            savePath,
+            status,
+            type
+        from member
         where email=#{email}
     </select>
 

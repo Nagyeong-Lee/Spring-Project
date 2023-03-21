@@ -1,6 +1,5 @@
 package com.example.Spring_Project.controller;
 
-
 import com.example.Spring_Project.dto.BoardDTO;
 import com.example.Spring_Project.dto.CommentDTO;
 import com.example.Spring_Project.dto.FileDTO;
@@ -229,7 +228,7 @@ public class BoardController {
                 fileService.insertMap(list.get(i));
             }
         }
-        return "게시글 수정";
+        return "게시글 수정 완료";
     }
 
     @PostMapping("/img")

@@ -10,7 +10,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.util.UUID;
@@ -45,12 +44,11 @@ public class MemberController {
 
         String oriname = file.getOriginalFilename();
 
-        // 파일 이름 변경
         UUID uuid = UUID.randomUUID();
         String sysname = uuid + "_" + oriname;
 
         String savePath = path + sysname; //저장될 파일 경로
-        file.transferTo(new File(savePath)); //파일 저장
+        file.transferTo(new File(savePath));
 
         memberDTO.setSavePath(savePath);
         memberDTO.setOriname(oriname);
@@ -128,15 +126,12 @@ public class MemberController {
         if (!dir.isDirectory()) {
             dir.mkdirs();
         }
-
         String oriname = file.getOriginalFilename();
-
-        // 파일 이름 변경
         UUID uuid = UUID.randomUUID();
         String sysname = uuid + "_" + oriname;
 
         String savePath = path + sysname; //저장될 파일 경로
-        file.transferTo(new File(savePath)); //파일 저장
+        file.transferTo(new File(savePath));
 
         memberDTO.setSavePath(savePath);
         memberDTO.setOriname(oriname);
@@ -152,10 +147,8 @@ public class MemberController {
         return "/member/searchId";
     }
 
-
-    //id 찾기
     @ResponseBody
-    @PostMapping("/searchId")
+    @PostMapping("/searchId") //id 찾기
     public String searchId(@RequestParam String email) throws Exception {
         String id = service.searchId(email);
         if (id == null) {
@@ -164,15 +157,13 @@ public class MemberController {
         return id;
     }
 
-    //pw 찾기 페이지로 이동
-    @GetMapping("/toSearchPwForm")
+    @GetMapping("/toSearchPwForm") //pw 찾기 페이지로 이동
     public String toSearchPwForm() throws Exception {
         return "/member/searchPw";
     }
 
-    //pw 찾기
     @ResponseBody
-    @PostMapping("/emailExist")
+    @PostMapping("/emailExist") //이메일 존재 여부
     public String emailExist(@RequestParam String email) throws Exception {
         Integer cnt = service.isEmailExist(email);
         if (cnt == 1) {
@@ -183,7 +174,7 @@ public class MemberController {
     }
 
     @ResponseBody
-    @PostMapping("/searchPw")
+    @PostMapping("/searchPw")   //pw 찾기
     public String searchPw(@RequestParam String email, @RequestParam String pw) throws Exception {
         MemberDTO memberDTO = service.selectByEmail(email);
         service.tempPw(email, pw);

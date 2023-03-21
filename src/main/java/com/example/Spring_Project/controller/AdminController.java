@@ -80,7 +80,7 @@ public class AdminController {
             throw new RuntimeException("엑셀파일을 선택해 주세요.");
         }
 
-        String path = "D:\\memberUpload\\"; // 경로에 접근할 때 역슬래시('\') 사용
+        String path = "D:\\memberUpload\\";
         File dir = new File(path);
         if (!dir.isDirectory()) {
             dir.mkdirs();

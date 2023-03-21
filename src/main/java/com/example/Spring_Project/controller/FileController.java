@@ -29,7 +29,7 @@ public class FileController {
     public Object insert(@RequestParam("b_seq") Integer b_seq, @RequestParam("file") List<MultipartFile> file) throws Exception {
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
-        if (!file.isEmpty()) {  //파일 있으면
+        if (!file.isEmpty()) {  //파일 있을 때
 
             String path = "D:/storage/";
             File dir = new File(path);
@@ -86,16 +86,12 @@ public class FileController {
             byte readByte[] = new byte[4096];
 
             try {
-
                 InputStream bufferedinputstream = new FileInputStream(file);
-
                 int i;
-
                 while ((i = bufferedinputstream.read(readByte, 0, 4096)) != -1) {
                     response.getOutputStream().write(readByte, 0, i);
                 }
                 bufferedinputstream.close();
-
             } catch (Exception _ex) {
                 _ex.printStackTrace();
             } finally {

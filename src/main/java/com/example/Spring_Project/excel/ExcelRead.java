@@ -101,10 +101,7 @@ public class ExcelRead {
             if (dataMap.size() != 0) {
                 result.add(dataMap);
             }
-
         }
-
-
         return result;
     }
 }

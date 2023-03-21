@@ -1,20 +1,16 @@
 package com.example.Spring_Project.controller;
 
 import com.example.Spring_Project.dto.CommentDTO;
-import com.example.Spring_Project.dto.MemberDTO;
-import com.example.Spring_Project.mapper.MemberMapper;
 import com.example.Spring_Project.service.CommentService;
 import com.example.Spring_Project.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
-import javax.sound.midi.Soundbank;
 
 @Controller
 @RequestMapping("/comment")
@@ -29,8 +25,8 @@ public class CommentController {
     @Autowired
     private HttpSession session;
 
-    @ResponseBody     //댓글 insert
-    @PostMapping("/insert")
+    @ResponseBody
+    @PostMapping("/insert") //댓글 insert
     public CommentDTO insert(@RequestParam String content, @RequestParam String writer, @RequestParam Integer b_seq) throws Exception {
 
         CommentDTO commentDTO = new CommentDTO();
@@ -45,12 +41,12 @@ public class CommentController {
     }
 
     @ResponseBody
-    @PostMapping("/reply")
+    @PostMapping("/reply") //대댓글 insert
     public String reply(@RequestParam String writer, @RequestParam String content, @RequestParam Integer b_seq,
                         @RequestParam Integer parent_cmt_seq) throws Exception {
 
         service.reply(writer, content, b_seq, parent_cmt_seq);
-        return "완";
+        return "대댓글 작성 완료";
     }
 
 
@@ -58,7 +54,7 @@ public class CommentController {
     @PostMapping("/deleteCmt") //댓글 삭제
     public String deleteComment(@RequestParam Integer cmt_seq) throws Exception {
         Integer parent_cmt_seq = service.getParentSeq(cmt_seq);
-        service.deleteCmt(cmt_seq); // status = n으로
+        service.deleteCmt(cmt_seq); // status = N으로 변경
         return "댓글 삭제 완료";
     }
 

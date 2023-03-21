@@ -17,21 +17,19 @@ public class CommentService {
         mapper.insert(commentDTO);
     }
 
-    public List<CommentDTO> getComment(@RequestParam Integer b_seq) throws Exception {  //댓글까지 같이 출력해서 리스트 뿌리기
+    public List<CommentDTO> getComment(@RequestParam Integer b_seq) throws Exception {  //댓글까지 같이 출력
         return mapper.getComment(b_seq);
     }
 
     public void reply(@RequestParam String writer, @RequestParam String content, @RequestParam Integer b_seq
-                    ,@RequestParam Integer parent_cmt_seq)throws Exception {
-        mapper.reply(writer, content, b_seq,parent_cmt_seq);   // 대댓글 insert
+                    ,@RequestParam Integer parent_cmt_seq)throws Exception { // 대댓글 insert
+        mapper.reply(writer, content, b_seq,parent_cmt_seq);
     }
 
     public void deleteCmt(@RequestParam Integer cmt_seq) throws Exception{
        mapper.deleteCmt(cmt_seq);
     }
-    public void deleteAllCmt(@RequestParam Integer cmt_seq) throws Exception{
-       mapper.deleteAllCmt(cmt_seq);
-    }
+
     public void updateCmt(@RequestParam String content, @RequestParam Integer b_seq, @RequestParam Integer cmt_seq) throws Exception{
         mapper.updateCmt(content,b_seq,cmt_seq);
     }

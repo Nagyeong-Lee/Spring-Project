@@ -4,7 +4,6 @@ import com.example.Spring_Project.dto.CommentDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -23,5 +22,4 @@ public interface CommentMapper {
                    @Param("cmt_seq") Integer cmt_seq); //댓글 수정
 
     Integer getParentSeq(@Param("cmt_seq") Integer cmt_seq);
-    void deleteAllCmt(@Param("cmt_seq") Integer cmt_seq);
 }

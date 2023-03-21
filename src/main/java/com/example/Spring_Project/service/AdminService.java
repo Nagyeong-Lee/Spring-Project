@@ -2,10 +2,7 @@ package com.example.Spring_Project.service;
 
 import com.example.Spring_Project.dto.MemberDTO;
 import com.example.Spring_Project.excel.ExcelRead;
-import com.example.Spring_Project.excel.ExcelReadOption;
 import com.example.Spring_Project.mapper.AdminMapper;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
@@ -14,14 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +48,7 @@ public class AdminService {
     public void downloadList(HttpServletResponse response) throws Exception { //회원 리스트 다운
 
         Workbook workbook = new XSSFWorkbook();   //엑셀 파일 생성
-        Sheet sheet = workbook.createSheet("member_list"); //시트 생성
+        Sheet sheet = workbook.createSheet("member_list");
         int rowNo = 0;
 
         XSSFCellStyle style = (XSSFCellStyle) workbook.createCellStyle();
