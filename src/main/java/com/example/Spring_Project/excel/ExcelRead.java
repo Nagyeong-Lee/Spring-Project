@@ -14,6 +14,8 @@ import java.util.*;
 @Repository
 public class ExcelRead {
 
+    @Autowired
+    private static BCryptPasswordEncoder bCryptPasswordEncoder;
     public static List<Map<String, Object>> read(MultipartFile fileExcel) throws Exception {
         OPCPackage opcPackage = OPCPackage.open(fileExcel.getInputStream()); // 파일 읽어오기
         Workbook workbook = WorkbookFactory.create(opcPackage);
@@ -55,7 +57,7 @@ public class ExcelRead {
                             dataMap.put("id", cellvalue);
                             break;
                         case 1:
-                            dataMap.put("pw", cellvalue);
+                            dataMap.put("pw", bCryptPasswordEncoder.encode(cellvalue));
                             break;
                         case 2:
                             dataMap.put("name", cellvalue);
