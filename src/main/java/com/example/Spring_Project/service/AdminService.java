@@ -22,6 +22,9 @@ public class AdminService {
     private AdminMapper adminMapper;
 
     @Autowired
+    private ExcelRead excelRead;
+
+    @Autowired
     private static BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public List<MemberDTO> selectMemberList() throws Exception {  //회원 리스트 출력
@@ -91,6 +94,8 @@ public class AdminService {
             id = id.substring(0, length) + "***";  // 뒷 2자리 ***
             //이름
             String name = dto.getName();
+            String name2=dto.getName();
+            String str="";
             if (name.length() == 2) {
                 length = name.length() - 1;
                 name = name.substring(0, length) + "*";  // 뒷 1자리 *
@@ -98,7 +103,10 @@ public class AdminService {
                 name = name.substring(0, 1) + "*" + name.substring(2, 3);  // 가운데 *
             } else {
                 length = name.length() - 2;
-                name = name.substring(0, length) + "*";  // 뒷 2자리 ***
+                name = name.substring(0, length);
+                for(int i=length; i<name2.length(); i++){
+                    str+="*";
+                }
             }
             //이메일
             String email = dto.getEmail();
@@ -112,7 +120,7 @@ public class AdminService {
             //전화번호
             String phone = dto.getPhone().substring(0, 3) + "****" + dto.getPhone().substring(7, 11);
 
-            row.createCell(0).setCellValue(name);
+            row.createCell(0).setCellValue(name+str);
             row.createCell(1).setCellValue(id);
             row.createCell(2).setCellValue(email);
             row.createCell(3).setCellValue(phone);
@@ -137,13 +145,14 @@ public class AdminService {
     //엑셀 업로드
     public void excelUpload(@RequestParam MultipartFile fileExcel) throws Exception {
 
-        List<Map<String, Object>> excelContent = ExcelRead.read(fileExcel);
-
-
-        for(int i=0; i<excelContent.size(); i++){
-            String pw = (String)excelContent.get(i).get("pw");
-            bCryptPasswordEncoder.encode(pw);
-        }
+        List<Map<String, Object>> excelContent = excelRead.read(fileExcel);
+//
+//        System.out.println("excelContent size : "+excelContent.size());
+//        for(int i=0; i<excelContent.size(); i++){
+//            String pw = (String)excelContent.get(i).get("pw");
+//            System.out.println("pw : "+pw);
+//            pw=bCryptPasswordEncoder.encode(pw);
+//        }
 
         try {
             adminMapper.insertExcel(excelContent);

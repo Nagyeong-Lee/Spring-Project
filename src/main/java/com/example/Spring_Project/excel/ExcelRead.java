@@ -15,8 +15,8 @@ import java.util.*;
 public class ExcelRead {
 
     @Autowired
-    private static BCryptPasswordEncoder bCryptPasswordEncoder;
-    public static List<Map<String, Object>> read(MultipartFile fileExcel) throws Exception {
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    public List<Map<String, Object>> read(MultipartFile fileExcel) throws Exception {
         OPCPackage opcPackage = OPCPackage.open(fileExcel.getInputStream()); // 파일 읽어오기
         Workbook workbook = WorkbookFactory.create(opcPackage);
         Sheet firstSheet = workbook.getSheetAt(0);
@@ -25,10 +25,11 @@ public class ExcelRead {
         List<Map<String, Object>> result = new ArrayList<>();
 
 
+        Map<String, Object> dataMap = null;
         while (iterator.hasNext()) {
             Row nextRow = iterator.next();
             Iterator<Cell> cellIterator = nextRow.cellIterator();
-            Map<String, Object> dataMap = new HashMap<>();
+            dataMap = new HashMap<>();
 
             while (cellIterator.hasNext()) {
                 Cell cell = cellIterator.next();
@@ -100,6 +101,7 @@ public class ExcelRead {
                 }
 
             }
+
             if (dataMap.size() != 0) {
                 result.add(dataMap);
             }

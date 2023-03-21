@@ -71,7 +71,7 @@ public class AdminController {
 
     @ResponseBody  //엑셀 업로드
     @PostMapping("/upload")
-    public String excelUploadAjax(@RequestParam MultipartFile fileExcel,MultipartHttpServletRequest request) throws Exception {
+    public ModelAndView excelUploadAjax(@RequestParam MultipartFile fileExcel,MultipartHttpServletRequest request) throws Exception {
 
         MultipartFile excelFile = request.getFile("fileExcel");
 
@@ -104,14 +104,13 @@ public class AdminController {
 
         MultipartFile multipartFile = new CommonsMultipartFile(fileItem);
 
-
         adminService.excelUpload(multipartFile);
 
         ModelAndView view = new ModelAndView();
 
         view.setViewName("/admin/main");
 
-        return "";
+        return view;
     }
 }
 
