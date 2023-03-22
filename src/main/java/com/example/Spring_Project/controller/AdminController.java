@@ -2,8 +2,11 @@ package com.example.Spring_Project.controller;
 
 import com.example.Spring_Project.dto.MemberDTO;
 import com.example.Spring_Project.service.AdminService;
+import com.example.Spring_Project.service.MemberService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -26,6 +29,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.*;
 
+@Slf4j
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
@@ -47,6 +51,8 @@ public class AdminController {
         }
         model.addAttribute("list", list);
         return "/admin/main";
+
+//        log.debug("trace log={}", name);
     }
 
     @RequestMapping("/chart") //분기별 회원가입 수
