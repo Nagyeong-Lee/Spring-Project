@@ -1,3 +1,6 @@
+<%@ page import="static jdk.javadoc.internal.doclets.formats.html.markup.RawHtml.nbsp" %>
+<%@ page import="com.example.Spring_Project.dto.ReplyDTO" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -118,7 +121,10 @@
                     <c:forEach var="i" items="${commentList}">
                         <div class="content" id="${i.cmt_seq}">
                             <c:if test="${i.status eq 'Y' }">
-                                ${i.content}
+                                <c:forEach var="k" begin="2" end="${i.level}">
+                                    &nbsp
+                                </c:forEach>
+                                <span id="originalContent${i.cmt_seq}">${i.content}</span>
                             </c:if>
                             <c:if test="${i.status eq 'N'}">
                                 =============삭제된 댓글입니다.=============
@@ -278,7 +284,7 @@
             , isModalEnd: true
             , async: false
             , success: function (data) {
-                location.href = "/board/list?currentPage=1&count=10"
+                location.href = "/board/detail?b_seq=" + b_seq;
             }, error: function (e) {
             }
         });
@@ -300,18 +306,21 @@
                     "b_seq": b_seq
                 }
         }).done(function (resp) {
-            let comment = $("<div></div>");
+            let comment = $("<div id=\""+resp+"\"></div>");
             comment.text(content);   //댓글 작성
             $("#comment").val('');   //댓글 작성칸 초기화
 
-            let str="<button>대댓글 달기</button><button>댓글 삭제</button><button>댓글 수정</button>";
-
+            console.log("resp : " + resp);
+            let str = '<button type="button" class="cmt" onclick="cmtOpen(\'' + resp + '\')">대댓글 달기</button> ';
+            str += '<button type="button" onclick="cmtDel(\'' + resp + '\')">댓글 삭제</button> ';
+            str += '<button type="button" onclick="cmtUpd(\'' + resp + '\')">댓글 수정</button>';
             comment.append(str);
             let info = $("<div></div>");
             let infoText = writer + " " + $("#write_date").val();
             info.text(infoText);
+            comment.append(info);
             $(".showComments").append(comment);
-            $(".showComments").append(info);
+            // $(".showComments").append(info);
         });
     });
 
@@ -319,10 +328,10 @@
     let replyCmtNum; //대댓글의 cmt_seq
 
     function cmtOpen(cmtNum) {
-
+        console.log('cmtOpen');
         replyCmtNum = cmtNum;
-
-        $(".cmt").remove();
+        // console.log("ㅌㅇ : " + cmtNum);
+        // $(".cmt").remove();
         let parent_cmt_seq = cmtNum;
 
         let btn = '<button type="button" class="completeCmt" id="complete" onClick="writeReply(' + cmtNum + ')">대댓글 작성완료</button><br>'
@@ -334,15 +343,15 @@
     }
 
     function cmtDel(cmtNum) {  //댓글 삭제
-
+        console.log('cmtDel');
         let cmt_seq = cmtNum;
-
+        let b_seq = $("#b_seq").val();
         $.ajax({
             url: "/comment/deleteCmt",
             type: "post",
             data: {"cmt_seq": cmt_seq}
         }).done(function (resp) {
-            location.href = "/board/list?currentPage=1&count=10";
+            location.href = "/board/detail?b_seq=" + b_seq;
         });
     }
 
@@ -350,16 +359,18 @@
 
     //댓글 수정
     function cmtUpd(cmtNum) {
+        console.log('cmtUpd');
+        let originalContent = $("#originalContent" + cmtNum).text();
         cmt_num = cmtNum;
-        $("#" + cmtNum).remove();
-        $("#info" + cmtNum).remove();
+        // $("#" + cmtNum).remove();
+        // $("#info" + cmtNum).remove();
 
         let btn = '<button type="button" class="upd" id="upd">수정 완료</button>'
-        let div = '<textarea class="box" id="updtextArea" name="updtextArea"></textarea>'
-
-        $("#" + cmtNum).append(div); //textarea
-        $("#" + cmtNum).append(btn); //작성완료 btn
-
+        let div = '<textarea class="box" id="updtextArea" name="updtextArea">' + originalContent + ' </textarea>'
+        // $("#originalContent"+cmtNum).remove();
+        $("#updTextArea").text(originalContent);
+        $("#" + cmt_num).append(div); //textarea
+        $("#" + cmt_num).append(btn); //작성완료 btn
     }
 
     //댓글 수정 완료 클릭 시
@@ -379,7 +390,7 @@
                 "cmt_seq": cmt_seq
             }
         }).done(function (resp) {
-            location.href = "/board/list?currentPage=1&count=10";
+            location.href = "/board/detail?b_seq=" + b_seq;
         });
     })
 
@@ -409,7 +420,7 @@
                 "parent_cmt_seq": replyCmtNum
             }
         }).done(function (resp) {
-            location.href = "/board/list?currentPage=1&count=10";
+            location.href = "/board/detail?b_seq=" + b_seq;
         });
     })
 

@@ -27,7 +27,7 @@ public class CommentController {
 
     @ResponseBody
     @PostMapping("/insert") //댓글 insert
-    public CommentDTO insert(@RequestParam String content, @RequestParam String writer, @RequestParam Integer b_seq) throws Exception {
+    public Integer insert(@RequestParam String content, @RequestParam String writer, @RequestParam Integer b_seq) throws Exception {
 
         CommentDTO commentDTO = new CommentDTO();
         commentDTO.setContent(content);
@@ -37,7 +37,10 @@ public class CommentController {
         service.insert(commentDTO);
 
         session.setAttribute("cmtID", writer);
-        return commentDTO;
+
+        Integer currVal=service.getCurrentVal();
+
+        return currVal;
     }
 
     @ResponseBody

@@ -74,14 +74,16 @@
         <input type=hidden value="10" name="count" id="count">
 
         <select name="searchType" id="searchType">
-            <option value="title" selected>제목</option>
-            <option value="writer">작성자</option>
-            <option value="content">내용</option>
+            <option value="title" <c:out value="${searchType eq 'title' ? 'selected' : ''}"/>>제목</option>
+            <option value="writer" <c:out value="${searchType eq 'writer' ? 'selected' : ''}"/>>작성자</option>
+            <option value="content" <c:out value="${searchType eq 'content' ? 'selected' : ''}"/>>내용</option>
         </select>
-        <input type="text" id="keyword" name="keyword">
+        <input type="text" id="keyword" name="keyword" value="${keyword}">
         <button type="submit" id="searchBtn">글 검색</button>
         <button type="button" id="writeBtn">글 작성</button>
-        <a href="/member/myPage"><button type="button" id="toMyPage">마이페이지로 이동</button></a>
+        <a href="/member/myPage">
+            <button type="button" id="toMyPage">마이페이지로 이동</button>
+        </a>
     </form>
 </div>
 

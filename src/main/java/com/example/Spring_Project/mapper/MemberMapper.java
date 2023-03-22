@@ -5,6 +5,7 @@ import com.example.Spring_Project.dto.MemberDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Repository
 @Mapper
@@ -42,6 +43,6 @@ public interface MemberMapper {
 
     void tempPw(@Param("email") String email, @Param("pw") String pw); //임시 pw
     void update(MemberDTO memberDTO); //정보수정
-
+    MemberDTO getImgInfo(@Param("m_seq") Integer m_seq);
     String getUserType(@Param ("id") String id);  //인터셉터
 }

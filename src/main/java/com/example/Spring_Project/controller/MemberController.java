@@ -37,19 +37,19 @@ public class MemberController {
     public String signUp(MemberDTO memberDTO, MailDTO mailDTO,
                          @RequestParam("file") MultipartFile file, MultipartHttpServletRequest request) throws Exception {
 
-        String path = "C:/PROFILE/";
-        File dir = new File(path);
-        if (!dir.isDirectory()) {
-            dir.mkdirs();
+        String path = "/resources/img/profile/";
+
+        String savePath = request.getServletContext().getRealPath(path); //webapp 폴더
+        File fileSavePath = new File(savePath);
+
+        if (!fileSavePath.exists()) {
+            fileSavePath.mkdir();
         }
 
         String oriname = file.getOriginalFilename();
+        String sysname = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
-        UUID uuid = UUID.randomUUID();
-        String sysname = uuid + "_" + oriname;
-
-        String savePath = path + sysname; //저장될 파일 경로
-        file.transferTo(new File(savePath));
+        file.transferTo(new File(fileSavePath + "/" + sysname));
 
         memberDTO.setSavePath(savePath);
         memberDTO.setOriname(oriname);
@@ -70,8 +70,15 @@ public class MemberController {
 
     @ResponseBody
     @PostMapping("/emailDupleCheck")   //이메일 중복 체크
-    public Integer emailDupleCheck(@RequestParam String email) throws Exception {
-        return service.emailDupleCheck(email);
+    public String emailDupleCheck(@RequestParam String email) throws Exception {
+        String str = "";
+        Integer result = service.emailDupleCheck(email);
+        if (result == 1) {
+            str = "exist";
+        } else {
+            str = "none";
+        }
+        return str;
     }
 
     @PostMapping("/login")  //로그인 (성공->마이페이지 / 실패->메인페이지로 이동)
@@ -79,18 +86,20 @@ public class MemberController {
         String result = "";
 
         MemberDTO memberDTO = service.selectById(id);
-        String type = memberDTO.getType();
-
         if (memberDTO == null) {
             result = "redirect:/";
-        } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && type.equals("ROLE_ADMIN")) {  //ADMIN일때 타입일때
+            return result;
+        }
+        String type = memberDTO.getType();
+
+        if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && type.equals("ROLE_ADMIN")) {  //ADMIN일때 타입일때
             session.setAttribute("id", id);
-            session.setAttribute("admin" , true);  //관리자 세션 부여
+            session.setAttribute("admin", true);  //관리자 세션 부여
             result = "redirect:/admin/main";
         } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && !type.equals("ROLE_ADMIN")) {
             if (service.login(memberDTO.getId(), memberDTO.getPw()) == 1) { //로그인 성공
                 session.setAttribute("id", id);  //아이디 세션 부여
-                session.setAttribute("admin" , false);
+                session.setAttribute("admin", false);
                 model.addAttribute("id", session.getAttribute("id"));
                 result = "/member/myPage";
             } else {
@@ -124,27 +133,37 @@ public class MemberController {
     }
 
     @PostMapping("/update")  //정보수정
-    public String update(MemberDTO memberDTO, @RequestParam("file") MultipartFile file) throws Exception {
+    public String update(MemberDTO memberDTO, @RequestParam("file") MultipartFile file, MultipartHttpServletRequest request) throws Exception {
 
-        String path = "C:/PROFILE/";
-        File dir = new File(path);
-        if (!dir.isDirectory()) {
-            dir.mkdirs();
+        String path = "/resources/img/profile/";
+
+//        MemberDTO imgDTO = service.getImgInfo(memberDTO.getM_seq());
+
+        String savePath = request.getServletContext().getRealPath(path); //webapp 폴더
+        File fileSavePath = new File(savePath);
+
+        if (!fileSavePath.exists()) {
+            fileSavePath.mkdir();
         }
+
         String oriname = file.getOriginalFilename();
-        UUID uuid = UUID.randomUUID();
-        String sysname = uuid + "_" + oriname;
+        String sysname = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
-        String savePath = path + sysname; //저장될 파일 경로
-        file.transferTo(new File(savePath));
+        if (file.isEmpty()) {
+            //없을떄
+            memberDTO.setFileIsEmpty("N");
+        } else {
+            //있을때
+            file.transferTo(new File(fileSavePath + "/" + sysname));
+            memberDTO.setFileIsEmpty("Y");
+            memberDTO.setSavePath(savePath);
+            memberDTO.setOriname(oriname);
+            memberDTO.setSysname(sysname);
+        }
 
-        memberDTO.setSavePath(savePath);
-        memberDTO.setOriname(oriname);
-        memberDTO.setSysname(sysname);
-
-        memberDTO.setPw(bCryptPasswordEncoder.encode(memberDTO.getPw()));
+//      memberDTO.setPw(bCryptPasswordEncoder.encode(memberDTO.getPw()));
         service.update(memberDTO);
-        return "redirect:/";
+        return "/member/myPage";
     }
 
     @GetMapping("/toSearchIdForm")  //id 찾기 페이지로 이동

@@ -3,6 +3,7 @@ package com.example.Spring_Project.controller;
 import com.example.Spring_Project.dto.BoardDTO;
 import com.example.Spring_Project.dto.CommentDTO;
 import com.example.Spring_Project.dto.FileDTO;
+import com.example.Spring_Project.dto.ReplyDTO;
 import com.example.Spring_Project.service.BoardService;
 import com.example.Spring_Project.service.CommentService;
 import com.example.Spring_Project.service.FileService;
@@ -64,6 +65,8 @@ public class BoardController {
         model.addAttribute("list", list);
         model.addAttribute("paging", paging);
         model.addAttribute("id", session.getAttribute("id"));
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("keyword", keyword);
         return "/board/main";
     }
 
@@ -123,13 +126,14 @@ public class BoardController {
         service.count(b_seq);   //조회수 증가
 
         BoardDTO boardDTO = service.getBoardDetail(b_seq);   //게시글 상세 정보 가져오기
-        List<CommentDTO> commentList = commentService.getComment(b_seq);
+        List<ReplyDTO> commentList = commentService.getComment(b_seq);
         List<FileDTO> list = fileService.getFile(b_seq);
 
 
         model.addAttribute("boardDTO", boardDTO);
         model.addAttribute("commentList", commentList); //댓글 가져오기
         model.addAttribute("file", list);
+        model.addAttribute("b_seq", b_seq);
         return "/board/detailPost";
     }
 

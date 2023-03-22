@@ -32,7 +32,7 @@
         </div>
         <div>
             이메일<input type="text" id="email" name="email">
-            <span id="checkEmail"></span><br>
+            <span id="checkEmail"></span>
             <input type="button" id="authenticBtn" name="authenticBtn" value="인증하기">
         </div>
         <div class="emailDupleCheck"></div>
@@ -52,7 +52,7 @@
         <input type="text" id="detailAddress" name="detailAddress" placeholder="상세주소">
 
         <div>프로필 사진<br>
-            <input type="file" id="file" name="file"><br>
+            <input type="file" id="file" name="file" onclick="checkFileName(this)"><br>
             <span id="isFileExist" name="isFileExist"></span>
         </div>
         <div>
@@ -68,8 +68,6 @@
 
 
 <script>
-
-    $("#authenticBtn").hide();
 
     //아이디 중복 체크 (포커스 이동시)
     let idDupleCheck = false;
@@ -92,6 +90,8 @@
             }
         }).done(function (res) {
             if (res == 1) {
+                alert("중복된 아이디입니다.");
+                $("#id").val('');
                 idDupleCheck = false;
             } else {
                 idDupleCheck = true;
@@ -99,26 +99,59 @@
         });
     });
 
+
     //이메일 중복 체크
     let emailDupleCheck = false;
-    $("#email").on("change", function () {
+    let EmailOk = true;
+    let regexEmail = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.com/;
+
+    //인증하기 버튼 클릭 시
+    $("#authenticBtn").on("click", function () {
 
         let email = $("#email").val();
 
-        $.ajax({
-            url: "/member/emailDupleCheck",
-            type: "post",
-            data: {"email": email}
-        }).done(function (res) {
-            if (res == 1) {
-                emailDupleCheck = false;
-            } else {
-                emailDupleCheck = true;
-                //인증하기 버튼 보여주기
-                $("#authenticBtn").show();
-            }
-        });
+        //이메일 유효성 체크
+        if (regexEmail.test(email) == false) {
+            alert("이메일 형식이 맞지 않습니다.");
+            $("#email").val("");
+            EmailOk = false;
+        } else {
+            EmailOk = true;
+        }
+
+        if (EmailOk) {
+            $.ajax({
+                url: "/member/emailDupleCheck",
+                type: "post",
+                data: {"email": email},
+                async: false
+            }).done(function (data) {
+                if (data == 'exist') {
+                    emailDupleCheck = false;
+                    alert('중복된 이메일입니다.');
+                    $("#email").val('');
+                    return false;
+                }else if(data == 'none'){
+                    emailDupleCheck = true;
+                }
+            });
+        }
+
+        if (EmailOk==true && emailDupleCheck==true) {
+            $.ajax({
+                url: "/mail",
+                type: "post",
+                data: {
+                    "address": $("#email").val(),
+                    "title": "회원가입 인증",
+                    "message": msg
+                }
+            }).done(function (resp) {
+                alert("인증번호를 전송했습니다.");
+            });
+        }
     });
+
 
     //pw 일치 여부
     let pwOk = false;
@@ -137,20 +170,30 @@
 
     let msg = randomString();
 
-    //메일 인증하기 클릭 시
-    $("#authenticBtn").on("click", function () {
-        $.ajax({
-            url: "/mail",
-            type: "post",
-            data: {
-                "address": $("#email").val(),
-                "title": "회원가입 인증",
-                "message": msg
-            }
-        }).done(function (resp) {
-            alert("인증번호를 전송했습니다.");
-        });
+    //사진 확장자 체크
+    let extension = true;
+    $("#file").on("change", function () {
+
+        var str = $(this).val();
+        var fileName = str.split('\\').pop().toLowerCase();
+        checkFileName(fileName);
+
     });
+
+    function checkFileName(str) {
+        //1. 확장자 체크
+        var ext = str.split('.').pop().toLowerCase();
+        if ($.inArray(ext, ['jpg', 'png', 'jpeg']) == -1) {
+            alert('jpg, png, jpeg 파일만 업로드 가능합니다.');
+            $("#file").val('');
+            extension = false;
+        } else {
+            extension = true;
+            return;
+        }
+
+    }
+
 
     //유효성 검사
     $('#btn').on('click', function () {
@@ -174,6 +217,7 @@
         let regexEmail = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.com/;
         let regexPhone = /^010\d{4}\d{4}$/;
 
+
         //아이디 공백
         if (id == '') {
             alert("아이디를 입력해주세요.");
@@ -188,7 +232,6 @@
 
         //아이디 중복 체크
         if (idDupleCheck == false) {
-            alert("중복된 아이디입니다.");
             return false;
         }
 
@@ -236,14 +279,16 @@
         }
 
         //이메일 유효성
-        if (regexEmail.test(email) == false) {
-            alert("이메일 형식이 맞지 않습니다.");
+        if (EmailOk = false) {
             return false;
         }
+        //이메일 유효성
+        // if (regexEmail.test(email) == false) {
+        //     return false;
+        // }
 
         //이메일 중복일때
         if (emailDupleCheck == false) {
-            alert("중복된 이메일입니다.");
             return false;
         }
 
@@ -288,11 +333,17 @@
             return false;
         }
 
+        //파일 확장자 안맞을때
+        if (extension == false) {
+            return false;
+        }
+
         // 파일 없을 때
         if (file == '') {
             alert("파일을 첨부해주세요.");
             return false;
         }
+
         $('#frm').submit();
     });
 

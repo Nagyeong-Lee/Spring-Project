@@ -18,7 +18,7 @@
         )
     </insert>
     
-    <select id="getComment" resultType="com.example.Spring_Project.dto.CommentDTO">
+    <select id="getComment" resultType="com.example.Spring_Project.dto.ReplyDTO">
         SELECT
             LPAD(' ', 2*(LEVEL-1)) || content AS content,
             b_seq,
@@ -73,5 +73,10 @@
         select parent_cmt_seq
         from cmt
         where cmt_seq=#{cmt_seq}
+    </select>
+
+    <select id="getCurrentVal" resultType="Integer">
+        select cmt_seq.currval
+        from dual
     </select>
 </mapper>

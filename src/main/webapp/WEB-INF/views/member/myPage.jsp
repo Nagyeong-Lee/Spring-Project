@@ -24,7 +24,7 @@
 
     //커뮤니티로 이동
     $("#board").on("click", function () {
-        location.href = "/board/list?currentPage=1&count=10&searchType=''&keyword=''";
+        location.href = "/board/list?currentPage=1&count=10&searchType=&keyword=";
     });
 
     //계정 탈퇴

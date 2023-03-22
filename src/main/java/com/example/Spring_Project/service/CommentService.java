@@ -1,5 +1,6 @@
 package com.example.Spring_Project.service;
 import com.example.Spring_Project.dto.CommentDTO;
+import com.example.Spring_Project.dto.ReplyDTO;
 import com.example.Spring_Project.mapper.CommentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ public class CommentService {
         mapper.insert(commentDTO);
     }
 
-    public List<CommentDTO> getComment(@RequestParam Integer b_seq) throws Exception {  //댓글까지 같이 출력
+    public List<ReplyDTO> getComment(@RequestParam Integer b_seq) throws Exception {  //댓글까지 같이 출력
         return mapper.getComment(b_seq);
     }
 
@@ -37,5 +38,10 @@ public class CommentService {
     public Integer getParentSeq(@RequestParam Integer cmt_seq) throws Exception{
         return mapper.getParentSeq(cmt_seq);
     }
+
+    public Integer getCurrentVal() throws Exception{
+        return mapper.getCurrentVal();
+    }
+
 
 }

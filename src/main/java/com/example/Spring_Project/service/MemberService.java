@@ -79,6 +79,12 @@ public class MemberService {
         return mapper.login(id, pw);
     }
 
+    //update img
+    public MemberDTO getImgInfo(@RequestParam Integer m_seq) throws Exception {
+        return mapper.getImgInfo(m_seq);
+    }
+
+
     //인터셉터
     public String getUserType(@Param("id") String id) throws Exception{
         return mapper.getUserType(id);

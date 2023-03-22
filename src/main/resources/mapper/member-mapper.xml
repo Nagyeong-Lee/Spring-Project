@@ -20,11 +20,12 @@
         #{jibunAddress},
         #{detailAddress, jdbcType=VARCHAR},
         sysdate,
-        #{oriname},
-        #{sysname},
-        #{savePath},
+        #{oriname, jdbcType=VARCHAR},
+        #{sysname, jdbcType=VARCHAR},
+        #{savePath, jdbcType=VARCHAR},
         'Y',
-        'ROLE_MEMBER')
+        'ROLE_MEMBER',
+        #{fileIsEmpty, jdbcType=VARCHAR})
     </insert>
 
     <select id="idDupleCheck" resultType="Integer">
@@ -54,22 +55,22 @@
 
     <select id="memberInfo" resultType="com.example.Spring_Project.dto.MemberDTO">
         select
-            m_seq,
-            id,
-            pw,
-            name,
-            email,
-            phone,
-            postcode,
-            roadAddress,
-            jibunAddress,
-            detailAddress,
-            signup_date,
-            oriname,
-            sysname,
-            savePath,
-            status,
-            type
+        m_seq,
+        id,
+        pw,
+        name,
+        email,
+        phone,
+        postcode,
+        roadAddress,
+        jibunAddress,
+        detailAddress,
+        signup_date,
+        oriname,
+        sysname,
+        savePath,
+        status,
+        type
         from member
         where id=#{id} and status='Y'
     </select>
@@ -88,44 +89,44 @@
 
     <select id="selectById" resultType="com.example.Spring_Project.dto.MemberDTO">
         select
-            m_seq,
-            id,
-            pw,
-            name,
-            email,
-            phone,
-            postcode,
-            roadAddress,
-            jibunAddress,
-            detailAddress,
-            signup_date,
-            oriname,
-            sysname,
-            savePath,
-            status,
-            type
+        m_seq,
+        id,
+        pw,
+        name,
+        email,
+        phone,
+        postcode,
+        roadAddress,
+        jibunAddress,
+        detailAddress,
+        signup_date,
+        oriname,
+        sysname,
+        savePath,
+        status,
+        type
         from member
         where id=#{id} and status='Y'
     </select>
 
     <select id="selectByEmail" resultType="com.example.Spring_Project.dto.MemberDTO">
         select
-            m_seq,
-            id,
-            pw,
-            name,
-            email,
-            phone,
-            postcode,
-            roadAddress,
-            jibunAddress,
-            detailAddress,
-            signup_date,
-            oriname,
-            sysname,
-            savePath,
-            status,
-            type
+        m_seq,
+        id,
+        pw,
+        name,
+        email,
+        phone,
+        postcode,
+        roadAddress,
+        jibunAddress,
+        detailAddress,
+        signup_date,
+        oriname,
+        sysname,
+        savePath,
+        status,
+        type
         from member
         where email=#{email}
     </select>
@@ -145,16 +146,17 @@
 
     <update id="update" parameterType="com.example.Spring_Project.dto.MemberDTO">
         update member
-            set pw=#{pw},
-            name=#{name},
-            phone=#{phone},
-            postcode=#{postcode},
-            roadAddress=#{roadAddress},
-            jibunAddress=#{jibunAddress},
-            detailAddress=#{detailAddress, jdbcType=VARCHAR},
-            oriname=#{oriname},
-            sysname=#{sysname},
-            savePath=#{savePath}
+        set name=#{name},
+        phone=#{phone},
+        postcode=#{postcode},
+        roadAddress=#{roadAddress},
+        jibunAddress=#{jibunAddress},
+        detailAddress=#{detailAddress, jdbcType=VARCHAR}
+        <if test="fileIsEmpty eq 'Y'.toString()">
+            ,oriname=#{oriname, jdbcType=VARCHAR},
+            sysname=#{sysname, jdbcType=VARCHAR},
+            savePath=#{savePath, jdbcType=VARCHAR}
+        </if>
         where id=#{id}
         and status='Y'
     </update>
@@ -164,4 +166,5 @@
         from member
         where id=#{id}
     </select>
+
 </mapper>

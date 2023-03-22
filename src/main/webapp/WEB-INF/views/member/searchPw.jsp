@@ -55,6 +55,9 @@
         }).done(function (resp) {
             if (resp == 'none') {
                 alert('존재하지 않는 이메일입니다.');
+                $("#author").hide();
+                $("#authenticBtn").hide();
+                $("#email").val('');
             } else {
                 $("#author").show();
                 $("#authenticBtn").show();
@@ -81,7 +84,7 @@
         let email = $("#email").val();
         let pw = msg; // pw를 임시비번으로
 
-        let temp=$("#tempNum").val();
+        let temp = $("#tempNum").val();
 
         $.ajax({
             url: "/member/searchPw",
@@ -93,8 +96,8 @@
         }).done(function (resp) {
             if (temp == msg) {
                 alert('임시비밀번호로 변경되었습니다.');
-                location.href="/";
-            }else{
+                location.href = "/";
+            } else {
                 alert('인증번호가 일치하지 않습니다.');
                 $("#tempNum").val('');
             }

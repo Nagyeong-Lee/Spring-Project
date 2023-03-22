@@ -29,4 +29,5 @@ public class MemberDTO {
     private String savePath;
     private String status;
     private String type;
+    private String fileIsEmpty;
 }

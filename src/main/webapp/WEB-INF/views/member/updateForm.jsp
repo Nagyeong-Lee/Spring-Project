@@ -20,22 +20,15 @@
 <c:if test="${not empty memberDTO}">
     <div class="updateInfoBox">
         <form action="/member/update" method="post" id="frm" enctype="multipart/form-data">
+            <input type="hidden" id="m_seq"  name="m_seq" value="${memberDTO.m_seq}">
             <div>아이디
                 <input type="hidden" id="id" name="id" value="${memberDTO.id}">
                 <input type="text" disabled="disabled" placeholder="영어,숫자 6-10" value=${memberDTO.getId()}>
                 <span id="checkId"></span>
             </div>
             <div class="idDupleCheck"></div>
-            <div>비밀번호
-                <input type="password" id="pw" name="pw" placeholder="영어,숫자,~,!,@,$,^ 8-15">
-                <span id="checkPw"></span>
-            </div>
-            <div>비밀번호 확인
-                <input type="password" id="checkPwOk" name="checkPwOk">
-                <span id="equalPw"></span>
-            </div>
             <div>
-                이름<input type="text" id="name" name="name" placeholder="2~5자">
+                이름<input type="text" id="name" name="name" placeholder="2~5자" value="${memberDTO.name}">
                 <span id="checkName"></span>
             </div>
             <div>
@@ -44,17 +37,18 @@
                 <span id="checkEmail"></span><br>
             </div>
             <div>
-                전화번호<input type="text" id="phone" name="phone" placeholder="숫자만 입력">
+                전화번호<input type="text" id="phone" name="phone" placeholder="숫자만 입력" value="${memberDTO.phone}">
                 <span id="checkPhone"></span>
             </div>
 
-            <input type="text" id="postcode" name="postcode" placeholder="우편번호">
+            <input type="text" id="postcode" name="postcode" placeholder="우편번호" value="${memberDTO.postcode}">
             <input type="button" onclick="sample4_execDaumPostcode()" value="우편번호 찾기"><br>
-            <input type="text" id="roadAddress" name="roadAddress" placeholder="도로명주소"><br>
-            <input type="text" id="jibunAddress" name="jibunAddress" placeholder="지번주소"><br>
-            <input type="text" id="detailAddress" name="detailAddress" placeholder="상세주소">
+            <input type="text" id="roadAddress" name="roadAddress" placeholder="도로명주소" value="${memberDTO.roadAddress}"><br>
+            <input type="text" id="jibunAddress" name="jibunAddress" placeholder="지번주소" value="${memberDTO.jibunAddress}"><br>
+            <input type="text" id="detailAddress" name="detailAddress" placeholder="상세주소" value="${memberDTO.detailAddress}">
 
             <div>프로필 사진<br>
+                <img src="/resources/img/profile/${memberDTO.sysname}" style="width: 200px; height: 200px;"><br>
                 <input type="file" id="file" name="file"><br>
             </div>
             <div>
@@ -71,7 +65,7 @@
 <script>
 
     //pw 일치 여부
-    let pwOk = false;
+    // let pwOk = false;
 
     //6글자 랜덤 숫자 생성
     function randomString() {
@@ -87,9 +81,31 @@
 
     let msg = randomString();
 
+    //사진 확장자 체크
+    let extension = true;
+    $("#file").on("change",function(){
+
+        var str = $(this).val();
+        var fileName = str.split('\\').pop().toLowerCase();
+        checkFileName(fileName);
+
+    });
+
+    function checkFileName(str){
+        //1. 확장자 체크
+        var ext =  str.split('.').pop().toLowerCase();
+        if($.inArray(ext, ['jpg','png','jpeg']) == -1) {
+            alert('jpg, png, jpeg 파일만 업로드 가능합니다.');
+            $("#file").val('');
+            extension=false;
+        }
+
+    }
+
     //유효성 검사
     $('#updateBtn').on('click', function () {
 
+        let seq=$("#seq").val();
         let pw = $("#pw").val();
         let checkPwOk = $("#checkPwOk").val();
         let name = $("#name").val();
@@ -104,29 +120,29 @@
         let regexName = /^[가-힣]{2,5}$/;
         let regexPhone = /^010\d{4}\d{4}$/;
 
-        //pw 공백
-        if (pw == '') {
-            alert("비밀번호를 입력해주세요");
-            return false;
-        }
-
-        //pw 유효성
-        if (regexPw.test(pw) == false) {
-            alert("비밀번호 형식이 맞지 않습니다.");
-            return false;
-        }
-
-        //비밀번호 확인칸 공백
-        if (checkPwOk == '') {
-            alert("비밀번호를 확인해주세요.");
-            return false;
-        }
-
-        //pw 불일치
-        if (pw != checkPwOk) {
-            alert("비밀번호가 일치하지 않습니다.");
-            return false;
-        }
+        // //pw 공백
+        // if (pw == '') {
+        //     alert("비밀번호를 입력해주세요");
+        //     return false;
+        // }
+        //
+        // //pw 유효성
+        // if (regexPw.test(pw) == false) {
+        //     alert("비밀번호 형식이 맞지 않습니다.");
+        //     return false;
+        // }
+        //
+        // //비밀번호 확인칸 공백
+        // if (checkPwOk == '') {
+        //     alert("비밀번호를 확인해주세요.");
+        //     return false;
+        // }
+        //
+        // //pw 불일치
+        // if (pw != checkPwOk) {
+        //     alert("비밀번호가 일치하지 않습니다.");
+        //     return false;
+        // }
 
         //이름 공백
         if (name == '') {
@@ -169,11 +185,16 @@
             return false;
         }
 
-        // 파일 없을 때
-        if (file == '') {
-            alert("파일을 첨부해주세요.");
+        //파일 확장자 안맞을때
+        if (extension == false) {
             return false;
         }
+
+        //파일 없을 때
+        /*if (file == '') {
+            alert("파일을 첨부해주세요.");
+            return false;
+        }*/
 
         $('#frm').submit();
     });
@@ -205,6 +226,9 @@
         }).open();
     }
 
+    $("#file").on("change",function(){
+        $("img").remove();
+    });
 </script>
 </body>
 </html>

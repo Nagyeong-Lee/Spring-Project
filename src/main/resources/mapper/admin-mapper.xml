@@ -5,21 +5,21 @@
 <mapper namespace="com.example.Spring_Project.mapper.AdminMapper">
     <select id="selectMemberList" resultType="com.example.Spring_Project.dto.MemberDTO">
         select
-            id,
-            pw,
-            name,
-            email,
-            phone,
-            postcode,
-            roadAddress,
-            jibunAddress,
-            detailAddress,
-            signUp_date,
-            oriname,
-            sysname,
-            savePath,
-            status,
-            type
+        id,
+        pw,
+        name,
+        email,
+        phone,
+        postcode,
+        roadAddress,
+        jibunAddress,
+        detailAddress,
+        signUp_date,
+        oriname,
+        sysname,
+        savePath,
+        status,
+        type
         from member
         where id not in ('admin123')
     </select>
@@ -60,47 +60,48 @@
         and id not in ('admin123')
     </select>
 
-<!--    <insert id="insertExcel" parameterType="java.util.List">-->
-<!--        insert all-->
-<!--        <foreach collection="excelContent" item="item" separator=",">-->
-<!--            into member values-->
-<!--            (m_seq.nextval,-->
-<!--                #{item.id},-->
-<!--                #{item.pw},-->
-<!--                #{item.name},-->
-<!--                #{item.email},-->
-<!--                #{item.phone},-->
-<!--                #{item.postcode},-->
-<!--                #{item.roadAddress},-->
-<!--                #{item.jibunAddress},-->
-<!--                #{item.detailAddress, jdbcType=VARCHAR},-->
-<!--                sysdate,-->
-<!--                #{item.oriname},-->
-<!--                #{item.sysname},-->
-<!--                #{item.savePath},-->
-<!--                'Y',-->
-<!--                'ROLE_MEMBER')-->
-<!--        </foreach>-->
-<!--        SELECT * FROM DUAL-->
-<!--    </insert>-->
+    <!--    <insert id="insertExcel" parameterType="java.util.List">-->
+    <!--        insert all-->
+    <!--        <foreach collection="excelContent" item="item" separator=",">-->
+    <!--            into member values-->
+    <!--            (m_seq.nextval,-->
+    <!--                #{item.id},-->
+    <!--                #{item.pw},-->
+    <!--                #{item.name},-->
+    <!--                #{item.email},-->
+    <!--                #{item.phone},-->
+    <!--                #{item.postcode},-->
+    <!--                #{item.roadAddress},-->
+    <!--                #{item.jibunAddress},-->
+    <!--                #{item.detailAddress, jdbcType=VARCHAR},-->
+    <!--                sysdate,-->
+    <!--                #{item.oriname},-->
+    <!--                #{item.sysname},-->
+    <!--                #{item.savePath},-->
+    <!--                'Y',-->
+    <!--                'ROLE_MEMBER')-->
+    <!--        </foreach>-->
+    <!--        SELECT * FROM DUAL-->
+    <!--    </insert>-->
     <insert id="insertExcel" parameterType="java.util.HashMap">
         insert into member
-        values
-        (               m_seq.nextval,
-                        #{id},
-                        #{pw},
-                        #{name},
-                        #{email},
-                        #{phone},
-                        #{postcode},
-                        #{roadAddress},
-                        #{jibunAddress},
-                        #{detailAddress, jdbcType=VARCHAR},
-                        sysdate,
-                        #{oriname},
-                        #{sysname},
-                        #{savePath},
-                        'Y',
-                        'ROLE_MEMBER')
+        values (
+        m_seq.nextval,
+        #{id},
+        #{pw},
+        #{name},
+        #{email},
+        #{phone},
+        #{postcode},
+        #{roadAddress},
+        #{jibunAddress},
+        #{detailAddress, jdbcType=VARCHAR},
+        sysdate,
+        #{oriname, jdbcType=VARCHAR},
+        #{sysname, jdbcType=VARCHAR},
+        #{savePath, jdbcType=VARCHAR},
+        'Y',
+        'ROLE_MEMBER',
+        #{fileIsEmpty, jdbcType=VARCHAR})
     </insert>
 </mapper>
