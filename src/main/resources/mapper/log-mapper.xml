@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.Spring_Project.mapper.LogMapper">
+    <insert id="insertLog">
+        insert into
+        log
+        values
+            (log_seq.nextval,
+            #{id},
+            sysdate)
+    </insert>
+
+    <select id="isIdExist" resultType="Integer">
+        select
+            count(*)
+        from log
+        where id=#{id}
+    </select>
+</mapper>

@@ -93,14 +93,16 @@ public class MemberController {
         String type = memberDTO.getType();
 
         if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && type.equals("ROLE_ADMIN")) {  //ADMIN일때 타입일때
-            session.setAttribute("id", id);
-            session.setAttribute("admin", true);  //관리자 세션 부여
+            if (service.login(memberDTO.getId(), memberDTO.getPw()) == 1) { //로그인 성공
+                session.setAttribute("id", id); //아이디 세션 부여
+                session.setAttribute("admin", true);  //관리자 세션 부여
+            }
             result = "redirect:/admin/main";
         } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && !type.equals("ROLE_ADMIN")) {
             if (service.login(memberDTO.getId(), memberDTO.getPw()) == 1) { //로그인 성공
-                session.setAttribute("id", id);  //아이디 세션 부여
+                session.setAttribute("id", id);
                 session.setAttribute("admin", false);
-                model.addAttribute("id", session.getAttribute("id"));
+                model.addAttribute("admin", session.getAttribute("admin"));
                 result = "/member/myPage";
             } else {
                 result = "redirect:/";
