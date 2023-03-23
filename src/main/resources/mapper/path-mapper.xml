@@ -3,9 +3,26 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.Spring_Project.mapper.PathMapper">
-    <select id="getRole" resultType="String">
-        select type
-        from auth
-        where id=#{session}
+    <select id="getCommunityPath" resultType="String">
+        select path
+        from pathUrl
+        where path_seq=1
+    </select>
+
+    <select id="getLogoutPath" resultType="String">
+        select path
+        from pathUrl
+        where path_seq=3
+    </select>
+
+    <select id="getDeletePath" resultType="String">
+        select path
+        from pathUrl
+        where path_seq=2
+    </select>
+    <select id="getUpdateFormPath" resultType="String">
+        select path
+        from pathUrl
+        where path_seq=4
     </select>
 </mapper>

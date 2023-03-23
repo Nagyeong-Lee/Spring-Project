@@ -6,7 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@Mapper public interface PathMapper {
+@Mapper
+public interface PathMapper {
 
-    String getRole(String session);
+    String getCommunityPath();
+
+    String getLogoutPath();
+
+    String getDeletePath();
+
+    String getUpdateFormPath();
 }

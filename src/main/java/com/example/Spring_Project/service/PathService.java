@@ -11,7 +11,21 @@ public class PathService {
 
     @Autowired
     private PathMapper mapper;
-    public String getRole(String session) throws Exception{
-        return mapper.getRole(session);
+
+    public String getCommunityPath() throws Exception {
+        return mapper.getCommunityPath();
     }
+
+    public String getLogoutPath() throws Exception {
+        return mapper.getLogoutPath();
+    }
+
+    public String getDeletePath() throws Exception {
+        return mapper.getDeletePath();
+    }
+
+    public String getUpdateFormPath() throws Exception {
+        return mapper.getUpdateFormPath();
+    }
+
 }

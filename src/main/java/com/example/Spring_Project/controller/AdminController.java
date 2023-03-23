@@ -3,6 +3,7 @@ package com.example.Spring_Project.controller;
 import com.example.Spring_Project.dto.MemberDTO;
 import com.example.Spring_Project.service.AdminService;
 import com.example.Spring_Project.service.MemberService;
+import com.example.Spring_Project.service.PathService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
@@ -43,13 +44,18 @@ public class AdminController {
     @Autowired
     private HttpSession session;
 
+    @Autowired
+    private PathService pathService;
+
     @RequestMapping("/main")  //회원 리스트 출력
     public String toAdminMain(Model model) throws Exception {
         List<MemberDTO> list = adminService.selectMemberList();
         for (MemberDTO memberDTO : list) {
             memberDTO.setPw(BCryptPasswordEncoder.encode(memberDTO.getPw()));
         }
+        String logoutPath = pathService.getLogoutPath();
         model.addAttribute("list", list);
+        model.addAttribute("logoutPath", logoutPath);
         return "/admin/main";
 
 //        log.debug("trace log={}", name);

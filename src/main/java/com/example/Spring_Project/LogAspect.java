@@ -21,18 +21,6 @@ public class LogAspect {
     @Autowired
     private LogService logService;
 
-//    @Around("within(com.example.Spring_Project.service.MemberService*.doLogin(String,String)) && args())")
-//    public Object logging(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-//        Object result = proceedingJoinPoint.proceed();
-//        log.info("==> LogAspect Root:: " + proceedingJoinPoint.getSignature().getDeclaringTypeName());
-//        log.info("==> LogAspect Method:: " + proceedingJoinPoint.getSignature().getName());
-//
-//        if (proceedingJoinPoint.getSignature().getName().equals("login")) {
-//            String id = memberService.memberInfo(proceedingJoinPoint.getSignature().);
-//        }
-//        return result;
-//    }
-
     @Around("within(com.example.Spring_Project.service.MemberService) && args(id,pw)")
     public Object logging(ProceedingJoinPoint proceedingJoinPoint, String id, String pw) throws Throwable {
         Object result = proceedingJoinPoint.proceed();

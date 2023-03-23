@@ -17,18 +17,10 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        try{
-
+        try {
             HttpSession session = request.getSession();
             String uri = request.getRequestURI();
             String id = (String) session.getAttribute("id");
-            boolean admin = (boolean) session.getAttribute("admin");
-            String type = String.valueOf(service.getUserType(id));
-
-            System.out.println("uri : " + uri);
-            System.out.println("type : " + type);
-            System.out.println("id : " + id);
-            System.out.println("admin : " + admin);
 
             if (id == null) {
                 if (uri.equals("/member/logout")
@@ -44,17 +36,26 @@ public class LoginInterceptor implements HandlerInterceptor {
                 response.sendRedirect("/");
                 return false;
 
-            } else if (admin == false) { // 회원일때
+            }
+
+            boolean admin = (boolean) session.getAttribute("admin");
+            String type = String.valueOf(service.getUserType(id));
+
+            System.out.println("uri : " + uri);
+            System.out.println("type : " + type);
+            System.out.println("id : " + id);
+            System.out.println("admin : " + admin);
+
+            if (admin == false) { // 회원일때
                 if (uri.startsWith("/admin")) {
                     response.sendRedirect("/");
                     return false;
                 }
-            }
-            else if(admin) {
+            } else if (admin) {
                 return true;
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
 
         }

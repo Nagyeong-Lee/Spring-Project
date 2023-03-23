@@ -2,7 +2,9 @@ package com.example.Spring_Project.controller;
 
 import com.example.Spring_Project.dto.MemberDTO;
 import com.example.Spring_Project.mailSender.MailDTO;
+import com.example.Spring_Project.service.BatchService;
 import com.example.Spring_Project.service.MemberService;
+import com.example.Spring_Project.service.PathService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -27,6 +29,12 @@ public class MemberController {
 
     @Autowired
     private HttpSession session;
+
+    @Autowired
+    private PathService pathService;
+
+    @Autowired
+    private BatchService batchService;
 
     @GetMapping("/toSignUpForm")  // 회원가입폼으로 이동
     public String toSignUpForm() throws Exception {
@@ -100,9 +108,26 @@ public class MemberController {
             result = "redirect:/admin/main";
         } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && !type.equals("ROLE_ADMIN")) {
             if (service.login(memberDTO.getId(), memberDTO.getPw()) == 1) { //로그인 성공
+
+                Integer count = batchService.isIdExist(memberDTO.getId());
+                //휴면처리
+                if (count!=1) {
+                    batchService.insertLoginDate(memberDTO.getId());
+                }else{
+                    batchService.updateLoginDate(memberDTO.getId());
+                }
+
                 session.setAttribute("id", id);
                 session.setAttribute("admin", false);
                 model.addAttribute("admin", session.getAttribute("admin"));
+                String communityPath = pathService.getCommunityPath();
+                String deletePath = pathService.getDeletePath();
+                String updateFormPath = pathService.getUpdateFormPath();
+                String logoutPath = pathService.getLogoutPath();
+                model.addAttribute("updateFormPath", updateFormPath);
+                model.addAttribute("deletePath", deletePath);
+                model.addAttribute("logoutPath", logoutPath);
+                model.addAttribute("communityPath", communityPath);
                 result = "/member/myPage";
             } else {
                 result = "redirect:/";
@@ -117,14 +142,14 @@ public class MemberController {
     @GetMapping("/logout")  //로그아웃
     public String logout(@RequestParam String id) throws Exception {
         session.invalidate();
-        return "/member/index";
+        return "/";
     }
 
     @GetMapping("/delete")   //탈퇴하기
-    public String delete(@RequestParam String id) throws Exception {
+    public String delete(Model model, @RequestParam String id) throws Exception {
         session.invalidate();
         service.delete(id);
-        return "/member/index";
+        return "/";
     }
 
     @GetMapping("/toUpdateForm")    //회원 정보 수정 페이지로 이동
@@ -208,7 +233,15 @@ public class MemberController {
     }
 
     @RequestMapping("/myPage")
-    public String toMyPage() throws Exception {
+    public String toMyPage(Model model) throws Exception {
+        String communityPath = pathService.getCommunityPath();
+        String deletePath = pathService.getDeletePath();
+        String updateFormPath = pathService.getUpdateFormPath();
+        String logoutPath = pathService.getLogoutPath();
+        model.addAttribute("updateFormPath", updateFormPath);
+        model.addAttribute("deletePath", deletePath);
+        model.addAttribute("logoutPath", logoutPath);
+        model.addAttribute("communityPath", communityPath);
         return "/member/myPage";
     }
 

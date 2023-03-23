@@ -14,36 +14,40 @@
         ${id}님 안녕하세요.
     </c:if>
 </div>
-<button type="button" id="board"><input type="hidden" value="/member/delete">커뮤니티로</button>
-<button type="button" id="update">정보수정하기</button>
-<button type="button" id="delete">탈퇴하기</button>
-<button type="button" id="logout">로그아웃</button>
 
+<input type="hidden" value="${id}" id="sessionID">
+<button type="button" id="board"><input type="hidden" value="${communityPath}" id="toCommunity">커뮤니티로</button>
+<button type="button" id="update"><input type="hidden" value="${updateFormPath}" id="toUpdate">정보수정하기</button>
+<button type="button" id="delete"><input type="hidden" value="${deletePath}" id="toDelete">탈퇴하기</button>
+<button type="button" id="logout"><input type="hidden" value="${logoutPath}" id="toLogout">로그아웃</button>
 
 <script>
 
+    let id = $("#sessionID").val();
+
     //커뮤니티로 이동
     $("#board").on("click", function () {
-        location.href = "/board/list?currentPage=1&count=10&searchType=&keyword=";
+        location.href = $("#toCommunity").val();
     });
 
     //계정 탈퇴
     $("#delete").on("click", function () {
         if (confirm("탈퇴하시겠습니까?")) {
-            location.href = "/member/delete?id=${id}";
+            location.href = $("#toDelete").val() + id;
         }
     });
 
     //로그아웃
     $("#logout").on("click", function () {
         if (confirm("로그아웃하시겠습니까?")) {
-            location.href = "/member/logout?id=${id}";
+            location.href = $("#toLogout").val() + id;
         }
     });
 
     //정보 수정 페이지로 이동
     $("#update").on("click", function () {
-        location.href = "/member/toUpdateForm?id=${id}";
+        console.log($("#toUpdate").val() + id);
+        location.href = $("#toUpdate").val() + id;
     });
 
 </script>

@@ -52,12 +52,16 @@
 <button type="button" id="downloadBtn">excel download</button>
 <br>
 <a href="/admin/chart">
-    <button type="button">월별 회원가입 차트</button>
+    <button type="button">월별 회원가입 차트</button><br>
 </a>
-
+<button type="button" id="logout"><input type="hidden" id="toLogOut" value="${logoutPath}">로그아웃</button>
 <script>
     $("#downloadBtn").on("click", function () {
         location.href = "/admin/download";
+    });
+
+    $("#logout").on("click",function(){
+        location.href=$("#toLogOut").val();
     });
 
     //엑셀 업로드
