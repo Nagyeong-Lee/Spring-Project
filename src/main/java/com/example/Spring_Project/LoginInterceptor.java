@@ -22,6 +22,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             String uri = request.getRequestURI();
             String id = (String) session.getAttribute("id");
 
+            System.out.println("id null임");
             if (id == null) {
                 if (uri.equals("/member/logout")
                         || uri.equals("/member/delete")
