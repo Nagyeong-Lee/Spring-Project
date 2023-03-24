@@ -87,14 +87,15 @@
             type: 'post',
             data: {
                 "id": id
-            }
-        }).done(function (res) {
-            if (res == 1) {
-                alert("중복된 아이디입니다.");
-                $("#id").val('');
-                idDupleCheck = false;
-            } else {
-                idDupleCheck = true;
+            },
+            success: function (res) {
+                if (res == 1) {
+                    alert("중복된 아이디입니다.");
+                    $("#id").val('');
+                    idDupleCheck = false;
+                } else {
+                    idDupleCheck = true;
+                }
             }
         });
     });
@@ -124,20 +125,21 @@
                 url: "/member/emailDupleCheck",
                 type: "post",
                 data: {"email": email},
-                async: false
-            }).done(function (data) {
-                if (data == 'exist') {
-                    emailDupleCheck = false;
-                    alert('중복된 이메일입니다.');
-                    $("#email").val('');
-                    return false;
-                }else if(data == 'none'){
-                    emailDupleCheck = true;
+                async: false,
+                success: function (data) {
+                    if (data == 'exist') {
+                        emailDupleCheck = false;
+                        alert('중복된 이메일입니다.');
+                        $("#email").val('');
+                        return false;
+                    } else if (data == 'none') {
+                        emailDupleCheck = true;
+                    }
                 }
             });
         }
 
-        if (EmailOk==true && emailDupleCheck==true) {
+        if (EmailOk == true && emailDupleCheck == true) {
             $.ajax({
                 url: "/mail",
                 type: "post",
@@ -145,9 +147,10 @@
                     "address": $("#email").val(),
                     "title": "회원가입 인증",
                     "message": msg
+                },
+                success: function (resp) {
+                    alert("인증번호를 전송했습니다.");
                 }
-            }).done(function (resp) {
-                alert("인증번호를 전송했습니다.");
             });
         }
     });

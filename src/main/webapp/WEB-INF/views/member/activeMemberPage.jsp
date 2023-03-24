@@ -42,17 +42,18 @@
                 "email": email,
                 "id": id,
                 "pw": pw
-            }
-        }).done(function (data) {
-            if (data == "success") {
-                alert('휴면처리가 해제되었습니다.');
-                location.href = "/";
-            } else {
-                alert('정보를 다시 입력해주세요.');
-                $("#email").val("");
-                $("#id").val("");
-                $("#pw").val("");
-                //location.href="/member/toActiveMemberPage";
+            },
+            success: function (data) {
+                if (data == "success") {
+                    alert('휴면처리가 해제되었습니다.');
+                    location.href = "/";
+                } else {
+                    alert('정보를 다시 입력해주세요.');
+                    //input 초기화
+                    $("#email").val("");
+                    $("#id").val("");
+                    $("#pw").val("");
+                }
             }
         });
     });

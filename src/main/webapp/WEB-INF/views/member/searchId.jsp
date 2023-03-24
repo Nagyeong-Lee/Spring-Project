@@ -9,31 +9,34 @@
     </script>
 </head>
 <body>
-    <div class="searchIdBox">
-            <div>
-                 이메일 &nbsp<input type="text" placeholder='이메일을 입력해주세요' id="email" name="email">
-                 <button type="button" id="searchIdBtn">찾기</button>
-            </div>
-            <div class="text" id="text"></div>
-        <a href="/"><button type="button">목록으로</button></a>
+<div class="searchIdBox">
+    <div>
+        이메일 &nbsp<input type="text" placeholder='이메일을 입력해주세요' id="email" name="email">
+        <button type="button" id="searchIdBtn">찾기</button>
     </div>
+    <div class="text" id="text"></div>
+    <a href="/">
+        <button type="button">목록으로</button>
+    </a>
+</div>
 
-    <script>
-    $("#searchIdBtn").on("click",function(){
+<script>
+    $("#searchIdBtn").on("click", function () {
         let email = $("#email").val();
         $.ajax({
-            url:"/member/searchId",
-            type:"post",
-            data:{"email" : email},
-            async:false
-        }).done(function(data){
-            if(data != 'NONE'){
-                $("#text").text("ID : "+data);
-            }else{
-                $("#text").text("아이디가 존재하지 않습니다.");
+            url: "/member/searchId",
+            type: "post",
+            data: {"email": email},
+            async: false,
+            success: function (data) {
+                if (data != 'NONE') {
+                    $("#text").text("ID : " + data);
+                } else {
+                    $("#text").text("아이디가 존재하지 않습니다.");
+                }
             }
         });
     });
-    </script>
+</script>
 </body>
 </html>

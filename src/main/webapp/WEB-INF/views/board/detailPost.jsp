@@ -304,23 +304,24 @@
                     "content": content,
                     "writer": writer,
                     "b_seq": b_seq
-                }
-        }).done(function (resp) {
-            let comment = $("<div id=\""+resp+"\"></div>");
-            comment.text(content);   //댓글 작성
-            $("#comment").val('');   //댓글 작성칸 초기화
+                },
+            success: function (data) {
+                let comment = $("<div id=\"" + resp + "\"></div>");
+                comment.text(content);   //댓글 작성
+                $("#comment").val('');   //댓글 작성칸 초기화
 
-            let str = '<button type="button" class="cmt" onclick="cmtOpen(\'' + resp + '\')">대댓글 달기</button> ';
-            str += '<button type="button" onclick="cmtDel(\'' + resp + '\')">댓글 삭제</button> ';
-            str += '<button type="button" onclick="cmtUpd(\'' + resp + '\')">댓글 수정</button>';
-            comment.append(str);
-            let info = $("<div></div>");
-            let infoText = writer + " " + $("#write_date").val();
-            info.text(infoText);
-            comment.append(info);
-            $(".showComments").append(comment);
-            // $(".showComments").append(info);
-        });
+                let str = '<button type="button" class="cmt" onclick="cmtOpen(\'' + resp + '\')">대댓글 달기</button> ';
+                str += '<button type="button" onclick="cmtDel(\'' + resp + '\')">댓글 삭제</button> ';
+                str += '<button type="button" onclick="cmtUpd(\'' + resp + '\')">댓글 수정</button>';
+                comment.append(str);
+                let info = $("<div></div>");
+                let infoText = writer + " " + $("#write_date").val();
+                info.text(infoText);
+                comment.append(info);
+                $(".showComments").append(comment);
+                // $(".showComments").append(info);
+            }
+        })
     });
 
     //대댓글
@@ -345,9 +346,10 @@
         $.ajax({
             url: "/comment/deleteCmt",
             type: "post",
-            data: {"cmt_seq": cmt_seq}
-        }).done(function (resp) {
-            location.href = "/board/detail?b_seq=" + b_seq;
+            data: {"cmt_seq": cmt_seq},
+            success: function (data) {
+                location.href = "/board/detail?b_seq=" + b_seq;
+            }
         });
     }
 
@@ -383,9 +385,10 @@
                 "content": content,
                 "b_seq": b_seq,
                 "cmt_seq": cmt_seq
+            },
+            success: function (data) {
+                location.href = "/board/detail?b_seq=" + b_seq;
             }
-        }).done(function (resp) {
-            location.href = "/board/detail?b_seq=" + b_seq;
         });
     })
 
@@ -413,9 +416,10 @@
                 "content": content,
                 "b_seq": b_seq,
                 "parent_cmt_seq": replyCmtNum
+            },
+            success: function (data) {
+                location.href = "/board/detail?b_seq=" + b_seq;
             }
-        }).done(function (resp) {
-            location.href = "/board/detail?b_seq=" + b_seq;
         });
     })
 

@@ -51,16 +51,17 @@
             type: "post",
             data: {
                 "email": $("#email").val()
-            }
-        }).done(function (resp) {
-            if (resp == 'none') {
-                alert('존재하지 않는 이메일입니다.');
-                $("#author").hide();
-                $("#authenticBtn").hide();
-                $("#email").val('');
-            } else {
-                $("#author").show();
-                $("#authenticBtn").show();
+            },
+            success: function (resp) {
+                if (resp == 'none') {
+                    alert('존재하지 않는 이메일입니다.');
+                    $("#author").hide();
+                    $("#authenticBtn").hide();
+                    $("#email").val('');
+                } else {
+                    $("#author").show();
+                    $("#authenticBtn").show();
+                }
             }
         });
     });
@@ -74,9 +75,10 @@
                 "address": $("#email").val(),
                 "title": "임시 비밀번호",
                 "message": msg
+            },
+            success: function (resp) {
+                alert("임시 비밀번호를 전송했습니다.");
             }
-        }).done(function (resp) {
-            alert("임시 비밀번호를 전송했습니다.");
         });
     });
 
@@ -92,14 +94,15 @@
             data: {
                 "email": email,
                 "pw": pw
-            }
-        }).done(function (resp) {
-            if (temp == msg) {
-                alert('임시비밀번호로 변경되었습니다.');
-                location.href = "/";
-            } else {
-                alert('인증번호가 일치하지 않습니다.');
-                $("#tempNum").val('');
+            },
+            success: function (resp) {
+                if (temp == msg) {
+                    alert('임시비밀번호로 변경되었습니다.');
+                    location.href = "/";
+                } else {
+                    alert('인증번호가 일치하지 않습니다.');
+                    $("#tempNum").val('');
+                }
             }
         });
     });
