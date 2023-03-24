@@ -310,7 +310,6 @@
             comment.text(content);   //댓글 작성
             $("#comment").val('');   //댓글 작성칸 초기화
 
-            console.log("resp : " + resp);
             let str = '<button type="button" class="cmt" onclick="cmtOpen(\'' + resp + '\')">대댓글 달기</button> ';
             str += '<button type="button" onclick="cmtDel(\'' + resp + '\')">댓글 삭제</button> ';
             str += '<button type="button" onclick="cmtUpd(\'' + resp + '\')">댓글 수정</button>';
@@ -328,9 +327,7 @@
     let replyCmtNum; //대댓글의 cmt_seq
 
     function cmtOpen(cmtNum) {
-        console.log('cmtOpen');
         replyCmtNum = cmtNum;
-        // console.log("ㅌㅇ : " + cmtNum);
         // $(".cmt").remove();
         let parent_cmt_seq = cmtNum;
 
@@ -343,7 +340,6 @@
     }
 
     function cmtDel(cmtNum) {  //댓글 삭제
-        console.log('cmtDel');
         let cmt_seq = cmtNum;
         let b_seq = $("#b_seq").val();
         $.ajax({
@@ -359,7 +355,6 @@
 
     //댓글 수정
     function cmtUpd(cmtNum) {
-        console.log('cmtUpd');
         let originalContent = $("#originalContent" + cmtNum).text();
         cmt_num = cmtNum;
         // $("#" + cmtNum).remove();

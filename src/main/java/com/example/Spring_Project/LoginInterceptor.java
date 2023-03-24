@@ -32,7 +32,6 @@ public class LoginInterceptor implements HandlerInterceptor {
                         || uri.startsWith("/admin")
                         || uri.startsWith("/comment")
                         || uri.startsWith("/file"))
-                    System.out.println("SESSION CHECK");
                 response.sendRedirect("/");
                 return false;
 
@@ -40,11 +39,6 @@ public class LoginInterceptor implements HandlerInterceptor {
 
             boolean admin = (boolean) session.getAttribute("admin");
             String type = String.valueOf(service.getUserType(id));
-
-            System.out.println("uri : " + uri);
-            System.out.println("type : " + type);
-            System.out.println("id : " + id);
-            System.out.println("admin : " + admin);
 
             if (admin == false) { // 회원일때
                 if (uri.startsWith("/admin")) {

@@ -27,9 +27,6 @@ public class LogAspect {
         log.info("==> LogAspect Root:: " + proceedingJoinPoint.getSignature().getDeclaringTypeName());
         log.info("==> LogAspect Method:: " + proceedingJoinPoint.getSignature().getName());
 
-        System.out.println("ID : " + id);
-        System.out.println("PW : " + pw);
-
         if (proceedingJoinPoint.getSignature().getName().equals("login")) {
 
             MemberDTO dto = memberService.memberInfo(id);

@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import oracle.sql.DATE;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 
 @AllArgsConstructor
@@ -30,4 +32,5 @@ public class MemberDTO {
     private String status;
     private String type;
     private String fileIsEmpty;
+    private Date lastLoginDate;
 }

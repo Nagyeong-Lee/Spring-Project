@@ -1,10 +1,12 @@
 package com.example.Spring_Project.controller;
 
+import com.example.Spring_Project.dto.BatchDTO;
 import com.example.Spring_Project.dto.MemberDTO;
 import com.example.Spring_Project.mailSender.MailDTO;
 import com.example.Spring_Project.service.BatchService;
 import com.example.Spring_Project.service.MemberService;
 import com.example.Spring_Project.service.PathService;
+import oracle.ucp.proxy.annotation.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -100,6 +102,7 @@ public class MemberController {
         }
         String type = memberDTO.getType();
 
+
         if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && type.equals("ROLE_ADMIN")) {  //ADMIN일때 타입일때
             if (service.login(memberDTO.getId(), memberDTO.getPw()) == 1) { //로그인 성공
                 session.setAttribute("id", id); //아이디 세션 부여
@@ -107,30 +110,40 @@ public class MemberController {
             }
             result = "redirect:/admin/main";
         } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && !type.equals("ROLE_ADMIN")) {
-            if (service.login(memberDTO.getId(), memberDTO.getPw()) == 1) { //로그인 성공
 
-                Integer count = batchService.isIdExist(memberDTO.getId());
-                //휴면처리
-                if (count!=1) {
-                    batchService.insertLoginDate(memberDTO.getId());
-                }else{
-                    batchService.updateLoginDate(memberDTO.getId());
-                }
+            Integer nonActiveId = service.diffDate(id);   // 로그인한지 60일 이상
 
-                session.setAttribute("id", id);
-                session.setAttribute("admin", false);
-                model.addAttribute("admin", session.getAttribute("admin"));
-                String communityPath = pathService.getCommunityPath();
-                String deletePath = pathService.getDeletePath();
-                String updateFormPath = pathService.getUpdateFormPath();
-                String logoutPath = pathService.getLogoutPath();
-                model.addAttribute("updateFormPath", updateFormPath);
-                model.addAttribute("deletePath", deletePath);
-                model.addAttribute("logoutPath", logoutPath);
-                model.addAttribute("communityPath", communityPath);
-                result = "/member/myPage";
+            if (nonActiveId == 1) {
+                service.changeStatus(id);   // member lastLoginDate => null (로그인 안할수도 있으니까)
+                batchService.updateLoginDateNull(id); // batch lastLoginDate => null (로그인 안할수도 있으니까)
+                model.addAttribute("nonActiveID", id);
+                return "/member/activeMemberPage";
             } else {
-                result = "redirect:/";
+                if (service.login(memberDTO.getId(), memberDTO.getPw()) == 1) { //로그인 성공
+                    service.modifyLastLoginDate(id); //로그인 했을 때 마지막 update lastLoginDate
+                    Integer count = batchService.isIdExist(memberDTO.getId());
+                    //휴면처리
+                    if (count != 1) {
+                        batchService.insertLoginDate(memberDTO.getId());
+                    } else {
+                        batchService.updateLoginDate(memberDTO.getId());
+                    }
+
+                    session.setAttribute("id", id);
+                    session.setAttribute("admin", false);
+                    model.addAttribute("admin", session.getAttribute("admin"));
+                    String communityPath = pathService.getCommunityPath();
+                    String deletePath = pathService.getDeletePath();
+                    String updateFormPath = pathService.getUpdateFormPath();
+                    String logoutPath = pathService.getLogoutPath();
+                    model.addAttribute("updateFormPath", updateFormPath);
+                    model.addAttribute("deletePath", deletePath);
+                    model.addAttribute("logoutPath", logoutPath);
+                    model.addAttribute("communityPath", communityPath);
+                    result = "/member/myPage";
+                } else {
+                    result = "redirect:/";
+                }
             }
         } else {
             result = "redirect:/";
@@ -245,4 +258,24 @@ public class MemberController {
         return "/member/myPage";
     }
 
+    @ResponseBody
+    @PostMapping("/active")
+    public String activeMember(@RequestParam String email, @RequestParam String id, @RequestParam String pw) throws Exception {
+        MemberDTO memberDTO = service.getNonActiveMember(id); //상태 N인 회원 정보 가져오기
+        if (memberDTO == null) {
+            return "none";
+        }
+        if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) == true && service.isMemberExist(id, email) == 1) {
+            service.activeMember(id, email); // 멤버 status Y로
+            return "success";
+        } else {
+            return "recheck";
+        }
+    }
+
+    @GetMapping("/toActiveMemberPage")
+    public String toActiveMemberPage() throws Exception {
+
+        return "/member/activeMemberPage";
+    }
 }

@@ -16,15 +16,16 @@ public class WebConfig implements WebMvcConfigurer {
 
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
-                .excludePathPatterns("/")
-                .excludePathPatterns("/resources/**")
-                .excludePathPatterns("/member/toSignUpForm")
-                .excludePathPatterns("/member/login")
-                .excludePathPatterns("/member/logout")
-                .excludePathPatterns("/member/toSearchIdForm")
-                .excludePathPatterns("/member/toSearchPwForm")
-                .excludePathPatterns("/member/searchId")
-                .excludePathPatterns("/member/searchPw")
-                .excludePathPatterns("/member/signUp");
+                .excludePathPatterns("/**")
+                .excludePathPatterns("/resources/**");
+//                .excludePathPatterns("/member/toSignUpForm")
+//                .excludePathPatterns("/member/login")
+//                .excludePathPatterns("/member/logout")
+//                .excludePathPatterns("/member/toSearchIdForm")
+//                .excludePathPatterns("/member/toSearchPwForm")
+//                .excludePathPatterns("/member/searchId")
+//                .excludePathPatterns("/member/searchPw")
+//                .excludePathPatterns("/member/signUp")
+//                .excludePathPatterns("/member/active");
     }
 }

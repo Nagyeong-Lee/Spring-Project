@@ -167,4 +167,59 @@
         where id=#{id}
     </select>
 
+    <update id="modifyLastLoginDate">
+        update member
+        set lastLoginDate=sysdate
+        where id=#{id}
+    </update>
+
+    <select id="diffDate" resultType="Integer">
+        select count(*)
+        from member
+        where id=#{id}
+        and trunc(sysdate)-lastLoginDate >= 60
+    </select>
+
+    <update id="changeStatus">
+        update member
+        set status = 'N',
+            lastLoginDate = null
+        where id=#{id}
+    </update>
+
+    <select id="getNonActiveMember" resultType="com.example.Spring_Project.dto.MemberDTO">
+        select
+        m_seq,
+        id,
+        pw,
+        name,
+        email,
+        phone,
+        postcode,
+        roadAddress,
+        jibunAddress,
+        detailAddress,
+        signup_date,
+        oriname,
+        sysname,
+        savePath,
+        status,
+        type
+        from member
+        where id=#{id} and status='N'
+    </select>
+    
+    <select id="isMemberExist" resultType="Integer">
+        select count(*)
+        from member
+        where id=#{id}
+        and email=#{email}
+    </select>
+
+    <update id="activeMember">
+        update member
+        set status = 'Y'
+        where id=#{id}
+        and email=#{email}
+    </update>
 </mapper>

@@ -102,6 +102,7 @@
         #{savePath, jdbcType=VARCHAR},
         'Y',
         'ROLE_MEMBER',
-        #{fileIsEmpty, jdbcType=VARCHAR})
+        #{fileIsEmpty, jdbcType=VARCHAR},
+        #{lastLoginDate, jdbcType=DATE})
     </insert>
 </mapper>

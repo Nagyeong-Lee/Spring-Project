@@ -84,9 +84,32 @@ public class MemberService {
         return mapper.getImgInfo(m_seq);
     }
 
+    public void modifyLastLoginDate(@RequestParam String id) throws Exception{ //로그인시 시간 저장
+        mapper.modifyLastLoginDate(id);
+    }
+
+    public Integer diffDate(@RequestParam String id) throws Exception{
+        return mapper.diffDate(id);
+    }
+
+    public void changeStatus(@RequestParam String id) throws Exception{
+        mapper.changeStatus(id);
+    }
+
+    public MemberDTO getNonActiveMember(@RequestParam String id) throws Exception{
+        return mapper.getNonActiveMember(id);
+    }
+
+    public Integer isMemberExist(@RequestParam String id,@RequestParam String email) throws Exception{
+        return mapper.isMemberExist(id,email);
+    }
+    public void activeMember(@RequestParam String id, @RequestParam String email) throws Exception{
+        mapper.activeMember(id,email);
+    }
 
     //인터셉터
     public String getUserType(@Param("id") String id) throws Exception{
         return mapper.getUserType(id);
     }
+
 }

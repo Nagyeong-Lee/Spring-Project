@@ -22,10 +22,26 @@
         where id=#{id}
     </update>
 
+    <update id="updateLoginDateNull">
+        update batch
+        set lastLoginDate = null
+        where id=#{id}
+    </update>
+
     <update id="updateActiveN">
        update member
         set status = 'N'
         where id in
         (select id from batch where trunc(sysdate)-lastLoginDate >= 60)
     </update>
+
+    <select id="getInfo" resultType="com.example.Spring_Project.dto.BatchDTO">
+        select
+            batch_seq,
+            id,
+            lastLoginDate
+        from batch
+        where id=#{id}
+    </select>
+
 </mapper>

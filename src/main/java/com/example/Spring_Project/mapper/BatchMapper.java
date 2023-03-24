@@ -1,5 +1,6 @@
 package com.example.Spring_Project.mapper;
 
+import com.example.Spring_Project.dto.BatchDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.security.core.parameters.P;
@@ -15,5 +16,7 @@ public interface BatchMapper {
 
     void updateLoginDate(@Param("id") String id);
 
+    void updateLoginDateNull(@Param("id") String id);
     void updateActiveN();
+    BatchDTO getInfo(@Param("id") String id);
 }

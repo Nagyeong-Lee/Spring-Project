@@ -1,5 +1,6 @@
 package com.example.Spring_Project.service;
 
+import com.example.Spring_Project.dto.BatchDTO;
 import com.example.Spring_Project.mapper.BatchMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,4 +28,11 @@ public class BatchService {
         batchMapper.updateActiveN();
     }
 
+    public BatchDTO getInfo(@RequestParam String id) throws Exception{
+        return batchMapper.getInfo(id);
+    }
+
+    public void updateLoginDateNull(@RequestParam String id) throws Exception{
+        batchMapper.updateLoginDateNull(id);
+    }
 }
