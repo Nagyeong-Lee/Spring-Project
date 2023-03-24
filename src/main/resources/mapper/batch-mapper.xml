@@ -23,12 +23,9 @@
     </update>
 
     <update id="updateActiveN">
-        update member
-            set status = 'N'
-            where id IN(
-            SELECT ID
-            FROM BATCH
-            WHERE TRUNC(SYSDATE)-TO_DATE(lastLoginDate,'YYYYMMDD') FROM DUAL >=60
-        )
+       update member
+        set status = 'N'
+        where id in
+        (select id from batch where trunc(sysdate)-lastLoginDate >= 60)
     </update>
 </mapper>

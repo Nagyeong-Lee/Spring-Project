@@ -1,7 +1,6 @@
 package com.example.Spring_Project.controller;
 
 import com.example.Spring_Project.dto.BoardDTO;
-import com.example.Spring_Project.dto.CommentDTO;
 import com.example.Spring_Project.dto.FileDTO;
 import com.example.Spring_Project.dto.ReplyDTO;
 import com.example.Spring_Project.service.BoardService;
