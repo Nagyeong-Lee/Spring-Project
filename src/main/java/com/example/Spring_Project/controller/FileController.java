@@ -55,7 +55,8 @@ public class FileController {
             }
         }
 
-        for (int i = 0; i < list.size(); i++) {
+        Integer size = list.size();
+        for (int i = 0; i < size; i++) {
             fileService.insertMap(list.get(i));
         }
         return list;

@@ -33,7 +33,7 @@ public class LoginInterceptor implements HandlerInterceptor {
                         || uri.startsWith("/admin")
                         || uri.startsWith("/comment")
                         || uri.startsWith("/file"))
-                response.sendRedirect("/");
+                    response.sendRedirect("/");
                 return false;
 
             }

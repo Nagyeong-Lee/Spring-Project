@@ -16,6 +16,7 @@ public class ExcelRead {
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     public List<Map<String, Object>> read(MultipartFile fileExcel) throws Exception {
         OPCPackage opcPackage = OPCPackage.open(fileExcel.getInputStream()); // 파일 읽어오기
         Workbook workbook = WorkbookFactory.create(opcPackage);
@@ -102,7 +103,8 @@ public class ExcelRead {
 
             }
 
-            if (dataMap.size() != 0) {
+            Integer size = dataMap.size();
+            if (size != 0) {
                 result.add(dataMap);
             }
         }

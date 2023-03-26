@@ -147,9 +147,9 @@ public class AdminService {
     public void excelUpload(@RequestParam MultipartFile fileExcel) throws Exception {
 
         List<Map<String, Object>> excelContent = excelRead.read(fileExcel);
-
+        Integer size = excelContent.size();
         try {
-            for (int i = 0; i < excelContent.size(); i++) {
+            for (int i = 0; i < size; i++) {
                 adminMapper.insertExcel(excelContent.get(i));
             }
         } catch (Exception e) {

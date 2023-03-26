@@ -113,7 +113,8 @@ public class BoardController {
                 map.put("sysname", sysname);
                 list.add(map);
             }
-            for (int i = 0; i < list.size(); i++) {
+            Integer size = list.size();
+            for (int i = 0; i < size; i++) {
                 fileService.insertMap(list.get(i));
             }
         }
@@ -152,12 +153,12 @@ public class BoardController {
 
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();    // insert
         List<Map<String, Object>> status = new ArrayList<>();   //status 변경
-
         service.update(b_seq, title, content); //board update
         boolean flag = true;
+        Integer size = deleteSeq.size();
         if (file == null && deleteSeq != null) {
 
-            for (int i = 0; i < deleteSeq.size(); i++) {
+            for (int i = 0; i < size; i++) {
                 HashMap<String, Object>
                         arr = new HashMap<>();
                 arr.put("b_seq", b_seq);
@@ -167,7 +168,7 @@ public class BoardController {
             }
         } else if (file != null && deleteSeq != null) {
 
-            for (int i = 0; i < deleteSeq.size(); i++) {
+            for (int i = 0; i < size; i++) {
                 HashMap<String, Object>
                         arr = new HashMap<>();
                 arr.put("b_seq", b_seq);
@@ -199,7 +200,9 @@ public class BoardController {
                 map.put("sysname", sysname);
                 list.add(map);
             }
-            for (int i = 0; i < list.size(); i++) {
+
+            Integer listSize = list.size();
+            for (int i = 0; i < listSize; i++) {
                 fileService.insertMap(list.get(i));
             }
         } else if (file != null && deleteSeq == null) {
@@ -227,7 +230,8 @@ public class BoardController {
                 map.put("sysname", sysname);
                 list.add(map);
             }
-            for (int i = 0; i < list.size(); i++) {
+            Integer listSize = list.size();
+            for (int i = 0; i < listSize; i++) {
                 fileService.insertMap(list.get(i));
             }
         }

@@ -24,7 +24,7 @@
         아이디 <input type="text" name="id" id="id">
     </div>
     <div>
-        비밀번호 <input type="text" name="pw" id="pw">
+        비밀번호 <input type="password" name="pw" id="pw">
     </div>
 </div>
 <button type="button" id="active">휴면 해제</button>
