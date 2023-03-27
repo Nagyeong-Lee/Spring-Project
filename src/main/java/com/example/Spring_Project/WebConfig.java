@@ -16,16 +16,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
-                .addPathPatterns("/**") //인터셉터가 동작할 url 패턴
-                .excludePathPatterns("/resources/**"); //인터셉터가 동작하지않을 url 패턴
-//                .excludePathPatterns("/member/toSignUpForm")
-//                .excludePathPatterns("/member/login")
-//                .excludePathPatterns("/member/logout")
-//                .excludePathPatterns("/member/toSearchIdForm")
-//                .excludePathPatterns("/member/toSearchPwForm")
-//                .excludePathPatterns("/member/searchId")
-//                .excludePathPatterns("/member/searchPw")
-//                .excludePathPatterns("/member/signUp")
-//                .excludePathPatterns("/member/active");
+                .excludePathPatterns("/")
+                .excludePathPatterns("/member/login")
+                .excludePathPatterns("/resources/**") //인터셉터가 동작하지않을 url 패턴
+                .addPathPatterns("/**");//인터셉터가 동작할 url 패턴
     }
 }

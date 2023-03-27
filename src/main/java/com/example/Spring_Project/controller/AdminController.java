@@ -2,12 +2,10 @@ package com.example.Spring_Project.controller;
 
 import com.example.Spring_Project.dto.MemberDTO;
 import com.example.Spring_Project.service.AdminService;
-import com.example.Spring_Project.service.MemberService;
 import com.example.Spring_Project.service.PathService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -58,7 +56,6 @@ public class AdminController {
         model.addAttribute("logoutPath", logoutPath);
         return "/admin/main";
 
-//        log.debug("trace log={}", name);
     }
 
     @RequestMapping("/chart") //분기별 회원가입 수
@@ -83,7 +80,7 @@ public class AdminController {
 
     @ResponseBody  //엑셀 업로드
     @PostMapping("/upload")
-    public ModelAndView excelUploadAjax(@RequestParam MultipartFile fileExcel,MultipartHttpServletRequest request) throws Exception {
+    public ModelAndView excelUploadAjax(@RequestParam MultipartFile fileExcel, MultipartHttpServletRequest request) throws Exception {
 
         MultipartFile excelFile = request.getFile("fileExcel");
 
@@ -92,7 +89,7 @@ public class AdminController {
             throw new RuntimeException("엑셀파일을 선택해 주세요.");
         }
 
-        String path = "D:\\memberUpload\\";
+        String path = "D:\\excelUpload\\";
         File dir = new File(path);
         if (!dir.isDirectory()) {
             dir.mkdirs();
@@ -108,7 +105,7 @@ public class AdminController {
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        DiskFileItem fileItem = new DiskFileItem("file", Files.probeContentType(destFile.toPath()), false, destFile.getName(), (int) destFile.length() , destFile.getParentFile());
+        DiskFileItem fileItem = new DiskFileItem("file", Files.probeContentType(destFile.toPath()), false, destFile.getName(), (int) destFile.length(), destFile.getParentFile());
 
         InputStream input = new FileInputStream(destFile);
         OutputStream os = fileItem.getOutputStream();

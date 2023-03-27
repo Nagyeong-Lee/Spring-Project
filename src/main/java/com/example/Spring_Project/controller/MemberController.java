@@ -4,6 +4,7 @@ import com.example.Spring_Project.dto.BatchDTO;
 import com.example.Spring_Project.dto.MemberDTO;
 import com.example.Spring_Project.mailSender.MailDTO;
 import com.example.Spring_Project.service.BatchService;
+import com.example.Spring_Project.service.LogService;
 import com.example.Spring_Project.service.MemberService;
 import com.example.Spring_Project.service.PathService;
 import oracle.ucp.proxy.annotation.Post;
@@ -37,6 +38,9 @@ public class MemberController {
 
     @Autowired
     private BatchService batchService;
+
+    @Autowired
+    private LogService logService;
 
     @GetMapping("/toSignUpForm")  // 회원가입폼으로 이동
     public String toSignUpForm() throws Exception {
@@ -97,13 +101,12 @@ public class MemberController {
 
         MemberDTO memberDTO = service.selectById(id);
         if (memberDTO == null) {
+            logService.insertLog(id); //에러 로그 저장
             result = "redirect:/";
             return result;
         }
         String type = memberDTO.getType();
-
-
-        if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && type.equals("ROLE_ADMIN")) {  //ADMIN일때 타입일때
+        if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && type.equals("ROLE_ADMIN")) {  //ADMIN 타입일때
             if (service.login(memberDTO.getId(), memberDTO.getPw()) == 1) { //로그인 성공
                 session.setAttribute("id", id); //아이디 세션 부여
                 session.setAttribute("admin", true);  //관리자 세션 부여
@@ -142,27 +145,28 @@ public class MemberController {
                     model.addAttribute("communityPath", communityPath);
                     result = "/member/myPage";
                 } else {
+                    logService.insertLog(id);
                     result = "redirect:/";
                 }
             }
         } else {
+            logService.insertLog(id);
             result = "redirect:/";
         }
         return result;
     }
 
-
     @GetMapping("/logout")  //로그아웃
     public String logout(@RequestParam String id) throws Exception {
         session.invalidate();
-        return "/";
+        return "redirect:/";
     }
 
     @GetMapping("/delete")   //탈퇴하기
     public String delete(Model model, @RequestParam String id) throws Exception {
         session.invalidate();
         service.delete(id);
-        return "/";
+        return "redirect:/";
     }
 
     @GetMapping("/toUpdateForm")    //회원 정보 수정 페이지로 이동
@@ -203,7 +207,7 @@ public class MemberController {
 
 //      memberDTO.setPw(bCryptPasswordEncoder.encode(memberDTO.getPw()));
         service.update(memberDTO);
-        return "/member/myPage";
+        return "redirect:/member/myPage";
     }
 
     @GetMapping("/toSearchIdForm")  //id 찾기 페이지로 이동
@@ -275,7 +279,6 @@ public class MemberController {
 
     @GetMapping("/toActiveMemberPage")
     public String toActiveMemberPage() throws Exception {
-
         return "/member/activeMemberPage";
     }
 }

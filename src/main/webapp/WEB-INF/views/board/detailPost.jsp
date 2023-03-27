@@ -306,13 +306,14 @@
                     "b_seq": b_seq
                 },
             success: function (data) {
-                let comment = $("<div id=\"" + resp + "\"></div>");
+                console.log("data : " + data);
+                let comment = $("<div id=\"" + data + "\"></div>");
                 comment.text(content);   //댓글 작성
                 $("#comment").val('');   //댓글 작성칸 초기화
 
-                let str = '<button type="button" class="cmt" onclick="cmtOpen(\'' + resp + '\')">대댓글 달기</button> ';
-                str += '<button type="button" onclick="cmtDel(\'' + resp + '\')">댓글 삭제</button> ';
-                str += '<button type="button" onclick="cmtUpd(\'' + resp + '\')">댓글 수정</button>';
+                let str = '<button type="button" class="cmt" onclick="cmtOpen(\'' + data + '\')">대댓글 달기</button> ';
+                str += '<button type="button" onclick="cmtDel(\'' + data + '\')">댓글 삭제</button> ';
+                str += '<button type="button" onclick="cmtUpd(\'' + data + '\')">댓글 수정</button>';
                 comment.append(str);
                 let info = $("<div></div>");
                 let infoText = writer + " " + $("#write_date").val();

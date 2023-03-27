@@ -5,7 +5,6 @@ import com.example.Spring_Project.mailSender.MailDTO;
 import com.example.Spring_Project.mapper.MemberMapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -111,5 +110,11 @@ public class MemberService {
     public String getUserType(@Param("id") String id) throws Exception{
         return mapper.getUserType(id);
     }
+
+    public Integer loginCheck(@RequestParam String id, @RequestParam String pw) throws Exception {
+        return mapper.loginCheck(id, pw); //log
+    }
+
+
 
 }

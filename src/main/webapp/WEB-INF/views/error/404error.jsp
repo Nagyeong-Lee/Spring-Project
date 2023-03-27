@@ -42,47 +42,6 @@
         .error-page .error-inner p {
             padding: 20px 15px;
         }
-
-        .error-page .search-form {
-            width: 100%;
-            position: relative;
-        }
-
-        .error-page .search-form input {
-            width: 400px;
-            height: 50px;
-            padding: 0px 78px 0 30px;
-            border: none;
-            background: #f6f6f6;
-            border-radius: 5px;
-            display: inline-block;
-            margin-right: 10px;
-            font-weight: 400;
-            font-size: 14px;
-        }
-
-        .error-page .search-form input:hover {
-            padding-left: 35px;
-        }
-
-        .error-page .search-form .btn {
-            width: 80px;
-            height: 50px;
-            border-radius: 5px;
-            cursor: pointer;
-            background: #006DFE;
-            display: inline-block;
-            position: relative;
-            top: -2px;
-        }
-
-        .error-page .search-form .btn i {
-            font-size: 16px;
-        }
-
-        .error-page .search-form .btn:hover {
-            background: #333;
-        }
     </style>
 </head>
 <body>
@@ -94,14 +53,7 @@
                 <!-- Error Inner -->
                 <div class="error-inner">
                     <h1>404<span>Oop's  sorry we can't find that page!</span></h1>
-                    <p>Aenean eget sollicitudin lorem, et pretium felis. Nullam euismod diam libero, sed dapibus leo
-                        laoreet ut. Suspendisse potenti. Phasellus urna lacus</p>
-                    <form class="search-form">
-                        <input placeholder="Search from Here" type="text">
-                        <button class="btn" type="submit"><i class="fa fa-search"></i></button>
-                    </form>
                 </div>
-                <!--/ End Error Inner -->
             </div>
         </div>
     </div>

@@ -22,7 +22,6 @@ public class LoginInterceptor implements HandlerInterceptor {
             String uri = request.getRequestURI();
             String id = (String) session.getAttribute("id");
 
-            System.out.println("id null임");
             if (id == null) {
                 if (uri.equals("/member/logout")
                         || uri.equals("/member/delete")
@@ -35,7 +34,6 @@ public class LoginInterceptor implements HandlerInterceptor {
                         || uri.startsWith("/file"))
                     response.sendRedirect("/");
                 return false;
-
             }
 
             boolean admin = (boolean) session.getAttribute("admin");
@@ -52,9 +50,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
         } catch (Exception e) {
             e.printStackTrace();
-
         }
-
         return true;
     }
 

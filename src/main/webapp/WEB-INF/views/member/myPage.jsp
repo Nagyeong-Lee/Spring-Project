@@ -33,14 +33,14 @@
     //계정 탈퇴
     $("#delete").on("click", function () {
         if (confirm("탈퇴하시겠습니까?")) {
-            location.href ="/";
+            location.href =$("#toDelete").val()+id;
         }
     });
 
     //로그아웃
     $("#logout").on("click", function () {
         if (confirm("로그아웃하시겠습니까?")) {
-            location.href = "/";
+            location.href = $("#toLogout").val()+id;
         }
     });
 
