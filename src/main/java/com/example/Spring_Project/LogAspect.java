@@ -32,7 +32,7 @@ public class LogAspect {
         log.info("==> LogAspect Root:: " + proceedingJoinPoint.getSignature().getDeclaringTypeName());
         log.info("==> LogAspect Method:: " + proceedingJoinPoint.getSignature().getName());
         MemberDTO memberDTO = memberService.memberInfo(id);
-        if (!bCryptPasswordEncoder.matches(pw,memberDTO.getPw()) || logService.loginCheck(id, memberDTO.getPw())!=1) {
+        if (!bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) || logService.loginCheck(id, memberDTO.getPw()) != 1) {
             logService.insertLog(id); //에러 로그 저장
             log.info("==> ID 또는 PW가 일치하지 않습니다.");
         }

@@ -86,6 +86,9 @@
                 success: function (data) {
                     alert("모든 데이터가 업로드 되었습니다.");
                 },
+                error:function(request,status,error){
+                    alert("업로드에 실패했습니다.");
+                },
                 type: "POST"
             };
 

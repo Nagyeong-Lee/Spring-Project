@@ -10,8 +10,8 @@ public class BatchScheduler {
     @Autowired
     private BatchService batchService;
 
-    @Scheduled(cron = "0 0 0 1 * *")
-    //매달 1일 자정
+    @Scheduled(cron = "0 0 0 * * *")
+    //매일 12시 정각
     public void memberActive() throws Exception {
         batchService.updateActiveN();
     }

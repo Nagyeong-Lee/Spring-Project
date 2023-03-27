@@ -12,6 +12,6 @@
 </head>
 <body>
 에러페이지<br>
-<a href="/member/myPage">메인으로</a>
+<a href="/">메인으로</a>
 </body>
 </html>

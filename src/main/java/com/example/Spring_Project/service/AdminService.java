@@ -138,7 +138,7 @@ public class AdminService {
         sheet.setColumnWidth(4, 8000);
 
         response.setContentType("ms-vnd/excel");
-        response.setHeader("Content-Disposition", "attachment;filename=member_list.xls");
+        response.setHeader("Content-Disposition", "attachment;filename=member_list.xlsx");
 
         workbook.write(response.getOutputStream());
     }

@@ -306,7 +306,6 @@
                     "b_seq": b_seq
                 },
             success: function (data) {
-                console.log("data : " + data);
                 let comment = $("<div id=\"" + data + "\"></div>");
                 comment.text(content);   //댓글 작성
                 $("#comment").val('');   //댓글 작성칸 초기화

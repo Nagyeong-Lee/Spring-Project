@@ -27,36 +27,28 @@
     <select id="select1" resultType="Integer">
         select count(*)
         from member
-        where signup_date
-        between to_date('2023-01-01', 'YYYY-MM-DD')
-        and to_date('2023-03-31', 'YYYY-MM-DD')
+        where extract(month from signup_date) between 1 and 3
         and id not in ('admin123')
     </select>
 
     <select id="select2" resultType="Integer">
         select count(*)
         from member
-        where signup_date
-        between to_date('2023-04-01', 'YYYY-MM-DD')
-        and to_date('2023-06-30', 'YYYY-MM-DD')
+        where extract(month from signup_date) between 4 and 6
         and id not in ('admin123')
     </select>
 
     <select id="select3" resultType="Integer">
         select count(*)
         from member
-        where signup_date
-        between to_date('2023-07-01', 'YYYY-MM-DD')
-        and to_date('2023-09-30', 'YYYY-MM-DD')
+        where extract(month from signup_date) between 7 and 9
         and id not in ('admin123')
     </select>
 
     <select id="select4" resultType="Integer">
         select count(*)
         from member
-        where signup_date
-        between to_date('2023-10-01', 'YYYY-MM-DD')
-        and to_date('2023-12-31', 'YYYY-MM-DD')
+        where extract(month from signup_date) between 10 and 12
         and id not in ('admin123')
     </select>
 
