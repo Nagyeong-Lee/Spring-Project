@@ -19,4 +19,7 @@ public class LogService {
         return logMapper.isIdExist(id);
     }
 
+    public Integer loginCheck(@RequestParam String id, @RequestParam String pw) throws Exception {
+        return logMapper.loginCheck(id, pw); //log
+    }
 }

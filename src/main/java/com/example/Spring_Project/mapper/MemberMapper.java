@@ -63,5 +63,5 @@ public interface MemberMapper {
     Integer isMemberExist(@Param("id") String id,@Param("email") String email);
     void activeMember(@Param("id") String id, @Param("email") String email);
 
-    Integer loginCheck(@Param("id") String id, @Param("pw") String pw); //aop log
+
 }

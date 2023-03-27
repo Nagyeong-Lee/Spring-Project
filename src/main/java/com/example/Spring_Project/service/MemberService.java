@@ -111,10 +111,6 @@ public class MemberService {
         return mapper.getUserType(id);
     }
 
-    public Integer loginCheck(@RequestParam String id, @RequestParam String pw) throws Exception {
-        return mapper.loginCheck(id, pw); //log
-    }
-
 
 
 }

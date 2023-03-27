@@ -18,4 +18,11 @@
         from log
         where id=#{id}
     </select>
+
+    <select id="loginCheck" resultType="Integer">
+        select count(*)
+        from member
+        where id=#{id} and pw=#{pw}
+        and status='Y'
+    </select>
 </mapper>

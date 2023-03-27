@@ -7,6 +7,7 @@ import com.example.Spring_Project.service.BatchService;
 import com.example.Spring_Project.service.LogService;
 import com.example.Spring_Project.service.MemberService;
 import com.example.Spring_Project.service.PathService;
+import lombok.extern.slf4j.Slf4j;
 import oracle.ucp.proxy.annotation.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,6 +21,8 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.util.UUID;
 
+
+@Slf4j
 @Controller
 @RequestMapping("/member")
 public class MemberController {
@@ -100,11 +103,14 @@ public class MemberController {
         String result = "";
 
         MemberDTO memberDTO = service.selectById(id);
-        if (memberDTO == null) {
+
+        if (memberDTO == null || service.login(id, memberDTO.getPw()) != 1) {
             logService.insertLog(id); //에러 로그 저장
+            log.info("==> ID 또는 PW가 일치하지 않습니다.");
             result = "redirect:/";
             return result;
         }
+
         String type = memberDTO.getType();
         if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && type.equals("ROLE_ADMIN")) {  //ADMIN 타입일때
             if (service.login(memberDTO.getId(), memberDTO.getPw()) == 1) { //로그인 성공
@@ -113,9 +119,7 @@ public class MemberController {
             }
             result = "redirect:/admin/main";
         } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && !type.equals("ROLE_ADMIN")) {
-
             Integer nonActiveId = service.diffDate(id);   // 로그인한지 60일 이상
-
             if (nonActiveId == 1) {
                 service.changeStatus(id);   // member lastLoginDate => null (로그인 안할수도 있으니까)
                 batchService.updateLoginDateNull(id); // batch lastLoginDate => null (로그인 안할수도 있으니까)
@@ -145,12 +149,10 @@ public class MemberController {
                     model.addAttribute("communityPath", communityPath);
                     result = "/member/myPage";
                 } else {
-                    logService.insertLog(id);
                     result = "redirect:/";
                 }
             }
         } else {
-            logService.insertLog(id);
             result = "redirect:/";
         }
         return result;

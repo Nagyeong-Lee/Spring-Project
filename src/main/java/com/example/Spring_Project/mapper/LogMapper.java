@@ -11,4 +11,6 @@ public interface LogMapper {
     void insertLog(@Param("id") String id);
     Integer isIdExist(@Param("id") String id);
 
+    Integer loginCheck(@Param("id") String id, @Param("pw") String pw); //aop log
+
 }
