@@ -53,12 +53,18 @@ public class BoardController {
             count = 10;
         }
 
+        count=count;
+
         service.countPost(searchType, keyword); // 전체 글 개수
-        Integer start = currentPage * count - 9; //시작 글 번호
+        Integer start = currentPage * count - (count-1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
 
         List<BoardDTO> list = service.select(start, end, searchType, keyword); //검색
         String paging = service.getBoardPageNavi(currentPage, count, searchType, keyword);
+
+        System.out.println("count : "+count);
+        System.out.println("start : "+start);
+        System.out.println("end : "+end);
 
         Integer currPage = currentPage;
         model.addAttribute("list", list);
@@ -72,8 +78,10 @@ public class BoardController {
     }
 
     @RequestMapping("/toWriteForm")  //글 작성 폼으로 이동
-    public String toWriteForm(Model model, @RequestParam Integer b_seq) throws Exception {
+    public String toWriteForm(Model model, @RequestParam Integer b_seq, @RequestParam Integer count, @RequestParam Integer currentPage) throws Exception {
         model.addAttribute("b_seq", b_seq);
+        model.addAttribute("count", count);
+        model.addAttribute("currentPage", currentPage);
         return "/board/writeForm";
     }
 
@@ -124,7 +132,7 @@ public class BoardController {
     }
 
     @GetMapping("/detail")   //게시글 상세페이지
-    public String detail(Model model, @RequestParam Integer b_seq, @RequestParam (required = false) Integer currentPage) throws Exception {
+    public String detail(Model model, @RequestParam Integer b_seq, @RequestParam (required = false) Integer currentPage,@RequestParam (required = false) Integer count) throws Exception {
         service.count(b_seq);   //조회수 증가
 
         BoardDTO boardDTO = service.getBoardDetail(b_seq);   //게시글 상세 정보 가져오기
@@ -136,13 +144,14 @@ public class BoardController {
         model.addAttribute("file", list);
         model.addAttribute("b_seq", b_seq);
         model.addAttribute("currPage",currentPage);
+        model.addAttribute("count",count);
         return "/board/detailPost";
     }
 
     @GetMapping("/delete")   //게시글 삭제
-    public String delete(@RequestParam Integer b_seq, @RequestParam Integer currentPage) throws Exception {
+    public String delete(@RequestParam Integer b_seq, @RequestParam Integer currentPage, @RequestParam Integer count) throws Exception {
         service.delete(b_seq);
-        return "redirect:/board/list?currentPage="+currentPage+"&count=10";
+        return "redirect:/board/list?currentPage="+currentPage+"&count="+count;
     }
 
     @ResponseBody

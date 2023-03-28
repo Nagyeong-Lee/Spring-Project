@@ -26,7 +26,8 @@
 </head>
 <body>
 <input type="file" id="file" name="file" multiple="multiple" style="display: none;">
-
+<input type="hidden" id="count" name="count" value="${count}">
+<input type="hidden" id="currPage" name="currPage" value="${currentPage}">
 <form action="/board/insert" method="post" enctype="multipart/form-data" id="frm">
     <div class="title">
         제목 <input type="text" id="title" name="title">
@@ -78,10 +79,14 @@
 
     $("#writeBtn").on("click", function () {  //글 작성 버튼 클릭 시
 
+        let count=$("#count").val();
+        let currPage=$("#currPage").val();
         let writer = $("#writer").val();
         let content = $("#content").val();
         let title = $("#title").val();
 
+        console.log("count : "+count);
+        console.log("currPage : "+currPage);
         let frm = $('#frm')[0];
 
         let data = new FormData(frm);
@@ -102,7 +107,7 @@
             , isModal: true
             , isModalEnd: true
             , success: function (data) {
-                location.href = "/board/list?currentPage=1&count=10"
+                location.href = "/board/list?currentPage="+currPage+"&count="+count;
             }, error: function (e) {
 
             }
