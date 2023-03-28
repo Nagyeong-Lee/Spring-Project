@@ -144,17 +144,21 @@ public class AdminService {
     }
 
     //엑셀 업로드
-    public void excelUpload(@RequestParam MultipartFile fileExcel) throws Exception {
+    public boolean excelUpload(@RequestParam MultipartFile fileExcel) throws Exception {
 
+        boolean result = false;
         List<Map<String, Object>> excelContent = excelRead.read(fileExcel);
         Integer size = excelContent.size();
         try {
             for (int i = 0; i < size; i++) {
                 adminMapper.insertExcel(excelContent.get(i));
             }
+            result = true;
         } catch (Exception e) {
             e.printStackTrace();
+            result = false;
         }
+        return result;
     }
 
 }

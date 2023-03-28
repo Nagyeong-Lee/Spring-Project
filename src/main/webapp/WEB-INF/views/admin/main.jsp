@@ -20,7 +20,7 @@
 
 <form action="/admin/upload" enctype="multipart/form-data" method="post" id="frm">
     <input type="file" id="fileExcel" name="fileExcel">
-    <button type="button" id="uploadBtn" onclick="check()">excel upload</button>
+    <button type="submit" id="uploadBtn">excel upload</button>
 </form>
 
 회원 리스트
@@ -52,7 +52,8 @@
 <button type="button" id="downloadBtn">excel download</button>
 <br>
 <a href="/admin/chart">
-    <button type="button">월별 회원가입 차트</button><br>
+    <button type="button">월별 회원가입 차트</button>
+    <br>
 </a>
 <button type="button" id="logout"><input type="hidden" id="toLogOut" value="${logoutPath}">로그아웃</button>
 <script>
@@ -60,41 +61,9 @@
         location.href = "/admin/download";
     });
 
-    $("#logout").on("click",function(){
-        location.href=$("#toLogOut").val();
+    $("#logout").on("click", function () {
+        location.href = $("#toLogOut").val();
     });
-
-    //엑셀 업로드
-    function check() {
-
-        var file = $("#fileExcel").val();
-
-        if (file == "" || file == null) {
-            alert("파일을 선택해주세요.");
-
-            return false;
-        } else if (!checkFileType(file)) {
-            alert("엑셀 파일만 업로드 가능합니다.");
-
-            return false;
-        }
-
-        if (confirm("업로드 하시겠습니까?")) {
-
-            var options = {
-
-                success: function (data) {
-                    alert("모든 데이터가 업로드 되었습니다.");
-                },
-                error:function(request,status,error){
-                    alert("업로드에 실패했습니다.");
-                },
-                type: "POST"
-            };
-
-            $("#frm").ajaxSubmit(options);
-        }
-    }
 
     function checkFileType(filePath) {
         var fileFormat = filePath.split(".");
@@ -105,6 +74,36 @@
             return false;
         }
     }
+
+    var option = {
+        url: "/admin/upload",
+        TYPE: "POST",
+        success: function (res) {
+            console.log("res : " + res);
+            if(res=="success"){
+                alert('업로드 성공');
+            }else{
+                alert('업로드 실패');
+            }
+        }
+    }
+
+    $("#frm").submit(function(){
+        var file = $("#fileExcel").val();
+
+        if (file == "" || file == null) {
+            alert("파일을 선택해주세요.");
+            return false;
+        } else if (!checkFileType(file)) {
+            alert("엑셀 파일만 업로드 가능합니다.");
+            $("#fileExcel").val('');
+            return false;
+        }
+        $(this).ajaxSubmit(option); //옵션값대로 ajax비동기 동작을 시키고
+        return false; //기본 동작인 submit의 동작을 막아 페이지 reload를 막는다.
+    });
+
+
 </script>
 </body>
 </html>
