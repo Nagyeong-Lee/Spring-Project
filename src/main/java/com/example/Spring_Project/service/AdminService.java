@@ -56,41 +56,23 @@ public class AdminService {
         int rowNo = 0;
 
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
-        int start = 0;
-        int end = 0;
         List<MemberDTO> memberList = this.selectMemberList();
         Integer memberListSize = memberList.size();
-
+        int start = 0;
+        int end = 0;
         for (Integer i = 0; i < memberListSize; i++) {
             String date = sdf.format(memberList.get(i).getSignup_date());
-            //if(i == 0){
-            //start = 1;
-            //}else if(date.equals(sdf.format(memberList.get(i + 1).getSignup_date()))) {
-
-            //}else{
-            //end=i-1;
-
-            //System.out.println("end : "+end);
-            //System.out.println("start : "+start);
-            //start=i+1;
-            //}
             if (i == 0) {
                 start = i + 1;
             } else if (!date.equals(sdf.format(memberList.get(i - 1).getSignup_date()))) {
                 end = i;
-                System.out.println("안같을때");
-                System.out.println("start : " + start);
-                System.out.println("end : " + end);
                 sheet.addMergedRegion(new CellRangeAddress(start, end, 4, 4));
                 start = i + 1;
             } else if (i == memberListSize - 1) {
-                end = i + 2;
-                sheet.addMergedRegion(new CellRangeAddress(start, end-2, 4, 4));
-                System.out.println("마지막");
-                System.out.println("start : " + start);
-                System.out.println("end : " + end);
+//                end = i + 2;
+                end = i;
+                sheet.addMergedRegion(new CellRangeAddress(start, end, 4, 4));
             }
-//
         }
         XSSFCellStyle style = (XSSFCellStyle) workbook.createCellStyle();
         style.setFillForegroundColor(IndexedColors.YELLOW.getIndex());  // 배경색

@@ -76,6 +76,7 @@ public class FileController {
                 file.mkdirs();
             }
 
+
             fileName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1"); //한글
             response.setContentType("application/octet-stream;");
             response.setContentLength((int) file.length());

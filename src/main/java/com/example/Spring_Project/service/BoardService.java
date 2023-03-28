@@ -98,20 +98,20 @@ public class BoardService {
         StringBuilder sb = new StringBuilder();
 
         if (needPrev) {
-            sb.append("<a href='/board/list?currentPage=" + (startNavi - 1) + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><</a> ");
+            sb.append("<a href='/board/list?currentPage=" + (startNavi - 1) + "&count=" + count + "&searchType=" + "&keyword="+"'><</a> ");
         }
 
         for (int i = startNavi; i <= endNavi; i++) {
             if (currentPage == i) {
-                sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><b>" + i + "</b></a> ");
+                sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&searchType=" + "&keyword="+"'><b>" + i + "</b></a> ");
 
             } else {
-                sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'>" + i + "</a> ");
+                sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&searchType=" + "&keyword="+"'>" + i + "</a> ");
 
             }
         }
         if (needNext) {
-            sb.append("<a href='/board/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'>></a> ");
+            sb.append("<a href='/board/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + "&keyword="+"'>></a> ");
         }
         return sb.toString();
     }

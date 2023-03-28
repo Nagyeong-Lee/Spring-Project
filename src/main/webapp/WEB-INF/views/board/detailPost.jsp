@@ -163,10 +163,10 @@
         <div class="fileDiv"></div>
         <div class="btns">
             <c:if test="${boardDTO.writer ne id}">
-                <button type="button"><a href="/board/list?currentPage=1&count=10">목록으로</a></button>
+                <button type="button"><a href="/board/list?currentPage=${currPage}&count=10">목록으로</a></button>
             </c:if>
             <c:if test="${boardDTO.writer eq id}">
-                <button type="button"><a href="/board/list?currentPage=1&count=10">목록으로</a></button>
+                <button type="button"><a href="/board/list?currentPage=${currPage}&count=10">목록으로</a></button>
                 <button type="button"><a
                         href="/board/delete?b_seq=${boardDTO.b_seq}">삭제하기</a></button>
                 <button id="updBtn" type="button">게시글 수정하기</button>

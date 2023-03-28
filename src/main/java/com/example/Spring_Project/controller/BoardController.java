@@ -57,15 +57,16 @@ public class BoardController {
         Integer start = currentPage * count - 9; //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
 
-
         List<BoardDTO> list = service.select(start, end, searchType, keyword); //검색
         String paging = service.getBoardPageNavi(currentPage, count, searchType, keyword);
 
+        Integer currPage = currentPage;
         model.addAttribute("list", list);
         model.addAttribute("paging", paging);
         model.addAttribute("id", session.getAttribute("id"));
         model.addAttribute("searchType", searchType);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("currPage",currPage);
         return "/board/main";
     }
 
@@ -122,18 +123,18 @@ public class BoardController {
     }
 
     @GetMapping("/detail")   //게시글 상세페이지
-    public String detail(Model model, @RequestParam Integer b_seq) throws Exception {
+    public String detail(Model model, @RequestParam Integer b_seq, @RequestParam Integer currentPage) throws Exception {
         service.count(b_seq);   //조회수 증가
 
         BoardDTO boardDTO = service.getBoardDetail(b_seq);   //게시글 상세 정보 가져오기
         List<ReplyDTO> commentList = commentService.getComment(b_seq);
         List<FileDTO> list = fileService.getFile(b_seq);
 
-
         model.addAttribute("boardDTO", boardDTO);
         model.addAttribute("commentList", commentList); //댓글 가져오기
         model.addAttribute("file", list);
         model.addAttribute("b_seq", b_seq);
+        model.addAttribute("currPage",currentPage);
         return "/board/detailPost";
     }
 

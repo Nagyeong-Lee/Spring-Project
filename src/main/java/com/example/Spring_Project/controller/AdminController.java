@@ -48,9 +48,6 @@ public class AdminController {
     @RequestMapping("/main")  //회원 리스트 출력
     public String toAdminMain(Model model) throws Exception {
         List<MemberDTO> list = adminService.selectMemberList();
-        for (MemberDTO memberDTO : list) {
-            memberDTO.setPw(BCryptPasswordEncoder.encode(memberDTO.getPw()));
-        }
         String logoutPath = pathService.getLogoutPath();
         model.addAttribute("list", list);
         model.addAttribute("logoutPath", logoutPath);

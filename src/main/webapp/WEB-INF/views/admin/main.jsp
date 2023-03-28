@@ -56,13 +56,18 @@
     <br>
 </a>
 <button type="button" id="logout"><input type="hidden" id="toLogOut" value="${logoutPath}">로그아웃</button>
+<input type="hidden" id="session" name="session" value="${id}">
 <script>
+
+    let id=$("#session").val();
+    let path=$("#toLogOut").val();
+
     $("#downloadBtn").on("click", function () {
         location.href = "/admin/download";
     });
 
     $("#logout").on("click", function () {
-        location.href = $("#toLogOut").val();
+        location.href = path+id;
     });
 
     function checkFileType(filePath) {
