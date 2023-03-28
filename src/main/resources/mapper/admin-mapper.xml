@@ -22,6 +22,7 @@
         type
         from member
         where id not in ('admin123')
+        order by signUp_date asc
     </select>
 
     <select id="select1" resultType="Integer">

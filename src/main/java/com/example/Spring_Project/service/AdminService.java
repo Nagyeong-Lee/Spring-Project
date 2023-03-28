@@ -55,6 +55,43 @@ public class AdminService {
         Sheet sheet = workbook.createSheet("member_list");
         int rowNo = 0;
 
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
+        int start = 0;
+        int end = 0;
+        List<MemberDTO> memberList = this.selectMemberList();
+        Integer memberListSize = memberList.size();
+
+        for (Integer i = 0; i < memberListSize; i++) {
+            String date = sdf.format(memberList.get(i).getSignup_date());
+            //if(i == 0){
+            //start = 1;
+            //}else if(date.equals(sdf.format(memberList.get(i + 1).getSignup_date()))) {
+
+            //}else{
+            //end=i-1;
+
+            //System.out.println("end : "+end);
+            //System.out.println("start : "+start);
+            //start=i+1;
+            //}
+            if (i == 0) {
+                start = i + 1;
+            } else if (!date.equals(sdf.format(memberList.get(i - 1).getSignup_date()))) {
+                end = i;
+                System.out.println("안같을때");
+                System.out.println("start : " + start);
+                System.out.println("end : " + end);
+                sheet.addMergedRegion(new CellRangeAddress(start, end, 4, 4));
+                start = i + 1;
+            } else if (i == memberListSize - 1) {
+                end = i + 2;
+                sheet.addMergedRegion(new CellRangeAddress(start, end-2, 4, 4));
+                System.out.println("마지막");
+                System.out.println("start : " + start);
+                System.out.println("end : " + end);
+            }
+//
+        }
         XSSFCellStyle style = (XSSFCellStyle) workbook.createCellStyle();
         style.setFillForegroundColor(IndexedColors.YELLOW.getIndex());  // 배경색
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
@@ -84,18 +121,17 @@ public class AdminService {
         }
 
         List<MemberDTO> list = this.selectMemberList();
-        for (
-                MemberDTO dto : list) {
+        Integer size = list.size();
+        for (Integer i = 0; i < size - 1; i++) {
             Row row = sheet.createRow(rowNo++);
-
             Integer length = 0;
             //아이디
-            String id = dto.getId();
+            String id = list.get(i).getId();
             length = id.length() - 2;
             id = id.substring(0, length) + "***";  // 뒷 2자리 ***
             //이름
-            String name = dto.getName();
-            String name2 = dto.getName();
+            String name = list.get(i).getName();
+            String name2 = list.get(i).getName();
             String str = "";
             if (name.length() == 2) {
                 length = name.length() - 1;
@@ -105,30 +141,27 @@ public class AdminService {
             } else {
                 length = name.length() - 2;
                 name = name.substring(0, length);
-                for (int i = length; i < name2.length(); i++) {
+                for (int k = length; k < name2.length(); k++) {
                     str += "*";
                 }
             }
             //이메일
-            String email = dto.getEmail();
+            String email = list.get(i).getEmail();
             length = email.length();
             Integer index = email.indexOf("@");
             String newEmail = "";
-            for (int i = 0; i < index; i++) {
+            for (int j = 0; j < index; j++) {
                 newEmail += "*";
             }
-            email = newEmail + dto.getEmail().substring(index, length);
+            email = newEmail + list.get(i).getEmail().substring(index, length);
             //전화번호
-            String phone = dto.getPhone().substring(0, 3) + "****" + dto.getPhone().substring(7, 11);
+            String phone = list.get(i).getPhone().substring(0, 3) + "****" + list.get(i).getPhone().substring(7, 11);
 
             row.createCell(0).setCellValue(name + str);
             row.createCell(1).setCellValue(id);
             row.createCell(2).setCellValue(email);
             row.createCell(3).setCellValue(phone);
-            SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd hh:mm");
-
-            sheet.addMergedRegion(new CellRangeAddress(0, 0, 4, 5));
-            row.createCell(4).setCellValue(sdf.format(dto.getSignup_date()));
+            row.createCell(4).setCellValue(sdf.format(list.get(i).getSignup_date()));
         }
 
         sheet.setColumnWidth(0, 3000);

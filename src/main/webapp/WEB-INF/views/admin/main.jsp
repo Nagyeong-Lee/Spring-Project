@@ -80,15 +80,15 @@
         TYPE: "POST",
         success: function (res) {
             console.log("res : " + res);
-            if(res=="success"){
+            if (res == "success") {
                 alert('업로드 성공');
-            }else{
+            } else {
                 alert('업로드 실패');
             }
         }
     }
 
-    $("#frm").submit(function(){
+    $("#frm").submit(function () {
         var file = $("#fileExcel").val();
 
         if (file == "" || file == null) {
@@ -102,8 +102,6 @@
         $(this).ajaxSubmit(option); //옵션값대로 ajax비동기 동작을 시키고
         return false; //기본 동작인 submit의 동작을 막아 페이지 reload를 막는다.
     });
-
-
 </script>
 </body>
 </html>
