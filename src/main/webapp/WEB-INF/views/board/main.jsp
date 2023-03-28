@@ -43,7 +43,8 @@
             <c:forEach var="i" items="${list}">
                 <tr>
                     <td>${i.writer}</td>
-                    <td class="title"><a href="/board/detail?b_seq=${i.b_seq}&currentPage=${currPage}">${i.title}</a></td>
+                    <td class="title"><a href="/board/detail?b_seq=${i.b_seq}&currentPage=${currPage}">${i.title}</a>
+                    </td>
                     <input type="hidden" value="${i.b_seq}" class="b_seq">
                     <td><fmt:formatDate pattern='yyyy-MM-dd hh:mm' value="${i.write_date}"/></td>
                     <td>
@@ -71,8 +72,13 @@
 <div class="btn">
     <form action="/board/list?" method="get">
         <input type=hidden value="1" name="currentPage" id="currentPage">
-        <input type=hidden value="10" name="count" id="count">
+        <input type=text name="count" id="count">
 
+        <select name="postNum" id="postNum">
+            <option value="5" <c:out value="${count eq '5' ? 'selected' : ''}"/>>5</option>
+            <option value="10" <c:out value="${count eq '10' ? 'selected' : ''}"/>>10</option>
+            <option value="15" <c:out value="${count eq '15' ? 'selected' : ''}"/>>15</option>
+        </select>
         <select name="searchType" id="searchType">
             <option value="title" <c:out value="${searchType eq 'title' ? 'selected' : ''}"/>>제목</option>
             <option value="writer" <c:out value="${searchType eq 'writer' ? 'selected' : ''}"/>>작성자</option>
@@ -93,6 +99,10 @@
         location.href = "/board/toWriteForm?b_seq=" + b_seq;
     });
 
+    $("#postNum").on("change", function () {
+        console.log($("#postNum").val());
+        //    $("#count").val($("postNum").val());
+    });
 </script>
 </body>
 </html>

@@ -67,6 +67,7 @@ public class BoardController {
         model.addAttribute("searchType", searchType);
         model.addAttribute("keyword", keyword);
         model.addAttribute("currPage",currPage);
+        model.addAttribute("count",count);
         return "/board/main";
     }
 
@@ -123,7 +124,7 @@ public class BoardController {
     }
 
     @GetMapping("/detail")   //게시글 상세페이지
-    public String detail(Model model, @RequestParam Integer b_seq, @RequestParam Integer currentPage) throws Exception {
+    public String detail(Model model, @RequestParam Integer b_seq, @RequestParam (required = false) Integer currentPage) throws Exception {
         service.count(b_seq);   //조회수 증가
 
         BoardDTO boardDTO = service.getBoardDetail(b_seq);   //게시글 상세 정보 가져오기
@@ -139,9 +140,9 @@ public class BoardController {
     }
 
     @GetMapping("/delete")   //게시글 삭제
-    public String delete(@RequestParam Integer b_seq) throws Exception {
+    public String delete(@RequestParam Integer b_seq, @RequestParam Integer currentPage) throws Exception {
         service.delete(b_seq);
-        return "redirect:/board/list?currentPage=1&count=10";
+        return "redirect:/board/list?currentPage="+currentPage+"&count=10";
     }
 
     @ResponseBody

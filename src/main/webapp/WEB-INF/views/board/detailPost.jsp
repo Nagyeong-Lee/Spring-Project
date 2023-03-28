@@ -77,6 +77,8 @@
 
 </head>
 <body>
+${currPage}
+<input type="hidden" value="${currPage}" id="currpage" name="currpage">
 <input type="file" id="file" name="file" multiple="multiple" class="file" style="display: none">
 <%--작성자==로그인 아이디 일때 삭제.수정 보여주기--%>
 <form action="/board/update" id="frm" method="post" enctype="multipart/form-data">
@@ -168,7 +170,7 @@
             <c:if test="${boardDTO.writer eq id}">
                 <button type="button"><a href="/board/list?currentPage=${currPage}&count=10">목록으로</a></button>
                 <button type="button"><a
-                        href="/board/delete?b_seq=${boardDTO.b_seq}">삭제하기</a></button>
+                        href="/board/delete?b_seq=${boardDTO.b_seq}&currentPage=${currPage}">삭제하기</a></button>
                 <button id="updBtn" type="button">게시글 수정하기</button>
                 <button type="button" onclick="$('#file').click();" id="attach">첨부파일</button>
             </c:if>
@@ -190,6 +192,7 @@
     let no = '${boardDTO.write_date}';
 
     $("#updBtn").on("click", function () { //게시글 수정하기 클릭 시
+
 
         $("#attach").show();
         $(".fileDiv").show();
@@ -257,6 +260,7 @@
 
     $(document).on("click", "#completeUpdBtn", function () { //수정완료 버튼 클릭시 배열보내기
 
+        let currPage = $("#currpage").val();
         let b_seq = $("#b_seq").val();
         let writer = $("#id").val();
         let content = $("#content").val();
@@ -284,7 +288,7 @@
             , isModalEnd: true
             , async: false
             , success: function (data) {
-                location.href = "/board/detail?b_seq=" + b_seq;
+                location.href = "/board/detail?b_seq=" + b_seq + "&currentPage=" + currPage;
             }, error: function (e) {
             }
         });
