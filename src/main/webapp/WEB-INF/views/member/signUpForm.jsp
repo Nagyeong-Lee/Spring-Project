@@ -176,11 +176,9 @@
     //사진 확장자 체크
     let extension = true;
     $("#file").on("change", function () {
-
         var str = $(this).val();
         var fileName = str.split('\\').pop().toLowerCase();
         checkFileName(fileName);
-
     });
 
     function checkFileName(str) {
@@ -196,7 +194,6 @@
         }
 
     }
-
 
     //유효성 검사
     $('#btn').on('click', function () {

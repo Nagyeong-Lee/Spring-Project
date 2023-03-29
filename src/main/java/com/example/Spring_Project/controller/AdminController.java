@@ -49,7 +49,6 @@ public class AdminController {
     public String toAdminMain(Model model) throws Exception {
         List<MemberDTO> list = adminService.selectMemberList();
         String logoutPath = pathService.getLogoutPath();
-        model.addAttribute("list", list);
         model.addAttribute("logoutPath", logoutPath);
         return "/admin/main";
 
@@ -123,6 +122,13 @@ public class AdminController {
         }else{
             return "fail";
         }
+    }
+
+    @RequestMapping("/mngMember")
+    public String mngMember(Model model) throws Exception{
+        List<MemberDTO> list = adminService.selectMemberList();
+        model.addAttribute("list", list);
+        return "/admin/memberMng";
     }
 }
 

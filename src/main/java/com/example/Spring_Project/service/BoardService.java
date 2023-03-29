@@ -1,6 +1,5 @@
 package com.example.Spring_Project.service;
 
-
 import com.example.Spring_Project.dto.BoardDTO;
 import com.example.Spring_Project.mapper.BoardMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +57,6 @@ public class BoardService {
     public Integer countPost(@RequestParam String searchType, @RequestParam String keyword) throws Exception {  //게시글 총 개수
         return mapper.countPost(searchType, keyword);
     }
-
 
     //페이징 처리
     public String getBoardPageNavi(int currentPage, Integer count, String searchType, String keyword, Integer postNum) throws Exception {
@@ -142,21 +140,17 @@ public class BoardService {
         }
         if (needNext) {
             if (postNum == null) {
-
                 if (searchType == null && keyword == null) {
                     sb.append("<a href='/board/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + "&keyword=" + "'>></a> ");
                 } else {
                     sb.append("<a href='/board/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'>></a> ");
                 }
-
             } else {
-
                 if (searchType == null && keyword == null) {
                     sb.append("<a href='/board/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&postNum=" + postNum + "&searchType=" + "&keyword=" + "'>></a> ");
                 } else {
                     sb.append("<a href='/board/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&postNum=" + postNum + "&searchType=" + searchType + "&keyword=" + keyword + "'>></a> ");
                 }
-
             }
         }
         return sb.toString();
