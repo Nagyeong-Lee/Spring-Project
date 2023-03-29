@@ -46,7 +46,9 @@
 
 <script>
     $("#toMain").on("click", function () {  //게시글 메인 페이지로 이동
-        location.href = "/board/list?currentPage=1&count=10";
+        let currentPage = $("#currPage").val();
+        let count = $("#count").val();
+        location.href = "/board/list?currentPage="+currentPage+"&count="+count;
     });
 
     let arr = [];  //복사한 파일 배열
