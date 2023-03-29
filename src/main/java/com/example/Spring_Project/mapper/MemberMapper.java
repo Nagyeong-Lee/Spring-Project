@@ -30,6 +30,7 @@ public interface MemberMapper {
 
     //회원 정보 가져오기
     MemberDTO memberInfo(@Param("id") String id);
+    Integer getMemberInfo(@Param("id") String id, @Param("pw") String pw);
 
     //id 찾기
     String searchId(@Param("email") String email);

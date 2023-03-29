@@ -24,9 +24,17 @@
     <button type="button">월별 회원가입 차트</button>
     <br>
 </a>
-<button type="button">로그 확인</button>
+<a href="/admin/list?currentPage=1&count=10&postNum=&searchType=&keyword="><button type="button">로그 확인</button></a>
 <br>
 <button type="button" id="logout"><input type="hidden" id="toLogOut" value="${logoutPath}">로그아웃</button>
 <input type="hidden" id="session" name="session" value="${id}">
+
+<script>
+    let path=$("#toLogOut").val();
+    let session=$("#session").val();
+    $("#logout").on("click",function(){
+        location.href=path+session;
+    });
+</script>
 </body>
 </html>

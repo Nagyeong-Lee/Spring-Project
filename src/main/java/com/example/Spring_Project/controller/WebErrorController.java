@@ -13,15 +13,15 @@ public class WebErrorController implements ErrorController {
 
     @GetMapping("/error")
     public String HandleError(HttpServletRequest request) throws Exception {
-        String result="";
+        String result = "";
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
         if (status != null) {
             Integer errorCode = Integer.parseInt(status.toString());
 
             if (errorCode == HttpStatus.NOT_FOUND.value()) {
-                result= "/error/404error";
+                result = "/error/404error";
             } else {
-                result= "/error/error";
+                result = "/error/error";
             }
         }
         return result;

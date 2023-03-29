@@ -4,17 +4,21 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.Spring_Project.mapper.LogMapper">
     <insert id="insertLog">
-<!--        insert into-->
-<!--        log-->
-<!--        values-->
-<!--            (log_seq.nextval,-->
-<!--            #{id},-->
-<!--            sysdate)-->
+        insert into log
+        values(
+        log_seq.nextval,
+        #{type},
+        #{id},
+        #{parameter},
+        #{url},
+        sysdate,
+        #{description, jdbcType=VARCHAR}
+        )
     </insert>
 
     <select id="isIdExist" resultType="Integer">
         select
-            count(*)
+        count(*)
         from log
         where id=#{id}
     </select>
@@ -24,5 +28,53 @@
         from member
         where id=#{id} and pw=#{pw}
         and status='Y'
+    </select>
+
+    <select id="selectLog" resultType="com.example.Spring_Project.dto.LogDTO">
+        select
+        type,
+        id,
+        parameter,
+        url,
+        time,
+        description
+        FROM(SELECT ROWNUM rn, b.*
+        FROM ( select
+        type,
+        id,
+        parameter,
+        url,
+        time,
+        description
+        from log
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test=" searchType eq 'type'.toString() and keyword != null">
+                AND type like '%'||#{keyword}||'%'
+            </if>
+            <if test="searchType == 'url'.toString() and keyword !=null">
+                AND url like '%'||#{keyword}||'%'
+            </if>
+            <if test="searchType == 'description'.toString() and keyword !=null">
+                AND description like '%'||#{keyword}||'%'
+            </if>
+        </trim>
+        ORDER BY time desc) b)
+        where rn between #{start} and #{end}
+    </select>
+
+    <select id="countLog" resultType="Integer">
+        select count(*)
+        from log
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test=" searchType eq 'type'.toString() and keyword != null">
+                AND type like '%'||#{keyword}||'%'
+            </if>
+            <if test="searchType == 'url'.toString() and keyword !=null">
+                AND url like '%'||#{keyword}||'%'
+            </if>
+            <if test="searchType == 'description'.toString() and keyword !=null">
+                AND description like '%'||#{keyword}||'%'
+            </if>
+        </trim>
     </select>
 </mapper>

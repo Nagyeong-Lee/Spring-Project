@@ -1,8 +1,8 @@
 package com.example.Spring_Project.controller;
 
+import com.example.Spring_Project.dto.LogDTO;
 import com.example.Spring_Project.dto.MemberDTO;
-import com.example.Spring_Project.service.AdminService;
-import com.example.Spring_Project.service.PathService;
+import com.example.Spring_Project.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.*;
 
+
 @Slf4j
 @Controller
 @RequestMapping("/admin")
@@ -44,6 +45,12 @@ public class AdminController {
 
     @Autowired
     private PathService pathService;
+
+    @Autowired
+    private LogService logService;
+
+    @Autowired
+    private BoardService boardService;
 
     @RequestMapping("/main")  //회원 리스트 출력
     public String toAdminMain(Model model) throws Exception {
@@ -109,7 +116,7 @@ public class AdminController {
 
         MultipartFile multipartFile = new CommonsMultipartFile(fileItem);
 
-        boolean result=adminService.excelUpload(multipartFile);
+        boolean result = adminService.excelUpload(multipartFile);
 
 //        ModelAndView view = new ModelAndView();
 //
@@ -117,18 +124,55 @@ public class AdminController {
 //
 //        return view;
 
-        if(result==true){
+        if (result == true) {
             return "success";
-        }else{
+        } else {
             return "fail";
         }
     }
 
     @RequestMapping("/mngMember")
-    public String mngMember(Model model) throws Exception{
+    public String mngMember(Model model) throws Exception {
         List<MemberDTO> list = adminService.selectMemberList();
         model.addAttribute("list", list);
         return "/admin/memberMng";
     }
+
+    @RequestMapping("/list") // 게시글 리스트
+    public String logList(Model model,
+                          @RequestParam Integer currentPage,
+                          @RequestParam Integer count,
+                          @RequestParam(required = false) Integer postNum,
+                          @RequestParam(required = false) String searchType,
+                          @RequestParam(required = false) String keyword) throws Exception {
+
+        if (currentPage == null) {
+            currentPage = 1;
+        }
+
+        //게시글 개수 기본 10
+        if (count == null) {
+            count = 10;
+        }
+
+//        Integer totalLog = logService.countLog(searchType, keyword);  //전체 로그 개수
+        Integer start = currentPage * count - (count-1); //시작 글 번호
+        Integer end = currentPage * count; // 끝 글 번호
+
+        List<LogDTO> list = logService.selectLog(start, end, searchType, keyword);
+        String paging = logService.getLogPageNavi(currentPage, count, searchType, keyword,postNum);
+
+        Integer currPage = currentPage;
+        model.addAttribute("list", list);
+        model.addAttribute("paging", paging);
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("currPage",currPage);
+        model.addAttribute("count",count);
+        model.addAttribute("postNum",postNum);
+        return "/admin/logCheck";
+    }
+
+
 }
 

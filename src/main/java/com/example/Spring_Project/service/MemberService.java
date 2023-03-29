@@ -42,7 +42,9 @@ public class MemberService {
     public MemberDTO memberInfo(@RequestParam String id) throws Exception {
         return mapper.memberInfo(id);
     }
-
+    public Integer getMemberInfo(@RequestParam String id,@RequestParam String pw) throws Exception {
+        return mapper.getMemberInfo(id,pw);
+    }
     //id 찾기
     public String searchId(@RequestParam String email) throws Exception {
         return mapper.searchId(email);
@@ -110,7 +112,6 @@ public class MemberService {
     public String getUserType(@Param("id") String id) throws Exception{
         return mapper.getUserType(id);
     }
-
 
 
 }

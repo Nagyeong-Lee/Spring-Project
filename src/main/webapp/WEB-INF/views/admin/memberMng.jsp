@@ -2,7 +2,7 @@
   Created by IntelliJ IDEA.
   User: weaver-gram-0020
   Date: 2023-03-29
-  Time: 오전 11:22
+  Time: 오후 3:08
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -10,13 +10,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
-    <title>회원 관리</title>
-    <!--jQuery-->
-    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
-            integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
-    </script>
-    <%--chart.js--%>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+    <title>로그 확인</title>
 </head>
 <body>
 회원 리스트
@@ -53,28 +47,22 @@
 </form>
 
 <script>
-
     let id = $("#session").val();
     let path = $("#toLogOut").val();
-
     $("#downloadBtn").on("click", function () {
         location.href = "/admin/download";
     });
-
     $("#logout").on("click", function () {
         location.href = path + id;
     });
-
     function checkFileType(filePath) {
         var fileFormat = filePath.split(".");
-
         if (fileFormat.indexOf("xls") > -1 || fileFormat.indexOf("xlsx") > -1) {
             return true;
         } else {
             return false;
         }
     }
-
     var option = {
         url: "/admin/upload",
         TYPE: "POST",
@@ -86,10 +74,8 @@
             }
         }
     }
-
     $("#frm").submit(function () {
         var file = $("#fileExcel").val();
-
         if (file == "" || file == null) {
             alert("파일을 선택해주세요.");
             return false;
