@@ -84,7 +84,6 @@
         url: "/admin/upload",
         TYPE: "POST",
         success: function (res) {
-            console.log("res : " + res);
             if (res == "success") {
                 alert('업로드 성공');
             } else {

@@ -24,11 +24,9 @@
 <script>
 
     let id = $("#sessionID").val();
-
     //커뮤니티로 이동
     $("#board").on("click", function () {
         location.href = $("#toCommunity").val();
-        // location.href="/board/list?currentPage=1&count=15&searchType=&keyword=";
     });
 
     //계정 탈퇴

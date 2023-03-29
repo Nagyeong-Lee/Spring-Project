@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.Map;
+
 @Service
 public class BoardService {
 
@@ -59,11 +61,12 @@ public class BoardService {
 
 
     //페이징 처리
-    public String getBoardPageNavi(int currentPage, Integer count, String searchType, String keyword) throws Exception {
+    public String getBoardPageNavi(int currentPage, Integer count, String searchType, String keyword, Integer postNum) throws Exception {
         int postTotalCount = this.countPost(searchType, keyword);
 
         int recordCountPerPage = count; // 페이지 당 게시글 개수
         int naviCountPerPage = 10; // 내비 개수
+
 
         int pageTotalCount = 0; // 전체 내비 수
         if (postTotalCount % recordCountPerPage > 0) {
@@ -84,7 +87,6 @@ public class BoardService {
         if (endNavi > pageTotalCount) {
             endNavi = pageTotalCount;
         }
-
         boolean needPrev = true;
         boolean needNext = true;
 
@@ -98,20 +100,64 @@ public class BoardService {
         StringBuilder sb = new StringBuilder();
 
         if (needPrev) {
-            sb.append("<a href='/board/list?currentPage=" + (startNavi - 1) + "&count=" + count + "&searchType=" + "&keyword="+"'><</a> ");
+            if (postNum == null) {
+                sb.append("<a href='/board/list?currentPage=" + (startNavi - 1) + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><</a> ");
+            } else if (searchType == null && keyword == null) {
+                sb.append("<a href='/board/list?currentPage=" + (startNavi - 1) + "&count=" + count + "&postNum=" + postNum + "&searchType=&keyword=" + "'><</a> ");
+            } else {
+                sb.append("<a href='/board/list?currentPage=" + (startNavi - 1) + "&count=" + count + "&postNum=" + postNum + "&searchType=" + searchType + "&keyword=" + keyword + "'><</a> ");
+            }
         }
 
         for (int i = startNavi; i <= endNavi; i++) {
             if (currentPage == i) {
-                sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&searchType=" + "&keyword="+"'><b>" + i + "</b></a> ");
-
+                if (postNum == null) {
+                    if (searchType == null && keyword == null) {
+                        sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&searchType=" + "&keyword=" + "'><b>" + i + "</b></a> ");
+                    } else {
+                        sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><b>" + i + "</b></a> ");
+                    }
+                } else {
+                    if (searchType == null && keyword == null) {
+                        sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&postNum=" + postNum + "&searchType=" + "&keyword=" + "'><b>" + i + "</b></a> ");
+                    } else {
+                        sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&postNum=" + postNum + "&searchType=" + searchType + "&keyword=" + keyword + "'><b>" + i + "</b></a> ");
+                    }
+                }
             } else {
-                sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&searchType=" + "&keyword="+"'>" + i + "</a> ");
-
+                if (postNum == null) {
+                    if (searchType == null && keyword == null) {
+                        sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&searchType=" + "&keyword=" + "'><b>" + i + "</b></a> ");
+                    } else {
+                        sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><b>" + i + "</b></a> ");
+                    }
+                } else {
+                    if (searchType == null && keyword == null) {
+                        sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&postNum=" + postNum + "&searchType=" + "&keyword=" + "'>" + i + "</a> ");
+                    } else {
+                        sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&postNum=" + postNum + "&searchType=" + searchType + "&keyword=" + keyword + "'>" + i + "</a> ");
+                    }
+                }
             }
         }
         if (needNext) {
-            sb.append("<a href='/board/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + "&keyword="+"'>></a> ");
+            if (postNum == null) {
+
+                if (searchType == null && keyword == null) {
+                    sb.append("<a href='/board/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + "&keyword=" + "'>></a> ");
+                } else {
+                    sb.append("<a href='/board/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'>></a> ");
+                }
+
+            } else {
+
+                if (searchType == null && keyword == null) {
+                    sb.append("<a href='/board/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&postNum=" + postNum + "&searchType=" + "&keyword=" + "'>></a> ");
+                } else {
+                    sb.append("<a href='/board/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&postNum=" + postNum + "&searchType=" + searchType + "&keyword=" + keyword + "'>></a> ");
+                }
+
+            }
         }
         return sb.toString();
     }

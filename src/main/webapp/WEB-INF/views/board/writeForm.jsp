@@ -85,8 +85,6 @@
         let content = $("#content").val();
         let title = $("#title").val();
 
-        console.log("count : "+count);
-        console.log("currPage : "+currPage);
         let frm = $('#frm')[0];
 
         let data = new FormData(frm);
@@ -107,7 +105,7 @@
             , isModal: true
             , isModalEnd: true
             , success: function (data) {
-                location.href = "/board/list?currentPage="+currPage+"&count="+count;
+                location.href = "/board/list?currentPage=1"+"&count="+count;
             }, error: function (e) {
 
             }

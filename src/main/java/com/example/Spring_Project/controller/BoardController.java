@@ -42,8 +42,10 @@ public class BoardController {
     public String toBoard(Model model,
                           @RequestParam Integer currentPage,
                           @RequestParam Integer count,
+                          @RequestParam(required = false) Integer postNum,
                           @RequestParam(required = false) String searchType,
                           @RequestParam(required = false) String keyword) throws Exception {
+
         if (currentPage == null) {
             currentPage = 1;
         }
@@ -53,18 +55,12 @@ public class BoardController {
             count = 10;
         }
 
-        count=count;
-
         service.countPost(searchType, keyword); // 전체 글 개수
         Integer start = currentPage * count - (count-1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
 
         List<BoardDTO> list = service.select(start, end, searchType, keyword); //검색
-        String paging = service.getBoardPageNavi(currentPage, count, searchType, keyword);
-
-        System.out.println("count : "+count);
-        System.out.println("start : "+start);
-        System.out.println("end : "+end);
+        String paging = service.getBoardPageNavi(currentPage, count, searchType, keyword,postNum);
 
         Integer currPage = currentPage;
         model.addAttribute("list", list);
@@ -74,6 +70,7 @@ public class BoardController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("currPage",currPage);
         model.addAttribute("count",count);
+        model.addAttribute("postNum",postNum);
         return "/board/main";
     }
 

@@ -103,7 +103,6 @@
 
     $("#postNum").on("change", function () {
         let postNum=$("#postNum").val();
-        console.log($("#postNum").val());
         location.href="/board/list?currentPage=1&count="+postNum+"&searchType=&keyword=";
     });
 </script>
