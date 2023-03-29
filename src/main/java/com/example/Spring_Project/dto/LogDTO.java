@@ -13,6 +13,10 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 public class LogDTO {
     private Integer log_seq;
+    private String type;
     private String id;
+    private String parameter;
+    private String url;
     private Timestamp time;
+    private String description;
 }

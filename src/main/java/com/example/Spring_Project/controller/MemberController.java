@@ -1,6 +1,7 @@
 package com.example.Spring_Project.controller;
 
 import com.example.Spring_Project.dto.BatchDTO;
+import com.example.Spring_Project.dto.LogDTO;
 import com.example.Spring_Project.dto.MemberDTO;
 import com.example.Spring_Project.mailSender.MailDTO;
 import com.example.Spring_Project.service.BatchService;
@@ -19,6 +20,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -105,7 +108,16 @@ public class MemberController {
         MemberDTO memberDTO = service.selectById(id);
 
         if (memberDTO == null || service.login(id, memberDTO.getPw()) != 1) {
-            logService.insertLog(id); //에러 로그 저장
+            String type = "Login Fail";
+            String parameter = id + ", " + pw;
+            String url = "/member/login";
+            String description = id+" : 로그인에 실패했습니다.";
+            LogDTO logDTO = new LogDTO();
+            logDTO.setType(type);
+            logDTO.setParameter(parameter);
+            logDTO.setUrl(url);
+            logDTO.setDescription(description);
+//            logService.insertLog(logDTO); //에러 로그 저장
             log.info("==> ID 또는 PW가 일치하지 않습니다.");
             result = "redirect:/";
             return result;

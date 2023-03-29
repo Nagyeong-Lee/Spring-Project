@@ -30,8 +30,8 @@
 </head>
 <body>
 <table id="myTable">
-<input type="hidden" id="pageCount" name="pageCount" value="${count}">
-<input type="hidden" id="currPage" name="currPage" value="${currPage}">
+    <input type="hidden" id="pageCount" name="pageCount" value="${count}">
+    <input type="hidden" id="currPage" name="currPage" value="${currPage}">
     <tr>
         <th>작성자</th>
         <th>제목</th>
@@ -44,7 +44,8 @@
             <c:forEach var="i" items="${list}">
                 <tr>
                     <td>${i.writer}</td>
-                    <td class="title"><a href="/board/detail?b_seq=${i.b_seq}&currentPage=${currPage}&count=${count}">${i.title}</a>
+                    <td class="title"><a
+                            href="/board/detail?b_seq=${i.b_seq}&currentPage=${currPage}&count=${count}">${i.title}</a>
                     </td>
                     <input type="hidden" value="${i.b_seq}" class="b_seq">
                     <td><fmt:formatDate pattern='yyyy-MM-dd hh:mm' value="${i.write_date}"/></td>
@@ -70,10 +71,11 @@
 
 <div>${paging}</div>
 
+<input type=hidden value="${currPage}" name="cpage" id="cpage">
 <div class="btn">
     <form action="/board/list?" method="get">
-        <input type=hidden value="${currPage}" name="currentPage" id="currentPage">
         <input type=hidden value="${count}" name="count" id="count">
+        <input type=hidden value="1" name="currentPage" id="currentPage">
         <select name="postNum" id="postNum">
             <option value="5" <c:out value="${count eq '5' ? 'selected' : ''}"/>>5</option>
             <option value="10" <c:out value="${count eq '10' ? 'selected' : ''}"/>>10</option>
@@ -95,15 +97,15 @@
 
 <script>
     let b_seq = $(".b_seq").val();
-    let count=$("#pageCount").val();
-    let currPage=$("#currPage").val();
+    let count = $("#pageCount").val();
+    let currPage = $("#cpage").val();
     $("#writeBtn").on("click", function () {  //글작성 폼으로 이동
-        location.href = "/board/toWriteForm?b_seq=" + b_seq+"&count="+count+"&currentPage="+currPage;
+        location.href = "/board/toWriteForm?b_seq=" + b_seq + "&count=" + count + "&currentPage=" + currPage;
     });
 
     $("#postNum").on("change", function () {
-        let postNum=$("#postNum").val();
-        location.href="/board/list?currentPage=1&count="+postNum+"&searchType=&keyword=";
+        let postNum = $("#postNum").val();
+        location.href = "/board/list?currentPage=1&count=" + postNum + "&searchType=&keyword=";
     });
 </script>
 </body>
