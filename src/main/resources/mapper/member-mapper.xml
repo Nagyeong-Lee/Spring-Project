@@ -25,7 +25,8 @@
         #{savePath, jdbcType=VARCHAR},
         'Y',
         'ROLE_MEMBER',
-        #{fileIsEmpty, jdbcType=VARCHAR})
+        #{fileIsEmpty, jdbcType=VARCHAR},
+        null)
     </insert>
 
     <select id="idDupleCheck" resultType="Integer">

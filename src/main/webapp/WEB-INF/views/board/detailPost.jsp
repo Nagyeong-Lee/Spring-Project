@@ -77,12 +77,12 @@
 
 </head>
 <body>
-<input type="hidden" value="${count}" id="count" name="count">
-<input type="hidden" value="${currPage}" id="currpage" name="currpage">
+
 <input type="file" id="file" name="file" multiple="multiple" class="file" style="display: none">
 <%--작성자==로그인 아이디 일때 삭제.수정 보여주기--%>
 <form action="/board/update" id="frm" method="post" enctype="multipart/form-data">
-
+    <input type="hidden" value="${count}" id="count" name="count">
+    <input type="hidden" value="${currPage}" id="currpage" name="currpage">
     <div class="container">
         <input type="hidden" name="b_seq" id="b_seq" value="${boardDTO.b_seq}">
         <input type="hidden" name="writer" id="writer" value="${boardDTO.writer}">
@@ -170,7 +170,8 @@
             <c:if test="${boardDTO.writer eq id}">
                 <button type="button"><a href="/board/list?currentPage=${currPage}&count=${count}">목록으로</a></button>
                 <button type="button"><a
-                        href="/board/delete?b_seq=${boardDTO.b_seq}&currentPage=${currPage}&count=${count}">삭제하기</a></button>
+                        href="/board/delete?b_seq=${boardDTO.b_seq}&currentPage=${currPage}&count=${count}">삭제하기</a>
+                </button>
                 <button id="updBtn" type="button">게시글 수정하기</button>
                 <button type="button" onclick="$('#file').click();" id="attach">첨부파일</button>
             </c:if>
@@ -179,12 +180,12 @@
 </form>
 
 <script>
+
     $("#attach").hide();
     $(".fileDiv").hide();
     $(".deleteFile").hide();
 
     //파일 수정
-
     let deleteSeq = []; //삭제할 파일 f_seq
     let file = []; //실제 보낼 파일
     let arr = [];
@@ -192,7 +193,6 @@
     let no = '${boardDTO.write_date}';
 
     $("#updBtn").on("click", function () { //게시글 수정하기 클릭 시
-
 
         $("#attach").show();
         $(".fileDiv").show();
@@ -262,6 +262,7 @@
 
         let currPage = $("#currpage").val();
         let count = $("#count").val();
+
         let b_seq = $("#b_seq").val();
         let writer = $("#id").val();
         let content = $("#content").val();
@@ -289,7 +290,7 @@
             , isModalEnd: true
             , async: false
             , success: function (data) {
-                location.href = "/board/detail?b_seq=" + b_seq + "&currentPage=" + currPage+"&count="+count;
+                location.href = "/board/detail?b_seq=" + b_seq + "&currentPage=" + currPage + "&count=" + count;
             }, error: function (e) {
             }
         });
@@ -348,12 +349,15 @@
     function cmtDel(cmtNum) {  //댓글 삭제
         let cmt_seq = cmtNum;
         let b_seq = $("#b_seq").val();
+        let currentPage = $('#currpage').val();
+        let count = $('#count').val();
+
         $.ajax({
             url: "/comment/deleteCmt",
             type: "post",
             data: {"cmt_seq": cmt_seq},
             success: function (data) {
-                location.href = "/board/detail?b_seq=" + b_seq;
+                location.href = "/board/detail?b_seq=" + b_seq + "&currentPage=" + currentPage + "&count=" + count;
             }
         });
     }
@@ -362,11 +366,12 @@
 
     //댓글 수정
     function cmtUpd(cmtNum) {
+
+
         let originalContent = $("#originalContent" + cmtNum).text();
         cmt_num = cmtNum;
         // $("#" + cmtNum).remove();
         // $("#info" + cmtNum).remove();
-
         let btn = '<button type="button" class="upd" id="upd">수정 완료</button>'
         let div = '<textarea class="box" id="updtextArea" name="updtextArea">' + originalContent + ' </textarea>'
         // $("#originalContent"+cmtNum).remove();
@@ -382,6 +387,8 @@
         let content = $("#updtextArea").val();
         let cmt_seq = cmt_num;
         let b_seq = $("#b_seq").val();
+        let currentPage = $('#currpage').val();
+        let count = $('#count').val();
 
         $.ajax({
             url: "/comment/updCmt",
@@ -392,7 +399,7 @@
                 "cmt_seq": cmt_seq
             },
             success: function (data) {
-                location.href = "/board/detail?b_seq=" + b_seq;
+                location.href = "/board/detail?b_seq=" + b_seq + "&currentPage=" + currentPage + "&count=" + count;
             }
         });
     })
@@ -413,6 +420,9 @@
         let b_seq = $("#b_seq").val();
         let parent_cmt_seq = replyCmtNum;
 
+        let currentPage = $('#currpage').val();
+        let count = $('#count').val();
+
         $.ajax({
             url: "/comment/reply",
             type: "post",
@@ -423,7 +433,7 @@
                 "parent_cmt_seq": replyCmtNum
             },
             success: function (data) {
-                location.href = "/board/detail?b_seq=" + b_seq;
+                location.href = "/board/detail?b_seq=" + b_seq + "&currentPage=" + currentPage + "&count=" + count;
             }
         });
     })

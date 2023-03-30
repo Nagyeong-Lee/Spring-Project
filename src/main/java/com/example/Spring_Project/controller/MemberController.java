@@ -102,11 +102,10 @@ public class MemberController {
     }
 
     @PostMapping("/login")  //로그인 (성공->마이페이지 / 실패->메인페이지로 이동)
-    public String login(Model model, @RequestParam String id, @RequestParam String pw) throws Exception {
+    public String login(Model model, @RequestParam String id, @RequestParam String pw) throws Throwable {
         String result = "";
 
         MemberDTO memberDTO = service.selectById(id);
-
         if (memberDTO == null) { //회원이 아닐때
             String type = "None Member";
             String logID = id;
@@ -123,28 +122,28 @@ public class MemberController {
             log.info("==> 회원 정보가 없습니다.");
             result = "redirect:/";
             return result;
-        }else if(memberDTO != null ){
-            boolean flag=bCryptPasswordEncoder.matches(pw,memberDTO.getPw());
-            Integer cnt=0;
-            if(flag==true){
-                cnt = service.getMemberInfo(id,memberDTO.getPw());
+        } else if (memberDTO != null) {
+            boolean flag = bCryptPasswordEncoder.matches(pw, memberDTO.getPw());
+            Integer cnt = 0;
+            if (flag == true) {
+                cnt = service.getMemberInfo(id, memberDTO.getPw());
             }
-            if(cnt!=1){
-            String type = "None Member";
-            String logID = id;
-            String parameter = id + ", " + pw;
-            String url = "/member/login";
-            String description = id + " : 회원이 아닙니다.";
-            LogDTO logDTO = new LogDTO();
-            logDTO.setType(type);
-            logDTO.setId(logID);
-            logDTO.setParameter(parameter);
-            logDTO.setUrl(url);
-            logDTO.setDescription(description);
-            logService.insertLog(logDTO); //에러 로그 저장
-            log.info("==> 회원 정보가 없습니다.");
-            result = "redirect:/";
-            return result;
+            if (cnt != 1) {
+                String type = "None Member";
+                String logID = id;
+                String parameter = id + ", " + pw;
+                String url = "/member/login";
+                String description = id + " : 회원이 아닙니다.";
+                LogDTO logDTO = new LogDTO();
+                logDTO.setType(type);
+                logDTO.setId(logID);
+                logDTO.setParameter(parameter);
+                logDTO.setUrl(url);
+                logDTO.setDescription(description);
+                logService.insertLog(logDTO); //에러 로그 저장
+                log.info("==> 회원 정보가 없습니다.");
+                result = "redirect:/";
+                return result;
             }
         }
 
@@ -309,12 +308,12 @@ public class MemberController {
         if (memberDTO == null) {
             return "none";
         }
-        Integer count = service.getMemberInfo(id,memberDTO.getPw());
+        Integer count = service.getMemberInfo(id, memberDTO.getPw());
 //      if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) == true && service.isMemberExist(id, email) == 1) {
 //      service.activeMember(id, email); // 멤버 status Y로
-        String password=memberDTO.getPw();
-        if( count ==1 && service.isMemberExist(id,email,password)==1){
-            service.modifyLastLoginDateNull(id,email);
+        String password = memberDTO.getPw();
+        if (count == 1 && service.isMemberExist(id, email, password) == 1) {
+            service.modifyLastLoginDateNull(id, email);
             return "success";
         } else {
             return "recheck";

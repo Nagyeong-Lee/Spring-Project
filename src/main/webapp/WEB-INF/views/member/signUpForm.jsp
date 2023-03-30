@@ -106,6 +106,20 @@
     let EmailOk = true;
     let regexEmail = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.com/;
 
+    //6글자 랜덤 숫자 생성
+    function randomString() {
+        const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
+        const stringLength = 6;
+        let randomstring = '';
+        for (let i = 0; i < stringLength; i++) {
+            const rnum = Math.floor(Math.random() * chars.length);
+            randomstring += chars.substring(rnum, rnum + 1);
+        }
+        return randomstring;
+    }
+
+    let msg = randomString();
+
     //인증하기 버튼 클릭 시
     $("#authenticBtn").on("click", function () {
 
@@ -155,23 +169,8 @@
         }
     });
 
-
     //pw 일치 여부
     let pwOk = false;
-
-    //6글자 랜덤 숫자 생성
-    function randomString() {
-        const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
-        const stringLength = 6;
-        let randomstring = '';
-        for (let i = 0; i < stringLength; i++) {
-            const rnum = Math.floor(Math.random() * chars.length);
-            randomstring += chars.substring(rnum, rnum + 1);
-        }
-        return randomstring;
-    }
-
-    let msg = randomString();
 
     //사진 확장자 체크
     let extension = true;

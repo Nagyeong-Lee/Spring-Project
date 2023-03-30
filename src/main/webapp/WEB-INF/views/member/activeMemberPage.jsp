@@ -15,7 +15,7 @@
     <script src="https://malsup.github.io/jquery.form.js"></script>
     <title>휴면계정 해제</title>
 </head>
-<body>
+<a>
 <div class="ActiveBox">
     <div>
         이메일 <input type="text" name="email" id="email">
@@ -28,6 +28,7 @@
     </div>
 </div>
 <button type="button" id="active">휴면 해제</button>
+<a href="/"><button type="button" id="toIndex">취소</button></a>
 
 <script>
     $("#active").on("click", function () {
@@ -35,9 +36,6 @@
         let id = $("#id").val();
         let pw = $("#pw").val();
 
-        console.log("email : "+email);
-        console.log("id : "+id);
-        console.log("pw : "+pw);
         $.ajax({
             url: "/member/active",
             type: "post",
@@ -48,7 +46,6 @@
             },
             dataType:"text",
             success: function (data) {
-                console.log("data : "+data);
                 if (data == "success") {
                     alert('휴면처리가 해제되었습니다.');
                     location.href = "/";

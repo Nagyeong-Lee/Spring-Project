@@ -17,18 +17,20 @@ public class LogService {
     @Autowired
     private LogMapper logMapper;
 
-    public void insertLog(LogDTO logDTO) throws Exception{
-        try {
-            // throw로 강제 예외 발생
-//            throw new Exception("강제 예외 발생!!!");
-        } catch (Exception e)    {
-            System.out.println("err_msg : " + e.getMessage());
-        }
+    public void insertLog(LogDTO logDTO) throws Exception {
+//        try {
+////             throw로 강제 예외 발생
+//            throw new Throwable("강제 예외 발생!!!");
+//        } catch (Exception e) {
+//            System.out.println("err_msg : " + e.getMessage());
+//        } catch (Throwable e) {
+//            throw new RuntimeException(e);
+//        }
 
         logMapper.insertLog(logDTO);
     }
 
-    public Integer isIdExist(@RequestParam String id) throws Exception{
+    public Integer isIdExist(@RequestParam String id) throws Exception {
         return logMapper.isIdExist(id);
     }
 
@@ -37,12 +39,12 @@ public class LogService {
     }
 
     public List<LogDTO> selectLog(@RequestParam Integer start, @RequestParam Integer end,
-                                  @RequestParam String searchType, @RequestParam String keyword) throws Exception{
+                                  @RequestParam String searchType, @RequestParam String keyword) throws Exception {
         return logMapper.selectLog(start, end, searchType, keyword);
     }
 
-    public Integer countLog(@RequestParam String searchType,@RequestParam String keyword) throws Exception {
-        return logMapper.countLog(searchType,keyword); //log
+    public Integer countLog(@RequestParam String searchType, @RequestParam String keyword) throws Exception {
+        return logMapper.countLog(searchType, keyword); //log
     }
 
     //페이징 처리
@@ -85,11 +87,11 @@ public class LogService {
 
         if (needPrev) {
             if (postNum == null) {
-                sb.append("<a href='/board/list?currentPage=" + (startNavi - 1) + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><</a> ");
+                sb.append("<a href='/admin/list?currentPage=" + (startNavi - 1) + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><</a> ");
             } else if (searchType == null && keyword == null) {
-                sb.append("<a href='/board/list?currentPage=" + (startNavi - 1) + "&count=" + count + "&postNum=" + postNum + "&searchType=&keyword=" + "'><</a> ");
+                sb.append("<a href='/admin/list?currentPage=" + (startNavi - 1) + "&count=" + count + "&postNum=" + postNum + "&searchType=&keyword=" + "'><</a> ");
             } else {
-                sb.append("<a href='/board/list?currentPage=" + (startNavi - 1) + "&count=" + count + "&postNum=" + postNum + "&searchType=" + searchType + "&keyword=" + keyword + "'><</a> ");
+                sb.append("<a href='/admin/list?currentPage=" + (startNavi - 1) + "&count=" + count + "&postNum=" + postNum + "&searchType=" + searchType + "&keyword=" + keyword + "'><</a> ");
             }
         }
 
@@ -97,29 +99,29 @@ public class LogService {
             if (currentPage == i) {
                 if (postNum == null) {
                     if (searchType == null && keyword == null) {
-                        sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&searchType=" + "&keyword=" + "'><b>" + i + "</b></a> ");
+                        sb.append("<a href='/admin/list?currentPage=" + i + "&count=" + count + "&searchType=" + "&keyword=" + "'><b>" + i + "</b></a> ");
                     } else {
-                        sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><b>" + i + "</b></a> ");
+                        sb.append("<a href='/admin/list?currentPage=" + i + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><b>" + i + "</b></a> ");
                     }
                 } else {
                     if (searchType == null && keyword == null) {
-                        sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&postNum=" + postNum + "&searchType=" + "&keyword=" + "'><b>" + i + "</b></a> ");
+                        sb.append("<a href='/admin/list?currentPage=" + i + "&count=" + count + "&postNum=" + postNum + "&searchType=" + "&keyword=" + "'><b>" + i + "</b></a> ");
                     } else {
-                        sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&postNum=" + postNum + "&searchType=" + searchType + "&keyword=" + keyword + "'><b>" + i + "</b></a> ");
+                        sb.append("<a href='/admin/list?currentPage=" + i + "&count=" + count + "&postNum=" + postNum + "&searchType=" + searchType + "&keyword=" + keyword + "'><b>" + i + "</b></a> ");
                     }
                 }
             } else {
                 if (postNum == null) {
                     if (searchType == null && keyword == null) {
-                        sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&searchType=" + "&keyword=" + "'><b>" + i + "</b></a> ");
+                        sb.append("<a href='/admin/list?currentPage=" + i + "&count=" + count + "&searchType=" + "&keyword=" + "'><b>" + i + "</b></a> ");
                     } else {
-                        sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><b>" + i + "</b></a> ");
+                        sb.append("<a href='/admin/list?currentPage=" + i + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><b>" + i + "</b></a> ");
                     }
                 } else {
                     if (searchType == null && keyword == null) {
-                        sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&postNum=" + postNum + "&searchType=" + "&keyword=" + "'>" + i + "</a> ");
+                        sb.append("<a href='/admin/list?currentPage=" + i + "&count=" + count + "&postNum=" + postNum + "&searchType=" + "&keyword=" + "'>" + i + "</a> ");
                     } else {
-                        sb.append("<a href='/board/list?currentPage=" + i + "&count=" + count + "&postNum=" + postNum + "&searchType=" + searchType + "&keyword=" + keyword + "'>" + i + "</a> ");
+                        sb.append("<a href='/admin/list?currentPage=" + i + "&count=" + count + "&postNum=" + postNum + "&searchType=" + searchType + "&keyword=" + keyword + "'>" + i + "</a> ");
                     }
                 }
             }
@@ -127,15 +129,15 @@ public class LogService {
         if (needNext) {
             if (postNum == null) {
                 if (searchType == null && keyword == null) {
-                    sb.append("<a href='/board/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + "&keyword=" + "'>></a> ");
+                    sb.append("<a href='/admin/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + "&keyword=" + "'>></a> ");
                 } else {
-                    sb.append("<a href='/board/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'>></a> ");
+                    sb.append("<a href='/admin/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'>></a> ");
                 }
             } else {
                 if (searchType == null && keyword == null) {
-                    sb.append("<a href='/board/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&postNum=" + postNum + "&searchType=" + "&keyword=" + "'>></a> ");
+                    sb.append("<a href='/admin/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&postNum=" + postNum + "&searchType=" + "&keyword=" + "'>></a> ");
                 } else {
-                    sb.append("<a href='/board/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&postNum=" + postNum + "&searchType=" + searchType + "&keyword=" + keyword + "'>></a> ");
+                    sb.append("<a href='/admin/list?currentPage=" + (endNavi + 1) + "&count=" + count + "&postNum=" + postNum + "&searchType=" + searchType + "&keyword=" + keyword + "'>></a> ");
                 }
             }
         }

@@ -79,6 +79,7 @@
         </select>
         <input type="text" id="keyword" name="keyword" value="${keyword}">
         <button type="submit" id="searchBtn">검색</button>
+        <a href="/admin/main"><button type="button" id="toAdminMenu">관리자 메뉴로</button></a>
     </form>
 </div>
 

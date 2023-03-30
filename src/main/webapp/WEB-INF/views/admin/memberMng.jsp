@@ -11,6 +11,10 @@
 <html>
 <head>
     <title>로그 확인</title>
+    <!--jQuery-->
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+    <script src="https://malsup.github.io/jquery.form.js"></script>
 </head>
 <body>
 회원 리스트
@@ -69,6 +73,7 @@
         success: function (res) {
             if (res == "success") {
                 alert('업로드 성공');
+                location.href="/admin/mngMember";
             } else {
                 alert('업로드 실패');
             }
