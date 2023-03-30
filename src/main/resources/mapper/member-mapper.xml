@@ -222,11 +222,19 @@
         from member
         where id=#{id}
         and email=#{email}
+        and pw=#{password}
     </select>
 
     <update id="activeMember">
         update member
         set status = 'Y'
+        where id=#{id}
+        and email=#{email}
+    </update>
+
+    <update id="modifyLastLoginDateNull">
+        update member
+        set  lastLoginDate = null
         where id=#{id}
         and email=#{email}
     </update>

@@ -35,15 +35,20 @@
         let id = $("#id").val();
         let pw = $("#pw").val();
 
+        console.log("email : "+email);
+        console.log("id : "+id);
+        console.log("pw : "+pw);
         $.ajax({
             url: "/member/active",
-            type: "POST",
+            type: "post",
             data: {
                 "email": email,
                 "id": id,
                 "pw": pw
             },
+            dataType:"text",
             success: function (data) {
+                console.log("data : "+data);
                 if (data == "success") {
                     alert('휴면처리가 해제되었습니다.');
                     location.href = "/";

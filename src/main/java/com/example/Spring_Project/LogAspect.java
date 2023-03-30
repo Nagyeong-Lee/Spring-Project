@@ -1,23 +1,23 @@
 package com.example.Spring_Project;
 
 import com.example.Spring_Project.dto.LogDTO;
+import com.example.Spring_Project.service.LogService;
+import com.example.Spring_Project.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Aspect
 @Component
 public class LogAspect {
-//    @Autowired
-//    private MemberService memberService;
-//
-//    @Autowired
-//    private LogService logService;
-//
-//    @Autowired
-//    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private MemberService memberService;
+
+    @Autowired
+    private LogService logService;
 
     @AfterThrowing(value = "execution( * com.example.Spring_Project.*.*.*(..))", throwing = "ex")
     public void afterThrowing(JoinPoint joinPoint, Throwable ex) throws Exception {
@@ -36,12 +36,12 @@ public class LogAspect {
 //        logService.insertLog(logDTO); //에러 로그 저장
     }
 
-    @AfterReturning(value = "execution(* com.example.Spring_Project.*.*(..))", returning = "returnValue")
-    public void writeSuccessLog(JoinPoint joinPoint, Object returnValue) throws RuntimeException {
-        //logging
-        //returnValue 는 해당 메서드의 리턴객체를 그대로 가져올 수 있다.
-        System.out.println("TEST");
-    }
+//    @AfterReturning(value = "execution(* com.example.Spring_Project.*.*(..))", returning = "returnValue")
+//    public void writeSuccessLog(JoinPoint joinPoint, Object returnValue) throws RuntimeException {
+//        //logging
+//        //returnValue 는 해당 메서드의 리턴객체를 그대로 가져올 수 있다.
+//        System.out.println("TEST");
+//    }
 
 }
 

@@ -158,7 +158,7 @@ public class MemberController {
         } else if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) && !type.equals("ROLE_ADMIN")) {
             Integer nonActiveId = service.diffDate(id);   // 로그인한지 60일 이상
             if (nonActiveId == 1) {
-                service.changeStatus(id);   // member lastLoginDate => null (로그인 안할수도 있으니까)
+//                service.changeStatus(id);   // member lastLoginDate => null (로그인 안할수도 있으니까)
                 batchService.updateLoginDateNull(id); // batch lastLoginDate => null (로그인 안할수도 있으니까)
                 model.addAttribute("nonActiveID", id);
                 return "/member/activeMemberPage";
@@ -304,12 +304,17 @@ public class MemberController {
     @ResponseBody
     @PostMapping("/active")
     public String activeMember(@RequestParam String email, @RequestParam String id, @RequestParam String pw) throws Exception {
-        MemberDTO memberDTO = service.getNonActiveMember(id); //상태 N인 회원 정보 가져오기
+//      MemberDTO memberDTO = service.getNonActiveMember(id); //상태 N인 회원 정보 가져오기
+        MemberDTO memberDTO = service.memberInfo(id);
         if (memberDTO == null) {
             return "none";
         }
-        if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) == true && service.isMemberExist(id, email) == 1) {
-            service.activeMember(id, email); // 멤버 status Y로
+        Integer count = service.getMemberInfo(id,memberDTO.getPw());
+//      if (bCryptPasswordEncoder.matches(pw, memberDTO.getPw()) == true && service.isMemberExist(id, email) == 1) {
+//      service.activeMember(id, email); // 멤버 status Y로
+        String password=memberDTO.getPw();
+        if( count ==1 && service.isMemberExist(id,email,password)==1){
+            service.modifyLastLoginDateNull(id,email);
             return "success";
         } else {
             return "recheck";

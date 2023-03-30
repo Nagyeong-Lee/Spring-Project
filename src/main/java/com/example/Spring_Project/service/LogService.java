@@ -20,12 +20,12 @@ public class LogService {
     public void insertLog(LogDTO logDTO) throws Exception{
         try {
             // throw로 강제 예외 발생
-            throw new Exception("강제 예외 발생!!!");
+//            throw new Exception("강제 예외 발생!!!");
         } catch (Exception e)    {
             System.out.println("err_msg : " + e.getMessage());
         }
 
-        //logMapper.insertLog(logDTO);
+        logMapper.insertLog(logDTO);
     }
 
     public Integer isIdExist(@RequestParam String id) throws Exception{

@@ -29,10 +29,10 @@
     </update>
 
     <update id="updateActiveN">
-       update member
-        set status = 'N'
-        where id in
-        (select id from batch where trunc(sysdate)-lastLoginDate >= 60)
+<!--       update member-->
+<!--        set status = 'N'-->
+<!--        where id in-->
+<!--        (select id from batch where trunc(sysdate)-lastLoginDate >= 60)-->
     </update>
 
     <select id="getInfo" resultType="com.example.Spring_Project.dto.BatchDTO">

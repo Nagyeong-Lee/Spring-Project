@@ -101,12 +101,17 @@ public class MemberService {
         return mapper.getNonActiveMember(id);
     }
 
-    public Integer isMemberExist(@RequestParam String id,@RequestParam String email) throws Exception{
-        return mapper.isMemberExist(id,email);
+    public Integer isMemberExist(@RequestParam String id,@RequestParam String email,@RequestParam String password) throws Exception{
+        return mapper.isMemberExist(id,email,password);
     }
     public void activeMember(@RequestParam String id, @RequestParam String email) throws Exception{
         mapper.activeMember(id,email);
     }
+
+    public void modifyLastLoginDateNull(@RequestParam String id, @RequestParam String email) throws Exception{
+        mapper.modifyLastLoginDateNull(id,email);
+    }
+
 
     //인터셉터
     public String getUserType(@Param("id") String id) throws Exception{

@@ -61,8 +61,9 @@ public interface MemberMapper {
     void changeStatus(@Param("id") String id);
 
 
-    Integer isMemberExist(@Param("id") String id,@Param("email") String email);
+    Integer isMemberExist(@Param("id") String id,@Param("email") String email,@Param("password")String password);
     void activeMember(@Param("id") String id, @Param("email") String email);
 
+    void modifyLastLoginDateNull(@Param("id") String id, @Param("email") String email);
 
 }
