@@ -25,7 +25,7 @@ public class LogAspect {
     @Autowired
     private LogService logService;
 
-    @Autowired(required = false)
+    @Autowired
     private HttpServletRequest request;
 
     @AfterThrowing(pointcut = "execution(* com.example.Spring_Project.service.*.*(..))", throwing = "Exception")
