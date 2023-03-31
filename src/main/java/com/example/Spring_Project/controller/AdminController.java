@@ -6,6 +6,7 @@ import com.example.Spring_Project.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
+import org.apache.poi.ss.usermodel.Row;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -134,9 +135,50 @@ public class AdminController {
     @RequestMapping("/mngMember")
     public String mngMember(Model model) throws Exception {
         List<MemberDTO> list = adminService.selectMemberList();
+        Integer size = list.size();
+        for (Integer i = 0; i < size - 1; i++) {
+            Integer length = 0;
+            //아이디
+            String id = list.get(i).getId();
+            length = id.length() - 2;
+            id = id.substring(0, length) + "***";  // 뒷 2자리 ***
+            list.get(i).setId(id);
+            //이름
+            String name = list.get(i).getName();
+            String name2 = list.get(i).getName();
+            String str = "";
+            if (name.length() == 2) {
+                length = name.length() - 1;
+                name = name.substring(0, length) + "*";  // 뒷 1자리 *
+            } else if (name.length() == 3) {
+                name = name.substring(0, 1) + "*" + name.substring(2, 3);  // 가운데 *
+            } else {
+                length = name.length() - 2;
+                name = name.substring(0, length);
+                for (int k = length; k < name2.length(); k++) {
+                    str += "*";
+                }
+            }
+            list.get(i).setName(name);
+            //이메일
+            String email = list.get(i).getEmail();
+            length = email.length();
+            Integer index = email.indexOf("@");
+            String newEmail = "";
+            for (int j = 0; j < index; j++) {
+                newEmail += "*";
+            }
+            email = newEmail + list.get(i).getEmail().substring(index, length);
+            list.get(i).setEmail(email);
+            //전화번호
+            String phone = list.get(i).getPhone().substring(0, 3) + "****" + list.get(i).getPhone().substring(7, 11);
+            list.get(i).setPhone(phone);
+
+        }
         model.addAttribute("list", list);
         return "/admin/memberMng";
     }
+
 
     @RequestMapping("/list") // 게시글 리스트
     public String logList(Model model,
@@ -156,20 +198,20 @@ public class AdminController {
         }
 
 //        Integer totalLog = logService.countLog(searchType, keyword);  //전체 로그 개수
-        Integer start = currentPage * count - (count-1); //시작 글 번호
+        Integer start = currentPage * count - (count - 1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
 
         List<LogDTO> list = logService.selectLog(start, end, searchType, keyword);
-        String paging = logService.getLogPageNavi(currentPage, count, searchType, keyword,postNum);
+        String paging = logService.getLogPageNavi(currentPage, count, searchType, keyword, postNum);
 
         Integer currPage = currentPage;
         model.addAttribute("list", list);
         model.addAttribute("paging", paging);
         model.addAttribute("searchType", searchType);
         model.addAttribute("keyword", keyword);
-        model.addAttribute("currPage",currPage);
-        model.addAttribute("count",count);
-        model.addAttribute("postNum",postNum);
+        model.addAttribute("currPage", currPage);
+        model.addAttribute("count", count);
+        model.addAttribute("postNum", postNum);
         return "/admin/logCheck";
     }
 

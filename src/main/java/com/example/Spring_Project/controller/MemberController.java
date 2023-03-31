@@ -122,7 +122,7 @@ public class MemberController {
             log.info("==> 회원 정보가 없습니다.");
             result = "redirect:/";
             return result;
-        } else if (memberDTO != null) {
+        }else if (memberDTO != null) {
             boolean flag = bCryptPasswordEncoder.matches(pw, memberDTO.getPw());
             Integer cnt = 0;
             if (flag == true) {

@@ -26,7 +26,6 @@ public class LogService {
 //        } catch (Throwable e) {
 //            throw new RuntimeException(e);
 //        }
-
         logMapper.insertLog(logDTO);
     }
 
