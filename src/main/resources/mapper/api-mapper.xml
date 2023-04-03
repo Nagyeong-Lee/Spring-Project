@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.Spring_Project.mapper.ApiMapper">
+    <insert id="insertInfectionInfo" parameterType="com.example.Spring_Project.dto.InfectionDTO">
+        INSERT INTO infection
+        VALUES(
+        infection_seq.nextval,
+        #{resultCode},
+        #{resultMsg},
+        #{resultCnt},
+        #{mmddhh},
+        #{mmdd1},
+        #{cnt1},
+        #{rate1},
+        #{mmdd2},
+        #{cnt2},
+        #{rate2},
+        #{mmdd3},
+        #{cnt3},
+        #{rate3},
+        #{mmdd4},
+        #{cnt4},
+        #{rate4},
+        #{mmdd5},
+        #{cnt5},
+        #{rate5},
+        #{mmdd6},
+        #{cnt6},
+        #{rate6},
+        #{mmdd7},
+        #{cnt7},
+        #{rate7},
+        #{mmdd8},
+        #{cnt8},
+        #{rate8},
+        #{status}
+        )
+    </insert>
+</mapper>

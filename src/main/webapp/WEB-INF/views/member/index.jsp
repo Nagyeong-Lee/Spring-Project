@@ -23,6 +23,13 @@
     </form>
 </div>
 
+<form name="frm1" method="post" action="/api/data">
+        <button type="submit">일일 감염자수</button>
+</form>
+<form name="frm2" method="post" action="/api/hospital">
+        <button type="submit">병원 정보</button>
+</form>
+
 <script>
     $("#searchIdBtn").on("click", function () {
         location.href = "/member/toSearchIdForm";
