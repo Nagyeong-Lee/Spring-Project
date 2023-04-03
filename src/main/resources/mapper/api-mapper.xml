@@ -35,7 +35,48 @@
         #{mmdd8},
         #{cnt8},
         #{rate8},
-        #{status}
+        'Y'
         )
     </insert>
+
+    <select id="getInfectionInfo" resultType="com.example.Spring_Project.dto.InfectionDTO">
+        select
+            resultCode,
+            resultMsg,
+            resultCnt,
+            mmddhh,
+            mmdd1,
+            cnt1,
+            rate1,
+            mmdd2,
+            cnt2,
+            rate2,
+            mmdd3,
+            cnt3,
+            rate3,
+            mmdd4,
+            cnt4,
+            rate4,
+            mmdd5,
+            cnt5,
+            rate5,
+            mmdd6,
+            cnt6,
+            rate6,
+            mmdd7,
+            cnt7,
+            rate7,
+            mmdd8,
+            cnt8,
+            rate8,
+            status
+        from infection
+        where status='Y'
+    </select>
+
+    <update id="updateStatus">
+        UPDATE infection
+        set status='N'
+        where infection_seq not in #{infection_seq}
+    </update>
 </mapper>

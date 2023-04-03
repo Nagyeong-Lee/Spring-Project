@@ -6,7 +6,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -23,10 +25,6 @@ public class ApiService {
     @Autowired
     private ApiMapper apiMapper;
 
-    public void insertInfectionInfo(InfectionDTO infectionDTO) throws Exception {
-        apiMapper.insertInfectionInfo(infectionDTO);
-    }
-
     public void scheduler() throws Exception {
         List<String> list = new ArrayList<>();
         StringBuilder urlBuilder = new StringBuilder("https://apis.data.go.kr/1790387/covid19CurrentStatusConfirmations/covid19CurrentStatusConfirmationsJson"); /*URL*/
@@ -35,7 +33,7 @@ public class ApiService {
         URL url = new URL(urlBuilder.toString());
         System.out.println(url);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
+        conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-type", "application/json");
         System.out.println("Response code: " + conn.getResponseCode());
         BufferedReader rd;
@@ -59,11 +57,11 @@ public class ApiService {
                 jsonObject2 = (JsonObject) jsonArray.get(0);
                 System.out.println(jsonObject2.get("resultCode"));
                 InfectionDTO data = new Gson().fromJson(jsonObject2, InfectionDTO.class);
-
+                InfectionDTO data1=new Gson().fromJson(jsonObject1,InfectionDTO.class);
                 InfectionDTO infectionDTO = InfectionDTO.builder()
-                        .resultCode(data.getResultCode())
-                        .resultMsg(data.getResultMsg())
-                        .resultCnt(data.getResultCnt())
+                        .resultCode(data1.getResultCode())
+                        .resultMsg(data1.getResultMsg())
+                        .resultCnt(data1.getResultCnt())
                         .mmddhh(data.getMmddhh())
                         .mmdd1(data.getMmdd1())
                         .cnt1(data.getCnt1())
@@ -74,30 +72,38 @@ public class ApiService {
                         .mmdd3(data.getMmdd3())
                         .cnt3(data.getCnt3())
                         .rate3(data.getRate3())
-
-
                         .mmdd4(data.getMmdd4())
                         .cnt4(data.getCnt4())
                         .rate4(data.getRate4())
-
                         .mmdd5(data.getMmdd5())
                         .cnt5(data.getCnt5())
                         .rate5(data.getRate5())
-
                         .mmdd6(data.getMmdd6())
                         .cnt6(data.getCnt6())
                         .rate6(data.getRate6())
-
                         .mmdd7(data.getMmdd7())
                         .cnt7(data.getCnt7())
                         .rate7(data.getRate7())
-
                         .mmdd8(data.getMmdd8())
                         .cnt8(data.getCnt8())
                         .rate8(data.getRate8())
-                        .status("Y").build();
+                        .build();
                 this.insertInfectionInfo(infectionDTO);
+                this.updateStatus(infectionDTO);
             }
         }
     }
+
+    public void insertInfectionInfo(InfectionDTO infectionDTO) throws Exception {
+        apiMapper.insertInfectionInfo(infectionDTO);
+    }
+
+    public InfectionDTO getInfectionInfo() throws Exception {
+        return apiMapper.getInfectionInfo();
+    }
+
+    public void updateStatus(InfectionDTO infectionDTO) throws Exception {
+        apiMapper.updateStatus(infectionDTO.getInfection_seq());
+    }
+
 }

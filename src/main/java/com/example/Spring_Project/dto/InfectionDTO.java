@@ -1,9 +1,11 @@
 package com.example.Spring_Project.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class InfectionDTO {
 

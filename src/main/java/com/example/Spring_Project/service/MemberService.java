@@ -47,14 +47,14 @@ public class MemberService {
     }
     //id 찾기
     public String searchId(@RequestParam String email) throws Exception {
-        try {
-//             throw로 강제 예외 발생
-            throw new Throwable("강제 예외 발생!!!");
-        } catch (Exception e) {
-            System.out.println("err_msg : " + e.getMessage());
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+////             throw로 강제 예외 발생
+//            throw new Throwable("강제 예외 발생!!!");
+//        } catch (Exception e) {
+//            System.out.println("err_msg : " + e.getMessage());
+//        } catch (Throwable e) {
+//            throw new RuntimeException(e);
+//        }
         return mapper.searchId(email);
     }
 
