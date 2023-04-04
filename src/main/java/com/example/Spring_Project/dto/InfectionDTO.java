@@ -4,9 +4,9 @@ import lombok.*;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class InfectionDTO {
 
     private Integer infection_seq;
@@ -39,4 +39,5 @@ public class InfectionDTO {
     private String cnt8;
     private String rate8;
     private String status;
+
 }

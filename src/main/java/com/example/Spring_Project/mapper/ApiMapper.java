@@ -9,7 +9,9 @@ import org.springframework.stereotype.Repository;
 @Mapper
 public interface ApiMapper {
 
-    void insertInfectionInfo(InfectionDTO infectionDTO);
+    void insertInfectionInfo(InfectionDTO infectionDTO); //일별 감염 현황
     InfectionDTO getInfectionInfo();
+    Integer getCurrVal();
+    Integer getNextVal();
     void updateStatus(@Param("infection_seq") Integer infection_seq);
 }

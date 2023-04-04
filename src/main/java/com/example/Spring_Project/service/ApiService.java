@@ -6,11 +6,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -26,6 +23,7 @@ public class ApiService {
     private ApiMapper apiMapper;
 
     public void scheduler() throws Exception {
+        Integer nextVal=this.getNextVal();
         List<String> list = new ArrayList<>();
         StringBuilder urlBuilder = new StringBuilder("https://apis.data.go.kr/1790387/covid19CurrentStatusConfirmations/covid19CurrentStatusConfirmationsJson"); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=LKJBg0TUTr8u6PxqJPp2gTaRuOl9vzlXSGB%2FutNU7s765%2F8gb9ahOaNDyYYDpJuo%2BLiDSes3a%2BC70w5APfDzGg%3D%3D"); /*Service Key*/
@@ -59,6 +57,7 @@ public class ApiService {
                 InfectionDTO data = new Gson().fromJson(jsonObject2, InfectionDTO.class);
                 InfectionDTO data1=new Gson().fromJson(jsonObject1,InfectionDTO.class);
                 InfectionDTO infectionDTO = InfectionDTO.builder()
+                        .infection_seq(nextVal)
                         .resultCode(data1.getResultCode())
                         .resultMsg(data1.getResultMsg())
                         .resultCnt(data1.getResultCnt())
@@ -87,9 +86,10 @@ public class ApiService {
                         .mmdd8(data.getMmdd8())
                         .cnt8(data.getCnt8())
                         .rate8(data.getRate8())
-                        .build();
+                        .status("Y").build();
                 this.insertInfectionInfo(infectionDTO);
-                this.updateStatus(infectionDTO);
+                Integer currVal=this.getCurrVal();
+                this.updateStatus(currVal);
             }
         }
     }
@@ -102,8 +102,18 @@ public class ApiService {
         return apiMapper.getInfectionInfo();
     }
 
-    public void updateStatus(InfectionDTO infectionDTO) throws Exception {
-        apiMapper.updateStatus(infectionDTO.getInfection_seq());
+    public Integer getCurrVal() throws Exception{
+        return apiMapper.getCurrVal();
     }
+
+    public Integer getNextVal() throws Exception{
+        return apiMapper.getNextVal();
+    }
+
+    public void updateStatus(Integer infection_seq) throws Exception {
+        apiMapper.updateStatus(infection_seq);
+    }
+
+
 
 }

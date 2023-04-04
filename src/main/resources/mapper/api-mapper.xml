@@ -6,7 +6,7 @@
     <insert id="insertInfectionInfo" parameterType="com.example.Spring_Project.dto.InfectionDTO">
         INSERT INTO infection
         VALUES(
-        infection_seq.nextval,
+        infection_seq.currval,
         #{resultCode},
         #{resultMsg},
         #{resultCnt},
@@ -72,6 +72,14 @@
             status
         from infection
         where status='Y'
+    </select>
+
+    <select id="getCurrVal" resultType="Integer">
+        SELECT infection_seq.currval from dual
+    </select>
+
+    <select id="getNextVal" resultType="Integer">
+        SELECT infection_seq.nextval from dual
     </select>
 
     <update id="updateStatus">
