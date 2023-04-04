@@ -17,7 +17,7 @@ public class BatchScheduler {
         batchService.updateActiveN();
     }
 
-    @Scheduled(cron = "0 0 22 * * *") //매일 22시
+    @Scheduled(cron = "0 0 8 * * *") //매일 22시
     public void runScheduler() throws Exception{
         apiService.scheduler(); //api data insert
     }
