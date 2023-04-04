@@ -21,5 +21,4 @@ public class BatchScheduler {
     public void runScheduler() throws Exception{
         apiService.scheduler(); //api data insert
     }
-
 }

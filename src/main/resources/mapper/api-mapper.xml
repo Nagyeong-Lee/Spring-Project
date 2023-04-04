@@ -87,4 +87,23 @@
         set status='N'
         where infection_seq not in #{infection_seq}
     </update>
+
+    <insert id="insertInfectionByMonth" parameterType="String">
+        INSERT INTO infectionByMonth
+        values(
+            infectionByMonth_seq.nextval,
+            #{mmdd},
+            #{cnt},
+            #{month},
+            #{year}
+        )
+    </insert>
+
+    <select id="getYear" resultType="String">
+        select to_char(sysdate,'YYYY') from dual
+    </select>
+
+    <select id="getInfectionByMonthInfo" resultType="com.example.Spring_Project.dto.InfectionByMonthDTO2">
+        SELECT MONTH,sum(cnt) as sum FROM infectionByMonth GROUP BY MONTH ORDER BY 1
+    </select>
 </mapper>

@@ -23,12 +23,8 @@
     </form>
 </div>
 
-<a href="/api/data">
-        <button type="submit">일일 감염자수</button>
-</a>
-<form name="frm2" method="post" action="/api/hospital">
-        <button type="submit">병원 정보</button>
-</form>
+<a href="/api/data">일일 감염자수</a><br>
+<a href="/api/dataByMonth">월별 감염자수</a>
 
 <script>
     $("#searchIdBtn").on("click", function () {

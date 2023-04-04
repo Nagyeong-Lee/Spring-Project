@@ -1,5 +1,7 @@
 package com.example.Spring_Project.controller;
 
+import com.example.Spring_Project.dto.InfectionByMonthDTO;
+import com.example.Spring_Project.dto.InfectionByMonthDTO2;
 import com.example.Spring_Project.dto.InfectionDTO;
 import com.example.Spring_Project.service.ApiService;
 import com.google.gson.JsonArray;
@@ -13,12 +15,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @Component
@@ -30,9 +35,24 @@ public class ApiController {
     @GetMapping("/data")
     public String api(Model model) throws Exception {
         InfectionDTO infectionDTO = apiService.getInfectionInfo();
-        model.addAttribute("infectionDTO",infectionDTO);
-        return"/api/infectionChart";
-}
+        model.addAttribute("infectionDTO", infectionDTO);
+        return "/api/infectionChart";
+    }
+
+    @GetMapping("/dataByMonth")
+    public String dataByMonth(Model model) throws Exception {
+        List<InfectionByMonthDTO2> list = apiService.getInfectionByMonthInfo();
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        Integer size = list.size();
+        for (Integer i = 0; i < size; i++) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("month", list.get(i).getMONTH());
+            map.put("sum", list.get(i).getSum());
+            mapList.add(map);
+        }
+        model.addAttribute("mapList", mapList);
+        return "/api/infectionChartByMonth";
+    }
 
     @PostMapping("/hospital")
     public String hospitalInfo(Model model) throws Exception {

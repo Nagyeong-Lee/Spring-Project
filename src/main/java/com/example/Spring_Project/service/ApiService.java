@@ -1,5 +1,6 @@
 package com.example.Spring_Project.service;
 
+import com.example.Spring_Project.dto.InfectionByMonthDTO2;
 import com.example.Spring_Project.dto.InfectionDTO;
 import com.example.Spring_Project.mapper.ApiMapper;
 import com.google.gson.Gson;
@@ -8,6 +9,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -15,6 +18,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ApiService {
@@ -29,11 +33,9 @@ public class ApiService {
         urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=LKJBg0TUTr8u6PxqJPp2gTaRuOl9vzlXSGB%2FutNU7s765%2F8gb9ahOaNDyYYDpJuo%2BLiDSes3a%2BC70w5APfDzGg%3D%3D"); /*Service Key*/
         urlBuilder.append("&type=json");
         URL url = new URL(urlBuilder.toString());
-        System.out.println(url);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-type", "application/json");
-        System.out.println("Response code: " + conn.getResponseCode());
         BufferedReader rd;
         if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
             rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -88,6 +90,11 @@ public class ApiService {
                         .rate8(data.getRate8())
                         .status("Y").build();
                 this.insertInfectionInfo(infectionDTO);
+                String mmdd=infectionDTO.getMmdd6();
+                String cnt=infectionDTO.getCnt6();
+                String month=mmdd.substring(0,2);
+                String year=this.getYear();//현재 년도 가져오기
+                this.insertInfectionByMonth(mmdd,cnt,month,year);
                 Integer currVal=this.getCurrVal();
                 this.updateStatus(currVal);
             }
@@ -114,6 +121,15 @@ public class ApiService {
         apiMapper.updateStatus(infection_seq);
     }
 
+    public void insertInfectionByMonth(@RequestParam String mmdd,@RequestParam String cnt, @RequestParam String month, @RequestParam String year) throws Exception {
+        apiMapper.insertInfectionByMonth(mmdd,cnt,month,year);
+    }
 
+    public String getYear() throws Exception{
+        return apiMapper.getYear();
+    }
 
+    public List<InfectionByMonthDTO2> getInfectionByMonthInfo() throws Exception{
+        return apiMapper.getInfectionByMonthInfo();
+    }
 }
