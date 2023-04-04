@@ -104,6 +104,49 @@
     </select>
 
     <select id="getInfectionByMonthInfo" resultType="com.example.Spring_Project.dto.InfectionByMonthDTO2">
-        SELECT MONTH,sum(cnt) as sum FROM infectionByMonth GROUP BY MONTH ORDER BY 1
+        SELECT MONTH,sum(cnt) as sum FROM infectionByMonth WHERE YEAR='2023' GROUP BY MONTH ORDER BY 1
+    </select>
+    
+    <select id="getHospitalInfo" resultType="com.example.Spring_Project.dto.HospitalDTO">
+        select
+          hospital_seq,
+          postcode,
+          city,
+          hospital_name,
+          roadAddress,
+          jibunAddress,
+          weekOpen,
+          weekClose,
+          satOpen,
+          satClose,
+          holidayOpen,
+          holidayClose,
+          phone,
+          latitude,
+          longitude,
+          flag
+        from hospital
+    </select>
+
+    <select id="getInfo" resultType="com.example.Spring_Project.dto.HospitalDTO">
+        select
+        hospital_seq,
+        postcode,
+        city,
+        hospital_name,
+        roadAddress,
+        jibunAddress,
+        weekOpen,
+        weekClose,
+        satOpen,
+        satClose,
+        holidayOpen,
+        holidayClose,
+        phone,
+        latitude,
+        longitude,
+        flag
+        from hospital
+        where hospital_seq=#{hospital_seq}
     </select>
 </mapper>

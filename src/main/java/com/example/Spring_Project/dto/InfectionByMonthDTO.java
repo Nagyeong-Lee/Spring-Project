@@ -12,11 +12,8 @@ import lombok.Setter;
 public class InfectionByMonthDTO {
 
     private Integer infectionByMonth_seq;
-
     private String mmdd;
-
     private String cnt;
-
     private String MONTH;
     private String YEAR;
 

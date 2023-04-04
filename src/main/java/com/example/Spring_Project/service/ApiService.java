@@ -1,5 +1,6 @@
 package com.example.Spring_Project.service;
 
+import com.example.Spring_Project.dto.HospitalDTO;
 import com.example.Spring_Project.dto.InfectionByMonthDTO2;
 import com.example.Spring_Project.dto.InfectionDTO;
 import com.example.Spring_Project.mapper.ApiMapper;
@@ -9,6 +10,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.BufferedReader;
@@ -26,8 +28,9 @@ public class ApiService {
     @Autowired
     private ApiMapper apiMapper;
 
+    @Transactional
     public void scheduler() throws Exception {
-        Integer nextVal=this.getNextVal();
+        Integer nextVal = this.getNextVal();
         List<String> list = new ArrayList<>();
         StringBuilder urlBuilder = new StringBuilder("https://apis.data.go.kr/1790387/covid19CurrentStatusConfirmations/covid19CurrentStatusConfirmationsJson"); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=LKJBg0TUTr8u6PxqJPp2gTaRuOl9vzlXSGB%2FutNU7s765%2F8gb9ahOaNDyYYDpJuo%2BLiDSes3a%2BC70w5APfDzGg%3D%3D"); /*Service Key*/
@@ -57,7 +60,7 @@ public class ApiService {
                 jsonObject2 = (JsonObject) jsonArray.get(0);
                 System.out.println(jsonObject2.get("resultCode"));
                 InfectionDTO data = new Gson().fromJson(jsonObject2, InfectionDTO.class);
-                InfectionDTO data1=new Gson().fromJson(jsonObject1,InfectionDTO.class);
+                InfectionDTO data1 = new Gson().fromJson(jsonObject1, InfectionDTO.class);
                 InfectionDTO infectionDTO = InfectionDTO.builder()
                         .infection_seq(nextVal)
                         .resultCode(data1.getResultCode())
@@ -90,12 +93,12 @@ public class ApiService {
                         .rate8(data.getRate8())
                         .status("Y").build();
                 this.insertInfectionInfo(infectionDTO);
-                String mmdd=infectionDTO.getMmdd6();
-                String cnt=infectionDTO.getCnt6();
-                String month=mmdd.substring(0,2);
-                String year=this.getYear();//현재 년도 가져오기
-                this.insertInfectionByMonth(mmdd,cnt,month,year);
-                Integer currVal=this.getCurrVal();
+                String mmdd = infectionDTO.getMmdd6();
+                String cnt = infectionDTO.getCnt6();
+                String month = mmdd.substring(0, 2);
+                String year = this.getYear();//현재 년도 가져오기
+                this.insertInfectionByMonth(mmdd, cnt, month, year);
+                Integer currVal = this.getCurrVal();
                 this.updateStatus(currVal);
             }
         }
@@ -109,11 +112,11 @@ public class ApiService {
         return apiMapper.getInfectionInfo();
     }
 
-    public Integer getCurrVal() throws Exception{
+    public Integer getCurrVal() throws Exception {
         return apiMapper.getCurrVal();
     }
 
-    public Integer getNextVal() throws Exception{
+    public Integer getNextVal() throws Exception {
         return apiMapper.getNextVal();
     }
 
@@ -121,15 +124,23 @@ public class ApiService {
         apiMapper.updateStatus(infection_seq);
     }
 
-    public void insertInfectionByMonth(@RequestParam String mmdd,@RequestParam String cnt, @RequestParam String month, @RequestParam String year) throws Exception {
-        apiMapper.insertInfectionByMonth(mmdd,cnt,month,year);
+    public void insertInfectionByMonth(@RequestParam String mmdd, @RequestParam String cnt, @RequestParam String month, @RequestParam String year) throws Exception {
+        apiMapper.insertInfectionByMonth(mmdd, cnt, month, year);
     }
 
-    public String getYear() throws Exception{
+    public String getYear() throws Exception {
         return apiMapper.getYear();
     }
 
-    public List<InfectionByMonthDTO2> getInfectionByMonthInfo() throws Exception{
+    public List<InfectionByMonthDTO2> getInfectionByMonthInfo() throws Exception {
         return apiMapper.getInfectionByMonthInfo();
+    }
+
+    public List<HospitalDTO>getHospitalInfo() throws Exception{
+        return apiMapper.getHospitalInfo();
+    }
+
+    public HospitalDTO getInfo(Integer hospital_seq) throws Exception{
+        return apiMapper.getInfo(hospital_seq);
     }
 }
