@@ -5,6 +5,7 @@ import com.example.Spring_Project.dto.InfectionByMonthDTO2;
 import com.example.Spring_Project.dto.InfectionDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -32,7 +33,10 @@ public interface ApiMapper {
     List<InfectionByMonthDTO2> getInfectionByMonthInfo();
 
     //병원
-    List<HospitalDTO> getHospitalInfo();
+    List<HospitalDTO> getHospitalInfo(@Param("searchType") String searchType,@Param("keyword") String keyword
+                                    ,@Param("start") Integer start, @Param("end") Integer end
+    );
 
     HospitalDTO getInfo(Integer hospital_seq);
+    Integer countPost(@Param("searchType") String searchType, @Param("keyword") String keyword);
 }

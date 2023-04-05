@@ -31,7 +31,8 @@ public class LoginInterceptor implements HandlerInterceptor {
                         || uri.startsWith("/board")
                         || uri.startsWith("/admin")
                         || uri.startsWith("/comment")
-                        || uri.startsWith("/file"))
+                        || uri.startsWith("/file")
+                        || uri.startsWith("/api"))
                     response.sendRedirect("/");
                 return false;
             }

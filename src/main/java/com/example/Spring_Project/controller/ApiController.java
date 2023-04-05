@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,19 +50,32 @@ public class ApiController {
     }
 
 
-    @RequestMapping("/hospital")
-    public String hospitalInfo(Model model) throws Exception {
-        List<HospitalDTO>list = apiService.getHospitalInfo();
-        model.addAttribute("list",list);
+    @GetMapping("/hospital")
+    public String hospitalInfo(Model model, @RequestParam Integer currentPage,
+                               @RequestParam Integer count,
+                               @RequestParam(required = false) String searchType,
+                               @RequestParam(required = false) String keyword) throws Exception {
+        Integer start = currentPage * count - (count - 1); //시작 글 번호
+        Integer end = currentPage * count; // 끝 글 번호
+        List<HospitalDTO> list = apiService.getHospitalInfo(searchType, keyword,start,end);
+        String paging=apiService.getHospitalPageNavi(currentPage, count, searchType, keyword);
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("list", list);
+        model.addAttribute("paging", paging);
+        model.addAttribute("count", count); //개수 선택
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("keyword", keyword);
         return "/api/hospitalInfo";
     }
 
-    @GetMapping("/detail")
-    public String map(Model model,Integer hospital_seq,String latitude, String longitude) throws Exception{
+    @RequestMapping("/detail")
+    public String map(Model model, Integer hospital_seq,Integer currentPage,Integer count,String searchType,String keyword) throws Exception {
         HospitalDTO hospitalDTO = apiService.getInfo(hospital_seq); //병원 한 개 정보
-        model.addAttribute("latitude",latitude);
-        model.addAttribute("longitude",longitude);
-        model.addAttribute("hospitalDTO",hospitalDTO);
+        model.addAttribute("hospitalDTO", hospitalDTO);
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("count", count);
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("keyword", keyword);
         return "/api/detail";
     }
 }

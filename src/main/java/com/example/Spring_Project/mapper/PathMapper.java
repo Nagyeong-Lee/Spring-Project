@@ -16,4 +16,7 @@ public interface PathMapper {
     String getDeletePath();
 
     String getUpdateFormPath();
+    String getHospitalPath();
+    String getDaily();
+    String getMonthly();
 }

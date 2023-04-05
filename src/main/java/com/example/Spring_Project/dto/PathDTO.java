@@ -12,4 +12,6 @@ import lombok.Setter;
 public class PathDTO {
     private Integer path_seq;
     private String path;
+    private String name;
+    private Integer parent_path_seq;
 }

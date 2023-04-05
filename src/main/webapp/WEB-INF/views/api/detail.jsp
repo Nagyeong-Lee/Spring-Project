@@ -23,25 +23,22 @@
 <div id="postcode">우편번호 : ${hospitalDTO.postcode}</div>
 <div id="roadAddress">도로명주소 : ${hospitalDTO.roadAddress}</div>
 <div id="jibunAddress">지번주소 : ${hospitalDTO.jibunAddress}</div>
-<div id="open">시작시간 : ${hospitalDTO.weekOpen}</div>
-<div id="close">종료시간 : ${hospitalDTO.weekClose}</div>
-<c:if test="${not empty hospitalDTO.satOpen}">토요일 오픈시간 : ${hospitalDTO.satOpen}</c:if>
-<c:if test="${not empty hospitalDTO.satClose}">토요일 종료시간 : ${hospitalDTO.satClose}</c:if>
-<c:if test="${not empty hospitalDTO.holidayOpen}">일요일 오픈시간 : ${hospitalDTO.holidayOpen}</c:if>
-<c:if test="${not empty hospitalDTO.holidayClose}">일요일 오픈시간 : ${hospitalDTO.holidayClose}</c:if>
+<div id="weekBsHour">진료 시간 : ${hospitalDTO.weekOpen} ~ ${hospitalDTO.weekClose}</div>
+<c:if test="${not empty hospitalDTO.satOpen}"><div id="satBsHour">토요일 진료 시간 : ${hospitalDTO.satOpen} ~ ${hospitalDTO.satClose}</div></c:if>
+<c:if test="${not empty hospitalDTO.holidayOpen}"><div id="holidayBsHour">일요일 및 공휴일 진료시간 : ${hospitalDTO.holidayOpen} ~ ${hospitalDTO.holidayClose}</div></c:if>
 <div id="map" style="width:50%;height:350px;"></div>
-
+<a href="/api/hospital?currentPage=${currentPage}&count=${count}&searchType=${searchType}&keyword=${keyword}"><button type="button" id="toList">목록으로</button></a>
 <script>
   var mapContainer = document.getElementById('map'), // 지도를 표시할 div
           mapOption = {
-            center: new kakao.maps.LatLng(${latitude}, ${longitude}), // 지도의 중심좌표
+            center: new kakao.maps.LatLng(${hospitalDTO.latitude}, ${hospitalDTO.longitude}), // 지도의 중심좌표
             level: 3 // 지도의 확대 레벨
           };
 
   var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
 
   // 마커가 표시될 위치입니다
-  var markerPosition = new kakao.maps.LatLng(${latitude}, ${longitude});
+  var markerPosition = new kakao.maps.LatLng(${hospitalDTO.latitude}, ${hospitalDTO.longitude});
 
   // 마커를 생성합니다
   var marker = new kakao.maps.Marker({

@@ -25,4 +25,28 @@
         from pathUrl
         where path_seq=4
     </select>
+    <select id="getHospitalPath" resultType="String">
+        select path
+        from pathUrl
+        where path_seq=5
+    </select>
+    <select id="getDaily" resultType="String">
+        select path
+        from pathUrl
+        where path_seq=6
+    </select>
+    <select id="getMonthly" resultType="String">
+        select path
+        from pathUrl
+        where path_seq=7
+    </select>
+
+    <select id="pathList" resultType="com.example.Spring_Project.dto.PathDTO">
+        select
+         path_seq,
+         path,
+         name,
+         parent_path_seq
+        from pathUrl
+    </select>
 </mapper>

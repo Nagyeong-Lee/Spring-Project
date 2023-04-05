@@ -3,6 +3,7 @@ package com.example.Spring_Project.controller;
 import com.example.Spring_Project.dto.BatchDTO;
 import com.example.Spring_Project.dto.LogDTO;
 import com.example.Spring_Project.dto.MemberDTO;
+import com.example.Spring_Project.dto.PathDTO;
 import com.example.Spring_Project.mailSender.MailDTO;
 import com.example.Spring_Project.service.BatchService;
 import com.example.Spring_Project.service.LogService;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -122,7 +124,7 @@ public class MemberController {
             log.info("==> 회원 정보가 없습니다.");
             result = "redirect:/";
             return result;
-        }else if (memberDTO != null) {
+        } else if (memberDTO != null) {
             boolean flag = bCryptPasswordEncoder.matches(pw, memberDTO.getPw());
             Integer cnt = 0;
             if (flag == true) {
@@ -183,7 +185,7 @@ public class MemberController {
                     model.addAttribute("deletePath", deletePath);
                     model.addAttribute("logoutPath", logoutPath);
                     model.addAttribute("communityPath", communityPath);
-                    result = "/member/myPage";
+                    result = "redirect:/member/myPage";
                 } else {
                     result = "redirect:/";
                 }
@@ -292,11 +294,19 @@ public class MemberController {
         String communityPath = pathService.getCommunityPath();
         String deletePath = pathService.getDeletePath();
         String updateFormPath = pathService.getUpdateFormPath();
-        String logoutPath = pathService.getLogoutPath();
+        String logoutPath = pathService.getDaily();
+        String daily = pathService.getMonthly();
+        String monthly = pathService.getLogoutPath();
+        String hospitalPath = pathService.getHospitalPath();
+
+        List<PathDTO>list = pathService.getPathList();
         model.addAttribute("updateFormPath", updateFormPath);
         model.addAttribute("deletePath", deletePath);
         model.addAttribute("logoutPath", logoutPath);
         model.addAttribute("communityPath", communityPath);
+        model.addAttribute("hospitalPath", hospitalPath);
+        model.addAttribute("daily", daily);
+        model.addAttribute("monthly", monthly);
         return "/member/myPage";
     }
 

@@ -23,10 +23,6 @@
     </form>
 </div>
 
-<a href="/api/data">일일 감염자수</a><br>
-<a href="/api/dataByMonth">월별 감염자수</a><br>
-<a href="/api/hospital">병원 정보</a>
-
 <script>
     $("#searchIdBtn").on("click", function () {
         location.href = "/member/toSearchIdForm";
@@ -35,7 +31,6 @@
     $("#searchPwBtn").on("click", function () {
         location.href = "/member/toSearchPwForm";
     });
-
 </script>
 </body>
 </html>

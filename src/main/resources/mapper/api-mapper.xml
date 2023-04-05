@@ -106,9 +106,29 @@
     <select id="getInfectionByMonthInfo" resultType="com.example.Spring_Project.dto.InfectionByMonthDTO2">
         SELECT MONTH,sum(cnt) as sum FROM infectionByMonth WHERE YEAR='2023' GROUP BY MONTH ORDER BY 1
     </select>
-    
+
     <select id="getHospitalInfo" resultType="com.example.Spring_Project.dto.HospitalDTO">
         select
+            hospital_seq,
+            postcode,
+            city,
+            hospital_name,
+            roadAddress,
+            jibunAddress,
+            weekOpen,
+            weekClose,
+            satOpen,
+            satClose,
+            holidayOpen,
+            holidayClose,
+            phone,
+            latitude,
+            longitude,
+            flag
+        from(
+        select ROWNUM rn,a.*
+        from
+        (select
           hospital_seq,
           postcode,
           city,
@@ -126,6 +146,20 @@
           longitude,
           flag
         from hospital
+        <if test="searchType eq 'hospital_name'.toString()">
+            where hospital_name like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType eq 'phone'.toString()">
+            where phone like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType eq 'postcode'.toString()">
+            where postcode like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType eq 'roadAddress'.toString()">
+            where roadAddress like '%'||#{keyword}||'%'
+        </if> order by 1) a
+        )
+        where rn between ${start} and #{end}
     </select>
 
     <select id="getInfo" resultType="com.example.Spring_Project.dto.HospitalDTO">
@@ -148,5 +182,21 @@
         flag
         from hospital
         where hospital_seq=#{hospital_seq}
+    </select>
+
+    <select id="countPost" resultType="Integer">
+        select count(*) from hospital
+        <if test="searchType eq 'hospital_name'.toString()">
+            where hospital_name like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType eq 'phone'.toString()">
+            where phone like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType eq 'postcode'.toString()">
+            where postcode like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType eq 'roadAddress'.toString()">
+            where roadAddress like '%'||#{keyword}||'%'
+        </if>
     </select>
 </mapper>

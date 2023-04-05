@@ -9,6 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -136,11 +137,85 @@ public class ApiService {
         return apiMapper.getInfectionByMonthInfo();
     }
 
-    public List<HospitalDTO>getHospitalInfo() throws Exception{
-        return apiMapper.getHospitalInfo();
+    public List<HospitalDTO>getHospitalInfo(String searchType, String keyword, Integer start, Integer end) throws Exception{
+        return apiMapper.getHospitalInfo(searchType,keyword,start,end);
     }
 
     public HospitalDTO getInfo(Integer hospital_seq) throws Exception{
         return apiMapper.getInfo(hospital_seq);
+    }
+
+    public Integer countPost(String searchType,String keyword) throws Exception{
+        return apiMapper.countPost(searchType,keyword);
+    }
+    //페이징 처리
+    public String getHospitalPageNavi(Integer currentPage, Integer count, String searchType, String keyword) throws Exception {
+        int postTotalCount = this.countPost(searchType, keyword);
+
+        int recordCountPerPage = count; // 페이지 당 게시글 개수
+        int naviCountPerPage = 10; // 내비 개수
+
+        int pageTotalCount = 0; // 전체 내비 수
+        if (postTotalCount % recordCountPerPage > 0) {
+            pageTotalCount = postTotalCount / recordCountPerPage + 1;
+        } else {
+            pageTotalCount = postTotalCount / recordCountPerPage;
+        }
+
+        if (currentPage < 1) {
+            currentPage = 1;
+        } else if (currentPage > pageTotalCount) {
+            currentPage = pageTotalCount;
+        }
+
+
+        int startNavi = (currentPage - 1) / naviCountPerPage * naviCountPerPage + 1; // 페이지 시작 내비 값
+        int endNavi = startNavi + naviCountPerPage - 1; // 페이지 마지막 내비 값
+
+        if (endNavi > pageTotalCount) {
+            endNavi = pageTotalCount;
+        }
+        boolean needPrev = true;
+        boolean needNext = true;
+
+        if (startNavi == 1) {
+            needPrev = false;
+        }
+        if (endNavi == pageTotalCount) {
+            needNext = false;
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        if (needPrev) {
+           if (searchType == null && keyword == null) {
+                sb.append("<a href='/api/hospital?currentPage=" + (startNavi - 1) + "&count=" + count + "&searchType=&keyword=" + "'><</a> ");
+            } else {
+                sb.append("<a href='/api/hospital?currentPage=" + (startNavi - 1) + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><</a> ");
+            }
+        }
+        for (int i = startNavi; i <= endNavi; i++) {
+            if (currentPage == i) {
+                    if (searchType == null && keyword == null) {
+                        sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count +   "&searchType=" + "&keyword=" + "'><b>" + i + "</b></a> ");
+                    } else {
+                        sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><b>" + i + "</b></a> ");
+                    }
+            } else {
+                    if (searchType == null && keyword == null) {
+                        sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count +   "&searchType=" + "&keyword=" + "'>" + i + "</a> ");
+                    } else {
+                        sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count +   "&searchType=" + searchType + "&keyword=" + keyword + "'>" + i + "</a> ");
+                    }
+            }
+        }
+        if (needNext) {
+                if (searchType == null && keyword == null) {
+                    sb.append("<a href='/api/hospital?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + "&keyword=" + "'>></a> ");
+                } else {
+                    sb.append("<a href='/api/hospital?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'>></a> ");
+                }
+        }
+        return sb.toString();
     }
 }

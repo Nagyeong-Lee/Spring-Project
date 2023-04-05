@@ -19,7 +19,12 @@
 <button type="button" id="board"><input type="hidden" value="${communityPath}" id="toCommunity">커뮤니티로</button>
 <button type="button" id="update"><input type="hidden" value="${updateFormPath}" id="toUpdate">정보수정하기</button>
 <button type="button" id="delete"><input type="hidden" value="${deletePath}" id="toDelete">탈퇴하기</button>
-<button type="button" id="logout"><input type="hidden" value="${logoutPath}" id="toLogout">로그아웃</button>
+<button type="button" id="logout"><input type="hidden" value="${logoutPath}" id="toLogout">로그아웃</button><br>
+<button type="button" id="infection1"><input type="hidden" value="${daily}" id="dailyInfection">일일 감염자수</button><br>
+<button type="button" id="infection2"><input type="hidden" value="${monthly}" id="monthlyInfection">월별 감염자수</button><br>
+<button type="button" id="hospital"><input type="hidden" value="${hospitalPath}" id="hospitalInfo">병원 정보</button><br>
+
+<%--<a href="javascript:toHospitalInfo()">병원 정보</a>--%>
 
 <script>
 
@@ -47,6 +52,19 @@
     $("#update").on("click", function () {
         location.href = $("#toUpdate").val() + id;
     });
+
+    $("#hospital").on("click", function () {
+        location.href = $("#hospitalInfo").val();
+    });
+
+    // function toHospitalInfo(){
+    //     let path=$("#hospitalPath").val();
+    //     let form = document.createElement("form");
+    //     form.setAttribute("method","post");
+    //     form.setAttribute("action",path);
+    //     document.body.appendChild(form);
+    //     form.submit();
+    // }
 
 </script>
 </body>
