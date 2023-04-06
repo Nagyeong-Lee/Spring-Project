@@ -49,4 +49,13 @@
          parent_path_seq
         from pathUrl
     </select>
+
+    <select id="getPathList" resultType="com.example.Spring_Project.dto.PathDTO">
+        select
+            path_seq,
+            path,
+            name,
+            parent_path_seq
+        from pathUrl
+    </select>
 </mapper>

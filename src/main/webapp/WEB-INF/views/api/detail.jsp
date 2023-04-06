@@ -27,8 +27,22 @@
 <c:if test="${not empty hospitalDTO.satOpen}"><div id="satBsHour">토요일 진료 시간 : ${hospitalDTO.satOpen} ~ ${hospitalDTO.satClose}</div></c:if>
 <c:if test="${not empty hospitalDTO.holidayOpen}"><div id="holidayBsHour">일요일 및 공휴일 진료시간 : ${hospitalDTO.holidayOpen} ~ ${hospitalDTO.holidayClose}</div></c:if>
 <div id="map" style="width:50%;height:350px;"></div>
-<a href="/api/hospital?currentPage=${currentPage}&count=${count}&searchType=${searchType}&keyword=${keyword}"><button type="button" id="toList">목록으로</button></a>
+<a href="javascript:void(0);" onclick="toList(${currentPage},${count},'${searchType}','${keyword}')"><button type="button" id="toList">목록으로</button></a>
+
+<form id="frm" name="frm" method="post" action="/api/hospital">
+  <input type="hidden" name="currentPage" id="currentPage"/>
+  <input type="hidden" name="count" id="count"/>
+  <input type="hidden" name="searchType" id="searchType"/>
+  <input type="hidden" name="keyword" id="keyword"/>
+</form>
 <script>
+  function toList(currentPage,count,searchType,keyword){
+    $("#currentPage").val(currentPage);
+    $("#count").val(count);
+    $("#searchType").val(searchType);
+    $("#keyword").val(keyword);
+    $("#frm").submit();
+  }
   var mapContainer = document.getElementById('map'), // 지도를 표시할 div
           mapOption = {
             center: new kakao.maps.LatLng(${hospitalDTO.latitude}, ${hospitalDTO.longitude}), // 지도의 중심좌표
@@ -50,6 +64,7 @@
 
   // 아래 코드는 지도 위의 마커를 제거하는 코드입니다
   // marker.setMap(null);
+
 </script>
 </body>
 </html>

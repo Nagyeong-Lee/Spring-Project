@@ -9,7 +9,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -148,6 +147,40 @@ public class ApiService {
     public Integer countPost(String searchType,String keyword) throws Exception{
         return apiMapper.countPost(searchType,keyword);
     }
+
+    //옵션 선택
+    public List<String> getCity() throws Exception{
+        return apiMapper.getCity();
+    }
+
+    public List<String> getWeekOpen() throws Exception{
+        return apiMapper.getWeekOpen();
+    }
+
+    public List<String> getWeekClose() throws Exception{
+        return apiMapper.getWeekClose();
+    }
+
+    public List<String> getSatOpen() throws Exception{
+        return apiMapper.getSatOpen();
+    }
+
+    public List<String> getSatClose() throws Exception{
+        return apiMapper.getSatClose();
+    }
+
+    public List<String> getHolidayYN() throws Exception{
+        return apiMapper.getHolidayYN();
+    }
+
+    public List<String> getHolidayOpen() throws Exception{
+        return apiMapper.getHolidayOpen();
+    }
+
+    public List<String> getHolidayClose() throws Exception{
+        return apiMapper.getHolidayClose();
+    }
+
     //페이징 처리
     public String getHospitalPageNavi(Integer currentPage, Integer count, String searchType, String keyword) throws Exception {
         int postTotalCount = this.countPost(searchType, keyword);
@@ -167,7 +200,6 @@ public class ApiService {
         } else if (currentPage > pageTotalCount) {
             currentPage = pageTotalCount;
         }
-
 
         int startNavi = (currentPage - 1) / naviCountPerPage * naviCountPerPage + 1; // 페이지 시작 내비 값
         int endNavi = startNavi + naviCountPerPage - 1; // 페이지 마지막 내비 값

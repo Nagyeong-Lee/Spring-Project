@@ -4,6 +4,7 @@ import com.example.Spring_Project.dto.PathDTO;
 import com.example.Spring_Project.mapper.PathMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 public class PathService {
@@ -38,7 +39,7 @@ public class PathService {
     }
 
     public List<PathDTO> getPathList() throws Exception {
-        return mapper.getMonthly();
+        return mapper.getPathList();
     }
 
 }

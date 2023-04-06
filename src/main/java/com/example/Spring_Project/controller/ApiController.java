@@ -9,11 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
+import org.springframework.web.bind.annotation.*;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,14 +24,14 @@ public class ApiController {
     @Autowired
     private ApiService apiService;
 
-    @GetMapping("/data")
+    @PostMapping("/data")
     public String api(Model model) throws Exception {
         InfectionDTO infectionDTO = apiService.getInfectionInfo();
         model.addAttribute("infectionDTO", infectionDTO);
         return "/api/infectionChart";
     }
 
-    @GetMapping("/dataByMonth")
+    @PostMapping("/dataByMonth")
     public String dataByMonth(Model model) throws Exception {
         List<InfectionByMonthDTO2> list = apiService.getInfectionByMonthInfo(); //2023년 월,감염자 수
         List<Map<String, Object>> mapList = new ArrayList<>();
@@ -49,27 +46,55 @@ public class ApiController {
         return "/api/infectionChartByMonth";
     }
 
+    @RequestMapping("/hospital")
+    public String hospitalInfo(HttpServletRequest request, Model model, @RequestParam Map<String, Object> map) throws Exception {
 
-    @GetMapping("/hospital")
-    public String hospitalInfo(Model model, @RequestParam Integer currentPage,
-                               @RequestParam Integer count,
-                               @RequestParam(required = false) String searchType,
-                               @RequestParam(required = false) String keyword) throws Exception {
+        Integer currentPage = Integer.parseInt(map.get("currentPage").toString());
+        Integer count = Integer.parseInt(map.get("count").toString());
+        String searchType = map.get("searchType").toString();
+        String keyword = map.get("keyword").toString();
+
         Integer start = currentPage * count - (count - 1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
-        List<HospitalDTO> list = apiService.getHospitalInfo(searchType, keyword,start,end);
-        String paging=apiService.getHospitalPageNavi(currentPage, count, searchType, keyword);
+        List<HospitalDTO> list = apiService.getHospitalInfo(searchType, keyword, start, end);
+        String paging = apiService.getHospitalPageNavi(currentPage, count, searchType, keyword);
+
+
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("list", list);
         model.addAttribute("paging", paging);
         model.addAttribute("count", count); //개수 선택
         model.addAttribute("searchType", searchType);
         model.addAttribute("keyword", keyword);
+
+        //옵션
+        List<String>city=apiService.getCity(); //지역명
+        List<String>weekOpen=apiService.getWeekOpen(); //평일 진료 시작 시간
+        List<String>weekClose=apiService.getWeekClose(); //평일 진료 마감 시간
+        List<String>satOpen=apiService.getSatOpen(); //토요일 진료 시작 시간
+        List<String>satClose=apiService.getSatClose(); //토요일 진료 마감 시간
+        List<String>holidayYN=apiService.getHolidayYN(); //일요일,공휴일 진료 여부
+        List<String>holidayOpen=apiService.getHolidayOpen(); //일요일,공휴일 진료 시작 시간
+        List<String>holidayClose=apiService.getHolidayClose(); //일요일,공휴일 진료 마감 시간
+        model.addAttribute("city",city);
+        model.addAttribute("weekOpen",weekOpen);
+        model.addAttribute("weekClose",weekClose);
+        model.addAttribute("satOpen",satOpen);
+        model.addAttribute("satClose",satClose);
+        model.addAttribute("holidayYN",holidayYN);
+        model.addAttribute("holidayOpen",holidayOpen);
+        model.addAttribute("holidayClose",holidayClose);
         return "/api/hospitalInfo";
     }
 
-    @RequestMapping("/detail")
-    public String map(Model model, Integer hospital_seq,Integer currentPage,Integer count,String searchType,String keyword) throws Exception {
+    @PostMapping("/detail")
+    public String map(Model model, @RequestParam Map<String, Object> map) throws Exception {
+        Integer hospital_seq = Integer.parseInt(map.get("hospital_seq").toString());
+        Integer currentPage = Integer.parseInt(map.get("currentPage").toString());
+        Integer count = Integer.parseInt(map.get("count").toString());
+        String searchType = map.get("searchType").toString();
+        String keyword = map.get("keyword").toString();
+
         HospitalDTO hospitalDTO = apiService.getInfo(hospital_seq); //병원 한 개 정보
         model.addAttribute("hospitalDTO", hospitalDTO);
         model.addAttribute("currentPage", currentPage);

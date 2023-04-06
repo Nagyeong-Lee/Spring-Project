@@ -307,6 +307,7 @@ public class MemberController {
         model.addAttribute("hospitalPath", hospitalPath);
         model.addAttribute("daily", daily);
         model.addAttribute("monthly", monthly);
+        model.addAttribute("list", list);
         return "/member/myPage";
     }
 

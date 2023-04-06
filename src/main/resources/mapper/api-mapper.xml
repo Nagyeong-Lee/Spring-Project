@@ -41,35 +41,35 @@
 
     <select id="getInfectionInfo" resultType="com.example.Spring_Project.dto.InfectionDTO">
         select
-            resultCode,
-            resultMsg,
-            resultCnt,
-            mmddhh,
-            mmdd1,
-            cnt1,
-            rate1,
-            mmdd2,
-            cnt2,
-            rate2,
-            mmdd3,
-            cnt3,
-            rate3,
-            mmdd4,
-            cnt4,
-            rate4,
-            mmdd5,
-            cnt5,
-            rate5,
-            mmdd6,
-            cnt6,
-            rate6,
-            mmdd7,
-            cnt7,
-            rate7,
-            mmdd8,
-            cnt8,
-            rate8,
-            status
+        resultCode,
+        resultMsg,
+        resultCnt,
+        mmddhh,
+        mmdd1,
+        cnt1,
+        rate1,
+        mmdd2,
+        cnt2,
+        rate2,
+        mmdd3,
+        cnt3,
+        rate3,
+        mmdd4,
+        cnt4,
+        rate4,
+        mmdd5,
+        cnt5,
+        rate5,
+        mmdd6,
+        cnt6,
+        rate6,
+        mmdd7,
+        cnt7,
+        rate7,
+        mmdd8,
+        cnt8,
+        rate8,
+        status
         from infection
         where status='Y'
     </select>
@@ -91,11 +91,11 @@
     <insert id="insertInfectionByMonth" parameterType="String">
         INSERT INTO infectionByMonth
         values(
-            infectionByMonth_seq.nextval,
-            #{mmdd},
-            #{cnt},
-            #{month},
-            #{year}
+        infectionByMonth_seq.nextval,
+        #{mmdd},
+        #{cnt},
+        #{month},
+        #{year}
         )
     </insert>
 
@@ -109,45 +109,45 @@
 
     <select id="getHospitalInfo" resultType="com.example.Spring_Project.dto.HospitalDTO">
         select
-            hospital_seq,
-            postcode,
-            city,
-            hospital_name,
-            roadAddress,
-            jibunAddress,
-            weekOpen,
-            weekClose,
-            satOpen,
-            satClose,
-            holidayOpen,
-            holidayClose,
-            phone,
-            latitude,
-            longitude,
-            flag
+        hospital_seq,
+        postcode,
+        city,
+        hospital_name,
+        roadAddress,
+        jibunAddress,
+        weekOpen,
+        weekClose,
+        satOpen,
+        satClose,
+        holidayOpen,
+        holidayClose,
+        phone,
+        latitude,
+        longitude,
+        flag
         from(
         select ROWNUM rn,a.*
         from
         (select
-          hospital_seq,
-          postcode,
-          city,
-          hospital_name,
-          roadAddress,
-          jibunAddress,
-          weekOpen,
-          weekClose,
-          satOpen,
-          satClose,
-          holidayOpen,
-          holidayClose,
-          phone,
-          latitude,
-          longitude,
-          flag
+        hospital_seq,
+        postcode,
+        city,
+        hospital_name,
+        roadAddress,
+        jibunAddress,
+        weekOpen,
+        weekClose,
+        satOpen,
+        satClose,
+        holidayOpen,
+        holidayClose,
+        phone,
+        latitude,
+        longitude,
+        flag
         from hospital
         <if test="searchType eq 'hospital_name'.toString()">
-            where hospital_name like '%'||#{keyword}||'%'
+            WHERE hospital_name like '%'||#{keyword}||'%'
         </if>
         <if test="searchType eq 'phone'.toString()">
             where phone like '%'||#{keyword}||'%'
@@ -157,7 +157,19 @@
         </if>
         <if test="searchType eq 'roadAddress'.toString()">
             where roadAddress like '%'||#{keyword}||'%'
-        </if> order by 1) a
+        </if>
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="city != null and city ne 'ALL'.toString()" >
+                AND city=#{city}
+            </if>
+<!--            <if test="city != null">-->
+<!--                AND city=#{city}-->
+<!--            </if>-->
+<!--            <if test="city != null">-->
+<!--                AND city=#{city}-->
+<!--            </if>-->
+        </trim>
+        order by 1) a
         )
         where rn between ${start} and #{end}
     </select>
@@ -199,4 +211,37 @@
             where roadAddress like '%'||#{keyword}||'%'
         </if>
     </select>
+
+    <select id="getCity" resultType="String">
+        SELECT city FROM hospital GROUP BY city order by 1
+    </select>
+
+    <select id="getWeekOpen" resultType="String">
+        SELECT WEEKOPEN FROM hospital GROUP BY WEEKOPEN order by 1
+    </select>
+
+    <select id="getWeekClose" resultType="String">
+        SELECT WEEKCLOSE FROM hospital GROUP BY WEEKCLOSE order by 1
+    </select>
+
+    <select id="getSatOpen" resultType="String">
+        SELECT SATOPEN FROM hospital GROUP BY SATOPEN order by 1
+    </select>
+
+    <select id="getSatClose" resultType="String">
+        SELECT SATCLOSE FROM hospital GROUP BY SATCLOSE order by 1
+    </select>
+
+    <select id="getHolidayYN" resultType="String">
+        SELECT DISTINCT NVL2(HOLIDAYOPEN,'진료','미진료') FROM hospital GROUP BY HOLIDAYOPEN
+    </select>
+
+    <select id="getHolidayOpen" resultType="String">
+        SELECT HOLIDAYOPEN FROM hospital WHERE HOLIDAYOPEN IS NOT NULL GROUP BY HOLIDAYOPEN order by 1
+    </select>
+
+    <select id="getHolidayClose" resultType="String">
+        SELECT HOLIDAYCLOSE FROM hospital WHERE HOLIDAYCLOSE IS NOT NULL GROUP BY HOLIDAYCLOSE order by 1
+    </select>
+
 </mapper>

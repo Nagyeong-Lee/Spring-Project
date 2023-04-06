@@ -1,9 +1,9 @@
 package com.example.Spring_Project.mapper;
 
-import com.example.Spring_Project.service.PathService;
+import com.example.Spring_Project.dto.PathDTO;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import java.util.List;
 
 @Repository
 @Mapper
@@ -19,4 +19,5 @@ public interface PathMapper {
     String getHospitalPath();
     String getDaily();
     String getMonthly();
+    List<PathDTO> getPathList();
 }
