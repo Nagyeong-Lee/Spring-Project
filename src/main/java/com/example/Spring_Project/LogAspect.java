@@ -41,7 +41,7 @@ public class LogAspect {
         logDTO.setParameter(parameter);
         logDTO.setUrl(request.getRequestURI());
         logDTO.setDescription(description);
-//        logService.insertLog(logDTO); //에러 로그 저장
+        logService.insertLog(logDTO); //에러 로그 저장
     }
 
 

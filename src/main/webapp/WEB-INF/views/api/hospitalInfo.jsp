@@ -25,41 +25,42 @@
 <br>
 평일 진료 시작 시간 :
 <c:forEach var="i" items="${weekOpen}">
-    ${i}<input type="radio" value="${i}" name="weekOpen" <c:if test="${i eq '09:00'? 'selected' : ''}"></c:if>>
+    ${i}<input type="radio" value="${i}" name="weekOpen" class="weekOpen" <c:out value="${i eq '09:00'? 'checked' : ''}"/>>
 </c:forEach>
 <br>
 평일 진료 마감 시간 :
 <c:forEach var="i" items="${weekClose}">
-    ${i}<input type="radio" value="${i}" name="weekClose">
+    ${i}<input type="radio" value="${i}" name="weekClose" class="weekClose" <c:out value="${i eq '09:00'? 'checked' : ''}"/>>
 </c:forEach>
 <br>
 토요일 진료 시작 시간 :
 <c:forEach var="i" items="${satOpen}">
-    ${i}<input type="radio" value="${i}" name="satOpen">
+    ${i}<input type="radio" value="${i}" name="satOpen" <c:out value="${i eq '09:00'? 'checked' : ''}"/>>
 </c:forEach>
 <br>
 토요일 진료 마감 시간 :
 <c:forEach var="i" items="${satClose}">
-    ${i}<input type="radio" value="${i}" name="satClose">
+    ${i}<input type="radio" value="${i}" name="satClose" <c:out value="${i eq '09:00'? 'checked' : ''}"/>>
 </c:forEach>
 <br>
 일요일/공휴일 진료 여부 :
 <c:forEach var="i" items="${holidayYN}">
-    ${i}<input type="checkbox" value="${i}" name="holidayYN">
+    ${i}<input type="checkbox" value="${i}" name="holidayYN" checked>
 </c:forEach>
 <br>
 일요일/공휴일 진료 시작 시간 :
 <c:forEach var="i" items="${holidayOpen}">
-    ${i}<input type="radio" value="${i}" name="holidayOpen">
+    ${i}<input type="radio" value="${i}" name="holidayOpen" <c:out value="${i eq '09:00'? 'checked' : ''}"/>>
 </c:forEach>
 <br>
 일요일/공휴일 진료 마감 시간 :
 <c:forEach var="i" items="${holidayClose}">
-    ${i}<input type="radio" value="${i}" name="holidayClose">
+    ${i}<input type="radio" value="${i}" name="holidayClose" <c:out value="${i eq '09:00'? 'checked' : ''}"/>>
 </c:forEach>
 <br>
 <hr>
-<input type="hidden" value="${currentPage}" id="currentPage">
+
+<input type="hidden" value="${currentPage}" id="currentPage" <c:out value="${i eq '09:00'? 'checked' : ''}"/>>
 <table style="border: 1px solid black">
     <th>지역명</th>
     <th>병원명</th>
@@ -174,6 +175,13 @@ ${paging}<br>
         let keyword = $("#keyword").val();
         let count = $("#count").val();
         let city = $("#city").val();
+        let weekOpen = $("#city").val();
+        let weekClose = $("#city").val();
+        let satOpen = $("#city").val();
+        let satClose = $("#city").val();
+        let holidayYN = $("#city").val();
+        let holidayOpen = $("#city").val();
+        let holidayClose = $("#city").val();
         $.ajax({
             url: '/api/hospital',
             type: 'post',
@@ -182,7 +190,14 @@ ${paging}<br>
                 "count": count,
                 "searchType": searchType,
                 "keyword": keyword,
-                "city":city
+                "city":city,
+                // "weekOpen":,
+                // "weekClose":,
+                // "satOpen":,
+                // "satClose":,
+                // "holidayYN":,
+                // "holidayOpen":,
+                // "holidayClose":
             },
             success:function(data){
                 console.log(data);

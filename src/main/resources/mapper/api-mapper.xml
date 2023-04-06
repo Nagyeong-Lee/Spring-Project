@@ -146,29 +146,44 @@
         longitude,
         flag
         from hospital
-        <if test="searchType eq 'hospital_name'.toString()">
-            WHERE hospital_name like '%'||#{keyword}||'%'
-        </if>
-        <if test="searchType eq 'phone'.toString()">
-            where phone like '%'||#{keyword}||'%'
-        </if>
-        <if test="searchType eq 'postcode'.toString()">
-            where postcode like '%'||#{keyword}||'%'
-        </if>
-        <if test="searchType eq 'roadAddress'.toString()">
-            where roadAddress like '%'||#{keyword}||'%'
-        </if>
         <trim prefix="WHERE" prefixOverrides="AND">
             <if test="city != null and city ne 'ALL'.toString()" >
                 AND city=#{city}
             </if>
-<!--            <if test="city != null">-->
-<!--                AND city=#{city}-->
-<!--            </if>-->
-<!--            <if test="city != null">-->
-<!--                AND city=#{city}-->
-<!--            </if>-->
+            <if test="weekOpen != null">
+                AND weekOpen=${weekOpen}
+            </if>
+            <if test="weekClose != null">
+                AND weekClose=${weekClose}
+            </if>
+            <if test="satOpen != null">
+                AND satOpen=${satOpen}
+            </if>
+            <if test="satClose != null">
+                AND satClose=${satClose}
+            </if>
+            <if test="holidayYN != null">
+                AND holidayYN=${holidayYN}
+            </if>
+            <if test="holidayOpen != null">
+                AND holidayOpen=${holidayOpen}
+            </if>
+            <if test="holidayClose != null">
+                AND holidayClose=${holidayClose}
+            </if>
         </trim>
+        <if test="searchType eq 'hospital_name'.toString()">
+            and hospital_name like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType eq 'phone'.toString()">
+            and phone like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType eq 'postcode'.toString()">
+            and postcode like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType eq 'roadAddress'.toString()">
+            and roadAddress like '%'||#{keyword}||'%'
+        </if>
         order by 1) a
         )
         where rn between ${start} and #{end}
