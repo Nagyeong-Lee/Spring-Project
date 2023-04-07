@@ -146,32 +146,32 @@
         longitude,
         flag
         from hospital
-        <trim prefix="WHERE" prefixOverrides="AND">
-            <if test="city != null and city ne 'ALL'.toString()" >
+        <if test="city neq ''">
+            <trim prefix="WHERE" prefixOverrides="AND">
                 AND city=#{city}
-            </if>
-            <if test="weekOpen != null">
-                AND weekOpen=${weekOpen}
-            </if>
-            <if test="weekClose != null">
-                AND weekClose=${weekClose}
-            </if>
-            <if test="satOpen != null">
-                AND satOpen=${satOpen}
-            </if>
-            <if test="satClose != null">
-                AND satClose=${satClose}
-            </if>
-            <if test="holidayYN != null">
-                AND holidayYN=${holidayYN}
-            </if>
-            <if test="holidayOpen != null">
-                AND holidayOpen=${holidayOpen}
-            </if>
-            <if test="holidayClose != null">
-                AND holidayClose=${holidayClose}
-            </if>
-        </trim>
+                <!--            <if test="weekOpen != null">-->
+                <!--                AND weekOpen=${weekOpen}-->
+                <!--            </if>-->
+                <!--            <if test="weekClose != null">-->
+                <!--                AND weekClose=${weekClose}-->
+                <!--            </if>-->
+                <!--            <if test="satOpen != null">-->
+                <!--                AND satOpen=${satOpen}-->
+                <!--            </if>-->
+                <!--            <if test="satClose != null">-->
+                <!--                AND satClose=${satClose}-->
+                <!--            </if>-->
+                <!--            <if test="holidayYN != null">-->
+                <!--                AND holidayYN=${holidayYN}-->
+                <!--            </if>-->
+                <!--            <if test="holidayOpen != null">-->
+                <!--                AND holidayOpen=${holidayOpen}-->
+                <!--            </if>-->
+                <!--            <if test="holidayClose != null">-->
+                <!--                AND holidayClose=${holidayClose}-->
+                <!--            </if>-->
+            </trim>
+        </if>
         <if test="searchType eq 'hospital_name'.toString()">
             and hospital_name like '%'||#{keyword}||'%'
         </if>
@@ -225,6 +225,9 @@
         <if test="searchType eq 'roadAddress'.toString()">
             where roadAddress like '%'||#{keyword}||'%'
         </if>
+        <if test="city neq ''">
+            AND city=#{city}
+        </if>
     </select>
 
     <select id="getCity" resultType="String">
@@ -257,6 +260,173 @@
 
     <select id="getHolidayClose" resultType="String">
         SELECT HOLIDAYCLOSE FROM hospital WHERE HOLIDAYCLOSE IS NOT NULL GROUP BY HOLIDAYCLOSE order by 1
+    </select>
+
+    <select id="test" resultType="com.example.Spring_Project.dto.HospitalDTO">
+        select
+        hospital_seq,
+        postcode,
+        city,
+        hospital_name,
+        roadAddress,
+        jibunAddress,
+        weekOpen,
+        weekClose,
+        satOpen,
+        satClose,
+        holidayOpen,
+        holidayClose,
+        phone,
+        latitude,
+        longitude,
+        flag
+        from(
+        select ROWNUM rn,a.*
+        from
+        (select
+        hospital_seq,
+        postcode,
+        city,
+        hospital_name,
+        roadAddress,
+        jibunAddress,
+        weekOpen,
+        weekClose,
+        satOpen,
+        satClose,
+        NVL2(holidayOpen,holidayOpen,'-') AS holidayOpen,
+        holidayClose,
+        phone,
+        latitude,
+        longitude,
+        flag
+        from hospital
+        <if test="searchType eq 'hospital_name'.toString()">
+            and hospital_name like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType eq 'phone'.toString()">
+            and phone like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType eq 'postcode'.toString()">
+            and postcode like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType eq 'roadAddress'.toString()">
+            and roadAddress like '%'||#{keyword}||'%'
+        </if>
+        order by 1) a
+        )
+        where rn between ${start} and #{end}
+    </select>
+
+
+    <select id="test2" parameterType="java.util.HashMap" resultType="com.example.Spring_Project.dto.HospitalDTO">
+
+        select
+        hospital_seq,
+        postcode,
+        city,
+        hospital_name,
+        roadAddress,
+        jibunAddress,
+        weekOpen,
+        weekClose,
+        satOpen,
+        satClose,
+        holidayOpen,
+        holidayClose,
+        phone,
+        latitude,
+        longitude,
+        flag
+        from(
+        select ROWNUM rn,a.*
+        from
+        (select
+        hospital_seq,
+        postcode,
+        city,
+        hospital_name,
+        roadAddress,
+        jibunAddress,
+        weekOpen,
+        weekClose,
+        satOpen,
+        satClose,
+        NVL2(holidayOpen,holidayOpen,'-') AS holidayOpen,
+        holidayClose,
+        phone,
+        latitude,
+        longitude,
+        flag
+        from hospital
+        <if test="city neq '' and city neq 'ALL'.toString()">
+            <trim prefix="WHERE" prefixOverrides="AND">
+                AND city=#{city}
+                <if test="weekOpen != null">
+                    <![CDATA[
+                    AND to_date(weekOpen,'hh24:mi')>=to_date(#{weekOpen},'hh24:mi')
+                    ]]>
+                </if>
+                <if test="weekClose != null">
+                    <![CDATA[
+                   AND to_date(weekClose,'hh24:mi')<=to_date(#{weekClose},'hh24:mi')
+                    ]]>
+                </if>
+                <if test="satOpen != null">
+                    <![CDATA[
+                  AND to_date(satOpen,'hh24:mi')>=to_date(#{satOpen},'hh24:mi')
+                     ]]>
+                </if>
+                <if test="satClose != null">
+                    <![CDATA[
+                AND to_date(satClose,'hh24:mi')<=to_date(#{satClose},'hh24:mi')
+                    ]]>
+                </if>
+                <if test="holidayYN eq '진료'.toString()">
+                    <if test="holidayOpen != null">
+                        <![CDATA[
+                 AND to_date(holidayOpen,'hh24:mi')>=to_date(#{holidayOpen},'hh24:mi')
+                   ]]>
+                    </if>
+                    <if test="holidayClose != null">
+                        <![CDATA[
+                      AND to_date(holidayClose,'hh24:mi')<=to_date(#{holidayClose},'hh24:mi')
+                      ]]>
+                    </if>
+                </if>
+            </trim>
+        </if>
+        <if test="city eq 'ALL'.toString()">
+            <if test="searchType eq 'hospital_name'.toString()">
+                where hospital_name like '%'||#{keyword}||'%'
+            </if>
+            <if test="searchType eq 'phone'.toString()">
+                where phone like '%'||#{keyword}||'%'
+            </if>
+            <if test="searchType eq 'postcode'.toString()">
+                where postcode like '%'||#{keyword}||'%'
+            </if>
+            <if test="searchType eq 'roadAddress'.toString()">
+                where roadAddress like '%'||#{keyword}||'%'
+            </if>
+        </if>
+        <if test="city neq '' and city neq 'ALL'.toString()">
+            <if test="searchType eq 'hospital_name'.toString()">
+                and hospital_name like '%'||#{keyword}||'%'
+            </if>
+            <if test="searchType eq 'phone'.toString()">
+                and phone like '%'||#{keyword}||'%'
+            </if>
+            <if test="searchType eq 'postcode'.toString()">
+                and postcode like '%'||#{keyword}||'%'
+            </if>
+            <if test="searchType eq 'roadAddress'.toString()">
+                and roadAddress like '%'||#{keyword}||'%'
+            </if>
+        </if>
+        order by 1) a
+        )
+        where rn between ${start} and #{end}
     </select>
 
 </mapper>

@@ -25,71 +25,79 @@
 <br>
 평일 진료 시작 시간 :
 <c:forEach var="i" items="${weekOpen}">
-    ${i}<input type="radio" value="${i}" name="weekOpen" class="weekOpen" <c:out value="${i eq '09:00'? 'checked' : ''}"/>>
+    ${i}<input type="radio" value="${i}" name="weekOpen" class="weekOpen" <c:out
+        value="${i eq '09:00'? 'checked' : ''}"/>>
 </c:forEach>
 <br>
 평일 진료 마감 시간 :
 <c:forEach var="i" items="${weekClose}">
-    ${i}<input type="radio" value="${i}" name="weekClose" class="weekClose" <c:out value="${i eq '09:00'? 'checked' : ''}"/>>
+    ${i}<input type="radio" value="${i}" name="weekClose" class="weekClose" <c:out
+        value="${i eq '22:00'? 'checked' : ''}"/>>
 </c:forEach>
 <br>
 토요일 진료 시작 시간 :
 <c:forEach var="i" items="${satOpen}">
-    ${i}<input type="radio" value="${i}" name="satOpen" <c:out value="${i eq '09:00'? 'checked' : ''}"/>>
+    ${i}<input type="radio" value="${i}" name="satOpen" class="satOpen" <c:out
+        value="${i eq '09:00'? 'checked' : ''}"/>>
 </c:forEach>
 <br>
 토요일 진료 마감 시간 :
 <c:forEach var="i" items="${satClose}">
-    ${i}<input type="radio" value="${i}" name="satClose" <c:out value="${i eq '09:00'? 'checked' : ''}"/>>
+    ${i}<input type="radio" value="${i}" name="satClose" class="satClose"  <c:out
+        value="${i eq '22:00'? 'checked' : ''}"/>>
 </c:forEach>
 <br>
 일요일/공휴일 진료 여부 :
 <c:forEach var="i" items="${holidayYN}">
-    ${i}<input type="checkbox" value="${i}" name="holidayYN" checked>
+    ${i}<input type="checkbox" value="${i}" name="holidayYN" class="holidayYN"
+    <c:out
+            value="${i eq '미진료'? 'checked' : ''}"/>>
 </c:forEach>
 <br>
 일요일/공휴일 진료 시작 시간 :
 <c:forEach var="i" items="${holidayOpen}">
-    ${i}<input type="radio" value="${i}" name="holidayOpen" <c:out value="${i eq '09:00'? 'checked' : ''}"/>>
+    ${i}<input type="radio" value="${i}" name="holidayOpen" class="holidayOpen" <c:out
+        value="${i eq '09:00'? 'checked' : ''}"/>>
 </c:forEach>
 <br>
 일요일/공휴일 진료 마감 시간 :
 <c:forEach var="i" items="${holidayClose}">
-    ${i}<input type="radio" value="${i}" name="holidayClose" <c:out value="${i eq '09:00'? 'checked' : ''}"/>>
+    ${i}<input type="radio" value="${i}" name="holidayClose" class="holidayClose" <c:out
+        value="${i eq '19:00'? 'checked' : ''}"/>>
 </c:forEach>
 <br>
 <hr>
 
 <input type="hidden" value="${currentPage}" id="currentPage" <c:out value="${i eq '09:00'? 'checked' : ''}"/>>
 <table style="border: 1px solid black">
+    <thead>
     <th>지역명</th>
     <th>병원명</th>
-    <th>진료 시작</th>
-    <th>진료 종료</th>
+    <th>평일</th>
+    <th>토요일</th>
+    <th>일요일/공휴일</th>
     <th>전화번호</th>
+    </thead>
+    <tbody class="tbody">
     <c:choose>
-        <c:when test="${not empty list}">
-            <c:forEach var="i" items="${list}">
+        <c:when test="${not empty test}">
+            <c:forEach var="i" items="${test}">
                 <tr>
                     <td>${i.city}</td>
                     <td>
-                            <%--                        <a href="/api/detail?hospital_seq=${i.hospital_seq}&currentPage=${currentPage}&count=${count}&searchType=${searchType}&keyword=${keyword}">${i.hospital_name}</a>--%>
-                            <%--                        <a href="javascript:detail(${i.hospital_seq},${currentPage},${count},${searchType},${keyword})">${i.hospital_name}</a>--%>
                         <a href="javascript:void(0);"
-                           onclick="detail(${i.hospital_seq}, ${currentPage}, ${count}, '${searchType}', '${keyword}');">${i.hospital_name}</a>
+               +             <%--onclick="detail(${i.hospital_seq}, ${currentPage}, ${count}, '${searchType}', '${keyword}');">${i.hospital_name}</a>--%>
+                            onclick="detail(${i.hospital_seq});">${i.hospital_name}</a>
                     </td>
-                    <td>${i.weekOpen}</td>
-                    <td>${i.weekClose}</td>
+                    <td>${i.weekOpen}~${i.weekClose}&nbsp&nbsp</td>
+                    <td>${i.satOpen}~${i.satClose}</td>
+                    <td style="text-align: center">${i.holidayOpen}</td>
                     <td>${i.phone}</td>
                 </tr>
             </c:forEach>
         </c:when>
-        <c:otherwise>
-            <tr>
-                <td>출력할 정보가 없습니다.</td>
-            </tr>
-        </c:otherwise>
     </c:choose>
+    </tbody>
 </table>
 ${paging}<br>
 <select name="searchType" id="searchType">
@@ -127,7 +135,7 @@ ${paging}<br>
 </form>
 <script>
 
-    function detail(hospital_seq, currentPage, count, searchType, keyword) {
+    function detail(hospital_seq/*, currentPage, count, searchType, keyword*/) {
         // $('#frm').html("");
         // let form=$('form[name="frm"]')[0];
         // let html='<input type="hidden" value="1" name="hospital_seq">';
@@ -137,10 +145,17 @@ ${paging}<br>
         // html+='<input type="hidden" value="keyword" name="keyword">';
         // $('#frm').append(html);
         $("#hospital_seq1").val(hospital_seq);
-        $("#currentPage1").val(currentPage);
+        /*$("#currentPage1").val(currentPage);
         $("#count1").val(count);
         $("#searchType1").val(searchType);
-        $("#keyword1").val(keyword);
+        $("#keyword1").val(keyword);*/
+        // $("#city1").val(city);
+
+        $("#currentPage1").val(1);
+        $("#count1").val(1);
+        $("#searchType1").val('');
+        $("#keyword1").val('');
+
         $("#frm").submit();
     }
 
@@ -170,41 +185,445 @@ ${paging}<br>
     });
 
     //옵션 선택
+    // function changeFunction() {
+    //     var searchType = $("#searchType").val();
+    //     var keyword = $("#keyword").val();
+    //     var count = $("#count").val();
+    //     var city = $("#city").val();
+    //     var weekOpen = $(".weekOpen:checked").val();
+    //     var weekClose = $(".weekClose:checked").val();
+    //     var satOpen = $(".satOpen:checked").val();
+    //     var satClose = $(".satClose:checked").val();
+    //     var holidayYN = $(".holidayYN:checked").val();
+    //     var holidayOpen = $(".holidayOpen:checked").val();
+    //     var holidayClose = $(".holidayClose:checked").val();
+    // }
+
     $("#city").on("change", function () {
+        // changeFunction(searchType,keyword,count,city,weekOpen,weekClose,satOpen,satClose,holidayYN,holidayOpen,holidayClose);
         let searchType = $("#searchType").val();
         let keyword = $("#keyword").val();
         let count = $("#count").val();
         let city = $("#city").val();
-        let weekOpen = $("#city").val();
-        let weekClose = $("#city").val();
-        let satOpen = $("#city").val();
-        let satClose = $("#city").val();
-        let holidayYN = $("#city").val();
-        let holidayOpen = $("#city").val();
-        let holidayClose = $("#city").val();
+        let weekOpen = $(".weekOpen:checked").val();
+        let weekClose = $(".weekClose:checked").val();
+        let satOpen = $(".satOpen:checked").val();
+        let satClose = $(".satClose:checked").val();
+        let holidayYN = $(".holidayYN:checked").val();
+        let holidayOpen = $(".holidayOpen:checked").val();
+        let holidayClose = $(".holidayClose:checked").val();
         $.ajax({
-            url: '/api/hospital',
+            url: '/api/hospital/list',
             type: 'post',
             data: {
                 "currentPage": 1,
                 "count": count,
                 "searchType": searchType,
                 "keyword": keyword,
-                "city":city,
-                // "weekOpen":,
-                // "weekClose":,
-                // "satOpen":,
-                // "satClose":,
-                // "holidayYN":,
-                // "holidayOpen":,
-                // "holidayClose":
+                "city": city,
+                "weekOpen": weekOpen,
+                "weekClose": weekClose,
+                "satOpen": satOpen,
+                "satClose": satClose,
+                "holidayYN": holidayYN,
+                "holidayOpen": holidayOpen,
+                "holidayClose": holidayClose
             },
-            success:function(data){
-                console.log(data);
+            success: function (data) {
+                $(".tbody").children().remove();
+                let items = data.items;
+                 console.log(data);
+                console.log(items.length);
+                for (let i = 0; i < items.length; i++) {
+                    var html = '<tr><td>' + items[i].city + '</td>';
+                    html += '<td><a href="javascript:void(0);" onclick="detail('+items[i].hospital_seq+');">' + items[i].hospital_name + '</a></td>';
+                    html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
+                    html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
+                    if (items[i].holidayOpen != null && items[i].holidayClose != null) {
+                        html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
+                    }else{
+                        html += '<td style="text-align: center">-</td>';
+                    }
+                    html += '<td>' + items[i].phone + '</td></tr>';
+                    $(".tbody").append(html);
+                }
+                console.log(html);
             }
         })
     });
 
+    $(".weekOpen").on("change", function () {
+        // $(".weekOpen").attr("checked",false);
+        // changeFunction();
+        let searchType = $("#searchType").val();
+        let keyword = $("#keyword").val();
+        let count = $("#count").val();
+        let city = $("#city").val();
+        let weekOpen = $(".weekOpen:checked").val();
+        let weekClose = $(".weekClose:checked").val();
+        let satOpen = $(".satOpen:checked").val();
+        let satClose = $(".satClose:checked").val();
+        let holidayYN = $(".holidayYN:checked").val();
+        let holidayOpen = $(".holidayOpen:checked").val();
+        let holidayClose = $(".holidayClose:checked").val();
+        $.ajax({
+            url: '/api/hospital/list',
+            type: 'post',
+            data: {
+                "currentPage": 1,
+                "count": count,
+                "searchType": searchType,
+                "keyword": keyword,
+                "city": city,
+                "weekOpen": weekOpen,
+                "weekClose": weekClose,
+                "satOpen": satOpen,
+                "satClose": satClose,
+                "holidayYN": holidayYN,
+                "holidayOpen": holidayOpen,
+                "holidayClose": holidayClose
+            },
+            success: function (data) {
+                $(".tbody").children().remove();
+                let items = data.items;
+                console.log(data);
+                console.log(items.length);
+                for (let i = 0; i < items.length; i++) {
+                    var html = '<tr><td>' + items[i].city + '</td>';
+                    html += '<td>' + items[i].hospital_name + '</td>';
+                    html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
+                    html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
+                    if (items[i].holidayOpen != null && items[i].holidayClose != null) {
+                        html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
+                    }else{
+                        html += '<td style="text-align: center">-</td>';
+                    }
+                    html += '<td>' + items[i].phone + '</td></tr>';
+                    $(".tbody").append(html);
+                }
+                console.log(html);
+            }
+        })
+    });
+
+    $(".weekClose").on("change", function () {
+        // changeFunction();
+        let searchType = $("#searchType").val();
+        let keyword = $("#keyword").val();
+        let count = $("#count").val();
+        let city = $("#city").val();
+        let weekOpen = $(".weekOpen:checked").val();
+        let weekClose = $(".weekClose:checked").val();
+        let satOpen = $(".satOpen:checked").val();
+        let satClose = $(".satClose:checked").val();
+        let holidayYN = $(".holidayYN:checked").val();
+        let holidayOpen = $(".holidayOpen:checked").val();
+        let holidayClose = $(".holidayClose:checked").val();
+        $.ajax({
+            url: '/api/hospital/list',
+            type: 'post',
+            data: {
+                "currentPage": 1,
+                "count": count,
+                "searchType": searchType,
+                "keyword": keyword,
+                "city": city,
+                "weekOpen": weekOpen,
+                "weekClose": weekClose,
+                "satOpen": satOpen,
+                "satClose": satClose,
+                "holidayYN": holidayYN,
+                "holidayOpen": holidayOpen,
+                "holidayClose": holidayClose
+            },
+            success: function (data) {
+                $(".tbody").children().remove();
+                let items = data.items;
+                console.log(data);
+                console.log(items.length);
+                for (let i = 0; i < items.length; i++) {
+                    var html = '<tr><td>' + items[i].city + '</td>';
+                    html += '<td>' + items[i].hospital_name + '</td>';
+                    html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
+                    html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
+                    if (items[i].holidayOpen != null && items[i].holidayClose != null) {
+                        html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
+                    }else{
+                        html += '<td style="text-align: center">-</td>';
+                    }
+                    html += '<td>' + items[i].phone + '</td></tr>';
+                    $(".tbody").append(html);
+                }
+                console.log(html);
+            }
+        })
+    });
+
+    $(".satOpen").on("change", function () {
+        // changeFunction();
+        let searchType = $("#searchType").val();
+        let keyword = $("#keyword").val();
+        let count = $("#count").val();
+        let city = $("#city").val();
+        let weekOpen = $(".weekOpen:checked").val();
+        let weekClose = $(".weekClose:checked").val();
+        let satOpen = $(".satOpen:checked").val();
+        let satClose = $(".satClose:checked").val();
+        let holidayYN = $(".holidayYN:checked").val();
+        let holidayOpen = $(".holidayOpen:checked").val();
+        let holidayClose = $(".holidayClose:checked").val();
+        $.ajax({
+            url: '/api/hospital/list',
+            type: 'post',
+            data: {
+                "currentPage": 1,
+                "count": count,
+                "searchType": searchType,
+                "keyword": keyword,
+                "city": city,
+                "weekOpen": weekOpen,
+                "weekClose": weekClose,
+                "satOpen": satOpen,
+                "satClose": satClose,
+                "holidayYN": holidayYN,
+                "holidayOpen": holidayOpen,
+                "holidayClose": holidayClose
+            },
+            success: function (data) {
+                $(".tbody").children().remove();
+                let items = data.items;
+                console.log(data);
+                console.log(items.length);
+                for (let i = 0; i < items.length; i++) {
+                    var html = '<tr><td>' + items[i].city + '</td>';
+                    html += '<td>' + items[i].hospital_name + '</td>';
+                    html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
+                    html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
+                    if (items[i].holidayOpen != null && items[i].holidayClose != null) {
+                        html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
+                    }else{
+                        html += '<td style="text-align: center">-</td>';
+                    }
+                    html += '<td>' + items[i].phone + '</td></tr>';
+                    $(".tbody").append(html);
+                }
+                console.log(html);
+            }
+        })
+    });
+
+    $(".satClose").on("change", function () {
+        // changeFunction();
+        let searchType = $("#searchType").val();
+        let keyword = $("#keyword").val();
+        let count = $("#count").val();
+        let city = $("#city").val();
+        let weekOpen = $(".weekOpen:checked").val();
+        let weekClose = $(".weekClose:checked").val();
+        let satOpen = $(".satOpen:checked").val();
+        let satClose = $(".satClose:checked").val();
+        let holidayYN = $(".holidayYN:checked").val();
+        let holidayOpen = $(".holidayOpen:checked").val();
+        let holidayClose = $(".holidayClose:checked").val();
+        $.ajax({
+            url: '/api/hospital/list',
+            type: 'post',
+            data: {
+                "currentPage": 1,
+                "count": count,
+                "searchType": searchType,
+                "keyword": keyword,
+                "city": city,
+                "weekOpen": weekOpen,
+                "weekClose": weekClose,
+                "satOpen": satOpen,
+                "satClose": satClose,
+                "holidayYN": holidayYN,
+                "holidayOpen": holidayOpen,
+                "holidayClose": holidayClose
+            },
+            success: function (data) {
+                $(".tbody").children().remove();
+                let items = data.items;
+                console.log(data);
+                console.log(items.length);
+                for (let i = 0; i < items.length; i++) {
+                    var html = '<tr><td>' + items[i].city + '</td>';
+                    html += '<td>' + items[i].hospital_name + '</td>';
+                    html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
+                    html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
+                    if (items[i].holidayOpen != null && items[i].holidayClose != null) {
+                        html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
+                    }else{
+                        html += '<td style="text-align: center">-</td>';
+                    }
+                    html += '<td>' + items[i].phone + '</td></tr>';
+                    $(".tbody").append(html);
+                }
+                console.log(html);
+            }
+        })
+    });
+
+    $(".holidayYN").on("change", function () {
+        // changeFunction();
+        let searchType = $("#searchType").val();
+        let keyword = $("#keyword").val();
+        let count = $("#count").val();
+        let city = $("#city").val();
+        let weekOpen = $(".weekOpen:checked").val();
+        let weekClose = $(".weekClose:checked").val();
+        let satOpen = $(".satOpen:checked").val();
+        let satClose = $(".satClose:checked").val();
+        let holidayYN = $(".holidayYN:checked").val();
+        let holidayOpen = $(".holidayOpen:checked").val();
+        let holidayClose = $(".holidayClose:checked").val();
+        $.ajax({
+            url: '/api/hospital/list',
+            type: 'post',
+            data: {
+                "currentPage": 1,
+                "count": count,
+                "searchType": searchType,
+                "keyword": keyword,
+                "city": city,
+                "weekOpen": weekOpen,
+                "weekClose": weekClose,
+                "satOpen": satOpen,
+                "satClose": satClose,
+                "holidayYN": holidayYN,
+                "holidayOpen": holidayOpen,
+                "holidayClose": holidayClose
+            },
+            success: function (data) {
+                $(".tbody").children().remove();
+                let items = data.items;
+                console.log(data);
+                console.log(items.length);
+                for (let i = 0; i < items.length; i++) {
+                    var html = '<tr><td>' + items[i].city + '</td>';
+                    html += '<td>' + items[i].hospital_name + '</td>';
+                    html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
+                    html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
+                    if (items[i].holidayOpen != null && items[i].holidayClose != null) {
+                        html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
+                    }else{
+                        html += '<td style="text-align: center">-</td>';
+                    }
+                    html += '<td>' + items[i].phone + '</td></tr>';
+                    $(".tbody").append(html);
+                }
+                console.log(html);
+            }
+        })
+    });
+
+    $(".holidayOpen").on("change", function () {
+        // changeFunction();
+        let searchType = $("#searchType").val();
+        let keyword = $("#keyword").val();
+        let count = $("#count").val();
+        let city = $("#city").val();
+        let weekOpen = $(".weekOpen:checked").val();
+        let weekClose = $(".weekClose:checked").val();
+        let satOpen = $(".satOpen:checked").val();
+        let satClose = $(".satClose:checked").val();
+        let holidayYN = $(".holidayYN:checked").val();
+        let holidayOpen = $(".holidayOpen:checked").val();
+        let holidayClose = $(".holidayClose:checked").val();
+        $.ajax({
+            url: '/api/hospital/list',
+            type: 'post',
+            data: {
+                "currentPage": 1,
+                "count": count,
+                "searchType": searchType,
+                "keyword": keyword,
+                "city": city,
+                "weekOpen": weekOpen,
+                "weekClose": weekClose,
+                "satOpen": satOpen,
+                "satClose": satClose,
+                "holidayYN": holidayYN,
+                "holidayOpen": holidayOpen,
+                "holidayClose": holidayClose
+            },
+            success: function (data) {
+                $(".tbody").children().remove();
+                let items = data.items;
+                console.log(data);
+                console.log(items.length);
+                for (let i = 0; i < items.length; i++) {
+                    var html = '<tr><td>' + items[i].city + '</td>';
+                    html += '<td>' + items[i].hospital_name + '</td>';
+                    html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
+                    html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
+                    if (items[i].holidayOpen != null && items[i].holidayClose != null) {
+                        html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
+                    }else{
+                        html += '<td style="text-align: center">-</td>';
+                    }
+                    html += '<td>' + items[i].phone + '</td></tr>';
+                    $(".tbody").append(html);
+                }
+                console.log(html);
+            }
+        })
+    });
+
+    $(".holidayClose").on("change", function () {
+        // changeFunction();
+        let searchType = $("#searchType").val();
+        let keyword = $("#keyword").val();
+        let count = $("#count").val();
+        let city = $("#city").val();
+        let weekOpen = $(".weekOpen:checked").val();
+        let weekClose = $(".weekClose:checked").val();
+        let satOpen = $(".satOpen:checked").val();
+        let satClose = $(".satClose:checked").val();
+        let holidayYN = $(".holidayYN:checked").val();
+        let holidayOpen = $(".holidayOpen:checked").val();
+        let holidayClose = $(".holidayClose:checked").val();
+        console.log(holidayClose);
+        $.ajax({
+            url: '/api/hospital/list',
+            type: 'post',
+            data: {
+                "currentPage": 1,
+                "count": count,
+                "searchType": searchType,
+                "keyword": keyword,
+                "city": city,
+                "weekOpen": weekOpen,
+                "weekClose": weekClose,
+                "satOpen": satOpen,
+                "satClose": satClose,
+                "holidayYN": holidayYN,
+                "holidayOpen": holidayOpen,
+                "holidayClose": holidayClose
+            },
+            success: function (data) {
+                $(".tbody").children().remove();
+                let items = data.items;
+                console.log(data);
+                console.log(items.length);
+                for (let i = 0; i < items.length; i++) {
+                    var html = '<tr><td>' + items[i].city + '</td>';
+                    html += '<td>' + items[i].hospital_name + '</td>';
+                    html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
+                    html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
+                    if (items[i].holidayOpen != null && items[i].holidayClose != null) {
+                        html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
+                    }else{
+                        html += '<td style="text-align: center">-</td>';
+                    }
+                    html += '<td>' + items[i].phone + '</td></tr>';
+                    $(".tbody").append(html);
+                }
+                console.log(html);
+            }
+        })
+    });
 </script>
 </body>
 </html>

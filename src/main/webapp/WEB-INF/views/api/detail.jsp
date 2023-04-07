@@ -34,6 +34,7 @@
   <input type="hidden" name="count" id="count"/>
   <input type="hidden" name="searchType" id="searchType"/>
   <input type="hidden" name="keyword" id="keyword"/>
+  <input type="hidden" name="city" id="city2"/>
 </form>
 <script>
   function toList(currentPage,count,searchType,keyword){
@@ -41,6 +42,7 @@
     $("#count").val(count);
     $("#searchType").val(searchType);
     $("#keyword").val(keyword);
+    // $("#city2").val(city);
     $("#frm").submit();
   }
   var mapContainer = document.getElementById('map'), // 지도를 표시할 div

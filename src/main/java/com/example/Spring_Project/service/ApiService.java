@@ -136,54 +136,58 @@ public class ApiService {
         return apiMapper.getInfectionByMonthInfo();
     }
 
-    public List<HospitalDTO>getHospitalInfo(String searchType, String keyword, Integer start, Integer end) throws Exception{
-        return apiMapper.getHospitalInfo(searchType,keyword,start,end);
+    public List<HospitalDTO> getHospitalInfo(String searchType, String keyword, Integer start, Integer end, String city) throws Exception {
+        return apiMapper.getHospitalInfo(searchType, keyword, start, end, city);
     }
 
-    public HospitalDTO getInfo(Integer hospital_seq) throws Exception{
+    public List<HospitalDTO> test(String searchType, String keyword, Integer start, Integer end, String city) throws Exception {
+        return apiMapper.test(searchType, keyword, start, end, city);
+    }
+
+    public HospitalDTO getInfo(Integer hospital_seq) throws Exception {
         return apiMapper.getInfo(hospital_seq);
     }
 
-    public Integer countPost(String searchType,String keyword) throws Exception{
-        return apiMapper.countPost(searchType,keyword);
+    public Integer countPost(String searchType, String keyword, String city) throws Exception {
+        return apiMapper.countPost(searchType, keyword, city);
     }
 
     //옵션 선택
-    public List<String> getCity() throws Exception{
+    public List<String> getCity() throws Exception {
         return apiMapper.getCity();
     }
 
-    public List<String> getWeekOpen() throws Exception{
+    public List<String> getWeekOpen() throws Exception {
         return apiMapper.getWeekOpen();
     }
 
-    public List<String> getWeekClose() throws Exception{
+    public List<String> getWeekClose() throws Exception {
         return apiMapper.getWeekClose();
     }
 
-    public List<String> getSatOpen() throws Exception{
+    public List<String> getSatOpen() throws Exception {
         return apiMapper.getSatOpen();
     }
 
-    public List<String> getSatClose() throws Exception{
+    public List<String> getSatClose() throws Exception {
         return apiMapper.getSatClose();
     }
 
-    public List<String> getHolidayYN() throws Exception{
+    public List<String> getHolidayYN() throws Exception {
         return apiMapper.getHolidayYN();
     }
 
-    public List<String> getHolidayOpen() throws Exception{
+    public List<String> getHolidayOpen() throws Exception {
         return apiMapper.getHolidayOpen();
     }
 
-    public List<String> getHolidayClose() throws Exception{
+    public List<String> getHolidayClose() throws Exception {
         return apiMapper.getHolidayClose();
     }
 
     //페이징 처리
-    public String getHospitalPageNavi(Integer currentPage, Integer count, String searchType, String keyword) throws Exception {
-        int postTotalCount = this.countPost(searchType, keyword);
+    public String getHospitalPageNavi(Integer currentPage, Integer count, String searchType, String keyword, String city) throws Exception {
+        int postTotalCount = this.countPost(searchType, keyword, city);
 
         int recordCountPerPage = count; // 페이지 당 게시글 개수
         int naviCountPerPage = 10; // 내비 개수
@@ -220,7 +224,7 @@ public class ApiService {
         StringBuilder sb = new StringBuilder();
 
         if (needPrev) {
-           if (searchType == null && keyword == null) {
+            if (searchType == null && keyword == null) {
                 sb.append("<a href='/api/hospital?currentPage=" + (startNavi - 1) + "&count=" + count + "&searchType=&keyword=" + "'><</a> ");
             } else {
                 sb.append("<a href='/api/hospital?currentPage=" + (startNavi - 1) + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><</a> ");
@@ -228,26 +232,30 @@ public class ApiService {
         }
         for (int i = startNavi; i <= endNavi; i++) {
             if (currentPage == i) {
-                    if (searchType == null && keyword == null) {
-                        sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count +   "&searchType=" + "&keyword=" + "'><b>" + i + "</b></a> ");
-                    } else {
-                        sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><b>" + i + "</b></a> ");
-                    }
+                if (searchType == null && keyword == null) {
+                    sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count + "&searchType=" + "&keyword=" + "'><b>" + i + "</b></a> ");
+                } else {
+                    sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><b>" + i + "</b></a> ");
+                }
             } else {
-                    if (searchType == null && keyword == null) {
-                        sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count +   "&searchType=" + "&keyword=" + "'>" + i + "</a> ");
-                    } else {
-                        sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count +   "&searchType=" + searchType + "&keyword=" + keyword + "'>" + i + "</a> ");
-                    }
+                if (searchType == null && keyword == null) {
+                    sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count + "&searchType=" + "&keyword=" + "'>" + i + "</a> ");
+                } else {
+                    sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'>" + i + "</a> ");
+                }
             }
         }
         if (needNext) {
-                if (searchType == null && keyword == null) {
-                    sb.append("<a href='/api/hospital?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + "&keyword=" + "'>></a> ");
-                } else {
-                    sb.append("<a href='/api/hospital?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'>></a> ");
-                }
+            if (searchType == null && keyword == null) {
+                sb.append("<a href='/api/hospital?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + "&keyword=" + "'>></a> ");
+            } else {
+                sb.append("<a href='/api/hospital?currentPage=" + (endNavi + 1) + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'>></a> ");
+            }
         }
         return sb.toString();
+    }
+
+    public List<HospitalDTO> test2(Map<String, Object> paramMap) {
+        return apiMapper.test2(paramMap);
     }
 }

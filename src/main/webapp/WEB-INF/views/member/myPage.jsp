@@ -98,6 +98,7 @@
         html += '<input type="hidden" value="10" id="count" name="count" />';
         html += '<input type="hidden" value="" id="searchType" name="searchType" />';
         html += '<input type="hidden" value="" id="keyword" name="keyword" />';
+        html += '<input type="hidden" value="" id="city" name="city" />';
         $('#frm').append(html);
 
         form.action =  $("#api1").val();;

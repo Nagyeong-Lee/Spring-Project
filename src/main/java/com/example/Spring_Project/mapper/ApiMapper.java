@@ -34,10 +34,15 @@ public interface ApiMapper {
 
     //병원
     List<HospitalDTO> getHospitalInfo(@Param("searchType") String searchType,@Param("keyword") String keyword
-                                    ,@Param("start") Integer start, @Param("end") Integer end
+                                    ,@Param("start") Integer start, @Param("end") Integer end,
+                                      @Param("city") String city
+    );
+    List<HospitalDTO> test(@Param("searchType") String searchType,@Param("keyword") String keyword
+                                    ,@Param("start") Integer start, @Param("end") Integer end,
+                                      @Param("city") String city
     );
     HospitalDTO getInfo(Integer hospital_seq);
-    Integer countPost(@Param("searchType") String searchType, @Param("keyword") String keyword);
+    Integer countPost(@Param("searchType") String searchType, @Param("keyword") String keyword,@Param("city") String city);
     List<String> getCity();
     List<String> getWeekOpen();
     List<String> getWeekClose();
@@ -46,4 +51,7 @@ public interface ApiMapper {
     List<String> getHolidayYN();
     List<String> getHolidayOpen();
     List<String> getHolidayClose();
+
+    List<HospitalDTO> test2(Map<String, Object> paramMap);
+
 }
