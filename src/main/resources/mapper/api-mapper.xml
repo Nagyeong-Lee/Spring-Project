@@ -376,35 +376,23 @@
             <trim prefix="WHERE" prefixOverrides="AND">
                 AND city=#{city}
                 <if test="weekOpen != null">
-                    <![CDATA[
-                    AND to_date(weekOpen,'hh24:mi')>=to_date(#{weekOpen},'hh24:mi')
-                    ]]>
+                    <![CDATA[AND to_date(weekOpen,'hh24:mi')>=to_date(#{weekOpen},'hh24:mi')]]>
                 </if>
                 <if test="weekClose != null">
-                    <![CDATA[
-                   AND to_date(weekClose,'hh24:mi')<=to_date(#{weekClose},'hh24:mi')
-                    ]]>
+                    <![CDATA[AND to_date(weekClose,'hh24:mi')<=to_date(#{weekClose},'hh24:mi')]]>
                 </if>
                 <if test="satOpen != null">
-                    <![CDATA[
-                  AND to_date(satOpen,'hh24:mi')>=to_date(#{satOpen},'hh24:mi')
-                     ]]>
+                    <![CDATA[AND to_date(satOpen,'hh24:mi')>=to_date(#{satOpen},'hh24:mi')]]>
                 </if>
                 <if test="satClose != null">
-                    <![CDATA[
-                AND to_date(satClose,'hh24:mi')<=to_date(#{satClose},'hh24:mi')
-                    ]]>
+                    <![CDATA[AND to_date(satClose,'hh24:mi')<=to_date(#{satClose},'hh24:mi')]]>
                 </if>
                 <if test="holidayYN eq '진료'.toString()">
                     <if test="holidayOpen != null">
-                        <![CDATA[
-                 AND to_date(holidayOpen,'hh24:mi')>=to_date(#{holidayOpen},'hh24:mi')
-                   ]]>
+                        <![CDATA[AND to_date(holidayOpen,'hh24:mi')>=to_date(#{holidayOpen},'hh24:mi')]]>
                     </if>
                     <if test="holidayClose != null">
-                        <![CDATA[
-                      AND to_date(holidayClose,'hh24:mi')<=to_date(#{holidayClose},'hh24:mi')
-                      ]]>
+                        <![CDATA[AND to_date(holidayClose,'hh24:mi')<=to_date(#{holidayClose},'hh24:mi')]]>
                     </if>
                 </if>
                 <if test="searchType eq 'hospital_name'.toString()">

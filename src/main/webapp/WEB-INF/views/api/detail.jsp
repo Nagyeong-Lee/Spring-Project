@@ -29,8 +29,8 @@
 <div id="map" style="width:50%;height:350px;"></div>
 <a href="javascript:void(0);" onclick="toList(${currentPage},${count},'${searchType}','${keyword}')"><button type="button" id="toList">목록으로</button></a>
 
-<form id="frm" name="frm" method="post" action="/api/hospital">
-<%--<form id="frm" name="frm" method="post" action="/api/hospital/list">--%>
+<%--<form id="frm" name="frm" method="post" action="/api/hospital">--%>
+<form id="frm" name="frm" method="post" action="/api/hospital/list">
   <input type="hidden" name="currentPage" id="currentPage"/>
   <input type="hidden" name="count" id="count"/>
   <input type="hidden" name="searchType" id="searchType"/>
