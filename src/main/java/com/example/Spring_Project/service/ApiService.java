@@ -140,16 +140,16 @@ public class ApiService {
         return apiMapper.getHospitalInfo(searchType, keyword, start, end, city);
     }
 
-    public List<HospitalDTO> test(String searchType, String keyword, Integer start, Integer end, String city) throws Exception {
-        return apiMapper.test(searchType, keyword, start, end, city);
+    public List<HospitalDTO> test(String searchType, String keyword, Integer start, Integer end) throws Exception {
+        return apiMapper.test(searchType, keyword, start, end);
     }
 
     public HospitalDTO getInfo(Integer hospital_seq) throws Exception {
         return apiMapper.getInfo(hospital_seq);
     }
 
-    public Integer countPost(String searchType, String keyword, String city) throws Exception {
-        return apiMapper.countPost(searchType, keyword, city);
+    public Integer countPost(String searchType, String keyword) throws Exception {
+        return apiMapper.countPost(searchType, keyword);
     }
 
     //옵션 선택
@@ -186,8 +186,8 @@ public class ApiService {
     }
 
     //페이징 처리
-    public String getHospitalPageNavi(Integer currentPage, Integer count, String searchType, String keyword, String city) throws Exception {
-        int postTotalCount = this.countPost(searchType, keyword, city);
+    public String getHospitalPageNavi(Integer currentPage, Integer count, String searchType, String keyword) throws Exception {
+        int postTotalCount = this.countPost(searchType, keyword);
 
         int recordCountPerPage = count; // 페이지 당 게시글 개수
         int naviCountPerPage = 10; // 내비 개수

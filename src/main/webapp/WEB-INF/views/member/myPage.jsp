@@ -26,7 +26,6 @@
 </c:forEach>
 
 <script>
-
     let id = $("#sessionID").val();
     //커뮤니티로 이동
     $("#btn1").on("click", function () {
@@ -54,54 +53,15 @@
 
     //병원 정보
     function api1() {
-        /*let path = $("#api1").val();
-        let form = document.createElement("form");
-        form.setAttribute("method", "post");
-        form.setAttribute("action", path);
-
-        let input1 = document.createElement("input1");
-        let input2 = document.createElement("input2");
-        let input3 = document.createElement("input3");
-        let input4 = document.createElement("input4");
-
-        input1.setAttribute("type", "hidden");
-        input1.setAttribute("name", "currentPage");
-        input1.setAttribute("value", parseInt("1"));
-        let crr_page = '<input type="hidden" name="currentPage" value="1">'
-
-        input2.setAttribute("type", "hidden");
-        input2.setAttribute("name", "count");
-        input2.setAttribute("value", parseInt("10"));
-        let count = '<input type="hidden" name="count" value="10">'
-
-        input3.setAttribute("type", "hidden");
-        input3.setAttribute("name", "searchType");
-        input3.setAttribute("value", "TEST");
-
-        input4.setAttribute("type", "hidden");
-        input4.setAttribute("name", "keyword");
-        input4.setAttribute("value", "T2");
-
-        //form.append(input1);
-        form.append(crr_page);
-        //form.append(input2);
-        form.append(count);
-        form.append(input3);
-        form.append(input4);
-
-        document.body.appendChild(form);
-        form.submit();*/
-
         $('#frm').html("");
         var form = $('form[name="frm"]')[0];
         var html = '<input type="hidden" value="1" name="currentPage" />';
         html += '<input type="hidden" value="10" id="count" name="count" />';
         html += '<input type="hidden" value="" id="searchType" name="searchType" />';
         html += '<input type="hidden" value="" id="keyword" name="keyword" />';
-        html += '<input type="hidden" value="" id="city" name="city" />';
         $('#frm').append(html);
 
-        form.action =  $("#api1").val();;
+        form.action =  $("#api1").val();
         form.submit();
     }
 
@@ -118,7 +78,6 @@
         form.action=$("#api3").val();
         form.submit();
     }
-
 
 </script>
 </body>

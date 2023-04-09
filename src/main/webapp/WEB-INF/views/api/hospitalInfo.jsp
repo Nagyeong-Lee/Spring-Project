@@ -68,7 +68,12 @@
 <br>
 <hr>
 
-<input type="hidden" value="${currentPage}" id="currentPage" <c:out value="${i eq '09:00'? 'checked' : ''}"/>>
+<%--<input type="hidden" value="${currentPage}" id="currentPage" <c:out value="${i eq '09:00'? 'checked' : ''}"/>>--%>
+<input type="hidden" value="${currentPage}" id="boardCurrentPage">
+<input type="hidden" value="${count}" id="boardCount">
+<input type="hidden" value="${searchType}" id="boardSearchType">
+<input type="hidden" value="${keyword}" id="boardKeyword">
+
 <table style="border: 1px solid black">
     <thead>
     <th>지역명</th>
@@ -86,8 +91,8 @@
                     <td>${i.city}</td>
                     <td>
                         <a href="javascript:void(0);"
-               +             <%--onclick="detail(${i.hospital_seq}, ${currentPage}, ${count}, '${searchType}', '${keyword}');">${i.hospital_name}</a>--%>
-                            onclick="detail(${i.hospital_seq});">${i.hospital_name}</a>
+                           +             <%--onclick="detail(${i.hospital_seq}, ${currentPage}, ${count}, '${searchType}', '${keyword}');">${i.hospital_name}</a>--%>
+                           onclick="detail(${i.hospital_seq});">${i.hospital_name}</a>
                     </td>
                     <td>${i.weekOpen}~${i.weekClose}&nbsp&nbsp</td>
                     <td>${i.satOpen}~${i.satClose}</td>
@@ -128,7 +133,7 @@ ${paging}<br>
     <input type="hidden" name="keyword" id="keyword2"/>
 </form>
 <form id="frm3" name="frm3" method="post" action="/api/hospital">
-    <input type="hidden" name="currentPage" value="1" id="currentPage3"/>
+    <input type="hidden" name="currentPage" id="currentPage3"/>
     <input type="hidden" name="count" id="count3"/>
     <input type="hidden" name="searchType" id="searchType3"/>
     <input type="hidden" name="keyword" id="keyword3"/>
@@ -144,18 +149,18 @@ ${paging}<br>
         // html+='<input type="hidden" value="searchType" name="searchType">';
         // html+='<input type="hidden" value="keyword" name="keyword">';
         // $('#frm').append(html);
-        $("#hospital_seq1").val(hospital_seq);
         /*$("#currentPage1").val(currentPage);
         $("#count1").val(count);
         $("#searchType1").val(searchType);
         $("#keyword1").val(keyword);*/
         // $("#city1").val(city);
-
-        $("#currentPage1").val(1);
-        $("#count1").val(1);
-        $("#searchType1").val('');
-        $("#keyword1").val('');
-
+        // $("#currentPage1").val(1);
+        // $("#count1").val(1);
+        $("#hospital_seq1").val(hospital_seq);
+        $("#currentPage1").val($("#boardCurrentPage").val());
+        $("#count1").val($("#boardCount").val());
+        $("#searchType1").val($("#boardSearchType").val());
+        $("#keyword1").val($("#boardKeyword").val());
         $("#frm").submit();
     }
 
@@ -177,6 +182,7 @@ ${paging}<br>
         let keyword = $("#keyword").val();
         let count = $("#count").val();
 
+        $("#currentPage3").val(1);
         $("#count3").val(count);
         $("#searchType3").val(searchType);
         $("#keyword3").val(keyword);
@@ -185,103 +191,133 @@ ${paging}<br>
     });
 
     //옵션 선택
-    // function changeFunction() {
-    //     var searchType = $("#searchType").val();
-    //     var keyword = $("#keyword").val();
-    //     var count = $("#count").val();
-    //     var city = $("#city").val();
-    //     var weekOpen = $(".weekOpen:checked").val();
-    //     var weekClose = $(".weekClose:checked").val();
-    //     var satOpen = $(".satOpen:checked").val();
-    //     var satClose = $(".satClose:checked").val();
-    //     var holidayYN = $(".holidayYN:checked").val();
-    //     var holidayOpen = $(".holidayOpen:checked").val();
-    //     var holidayClose = $(".holidayClose:checked").val();
-    // }
+    function changeOption() {
+        let data = {
+            searchType: $("#searchType").val(),
+            keyword: $("#keyword").val(),
+            count: $("#count").val(),
+            city: $("#city").val(),
+            weekOpen: $(".weekOpen:checked").val(),
+            weekClose: $(".weekClose:checked").val(),
+            satOpen: $(".satOpen:checked").val(),
+            satClose: $(".satClose:checked").val(),
+            holidayYN: $(".holidayYN:checked").val(),
+            holidayOpen: $(".holidayOpen:checked").val(),
+            holidayClose: $(".holidayClose:checked").val()
+        };
+        return data;
+    }
+
+    //tbody생성
+    function createHtml(item) {
+        var html = '<tr><td>' + item.city + '</td>';
+        html += '<td><a href="javascript:void(0);" onclick="detail(' + item.hospital_seq + ');">' + item.hospital_name + '</a></td>';
+        html += '<td>' + item.weekOpen + '~' + item.weekClose + '</td>';
+        html += '<td>' + item.satOpen + '~' + item.satClose + '</td>';
+        if (item.holidayOpen != null && item.holidayClose != null) {
+            html += '<td>' + item.holidayOpen + '~' + item.holidayClose + '</td>';
+        } else {
+            html += '<td style="text-align: center">-</td>';
+        }
+        html += '<td>' + item.phone + '</td></tr>';
+        return html;
+    }
 
     $("#city").on("change", function () {
-        // changeFunction(searchType,keyword,count,city,weekOpen,weekClose,satOpen,satClose,holidayYN,holidayOpen,holidayClose);
-        let searchType = $("#searchType").val();
-        let keyword = $("#keyword").val();
-        let count = $("#count").val();
-        let city = $("#city").val();
-        let weekOpen = $(".weekOpen:checked").val();
-        let weekClose = $(".weekClose:checked").val();
-        let satOpen = $(".satOpen:checked").val();
-        let satClose = $(".satClose:checked").val();
-        let holidayYN = $(".holidayYN:checked").val();
-        let holidayOpen = $(".holidayOpen:checked").val();
-        let holidayClose = $(".holidayClose:checked").val();
+        let result = changeOption();
+        // let searchType = $("#searchType").val();
+        // let keyword = $("#keyword").val();
+        // let count = $("#count").val();
+        // let city = $("#city").val();
+        // let weekOpen = $(".weekOpen:checked").val();
+        // let weekClose = $(".weekClose:checked").val();
+        // let satOpen = $(".satOpen:checked").val();
+        // let satClose = $(".satClose:checked").val();
+        // let holidayYN = $(".holidayYN:checked").val();
+        // let holidayOpen = $(".holidayOpen:checked").val();
+        // let holidayClose = $(".holidayClose:checked").val();
         $.ajax({
             url: '/api/hospital/list',
             type: 'post',
             data: {
+                // "currentPage": 1,
+                // "count": count,
+                // "searchType": searchType,
+                // "keyword": keyword,
+                // "city": city,
+                // "weekOpen": weekOpen,
+                // "weekClose": weekClose,
+                // "satOpen": satOpen,
+                // "satClose": satClose,
+                // "holidayYN": holidayYN,
+                // "holidayOpen": holidayOpen,
+                // "holidayClose": holidayClose
                 "currentPage": 1,
-                "count": count,
-                "searchType": searchType,
-                "keyword": keyword,
-                "city": city,
-                "weekOpen": weekOpen,
-                "weekClose": weekClose,
-                "satOpen": satOpen,
-                "satClose": satClose,
-                "holidayYN": holidayYN,
-                "holidayOpen": holidayOpen,
-                "holidayClose": holidayClose
+                "count": result.count,
+                "searchType": result.searchType,
+                "keyword": result.keyword,
+                "city": result.city,
+                "weekOpen": result.weekOpen,
+                "weekClose": result.weekClose,
+                "satOpen": result.satOpen,
+                "satClose": result.satClose,
+                "holidayYN": result.holidayYN,
+                "holidayOpen": result.holidayOpen,
+                "holidayClose": result.holidayClose
             },
             success: function (data) {
                 $(".tbody").children().remove();
                 let items = data.items;
-                 console.log(data);
+                console.log(data);
                 console.log(items.length);
                 for (let i = 0; i < items.length; i++) {
-                    var html = '<tr><td>' + items[i].city + '</td>';
-                    html += '<td><a href="javascript:void(0);" onclick="detail('+items[i].hospital_seq+');">' + items[i].hospital_name + '</a></td>';
-                    html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
-                    html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
-                    if (items[i].holidayOpen != null && items[i].holidayClose != null) {
-                        html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
-                    }else{
-                        html += '<td style="text-align: center">-</td>';
-                    }
-                    html += '<td>' + items[i].phone + '</td></tr>';
-                    $(".tbody").append(html);
+                    // var html = '<tr><td>' + items[i].city + '</td>';
+                    // html += '<td><a href="javascript:void(0);" onclick="detail(' + items[i].hospital_seq + ');">' + items[i].hospital_name + '</a></td>';
+                    // html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
+                    // html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
+                    // if (items[i].holidayOpen != null && items[i].holidayClose != null) {
+                    //     html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
+                    // } else {
+                    //     html += '<td style="text-align: center">-</td>';
+                    // }
+                    // html += '<td>' + items[i].phone + '</td></tr>';
+                    var newHtml = createHtml(items[i]);
+                    $(".tbody").append(newHtml);
                 }
-                console.log(html);
             }
         })
     });
 
     $(".weekOpen").on("change", function () {
         // $(".weekOpen").attr("checked",false);
-        // changeFunction();
-        let searchType = $("#searchType").val();
-        let keyword = $("#keyword").val();
-        let count = $("#count").val();
-        let city = $("#city").val();
-        let weekOpen = $(".weekOpen:checked").val();
-        let weekClose = $(".weekClose:checked").val();
-        let satOpen = $(".satOpen:checked").val();
-        let satClose = $(".satClose:checked").val();
-        let holidayYN = $(".holidayYN:checked").val();
-        let holidayOpen = $(".holidayOpen:checked").val();
-        let holidayClose = $(".holidayClose:checked").val();
+        let result = changeOption();
+        // let searchType = $("#searchType").val();
+        // let keyword = $("#keyword").val();
+        // let count = $("#count").val();
+        // let city = $("#city").val();
+        // let weekOpen = $(".weekOpen:checked").val();
+        // let weekClose = $(".weekClose:checked").val();
+        // let satOpen = $(".satOpen:checked").val();
+        // let satClose = $(".satClose:checked").val();
+        // let holidayYN = $(".holidayYN:checked").val();
+        // let holidayOpen = $(".holidayOpen:checked").val();
+        // let holidayClose = $(".holidayClose:checked").val();
         $.ajax({
             url: '/api/hospital/list',
             type: 'post',
             data: {
                 "currentPage": 1,
-                "count": count,
-                "searchType": searchType,
-                "keyword": keyword,
-                "city": city,
-                "weekOpen": weekOpen,
-                "weekClose": weekClose,
-                "satOpen": satOpen,
-                "satClose": satClose,
-                "holidayYN": holidayYN,
-                "holidayOpen": holidayOpen,
-                "holidayClose": holidayClose
+                "count": result.count,
+                "searchType": result.searchType,
+                "keyword": result.keyword,
+                "city": result.city,
+                "weekOpen": result.weekOpen,
+                "weekClose": result.weekClose,
+                "satOpen": result.satOpen,
+                "satClose": result.satClose,
+                "holidayYN": result.holidayYN,
+                "holidayOpen": result.holidayOpen,
+                "holidayClose": result.holidayClose
             },
             success: function (data) {
                 $(".tbody").children().remove();
@@ -289,52 +325,53 @@ ${paging}<br>
                 console.log(data);
                 console.log(items.length);
                 for (let i = 0; i < items.length; i++) {
-                    var html = '<tr><td>' + items[i].city + '</td>';
-                    html += '<td>' + items[i].hospital_name + '</td>';
-                    html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
-                    html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
-                    if (items[i].holidayOpen != null && items[i].holidayClose != null) {
-                        html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
-                    }else{
-                        html += '<td style="text-align: center">-</td>';
-                    }
-                    html += '<td>' + items[i].phone + '</td></tr>';
-                    $(".tbody").append(html);
+                    // var html = '<tr><td>' + items[i].city + '</td>';
+                    // html += '<td>' + items[i].hospital_name + '</td>';
+                    // html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
+                    // html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
+                    // if (items[i].holidayOpen != null && items[i].holidayClose != null) {
+                    //     html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
+                    // } else {
+                    //     html += '<td style="text-align: center">-</td>';
+                    // }
+                    // html += '<td>' + items[i].phone + '</td></tr>';
+                    // $(".tbody").append(html);
+                    var newHtml = createHtml(items[i]);
+                    $(".tbody").append(newHtml);
                 }
-                console.log(html);
             }
         })
     });
 
     $(".weekClose").on("change", function () {
-        // changeFunction();
-        let searchType = $("#searchType").val();
-        let keyword = $("#keyword").val();
-        let count = $("#count").val();
-        let city = $("#city").val();
-        let weekOpen = $(".weekOpen:checked").val();
-        let weekClose = $(".weekClose:checked").val();
-        let satOpen = $(".satOpen:checked").val();
-        let satClose = $(".satClose:checked").val();
-        let holidayYN = $(".holidayYN:checked").val();
-        let holidayOpen = $(".holidayOpen:checked").val();
-        let holidayClose = $(".holidayClose:checked").val();
+        let result = changeOption();
+        // let searchType = $("#searchType").val();
+        // let keyword = $("#keyword").val();
+        // let count = $("#count").val();
+        // let city = $("#city").val();
+        // let weekOpen = $(".weekOpen:checked").val();
+        // let weekClose = $(".weekClose:checked").val();
+        // let satOpen = $(".satOpen:checked").val();
+        // let satClose = $(".satClose:checked").val();
+        // let holidayYN = $(".holidayYN:checked").val();
+        // let holidayOpen = $(".holidayOpen:checked").val();
+        // let holidayClose = $(".holidayClose:checked").val();
         $.ajax({
             url: '/api/hospital/list',
             type: 'post',
             data: {
                 "currentPage": 1,
-                "count": count,
-                "searchType": searchType,
-                "keyword": keyword,
-                "city": city,
-                "weekOpen": weekOpen,
-                "weekClose": weekClose,
-                "satOpen": satOpen,
-                "satClose": satClose,
-                "holidayYN": holidayYN,
-                "holidayOpen": holidayOpen,
-                "holidayClose": holidayClose
+                "count": result.count,
+                "searchType": result.searchType,
+                "keyword": result.keyword,
+                "city": result.city,
+                "weekOpen": result.weekOpen,
+                "weekClose": result.weekClose,
+                "satOpen": result.satOpen,
+                "satClose": result.satClose,
+                "holidayYN": result.holidayYN,
+                "holidayOpen": result.holidayOpen,
+                "holidayClose": result.holidayClose
             },
             success: function (data) {
                 $(".tbody").children().remove();
@@ -342,52 +379,53 @@ ${paging}<br>
                 console.log(data);
                 console.log(items.length);
                 for (let i = 0; i < items.length; i++) {
-                    var html = '<tr><td>' + items[i].city + '</td>';
-                    html += '<td>' + items[i].hospital_name + '</td>';
-                    html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
-                    html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
-                    if (items[i].holidayOpen != null && items[i].holidayClose != null) {
-                        html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
-                    }else{
-                        html += '<td style="text-align: center">-</td>';
-                    }
-                    html += '<td>' + items[i].phone + '</td></tr>';
-                    $(".tbody").append(html);
+                    // var html = '<tr><td>' + items[i].city + '</td>';
+                    // html += '<td>' + items[i].hospital_name + '</td>';
+                    // html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
+                    // html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
+                    // if (items[i].holidayOpen != null && items[i].holidayClose != null) {
+                    //     html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
+                    // } else {
+                    //     html += '<td style="text-align: center">-</td>';
+                    // }
+                    // html += '<td>' + items[i].phone + '</td></tr>';
+                    // $(".tbody").append(html);
+                    var newHtml = createHtml(items[i]);
+                    $(".tbody").append(newHtml);
                 }
-                console.log(html);
             }
         })
     });
 
     $(".satOpen").on("change", function () {
-        // changeFunction();
-        let searchType = $("#searchType").val();
-        let keyword = $("#keyword").val();
-        let count = $("#count").val();
-        let city = $("#city").val();
-        let weekOpen = $(".weekOpen:checked").val();
-        let weekClose = $(".weekClose:checked").val();
-        let satOpen = $(".satOpen:checked").val();
-        let satClose = $(".satClose:checked").val();
-        let holidayYN = $(".holidayYN:checked").val();
-        let holidayOpen = $(".holidayOpen:checked").val();
-        let holidayClose = $(".holidayClose:checked").val();
+        let result = changeOption();
+        // let searchType = $("#searchType").val();
+        // let keyword = $("#keyword").val();
+        // let count = $("#count").val();
+        // let city = $("#city").val();
+        // let weekOpen = $(".weekOpen:checked").val();
+        // let weekClose = $(".weekClose:checked").val();
+        // let satOpen = $(".satOpen:checked").val();
+        // let satClose = $(".satClose:checked").val();
+        // let holidayYN = $(".holidayYN:checked").val();
+        // let holidayOpen = $(".holidayOpen:checked").val();
+        // let holidayClose = $(".holidayClose:checked").val();
         $.ajax({
             url: '/api/hospital/list',
             type: 'post',
             data: {
                 "currentPage": 1,
-                "count": count,
-                "searchType": searchType,
-                "keyword": keyword,
-                "city": city,
-                "weekOpen": weekOpen,
-                "weekClose": weekClose,
-                "satOpen": satOpen,
-                "satClose": satClose,
-                "holidayYN": holidayYN,
-                "holidayOpen": holidayOpen,
-                "holidayClose": holidayClose
+                "count": result.count,
+                "searchType": result.searchType,
+                "keyword": result.keyword,
+                "city": result.city,
+                "weekOpen": result.weekOpen,
+                "weekClose": result.weekClose,
+                "satOpen": result.satOpen,
+                "satClose": result.satClose,
+                "holidayYN": result.holidayYN,
+                "holidayOpen": result.holidayOpen,
+                "holidayClose": result.holidayClose
             },
             success: function (data) {
                 $(".tbody").children().remove();
@@ -395,52 +433,53 @@ ${paging}<br>
                 console.log(data);
                 console.log(items.length);
                 for (let i = 0; i < items.length; i++) {
-                    var html = '<tr><td>' + items[i].city + '</td>';
-                    html += '<td>' + items[i].hospital_name + '</td>';
-                    html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
-                    html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
-                    if (items[i].holidayOpen != null && items[i].holidayClose != null) {
-                        html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
-                    }else{
-                        html += '<td style="text-align: center">-</td>';
-                    }
-                    html += '<td>' + items[i].phone + '</td></tr>';
-                    $(".tbody").append(html);
+                    // var html = '<tr><td>' + items[i].city + '</td>';
+                    // html += '<td>' + items[i].hospital_name + '</td>';
+                    // html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
+                    // html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
+                    // if (items[i].holidayOpen != null && items[i].holidayClose != null) {
+                    //     html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
+                    // } else {
+                    //     html += '<td style="text-align: center">-</td>';
+                    // }
+                    // html += '<td>' + items[i].phone + '</td></tr>';
+                    // $(".tbody").append(html);
+                    var newHtml = createHtml(items[i]);
+                    $(".tbody").append(newHtml);
                 }
-                console.log(html);
             }
         })
     });
 
     $(".satClose").on("change", function () {
-        // changeFunction();
-        let searchType = $("#searchType").val();
-        let keyword = $("#keyword").val();
-        let count = $("#count").val();
-        let city = $("#city").val();
-        let weekOpen = $(".weekOpen:checked").val();
-        let weekClose = $(".weekClose:checked").val();
-        let satOpen = $(".satOpen:checked").val();
-        let satClose = $(".satClose:checked").val();
-        let holidayYN = $(".holidayYN:checked").val();
-        let holidayOpen = $(".holidayOpen:checked").val();
-        let holidayClose = $(".holidayClose:checked").val();
+        let result = changeOption();
+        // let searchType = $("#searchType").val();
+        // let keyword = $("#keyword").val();
+        // let count = $("#count").val();
+        // let city = $("#city").val();
+        // let weekOpen = $(".weekOpen:checked").val();
+        // let weekClose = $(".weekClose:checked").val();
+        // let satOpen = $(".satOpen:checked").val();
+        // let satClose = $(".satClose:checked").val();
+        // let holidayYN = $(".holidayYN:checked").val();
+        // let holidayOpen = $(".holidayOpen:checked").val();
+        // let holidayClose = $(".holidayClose:checked").val();
         $.ajax({
             url: '/api/hospital/list',
             type: 'post',
             data: {
                 "currentPage": 1,
-                "count": count,
-                "searchType": searchType,
-                "keyword": keyword,
-                "city": city,
-                "weekOpen": weekOpen,
-                "weekClose": weekClose,
-                "satOpen": satOpen,
-                "satClose": satClose,
-                "holidayYN": holidayYN,
-                "holidayOpen": holidayOpen,
-                "holidayClose": holidayClose
+                "count": result.count,
+                "searchType": result.searchType,
+                "keyword": result.keyword,
+                "city": result.city,
+                "weekOpen": result.weekOpen,
+                "weekClose": result.weekClose,
+                "satOpen": result.satOpen,
+                "satClose": result.satClose,
+                "holidayYN": result.holidayYN,
+                "holidayOpen": result.holidayOpen,
+                "holidayClose": result.holidayClose
             },
             success: function (data) {
                 $(".tbody").children().remove();
@@ -448,52 +487,53 @@ ${paging}<br>
                 console.log(data);
                 console.log(items.length);
                 for (let i = 0; i < items.length; i++) {
-                    var html = '<tr><td>' + items[i].city + '</td>';
-                    html += '<td>' + items[i].hospital_name + '</td>';
-                    html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
-                    html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
-                    if (items[i].holidayOpen != null && items[i].holidayClose != null) {
-                        html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
-                    }else{
-                        html += '<td style="text-align: center">-</td>';
-                    }
-                    html += '<td>' + items[i].phone + '</td></tr>';
-                    $(".tbody").append(html);
+                    // var html = '<tr><td>' + items[i].city + '</td>';
+                    // html += '<td>' + items[i].hospital_name + '</td>';
+                    // html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
+                    // html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
+                    // if (items[i].holidayOpen != null && items[i].holidayClose != null) {
+                    //     html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
+                    // } else {
+                    //     html += '<td style="text-align: center">-</td>';
+                    // }
+                    // html += '<td>' + items[i].phone + '</td></tr>';
+                    // $(".tbody").append(html);
+                    var newHtml = createHtml(items[i]);
+                    $(".tbody").append(newHtml);
                 }
-                console.log(html);
             }
         })
     });
 
     $(".holidayYN").on("change", function () {
-        // changeFunction();
-        let searchType = $("#searchType").val();
-        let keyword = $("#keyword").val();
-        let count = $("#count").val();
-        let city = $("#city").val();
-        let weekOpen = $(".weekOpen:checked").val();
-        let weekClose = $(".weekClose:checked").val();
-        let satOpen = $(".satOpen:checked").val();
-        let satClose = $(".satClose:checked").val();
-        let holidayYN = $(".holidayYN:checked").val();
-        let holidayOpen = $(".holidayOpen:checked").val();
-        let holidayClose = $(".holidayClose:checked").val();
+        let result = changeOption();
+        // let searchType = $("#searchType").val();
+        // let keyword = $("#keyword").val();
+        // let count = $("#count").val();
+        // let city = $("#city").val();
+        // let weekOpen = $(".weekOpen:checked").val();
+        // let weekClose = $(".weekClose:checked").val();
+        // let satOpen = $(".satOpen:checked").val();
+        // let satClose = $(".satClose:checked").val();
+        // let holidayYN = $(".holidayYN:checked").val();
+        // let holidayOpen = $(".holidayOpen:checked").val();
+        // let holidayClose = $(".holidayClose:checked").val();
         $.ajax({
             url: '/api/hospital/list',
             type: 'post',
             data: {
                 "currentPage": 1,
-                "count": count,
-                "searchType": searchType,
-                "keyword": keyword,
-                "city": city,
-                "weekOpen": weekOpen,
-                "weekClose": weekClose,
-                "satOpen": satOpen,
-                "satClose": satClose,
-                "holidayYN": holidayYN,
-                "holidayOpen": holidayOpen,
-                "holidayClose": holidayClose
+                "count": result.count,
+                "searchType": result.searchType,
+                "keyword": result.keyword,
+                "city": result.city,
+                "weekOpen": result.weekOpen,
+                "weekClose": result.weekClose,
+                "satOpen": result.satOpen,
+                "satClose": result.satClose,
+                "holidayYN": result.holidayYN,
+                "holidayOpen": result.holidayOpen,
+                "holidayClose": result.holidayClose
             },
             success: function (data) {
                 $(".tbody").children().remove();
@@ -501,52 +541,53 @@ ${paging}<br>
                 console.log(data);
                 console.log(items.length);
                 for (let i = 0; i < items.length; i++) {
-                    var html = '<tr><td>' + items[i].city + '</td>';
-                    html += '<td>' + items[i].hospital_name + '</td>';
-                    html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
-                    html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
-                    if (items[i].holidayOpen != null && items[i].holidayClose != null) {
-                        html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
-                    }else{
-                        html += '<td style="text-align: center">-</td>';
-                    }
-                    html += '<td>' + items[i].phone + '</td></tr>';
-                    $(".tbody").append(html);
+                    // var html = '<tr><td>' + items[i].city + '</td>';
+                    // html += '<td>' + items[i].hospital_name + '</td>';
+                    // html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
+                    // html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
+                    // if (items[i].holidayOpen != null && items[i].holidayClose != null) {
+                    //     html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
+                    // } else {
+                    //     html += '<td style="text-align: center">-</td>';
+                    // }
+                    // html += '<td>' + items[i].phone + '</td></tr>';
+                    // $(".tbody").append(html);
+                    var newHtml = createHtml(items[i]);
+                    $(".tbody").append(newHtml);
                 }
-                console.log(html);
             }
         })
     });
 
     $(".holidayOpen").on("change", function () {
-        // changeFunction();
-        let searchType = $("#searchType").val();
-        let keyword = $("#keyword").val();
-        let count = $("#count").val();
-        let city = $("#city").val();
-        let weekOpen = $(".weekOpen:checked").val();
-        let weekClose = $(".weekClose:checked").val();
-        let satOpen = $(".satOpen:checked").val();
-        let satClose = $(".satClose:checked").val();
-        let holidayYN = $(".holidayYN:checked").val();
-        let holidayOpen = $(".holidayOpen:checked").val();
-        let holidayClose = $(".holidayClose:checked").val();
+        let result = changeOption();
+        // let searchType = $("#searchType").val();
+        // let keyword = $("#keyword").val();
+        // let count = $("#count").val();
+        // let city = $("#city").val();
+        // let weekOpen = $(".weekOpen:checked").val();
+        // let weekClose = $(".weekClose:checked").val();
+        // let satOpen = $(".satOpen:checked").val();
+        // let satClose = $(".satClose:checked").val();
+        // let holidayYN = $(".holidayYN:checked").val();
+        // let holidayOpen = $(".holidayOpen:checked").val();
+        // let holidayClose = $(".holidayClose:checked").val();
         $.ajax({
             url: '/api/hospital/list',
             type: 'post',
             data: {
                 "currentPage": 1,
-                "count": count,
-                "searchType": searchType,
-                "keyword": keyword,
-                "city": city,
-                "weekOpen": weekOpen,
-                "weekClose": weekClose,
-                "satOpen": satOpen,
-                "satClose": satClose,
-                "holidayYN": holidayYN,
-                "holidayOpen": holidayOpen,
-                "holidayClose": holidayClose
+                "count": result.count,
+                "searchType": result.searchType,
+                "keyword": result.keyword,
+                "city": result.city,
+                "weekOpen": result.weekOpen,
+                "weekClose": result.weekClose,
+                "satOpen": result.satOpen,
+                "satClose": result.satClose,
+                "holidayYN": result.holidayYN,
+                "holidayOpen": result.holidayOpen,
+                "holidayClose": result.holidayClose
             },
             success: function (data) {
                 $(".tbody").children().remove();
@@ -554,53 +595,53 @@ ${paging}<br>
                 console.log(data);
                 console.log(items.length);
                 for (let i = 0; i < items.length; i++) {
-                    var html = '<tr><td>' + items[i].city + '</td>';
-                    html += '<td>' + items[i].hospital_name + '</td>';
-                    html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
-                    html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
-                    if (items[i].holidayOpen != null && items[i].holidayClose != null) {
-                        html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
-                    }else{
-                        html += '<td style="text-align: center">-</td>';
-                    }
-                    html += '<td>' + items[i].phone + '</td></tr>';
-                    $(".tbody").append(html);
+                    // var html = '<tr><td>' + items[i].city + '</td>';
+                    // html += '<td>' + items[i].hospital_name + '</td>';
+                    // html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
+                    // html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
+                    // if (items[i].holidayOpen != null && items[i].holidayClose != null) {
+                    //     html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
+                    // } else {
+                    //     html += '<td style="text-align: center">-</td>';
+                    // }
+                    // html += '<td>' + items[i].phone + '</td></tr>';
+                    // $(".tbody").append(html);
+                    var newHtml = createHtml(items[i]);
+                    $(".tbody").append(newHtml);
                 }
-                console.log(html);
             }
         })
     });
 
     $(".holidayClose").on("change", function () {
-        // changeFunction();
-        let searchType = $("#searchType").val();
-        let keyword = $("#keyword").val();
-        let count = $("#count").val();
-        let city = $("#city").val();
-        let weekOpen = $(".weekOpen:checked").val();
-        let weekClose = $(".weekClose:checked").val();
-        let satOpen = $(".satOpen:checked").val();
-        let satClose = $(".satClose:checked").val();
-        let holidayYN = $(".holidayYN:checked").val();
-        let holidayOpen = $(".holidayOpen:checked").val();
-        let holidayClose = $(".holidayClose:checked").val();
-        console.log(holidayClose);
+        let result = changeOption();
+        // let searchType = $("#searchType").val();
+        // let keyword = $("#keyword").val();
+        // let count = $("#count").val();
+        // let city = $("#city").val();
+        // let weekOpen = $(".weekOpen:checked").val();
+        // let weekClose = $(".weekClose:checked").val();
+        // let satOpen = $(".satOpen:checked").val();
+        // let satClose = $(".satClose:checked").val();
+        // let holidayYN = $(".holidayYN:checked").val();
+        // let holidayOpen = $(".holidayOpen:checked").val();
+        // let holidayClose = $(".holidayClose:checked").val();
         $.ajax({
             url: '/api/hospital/list',
             type: 'post',
             data: {
                 "currentPage": 1,
-                "count": count,
-                "searchType": searchType,
-                "keyword": keyword,
-                "city": city,
-                "weekOpen": weekOpen,
-                "weekClose": weekClose,
-                "satOpen": satOpen,
-                "satClose": satClose,
-                "holidayYN": holidayYN,
-                "holidayOpen": holidayOpen,
-                "holidayClose": holidayClose
+                "count": result.count,
+                "searchType": result.searchType,
+                "keyword": result.keyword,
+                "city": result.city,
+                "weekOpen": result.weekOpen,
+                "weekClose": result.weekClose,
+                "satOpen": result.satOpen,
+                "satClose": result.satClose,
+                "holidayYN": result.holidayYN,
+                "holidayOpen": result.holidayOpen,
+                "holidayClose": result.holidayClose
             },
             success: function (data) {
                 $(".tbody").children().remove();
@@ -608,19 +649,20 @@ ${paging}<br>
                 console.log(data);
                 console.log(items.length);
                 for (let i = 0; i < items.length; i++) {
-                    var html = '<tr><td>' + items[i].city + '</td>';
-                    html += '<td>' + items[i].hospital_name + '</td>';
-                    html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
-                    html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
-                    if (items[i].holidayOpen != null && items[i].holidayClose != null) {
-                        html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
-                    }else{
-                        html += '<td style="text-align: center">-</td>';
-                    }
-                    html += '<td>' + items[i].phone + '</td></tr>';
-                    $(".tbody").append(html);
+                    // var html = '<tr><td>' + items[i].city + '</td>';
+                    // html += '<td>' + items[i].hospital_name + '</td>';
+                    // html += '<td>' + items[i].weekOpen + '~' + items[i].weekClose + '</td>';
+                    // html += '<td>' + items[i].satOpen + '~' + items[i].satClose + '</td>';
+                    // if (items[i].holidayOpen != null && items[i].holidayClose != null) {
+                    //     html += '<td>' + items[i].holidayOpen + '~' + items[i].holidayClose + '</td>';
+                    // } else {
+                    //     html += '<td style="text-align: center">-</td>';
+                    // }
+                    // html += '<td>' + items[i].phone + '</td></tr>';
+                    // $(".tbody").append(html);
+                    var newHtml = createHtml(items[i]);
+                    $(".tbody").append(newHtml);
                 }
-                console.log(html);
             }
         })
     });

@@ -5,15 +5,11 @@ import com.example.Spring_Project.dto.InfectionByMonthDTO2;
 import com.example.Spring_Project.dto.InfectionDTO;
 import com.example.Spring_Project.service.ApiService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Delete;
-import org.dom4j.rule.Mode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,37 +46,30 @@ public class ApiController {
         return "/api/infectionChartByMonth";
     }
 
-    @RequestMapping("/hospital")
+    @RequestMapping("/hospital") //처음 들어갈때
     public String hospitalInfo(HttpServletRequest request, Model model, @RequestParam Map<String, Object> map) throws Exception {
         System.out.println("map : " + map);
-        Integer count = Integer.parseInt(map.get("count").toString());
         Integer currentPage = Integer.parseInt(map.get("currentPage").toString());
+        Integer count = Integer.parseInt(map.get("count").toString());
         String searchType = map.get("searchType").toString();
         String keyword = map.get("keyword").toString();
-        String c = map.get("city").toString();
-
-        System.out.println("도시 : " + c);
 
         Integer start = currentPage * count - (count - 1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
 
-        List<HospitalDTO> list = apiService.getHospitalInfo(searchType, keyword, start, end, c);
-        List<HospitalDTO> test = apiService.test(searchType, keyword, start, end, c); //처음에 병원 list 가져오기
-        String paging = apiService.getHospitalPageNavi(currentPage, count, searchType, keyword, c);
-
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("/api/hospitalInfo");
-
+//      List<HospitalDTO> list = apiService.getHospitalInfo(searchType, keyword, start, end, c);
+        List<HospitalDTO> test = apiService.test(searchType, keyword, start, end); //처음에 병원 list 가져오기
+        String paging = apiService.getHospitalPageNavi(currentPage, count, searchType, keyword);
 
         model.addAttribute("currentPage", currentPage);
-        model.addAttribute("list", list);
+//      model.addAttribute("list", list);
         model.addAttribute("paging", paging);
         model.addAttribute("count", count); //개수 선택
         model.addAttribute("searchType", searchType);
         model.addAttribute("keyword", keyword);
         model.addAttribute("test", test);
 
-        //옵션
+        //옵션 정보 가져오기
         List<String> city = apiService.getCity(); //지역명
         List<String> weekOpen = apiService.getWeekOpen(); //평일 진료 시작 시간
         List<String> weekClose = apiService.getWeekClose(); //평일 진료 마감 시간
@@ -101,51 +90,45 @@ public class ApiController {
         return "/api/hospitalInfo";
     }
 
-    @RequestMapping("/hospital/list")
     @ResponseBody
+    @RequestMapping("/hospital/list") //옵션 수정할때
     public Map<String, Object> hospitalItems(HttpServletRequest request, Model model, @RequestParam Map<String, Object> map) throws Exception {
         Map<String, Object> reMap = new HashMap<>();
-        List<Map<String, Object>> item_list = new ArrayList<>();
 
-        Map<String, Object> paramMap = new HashMap<>();
         //option 값
         Integer currentPage = Integer.parseInt(map.get("currentPage").toString());
         Integer count = Integer.parseInt(map.get("count").toString());
         String searchType = map.get("searchType").toString();
         String keyword = map.get("keyword").toString();
         String city = map.get("city").toString();
-        String weekOpen=map.get("weekOpen").toString();
-        String weekClose=map.get("weekClose").toString();
-        String satOpen=map.get("satOpen").toString();
-        String satClose=map.get("satClose").toString();
-        String holidayYN=map.get("holidayYN").toString();
-        String holidayOpen=map.get("holidayOpen").toString();
-        String holidayClose=map.get("holidayClose").toString();
-//        Integer weekOpen=Integer.parseInt(map.get("weekOpen").toString().substring(0,2));
-//        Integer weekClose=Integer.parseInt(map.get("weekClose").toString().substring(0,2));
-//        Integer satOpen=Integer.parseInt(map.get("satOpen").toString().substring(0,2));
-//        Integer satClose=Integer.parseInt(map.get("satClose").toString().substring(0,2));
-//        Integer holidayOpen=Integer.parseInt(map.get("holidayOpen").toString().substring(0,2));
-//        Integer holidayClose=Integer.parseInt(map.get("holidayClose").toString().substring(0,2));
+        String weekOpen = map.get("weekOpen").toString();
+        String weekClose = map.get("weekClose").toString();
+        String satOpen = map.get("satOpen").toString();
+        String satClose = map.get("satClose").toString();
+        String holidayYN = map.get("holidayYN").toString();
+        String holidayOpen = map.get("holidayOpen").toString();
+        String holidayClose = map.get("holidayClose").toString();
         Integer start = currentPage * count - (count - 1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
 
-        paramMap.put("currentPage",currentPage);
-        paramMap.put("count",count);
-        paramMap.put("searchType",searchType);
-        paramMap.put("keyword",keyword);
-        paramMap.put("city",city);
-        paramMap.put("weekOpen",weekOpen);
-        paramMap.put("weekClose",weekClose);
-        paramMap.put("satOpen",satOpen);
-        paramMap.put("satClose",satClose);
-        paramMap.put("holidayYN",holidayYN);
-        paramMap.put("holidayOpen",holidayOpen);
-        paramMap.put("holidayClose",holidayClose);
-        paramMap.put("start",start);
-        paramMap.put("end",end);
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("currentPage", currentPage);
+        paramMap.put("count", count);
+        paramMap.put("searchType", searchType);
+        paramMap.put("keyword", keyword);
+        paramMap.put("city", city);
+        paramMap.put("weekOpen", weekOpen);
+        paramMap.put("weekClose", weekClose);
+        paramMap.put("satOpen", satOpen);
+        paramMap.put("satClose", satClose);
+        paramMap.put("holidayYN", holidayYN);
+        paramMap.put("holidayOpen", holidayOpen);
+        paramMap.put("holidayClose", holidayClose);
+        paramMap.put("start", start);
+        paramMap.put("end", end);
 
 //      List<HospitalDTO> list = apiService.getHospitalInfo(searchType, keyword, start, end, city);
+//      String paging = apiService.getHospitalPageNavi(currentPage, count, searchType, keyword);
         List<HospitalDTO> list = apiService.test2(paramMap);
         reMap.put("items", list);
         return reMap;

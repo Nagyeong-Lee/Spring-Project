@@ -38,11 +38,10 @@ public interface ApiMapper {
                                       @Param("city") String city
     );
     List<HospitalDTO> test(@Param("searchType") String searchType,@Param("keyword") String keyword
-                                    ,@Param("start") Integer start, @Param("end") Integer end,
-                                      @Param("city") String city
+                                    ,@Param("start") Integer start, @Param("end") Integer end
     );
     HospitalDTO getInfo(Integer hospital_seq);
-    Integer countPost(@Param("searchType") String searchType, @Param("keyword") String keyword,@Param("city") String city);
+    Integer countPost(@Param("searchType") String searchType, @Param("keyword") String keyword);
     List<String> getCity();
     List<String> getWeekOpen();
     List<String> getWeekClose();
