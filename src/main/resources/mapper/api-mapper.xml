@@ -173,16 +173,18 @@
             </trim>
         </if>
         <if test="searchType eq 'hospital_name'.toString()">
-            and hospital_name like '%'||#{keyword}||'%'
+            <trim prefix="WHERE" prefixOverrides="AND">
+                and hospital_name like '%'||#{keyword}||'%'
+            </trim>
         </if>
         <if test="searchType eq 'phone'.toString()">
-            and phone like '%'||#{keyword}||'%'
+            where phone like '%'||#{keyword}||'%'
         </if>
         <if test="searchType eq 'postcode'.toString()">
-            and postcode like '%'||#{keyword}||'%'
+            where postcode like '%'||#{keyword}||'%'
         </if>
         <if test="searchType eq 'roadAddress'.toString()">
-            and roadAddress like '%'||#{keyword}||'%'
+            where roadAddress like '%'||#{keyword}||'%'
         </if>
         order by 1) a
         )
@@ -301,9 +303,10 @@
         longitude,
         flag
         from hospital
-        <if test="searchType eq 'hospital_name'.toString()">
-            and hospital_name like '%'||#{keyword}||'%'
-        </if>
+        <trim prefix="where" prefixOverrides="and">
+            <if test="searchType eq 'hospital_name'.toString()">
+                and hospital_name like '%'||#{keyword}||'%'
+            </if>
         <if test="searchType eq 'phone'.toString()">
             and phone like '%'||#{keyword}||'%'
         </if>
@@ -313,6 +316,7 @@
         <if test="searchType eq 'roadAddress'.toString()">
             and roadAddress like '%'||#{keyword}||'%'
         </if>
+        </trim>
         order by 1) a
         )
         where rn between ${start} and #{end}
@@ -359,18 +363,40 @@
         flag
         from hospital
         <if test="city eq 'ALL'.toString()">
-            <if test="searchType eq 'hospital_name'.toString()">
-                where hospital_name like '%'||#{keyword}||'%'
-            </if>
-            <if test="searchType eq 'phone'.toString()">
-                where phone like '%'||#{keyword}||'%'
-            </if>
-            <if test="searchType eq 'postcode'.toString()">
-                where postcode like '%'||#{keyword}||'%'
-            </if>
-            <if test="searchType eq 'roadAddress'.toString()">
-                where roadAddress like '%'||#{keyword}||'%'
-            </if>
+            <trim prefix="WHERE" prefixOverrides="AND">
+                <if test="weekOpen != null">
+                    <![CDATA[AND to_date(weekOpen,'hh24:mi')>=to_date(#{weekOpen},'hh24:mi')]]>
+                </if>
+                <if test="weekClose != null">
+                    <![CDATA[AND to_date(weekClose,'hh24:mi')<=to_date(#{weekClose},'hh24:mi')]]>
+                </if>
+                <if test="satOpen != null">
+                    <![CDATA[AND to_date(satOpen,'hh24:mi')>=to_date(#{satOpen},'hh24:mi')]]>
+                </if>
+                <if test="satClose != null">
+                    <![CDATA[AND to_date(satClose,'hh24:mi')<=to_date(#{satClose},'hh24:mi')]]>
+                </if>
+                <if test="holidayYN eq '진료'.toString()">
+                    <if test="holidayOpen != null">
+                        <![CDATA[AND to_date(holidayOpen,'hh24:mi')>=to_date(#{holidayOpen},'hh24:mi')]]>
+                    </if>
+                    <if test="holidayClose != null">
+                        <![CDATA[AND to_date(holidayClose,'hh24:mi')<=to_date(#{holidayClose},'hh24:mi')]]>
+                    </if>
+                </if>
+                <if test="searchType eq 'hospital_name'.toString()">
+                    and hospital_name like '%'||#{keyword}||'%'
+                </if>
+                <if test="searchType eq 'phone'.toString()">
+                    and phone like '%'||#{keyword}||'%'
+                </if>
+                <if test="searchType eq 'postcode'.toString()">
+                    and postcode like '%'||#{keyword}||'%'
+                </if>
+                <if test="searchType eq 'roadAddress'.toString()">
+                    and roadAddress like '%'||#{keyword}||'%'
+                </if>
+            </trim>
         </if>
         <if test="city neq '' and city neq 'ALL'.toString()">
             <trim prefix="WHERE" prefixOverrides="AND">
@@ -409,20 +435,6 @@
                 </if>
             </trim>
         </if>
-        <!--        <if test="city neq '' and city neq 'ALL'.toString()">-->
-        <!--            <if test="searchType eq 'hospital_name'.toString()">-->
-        <!--                and hospital_name like '%'||#{keyword}||'%'-->
-        <!--            </if>-->
-        <!--            <if test="searchType eq 'phone'.toString()">-->
-        <!--                and phone like '%'||#{keyword}||'%'-->
-        <!--            </if>-->
-        <!--            <if test="searchType eq 'postcode'.toString()">-->
-        <!--                and postcode like '%'||#{keyword}||'%'-->
-        <!--            </if>-->
-        <!--            <if test="searchType eq 'roadAddress'.toString()">-->
-        <!--                and roadAddress like '%'||#{keyword}||'%'-->
-        <!--            </if>-->
-        <!--        </if>-->
         order by 1) a
         )
         where rn between ${start} and #{end}

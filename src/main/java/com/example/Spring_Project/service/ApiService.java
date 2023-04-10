@@ -19,6 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -222,7 +223,8 @@ public class ApiService {
         }
 
         StringBuilder sb = new StringBuilder();
-
+        System.out.println("startNavi : " + startNavi);
+        System.out.println("endNavi : " + endNavi);
         if (needPrev) {
             if (searchType == null && keyword == null) {
                 sb.append("<a href='/api/hospital?currentPage=" + (startNavi - 1) + "&count=" + count + "&searchType=&keyword=" + "'><</a> ");
@@ -231,17 +233,17 @@ public class ApiService {
             }
         }
         for (int i = startNavi; i <= endNavi; i++) {
-            if (currentPage == i) {
-                if (searchType == null && keyword == null) {
-                    sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count + "&searchType=" + "&keyword=" + "'><b>" + i + "</b></a> ");
-                } else {
-                    sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><b>" + i + "</b></a> ");
-                }
-            } else {
-                if (searchType == null && keyword == null) {
-                    sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count + "&searchType=" + "&keyword=" + "'>" + i + "</a> ");
-                } else {
-                    sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'>" + i + "</a> ");
+                        if (currentPage == i) {
+                            if (searchType == null && keyword == null) {
+                                sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count + "&searchType=" + "&keyword=" + "'><b>" + i + "</b></a> ");
+                            } else {
+                                sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'><b>" + i + "</b></a> ");
+                            }
+                        } else {
+                            if (searchType == null && keyword == null) {
+                                sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count + "&searchType=" + "&keyword=" + "'>" + i + "</a> ");
+                            } else {
+                                sb.append("<a href='/api/hospital?currentPage=" + i + "&count=" + count + "&searchType=" + searchType + "&keyword=" + keyword + "'>" + i + "</a> ");
                 }
             }
         }
@@ -253,6 +255,52 @@ public class ApiService {
             }
         }
         return sb.toString();
+    }
+
+    //페이징 처리
+    public Map<String,Object> getHospitalPageNavi2(Integer currentPage, Integer count, String searchType, String keyword) throws Exception {
+        Map<String,Object> reMap = new HashMap<>();
+        int postTotalCount = this.countPost(searchType, keyword);
+
+        int recordCountPerPage = count; // 페이지 당 게시글 개수
+        int naviCountPerPage = 10; // 내비 개수
+
+        int pageTotalCount = 0; // 전체 내비 수
+        if (postTotalCount % recordCountPerPage > 0) {
+            pageTotalCount = postTotalCount / recordCountPerPage + 1;
+        } else {
+            pageTotalCount = postTotalCount / recordCountPerPage;
+        }
+
+        if (currentPage < 1) {
+            currentPage = 1;
+        } else if (currentPage > pageTotalCount) {
+            currentPage = pageTotalCount;
+        }
+
+        int startNavi = (currentPage - 1) / naviCountPerPage * naviCountPerPage + 1; // 페이지 시작 내비 값
+        int endNavi = startNavi + naviCountPerPage - 1; // 페이지 마지막 내비 값
+
+        if (endNavi > pageTotalCount) {
+            endNavi = pageTotalCount;
+        }
+        boolean needPrev = true;
+        boolean needNext = true;
+
+        if (startNavi == 1) {
+            needPrev = false;
+        }
+        if (endNavi == pageTotalCount) {
+            needNext = false;
+        }
+
+        System.out.println("startNavi : " + startNavi);
+        System.out.println("endNavi : " + endNavi);
+        reMap.put("startNavi",startNavi);
+        reMap.put("endNavi",endNavi);
+        reMap.put("needPrev",needPrev);
+        reMap.put("needNext",needNext);
+        return reMap;
     }
 
     public List<HospitalDTO> test2(Map<String, Object> paramMap) {
