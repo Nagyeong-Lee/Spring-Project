@@ -97,8 +97,6 @@
                     <td>${i.city}</td>
                     <td>
                         <a href="javascript:void(0);"
-                            <%--                           onclick="detail(${i.hospital_seq});">${i.hospital_name}</a>--%>
-                            <%--                                                       onclick="detail(${i.hospital_seq},${currentPage},${count});">${i.hospital_name}</a>--%>
                            onclick="detail(${i.hospital_seq},${currentPage},${count},'${cityOption}','${weekOpenOption}','${weekCloseOption}','${satOpenOption}','${satCloseOption}','${holidayOpenOption}','${holidayCloseOption}');">${i.hospital_name}</a>
                     </td>
                     <td>${i.weekOpen}~${i.weekClose}&nbsp&nbsp</td>
@@ -189,6 +187,7 @@
     <input type="hidden" name="weekClose" id="weekClose1"/>
     <input type="hidden" name="satOpen" id="satOpen1"/>
     <input type="hidden" name="satClose" id="satClose1"/>
+<%--    <input type="hidden" name="holidayYN" id="holidayYN1"/>--%>
     <input type="hidden" name="holidayOpen" id="holidayOpen1"/>
     <input type="hidden" name="holidayClose" id="holidayClose1"/>
 
@@ -235,17 +234,6 @@
     // }
 
     function detail(hospital_seq, cpage, count, city, weekOpen, weekClose, satOpen, satClose, holidayOpen, holidayClose) {
-        console.log("디테일");
-        console.log(hospital_seq);
-        console.log(cpage);
-        console.log(count);
-        console.log(city);
-        console.log(weekOpen);
-        console.log(weekClose);
-        console.log(satOpen);
-        console.log(satClose);
-        console.log(holidayOpen);
-        console.log(holidayClose);
         $("#hospital_seq1").val(hospital_seq);
         $("#currentPage1").val(cpage);
         $("#count1").val(count);
@@ -256,9 +244,9 @@
         $("#weekClose1").val(weekClose);
         $("#satOpen1").val(satOpen);
         $("#satClose1").val(satClose);
+        // $("#holidayYN1").val(satClose);
         $("#holidayOpen1").val(holidayOpen);
         $("#holidayClose1").val(holidayClose);
-
         $("#frm").submit();
     }
 
@@ -461,7 +449,6 @@
         // var arr = [item.hospital_seq, "\'"+item.city+"\'", "\'"+item.weekOpen + "\'", ];
         // "...onclick=detail(1, '홍길동'.....);
         // var b = "'" + item.city + "'";
-
         var html = '<tr><td>' + '정보가 없습니다.' + '</td>';
         return html;
     }
