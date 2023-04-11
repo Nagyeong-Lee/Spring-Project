@@ -72,6 +72,14 @@
 <input type="hidden" name="count" value="${count}" id="boardCount">
 <input type="hidden" name="searchType" value="${searchType}" id="boardSearchType">
 <input type="hidden" name="keyword" value="${keyword}" id="boardKeyword">
+<input type="hidden" name="city" value="${cityOption}" id="boardCity">
+<input type="hidden" name="weekOpen" value="${weekOpenOption}" id="boardWeekOpen">
+<input type="hidden" name="weekClose" value="${weekCloseOption}" id="boardWeekClose">
+<input type="hidden" name="satOpen" value="${satOpenOption}" id="boardSatOpen">
+<input type="hidden" name="satClose" value="${satCloseOption}" id="boardSatClose">
+<%--<input type="hidden" name="holidayYN" value="${holidayYNOption}" id="boardHolidayYN">--%>
+<input type="hidden" name="holidayOpen" value="${holidayOpenOption}" id="boardHolidayOpen">
+<input type="hidden" name="holidayClose" value="${holidayCloseOption}" id="boardHolidayClose">
 
 <form method="post" action="/api/hospital" id="pagingFrm">
     <input type="hidden" name="currentPage" id="cpage">
@@ -181,13 +189,12 @@
     <input type="hidden" name="count" id="count1"/>
     <input type="hidden" name="searchType" id="searchType1"/>
     <input type="hidden" name="keyword" id="keyword1"/>
-
     <input type="hidden" name="city" id="city1"/>
     <input type="hidden" name="weekOpen" id="weekOpen1"/>
     <input type="hidden" name="weekClose" id="weekClose1"/>
     <input type="hidden" name="satOpen" id="satOpen1"/>
     <input type="hidden" name="satClose" id="satClose1"/>
-<%--    <input type="hidden" name="holidayYN" id="holidayYN1"/>--%>
+<%--<input type="hidden" name="holidayYN" id="holidayYN1"/>--%>
     <input type="hidden" name="holidayOpen" id="holidayOpen1"/>
     <input type="hidden" name="holidayClose" id="holidayClose1"/>
 
@@ -197,12 +204,30 @@
     <input type="hidden" name="count" id="count2"/>
     <input type="hidden" name="searchType" id="searchType2"/>
     <input type="hidden" name="keyword" id="keyword2"/>
+
+    <input type="hidden" name="city" id="city2"/>
+    <input type="hidden" name="weekOpen" id="weekOpen2"/>
+    <input type="hidden" name="weekClose" id="weekClose2"/>
+    <input type="hidden" name="satOpen" id="satOpen2"/>
+    <input type="hidden" name="satClose" id="satClose2"/>
+    <%--<input type="hidden" name="holidayYN" id="holidayYN2"/>--%>
+    <input type="hidden" name="holidayOpen" id="holidayOpen2"/>
+    <input type="hidden" name="holidayClose" id="holidayClose2"/>
 </form>
+
 <form id="frm3" name="frm3" method="post" action="/api/hospital">
     <input type="hidden" name="currentPage" id="currentPage3"/>
     <input type="hidden" name="count" id="count3"/>
     <input type="hidden" name="searchType" id="searchType3"/>
     <input type="hidden" name="keyword" id="keyword3"/>
+    <input type="hidden" name="city" id="city3"/>
+    <input type="hidden" name="weekOpen" id="weekOpen3"/>
+    <input type="hidden" name="weekClose" id="weekClose3"/>
+    <input type="hidden" name="satOpen" id="satOpen3"/>
+    <input type="hidden" name="satClose" id="satClose3"/>
+    <%--<input type="hidden" name="holidayYN" id="holidayYN3"/>--%>
+    <input type="hidden" name="holidayOpen" id="holidayOpen3"/>
+    <input type="hidden" name="holidayClose" id="holidayClose3"/>
 </form>
 <script>
 
@@ -244,7 +269,7 @@
         $("#weekClose1").val(weekClose);
         $("#satOpen1").val(satOpen);
         $("#satClose1").val(satClose);
-        // $("#holidayYN1").val(satClose);
+        // $("#holidayYN1").val($("#holidayYNOption").val());
         $("#holidayOpen1").val(holidayOpen);
         $("#holidayClose1").val(holidayClose);
         $("#frm").submit();
@@ -349,9 +374,19 @@
     function countChange(count) {
         $("#currentPage2").val(1);
         $("#count2").val(count);
-        $("#searchType2").val("");
-        $("#keyword2").val("");
+        $("#searchType2").val($("#boardSearchType").val());
+        $("#keyword2").val($("#boardKeyword").val());
+
+        $("#city2").val($("#boardCity").val());
+        $("#weekOpen2").val($("#boardWeekOpen").val());
+        $("#weekClose2").val($("#boardWeekClose").val());
+        $("#satOpen2").val($("#boardSatOpen").val());
+        $("#satClose2").val($("#boardSatClose").val());
+        // $("#holidayYN2").val($("#boardHolidayYN").val());
+        $("#holidayOpen2").val($("#boardHolidayOpen").val());
+        $("#holidayClose2").val($("#boardHolidayClose").val());
         $("#frm2").submit();
+
     }
 
     $("#searchBtn").on("click", function () {
@@ -359,10 +394,25 @@
         let keyword = $("#keyword").val();
         let count = $("#count").val();
 
+        // $("#currentPage3").val(1);
+        // $("#count3").val(count);
+        // $("#searchType3").val(searchType);
+        // $("#keyword3").val(keyword);
+        // $("#frm3").submit();
+
         $("#currentPage3").val(1);
         $("#count3").val(count);
-        $("#searchType3").val(searchType);
-        $("#keyword3").val(keyword);
+        $("#searchType3").val($("#boardSearchType").val());
+        $("#keyword3").val($("#boardKeyword").val());
+
+        $("#city3").val($("#boardCity").val());
+        $("#weekOpen3").val($("#boardWeekOpen").val());
+        $("#weekClose3").val($("#boardWeekClose").val());
+        $("#satOpen3").val($("#boardSatOpen").val());
+        $("#satClose3").val($("#boardSatClose").val());
+        // $("#holidayYN3").val($("#boardHolidayYN").val());
+        $("#holidayOpen3").val($("#boardHolidayOpen").val());
+        $("#holidayClose3").val($("#boardHolidayClose").val());
         $("#frm3").submit();
     });
 
@@ -424,7 +474,6 @@
     //tbody생성
     function createHtml(item, cpage, cnt, cityOption, weekOpenOption, weekCloseOption,
                         satOpenOption, satCloseOption, holidayOpenOption, holidayCloseOption) {
-        //     "1, '홍길동'"
         // var arr = [item.hospital_seq, "\'"+item.city+"\'", "\'"+item.weekOpen + "\'", ];
         // "...onclick=detail(1, '홍길동'.....);
         // var b = "'" + item.city + "'";
