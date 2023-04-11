@@ -4,19 +4,32 @@ import com.example.Spring_Project.dto.HospitalDTO;
 import com.example.Spring_Project.dto.InfectionByMonthDTO2;
 import com.example.Spring_Project.dto.InfectionDTO;
 import com.example.Spring_Project.service.ApiService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.xmlbeans.soap.SOAPArrayType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
 
 @Controller
 @Component
@@ -51,8 +64,7 @@ public class ApiController {
     @RequestMapping("/hospital") //처음 들어갈때
     public String hospitalInfo(HttpServletRequest request, Model model, @RequestParam Map<String, Object> map) throws Exception {
 
-        System.out.println("MAP : "+map);
-        System.out.println("currentPage : "+Integer.parseInt(map.get("currentPage").toString()));
+        System.out.println("/hospital Map : " + map);
         Integer currentPage = Integer.parseInt(map.get("currentPage").toString());
         Integer count = Integer.parseInt(map.get("count").toString());
         String searchType = map.get("searchType").toString();
@@ -60,22 +72,6 @@ public class ApiController {
 
         Integer start = currentPage * count - (count - 1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
-
-        List<HospitalDTO> test = apiService.test(searchType, keyword, start, end); //처음에 병원 list 가져오기
-//      String paging = apiService.getHospitalPageNavi(currentPage, count, searchType, keyword);
-        Map<String, Object> paging = apiService.getHospitalPageNavi2(currentPage, count, searchType, keyword);
-        System.out.println("paging : " + paging);
-        model.addAttribute("currentPage", currentPage);
-//      model.addAttribute("list", list);
-        model.addAttribute("paging", paging);
-        model.addAttribute("count", count); //개수 선택
-        model.addAttribute("searchType", searchType);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("test", test);
-        model.addAttribute("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
-        model.addAttribute("endNavi", Integer.parseInt(paging.get("endNavi").toString()));
-        model.addAttribute("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));
-        model.addAttribute("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
 
         String cityOption = "";
         String weekOpenOption = "";
@@ -85,53 +81,56 @@ public class ApiController {
         String holidayYNOption = "";
         String holidayOpenOption = "";
         String holidayCloseOption = "";
+        System.out.println("weekOpenOption4 : " + weekOpenOption);
         //옵션 정보 가져오기
         if (map.get("city") == null) {
             cityOption = "ALL";
-        }else{
+        } else {
             cityOption = map.get("city").toString();
         }
-
-        if (map.get("weekOpenOption") == null) {
+//        System.out.println("map.get(\"weekOpenOption\") == null : " + map.get("weekOpenOption") == null);
+//        System.out.println("map.get(\"weekOpenOption\") : " + map.get("weekOpenOption"));
+        if (map.get("weekOpen") == null) {
             weekOpenOption = "09:00";
-        }else{
-            weekOpenOption=map.get("weekOpenOption").toString();
+        } else {
+            weekOpenOption = map.get("weekOpen").toString();
         }
+        System.out.println("weekOpenOption3 : " + weekOpenOption);
 
-        if (map.get("weekCloseOption") == null) {
+        if (map.get("weekClose") == null) {
             weekCloseOption = "22:00";
-        }else{
-            weekCloseOption=map.get("weekCloseOption").toString();
+        } else {
+            weekCloseOption = map.get("weekClose").toString();
         }
 
-        if (map.get("satOpenOption") == null) {
+        if (map.get("satOpen") == null) {
             satOpenOption = "09:00";
-        }else{
-            satOpenOption=map.get("satOpenOption").toString();
+        } else {
+            satOpenOption = map.get("satOpen").toString();
         }
 
-        if (map.get("satCloseOption") == null) {
+        if (map.get("satClose") == null) {
             satCloseOption = "22:00";
-        }else{
-            satCloseOption=map.get("satCloseOption").toString();
+        } else {
+            satCloseOption = map.get("satClose").toString();
         }
 
-        if (map.get("holidayYNOption") == null) {
+        if (map.get("holidayYN") == null) {
             holidayYNOption = "미진료";
-        }else{
+        } else {
             holidayYNOption = "미진료";
         }
 
-        if (map.get("holidayOpenNOption") == null) {
+        if (map.get("holidayOpen") == null) {
             holidayOpenOption = "09:00";
-        }else{
-            holidayOpenOption=map.get("holidayOpenNOption").toString();
+        } else {
+            holidayOpenOption = map.get("holidayOpen").toString();
         }
 
-        if (map.get("holidayCloseOption") == null) {
+        if (map.get("holidayClose") == null) {
             holidayCloseOption = "19:00";
-        }else{
-            holidayCloseOption=map.get("holidayCloseOption").toString();
+        } else {
+            holidayCloseOption = map.get("holidayClose").toString();
         }
 
         List<String> city = apiService.getCity(); //지역명
@@ -142,14 +141,6 @@ public class ApiController {
         List<String> holidayYN = apiService.getHolidayYN(); //일요일,공휴일 진료 여부
         List<String> holidayOpen = apiService.getHolidayOpen(); //일요일,공휴일 진료 시작 시간
         List<String> holidayClose = apiService.getHolidayClose(); //일요일,공휴일 진료 마감 시간
-
-        System.out.println("city : " + city);
-        System.out.println("cityOption : " + cityOption);
-        System.out.println("weekOpen : " + weekOpen);
-        System.out.println("weekClose : " + weekClose);
-        System.out.println("satOpen : " + satOpen);
-        System.out.println("satClose : " + satClose);
-        System.out.println("holidayYN : " + holidayYN);
 
         model.addAttribute("city", city);
         model.addAttribute("weekOpen", weekOpen);
@@ -162,6 +153,7 @@ public class ApiController {
 
         model.addAttribute("cityOption", cityOption);
         model.addAttribute("weekOpenOption", weekOpenOption);
+        System.out.println("weekOpenOption2 : " + weekOpenOption);
         model.addAttribute("weekCloseOption", weekCloseOption);
         model.addAttribute("satOpenOption", satOpenOption);
         model.addAttribute("satCloseOption", satCloseOption);
@@ -169,6 +161,53 @@ public class ApiController {
         model.addAttribute("holidayOpenOption", holidayOpenOption);
         model.addAttribute("holidayCloseOption", holidayCloseOption);
 
+        Map<String, Object> paramMap = new HashMap<>();
+        System.out.println("weekOpenOption1 : " + weekOpenOption);
+        paramMap.put("currentPage", currentPage);
+        paramMap.put("count", count);
+        paramMap.put("searchType", searchType);
+        paramMap.put("keyword", keyword);
+        paramMap.put("city", cityOption);
+        paramMap.put("weekOpen", weekOpenOption);
+        paramMap.put("weekClose", weekCloseOption);
+        paramMap.put("satOpen", satOpenOption);
+        paramMap.put("satClose", satCloseOption);
+        paramMap.put("holidayYN", holidayYNOption);
+        paramMap.put("holidayOpen", holidayOpenOption);
+        paramMap.put("holidayClose", holidayCloseOption);
+        paramMap.put("start", start);
+        paramMap.put("end", end);
+
+        System.out.println("cityOption : " + cityOption);
+        System.out.println("weekOpenOption : " + weekOpenOption);
+        System.out.println("weekCloseOption : " + weekCloseOption);
+        System.out.println("satOpenOption : " + satOpenOption);
+        System.out.println("satCloseOption : " + satCloseOption);
+        System.out.println("holidayYNOption : " + holidayYNOption);
+        System.out.println("holidayOpenOption : " + holidayOpenOption);
+        System.out.println("holidayCloseOption : " + holidayCloseOption);
+
+        Map<String, Object> reMap = new HashMap<>();
+        System.out.println("paraMap : " + paramMap);
+        List<HospitalDTO> list = apiService.test(paramMap); //처음에 병원 list 가져오기
+//        Map<String, Object> paging = apiService.getHospitalPageNavi2(currentPage, count, searchType, keyword);
+        Map<String, Object> paging = apiService.getHospitalPageNavi2(currentPage, count, searchType, keyword,cityOption,weekOpenOption,
+                weekCloseOption,satOpenOption,satCloseOption,holidayYNOption,holidayOpenOption,holidayCloseOption);
+        reMap.put("items", list);
+        reMap.put("paging", paging);
+
+//      String paging = apiService.getHospitalPageNavi(currentPage, count, searchType, keyword);
+        model.addAttribute("currentPage", currentPage);
+//      model.addAttribute("list", list);
+        model.addAttribute("paging", paging);
+        model.addAttribute("count", count); //개수 선택
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("test", list);
+        model.addAttribute("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
+        model.addAttribute("endNavi", Integer.parseInt(paging.get("endNavi").toString()));
+        model.addAttribute("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));
+        model.addAttribute("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
         return "/api/hospitalInfo";
     }
 
@@ -176,6 +215,7 @@ public class ApiController {
     @RequestMapping("/hospital/list") //옵션 수정할때
     public Map<String, Object> hospitalItems(HttpServletRequest request, Model model, @RequestParam Map<String, Object> map) throws Exception {
 
+        System.out.println("/hospital/list map : " + map);
         Map<String, Object> reMap = new HashMap<>();
 
         //option 값
@@ -244,13 +284,29 @@ public class ApiController {
         System.out.println(holidayYN);
         System.out.println(holidayOpen);
         System.out.println(holidayClose);
-        System.out.println("currentPage : "+currentPage);
-        System.out.println("count : "+count);
+        System.out.println("currentPage : " + currentPage);
+        System.out.println("count : " + count);
 //      List<HospitalDTO> list = apiService.getHospitalInfo(searchType, keyword, start, end, city);
 //      String paging = apiService.getHospitalPageNavi(currentPage, count, searchType, keyword);
         List<HospitalDTO> list = apiService.test2(paramMap);
-        Map<String, Object> paging = apiService.getHospitalPageNavi2(currentPage, count, searchType, keyword);
+//        Map<String, Object> paging = apiService.getHospitalPageNavi2(currentPage, count, searchType, keyword);
+        Map<String, Object> paging = apiService.getHospitalPageNavi2(currentPage, count, searchType, keyword,city,weekOpen,
+                weekClose,satOpen,satClose,holidayYN,holidayOpen,holidayClose);
+        System.out.println("변경 후 전체 글 개수");
+        System.out.println(paging.get("pageTotalCount"));
+
         reMap.put("items", list);
+
+        reMap.put("cityOption", city);
+        reMap.put("weekOpenOption", weekOpen);
+        reMap.put("weekCloseOption", weekClose);
+        reMap.put("satOpenOption", satOpen);
+        reMap.put("satCloseOption", satClose);
+        reMap.put("holidayYNOption", holidayYN);
+        reMap.put("holidayOpenOption", holidayOpen);
+        reMap.put("holidayCloseOption", holidayClose);
+
+
         reMap.put("paging", paging);
         reMap.put("currentPage", currentPage);
         reMap.put("count", count);
@@ -266,7 +322,13 @@ public class ApiController {
         Integer count = Integer.parseInt(map.get("count").toString());
         String searchType = map.get("searchType").toString();
         String keyword = map.get("keyword").toString();
-//        String city=map.get("city").toString();
+        String city = map.get("city").toString();
+        String weekOpen = map.get("weekOpen").toString();
+        String weekClose = map.get("weekClose").toString();
+        String satOpen = map.get("satOpen").toString();
+        String satClose = map.get("satClose").toString();
+        String holidayOpen = map.get("holidayOpen").toString();
+        String holidayClose = map.get("holidayClose").toString();
 
         HospitalDTO hospitalDTO = apiService.getInfo(hospital_seq); //병원 한 개 정보
         model.addAttribute("hospitalDTO", hospitalDTO);
@@ -274,7 +336,59 @@ public class ApiController {
         model.addAttribute("count", count);
         model.addAttribute("searchType", searchType);
         model.addAttribute("keyword", keyword);
-//        model.addAttribute("city", city);
+        model.addAttribute("city", city);
+        model.addAttribute("weekOpen", weekOpen);
+        model.addAttribute("weekClose", weekClose);
+        model.addAttribute("satOpen", satOpen);
+        model.addAttribute("satClose", satClose);
+        model.addAttribute("holidayOpen", holidayOpen);
+        model.addAttribute("holidayClose", holidayClose);
         return "/api/detail";
+    }
+
+    @GetMapping("/search")
+    public String list(Model model) throws Exception {
+
+//        String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
+
+        URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
+                .path("v1/search/news.json")
+                .queryParam("query", "코로나")
+                .queryParam("display", 5)
+                .queryParam("start", 1)
+                .queryParam("sort", "sim")
+                .encode()
+                .build()
+                .toUri();
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        RequestEntity<Void> req = RequestEntity
+                .get(uri)
+                .header("X-Naver-Client-Id", "w59f0ilmFqCGefTg1E7_")
+                .header("X-Naver-Client-Secret", "tHQhEtLMVk")
+                .build();
+
+        ResponseEntity<String> result = restTemplate.exchange(req, String.class);
+
+        List<Map<String, Object>> list = new ArrayList<>();
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = (JsonObject) jsonParser.parse(result.getBody());
+        JsonObject jsonObject1 = new JsonObject();
+        JsonArray jsonArray = (JsonArray) jsonObject.get("items");
+
+        System.out.println("뉴스 : " + jsonArray);
+
+        for (Integer i = 0; i < jsonArray.size(); i++) {
+            Map<String, Object> map = new HashMap<>();
+            JsonObject jsonObject2 = (JsonObject) jsonArray.get(i);
+            map.put("title", jsonObject2.get("title"));
+            map.put("link", jsonObject2.get("link"));
+            map.put("description", jsonObject2.get("description"));
+            map.put("pubDate", jsonObject2.get("pubDate"));
+            list.add(map);
+        }
+        model.addAttribute("list", list);
+        return "/api/search";
     }
 }

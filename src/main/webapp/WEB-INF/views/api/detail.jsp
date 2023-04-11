@@ -33,8 +33,8 @@
 <div id="map" style="width:50%;height:350px;"></div>
 
 <a href="javascript:void(0);"
-   onclick="toList(${currentPage},${count},'${searchType}','${keyword}','${hospitalDTO.city}','${hospitalDTO.weekOpen}','${hospitalDTO.weekClose}'
-           ,'${hospitalDTO.satOpen}','${hospitalDTO.satClose}','${hospitalDTO.holidayOpen}','${hospitalDTO.holidayClose}')">
+   onclick="toList(${currentPage},${count},'${searchType}','${keyword}','${city}','${weekOpen}','${weekClose}'
+           ,'${satOpen}','${satClose}','${holidayOpen}','${holidayClose}')">
     <button type="button" id="toList">목록으로</button>
 </a>
 
@@ -55,6 +55,19 @@
 </form>
 <script>
     function toList(currentPage, count, searchType, keyword, city, weekOpen, weekClose, satOpen, satClose, holidayOpen, holidayClose) {
+        console.log("목록으로 눌렀을때");
+        console.log(currentPage);
+        console.log(count);
+        console.log(searchType);
+        console.log(keyword);
+        console.log(city);
+        console.log(weekOpen);
+        console.log(weekClose);
+        console.log(satOpen);
+        console.log(satClose);
+        console.log(holidayOpen);
+        console.log(holidayClose);
+
         $("#currentPage").val(currentPage);
         $("#count").val(count);
         $("#searchType").val(searchType);

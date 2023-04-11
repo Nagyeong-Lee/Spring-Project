@@ -25,11 +25,14 @@
     <a href="javascript:api${status.count}()"><button type="button" id="apiBtn${status.count}"><input type="hidden" value="${i.path}" id="api${status.count}">${i.name}</button></a>
 </c:forEach>
 
+<a href=${list.get(7).path}><button type="submit">${list.get(7).name}</button></a>
+
+
 <script>
     let id = $("#sessionID").val();
     //커뮤니티로 이동
     $("#btn1").on("click", function () {
-        location.href = $("#1").val();
+        location.href = $("#1").val();``
     });
 
     //계정 탈퇴

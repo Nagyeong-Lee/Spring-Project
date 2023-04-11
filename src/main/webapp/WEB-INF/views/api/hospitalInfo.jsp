@@ -17,7 +17,7 @@
 </head>
 <body>
 <select name="city" id="city">
-    <option value="ALL" <c:out value="${cityOption eq 'ALL' ? 'selected' :''}"/>>전체지역</option>
+    <option value="ALL" <c:out value="${cityOption eq 'ALL'  ? 'selected' :''}"/>>전체지역</option>
     <c:forEach var="i" items="${city}">
         <option value="${i}" <c:out value="${cityOption eq i ? 'selected' :''}"/> >${i}</option>
     </c:forEach>
@@ -97,9 +97,9 @@
                     <td>${i.city}</td>
                     <td>
                         <a href="javascript:void(0);"
-                           +             <%--onclick="detail(${i.hospital_seq}, ${currentPage}, ${count}, '${searchType}', '${keyword}');">${i.hospital_name}</a>--%>
                             <%--                           onclick="detail(${i.hospital_seq});">${i.hospital_name}</a>--%>
-                           onclick="detail(${i.hospital_seq},${currentPage},${count});">${i.hospital_name}</a>
+                            <%--                                                       onclick="detail(${i.hospital_seq},${currentPage},${count});">${i.hospital_name}</a>--%>
+                           onclick="detail(${i.hospital_seq},${currentPage},${count},'${cityOption}','${weekOpenOption}','${weekCloseOption}','${satOpenOption}','${satCloseOption}','${holidayOpenOption}','${holidayCloseOption}');">${i.hospital_name}</a>
                     </td>
                     <td>${i.weekOpen}~${i.weekClose}&nbsp&nbsp</td>
                     <td>${i.satOpen}~${i.satClose}</td>
@@ -183,6 +183,15 @@
     <input type="hidden" name="count" id="count1"/>
     <input type="hidden" name="searchType" id="searchType1"/>
     <input type="hidden" name="keyword" id="keyword1"/>
+
+    <input type="hidden" name="city" id="city1"/>
+    <input type="hidden" name="weekOpen" id="weekOpen1"/>
+    <input type="hidden" name="weekClose" id="weekClose1"/>
+    <input type="hidden" name="satOpen" id="satOpen1"/>
+    <input type="hidden" name="satClose" id="satClose1"/>
+    <input type="hidden" name="holidayOpen" id="holidayOpen1"/>
+    <input type="hidden" name="holidayClose" id="holidayClose1"/>
+
 </form>
 <form id="frm2" name="frm2" method="post" action="/api/hospital">
     <input type="hidden" name="currentPage" id="currentPage2"/>
@@ -207,12 +216,49 @@
     //     $("#frm").submit();
     // }
 
-    function detail(hospital_seq, cpage, count) {
+    // function detail(hospital_seq, cpage, count) {
+    //     $("#hospital_seq1").val(hospital_seq);
+    //     $("#currentPage1").val(cpage);
+    //     $("#count1").val(count);
+    //     $("#searchType1").val($("#boardSearchType").val());
+    //     $("#keyword1").val($("#boardKeyword").val());
+    //
+    //     $("#city1").val($("#boardKeyword").val());
+    //     $("#weekOpen1").val($("#boardKeyword").val());
+    //     $("#weekClose1").val($("#boardKeyword").val());
+    //     $("#satOpen1").val($("#boardKeyword").val());
+    //     $("#satClose1").val($("#boardKeyword").val());
+    //     $("#holidayOpen1").val($("#boardKeyword").val());
+    //     $("#holidayClose1").val($("#boardKeyword").val());
+    //
+    //     $("#frm").submit();
+    // }
+
+    function detail(hospital_seq, cpage, count, city, weekOpen, weekClose, satOpen, satClose, holidayOpen, holidayClose) {
+        console.log("디테일");
+        console.log(hospital_seq);
+        console.log(cpage);
+        console.log(count);
+        console.log(city);
+        console.log(weekOpen);
+        console.log(weekClose);
+        console.log(satOpen);
+        console.log(satClose);
+        console.log(holidayOpen);
+        console.log(holidayClose);
         $("#hospital_seq1").val(hospital_seq);
         $("#currentPage1").val(cpage);
         $("#count1").val(count);
         $("#searchType1").val($("#boardSearchType").val());
         $("#keyword1").val($("#boardKeyword").val());
+        $("#city1").val(city);
+        $("#weekOpen1").val(weekOpen);
+        $("#weekClose1").val(weekClose);
+        $("#satOpen1").val(satOpen);
+        $("#satClose1").val(satClose);
+        $("#holidayOpen1").val(holidayOpen);
+        $("#holidayClose1").val(holidayClose);
+
         $("#frm").submit();
     }
 
@@ -254,7 +300,9 @@
                 console.log('data.cnt : ' + data.count);
                 for (let i = 0; i < items.length; i++) {
                     // var newHtml = createHtml(items[i]);
-                    var newHtml = createHtml(items[i], cpage, cnt);
+                    // var newHtml = createHtml(items[i], cpage, cnt);
+                    var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                        data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
                     $(".tbody").append(newHtml);
                 }
                 if (page.needPrev == true) {
@@ -365,9 +413,37 @@
     //}
 
     //tbody생성
-    function createHtml(item, cpage, cnt) {
+    // function createHtml(item, cpage, cnt) {
+    //     //     "1, '홍길동'"
+    //     // var arr = [item.hospital_seq, "\'"+item.city+"\'", "\'"+item.weekOpen + "\'", ];
+    //     // "...onclick=detail(1, '홍길동'.....);
+    //     // var b = "'" + item.city + "'";
+    //
+    //     var html = '<tr><td>' + item.city + '</td>';
+    //     html += '<td><a href="javascript:void(0);" onclick="detail(' + item.hospital_seq + ',' + cpage + ',' + cnt + ',\'' + item.city+ '\'' + ',\''+item.weekOpen + '\''
+    //         + ',\'' + item.weekClose + '\''+',\'' + item.satOpen + '\''+',\'' + item.satClose + '\''+',\'' + item.holidayOpen + '\''+ ',\'' + item.holidayClose + '\''+');">' + item.hospital_name + '</a></td>';
+    //     html += '<td>' + item.weekOpen + '~' + item.weekClose + '</td>';
+    //     html += '<td>' + item.satOpen + '~' + item.satClose + '</td>';
+    //     if (item.holidayOpen != null && item.holidayClose != null) {
+    //         html += '<td>' + item.holidayOpen + '~' + item.holidayClose + '</td>';
+    //     } else {
+    //         html += '<td style="text-align: center">-</td>';
+    //     }
+    //     html += '<td>' + item.phone + '</td></tr>';
+    //     return html;
+    // }
+
+    //tbody생성
+    function createHtml(item, cpage, cnt, cityOption, weekOpenOption, weekCloseOption,
+                        satOpenOption, satCloseOption, holidayOpenOption, holidayCloseOption) {
+        //     "1, '홍길동'"
+        // var arr = [item.hospital_seq, "\'"+item.city+"\'", "\'"+item.weekOpen + "\'", ];
+        // "...onclick=detail(1, '홍길동'.....);
+        // var b = "'" + item.city + "'";
+
         var html = '<tr><td>' + item.city + '</td>';
-        html += '<td><a href="javascript:void(0);" onclick="detail(' + item.hospital_seq + ',' + cpage + ',' + cnt + ');">' + item.hospital_name + '</a></td>';
+        html += '<td><a href="javascript:void(0);" onclick="detail(' + item.hospital_seq + ',' + cpage + ',' + cnt + ',\'' + cityOption + '\'' + ',\'' + weekOpenOption + '\''
+            + ',\'' + weekCloseOption + '\'' + ',\'' + satOpenOption + '\'' + ',\'' + satCloseOption + '\'' + ',\'' + holidayOpenOption + '\'' + ',\'' + holidayCloseOption + '\'' + ');">' + item.hospital_name + '</a></td>';
         html += '<td>' + item.weekOpen + '~' + item.weekClose + '</td>';
         html += '<td>' + item.satOpen + '~' + item.satClose + '</td>';
         if (item.holidayOpen != null && item.holidayClose != null) {
@@ -379,14 +455,24 @@
         return html;
     }
 
+    //데이터 없을때
+    function noDataHtml() {
+        //     "1, '홍길동'"
+        // var arr = [item.hospital_seq, "\'"+item.city+"\'", "\'"+item.weekOpen + "\'", ];
+        // "...onclick=detail(1, '홍길동'.....);
+        // var b = "'" + item.city + "'";
+
+        var html = '<tr><td>' + '정보가 없습니다.' + '</td>';
+        return html;
+    }
+
     //페이징 새로
     function createPaging1(page) {
         var pagingHtml = '';
         if (page.searchType == null && page.keyword == null) {
-            // <button type="button" onclick="openModal(\'' + v.cctvNm + '\')">
-            pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + (page.startNavi - 1) + ',' + $('#count').val() + ',\'\',\'\');" style="font-weight: bold">' + "<" + '</a>';
+            pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + (page.startNavi - 1) + ',' + $('#count').val() + ',\'\',\'\');">' + "<" + '</a>';
         } else {
-            pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + (page.startNavi - 1) + ',' + $('#count').val() + ',' + page.searchType + ',' + page.keyword + ');" style="font-weight: bold">' + "<" + '</a>';
+            pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + (page.startNavi - 1) + ',' + $('#count').val() + ',' + page.searchType + ',' + page.keyword + ');">' + "<" + '</a>';
         }
         return pagingHtml;
     }
@@ -394,9 +480,9 @@
     function createPaging2(page) {
         var pagingHtml = '';
         if (page.searchType == null && page.keyword == null) {
-            pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + (page.startNavi - 1) + ',' + $('#count').val() + ',\'\',\'\');" style="font-weight: bold">' + ">" + '</a>';
+            pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + (page.endNavi + 1) + ',' + $('#count').val() + ',\'\',\'\');">' + ">" + '</a>';
         } else {
-            pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + (page.startNavi - 1) + ',' + $('#count').val() + ',' + page.searchType + ',' + page.keyword + ');" style="font-weight: bold">' + ">" + '</a>';
+            pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + (page.endNavi + 1) + ',' + $('#count').val() + ',' + page.searchType + ',' + page.keyword + ');">' + ">" + '</a>';
         }
         return pagingHtml;
     }
@@ -406,7 +492,7 @@
         if (page.searchType == null && page.keyword == null) {
             pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + k + ',' + $('#count').val() + ',\'\',\'\')" style="font-weight: bold"> ' + k + ' </a>';
         } else {
-            pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + k + ',' + page.count + ',' + $('#count').val() + ',' + page.keyword + ');" style="font-weight: bold"> ' + k + ' </a>';
+            pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + k + ',' + page.count + ',' + $('#count').val() + ',' + page.keyword + ');"> ' + k + ' </a>';
         }
         return pagingHtml;
     }
@@ -414,7 +500,7 @@
     function createPaging4(k, page) {
         var pagingHtml = '';
         if (page.searchType == null && page.keyword == null) {
-            pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + k + ',' + $('#count').val() + ',\'\',\'\')" style="font-weight: bold"> ' + k + ' </a>';
+            pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + k + ',' + $('#count').val() + ',\'\',\'\')"> ' + k + ' </a>';
         } else {
             pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + k + ',' + $('#count').val() + ',' + page.searchType + ',' + page.keyword + ');" style="font-weight: bold"> ' + k + ' </a>';
         }
@@ -441,43 +527,51 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
-                console.log("cpage : " + data.currentPage);
-                console.log("count : " + data.count);
+                console.log("list길이 : " + data.items.length);
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
-                console.log('data.cpage : ' + data.currentPage);
-                console.log('data.cnt : ' + data.count);
-                for (let i = 0; i < items.length; i++) {
-                    // var newHtml = createHtml(items[i]);
-                    var newHtml = createHtml(items[i], cpage, cnt);
-                    $(".tbody").append(newHtml);
-                }
-                if (page.needPrev == true) {
-                    var pagingHtml = createPaging1(page);
-                    $(".pagingDiv").append(pagingHtml);
-                }
-                for (let k = page.startNavi; k <= page.endNavi; k++) {
-                    if (data.currentPage == k) {
-                        var pagingHtml = createPaging3(k, page);
-                        $(".pagingDiv").append(pagingHtml);
-                    } else {
-                        var pagingHtml = createPaging4(k, page);
+                // console.log('data.cpage : ' + data.currentPage);
+                // console.log('data.cnt : ' + data.count);
+                if (data.items.length == 0) {
+                    var html = noDataHtml();
+                    $(".tbody").append(html);
+                } else {
+                    for (let i = 0; i < items.length; i++) {
+                        // var newHtml = createHtml(items[i]);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                            data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+                        $(".tbody").append(newHtml);
+                    }
+                    if (page.needPrev == true) {
+                        var pagingHtml = createPaging1(page);
                         $(".pagingDiv").append(pagingHtml);
                     }
-                }
-                if (page.needNext == true) {
-                    var pagingHtml = createPaging2(page);
-                    $(".pagingDiv").append(pagingHtml);
+                    for (let k = page.startNavi; k <= page.endNavi; k++) {
+                        if (data.currentPage == k) {
+                            var pagingHtml = createPaging3(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        } else {
+                            var pagingHtml = createPaging4(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        }
+                    }
+                    if (page.needNext == true) {
+                        var pagingHtml = createPaging2(page);
+                        $(".pagingDiv").append(pagingHtml);
+                    }
                 }
             }
         })
     });
 
     $(".weekOpen").on("change", function () {
+        console.log("시작시간 변경할때");
         let result = changeOption();
         $.ajax({
             url: '/api/hospital/list',
@@ -497,31 +591,44 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
-                console.log(data);
+                console.log("list길이 : " + data.items.length);
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
                 let page = data.paging;
-                for (let i = 0; i < items.length; i++) {
-                    var newHtml = createHtml(items[i]);
-                    $(".tbody").append(newHtml);
-                }
-                if (page.needPrev == true) {
-                    var pagingHtml = createPaging1(page);
-                    $(".pagingDiv").append(pagingHtml);
-                }
-                for (let k = page.startNavi; k <= page.endNavi; k++) {
-                    if (data.currentPage == k) {
-                        var pagingHtml = createPaging3(k, page);
-                        $(".pagingDiv").append(pagingHtml);
-                    } else {
-                        var pagingHtml = createPaging4(k, page);
+                let cpage = data.currentPage;
+                let cnt = data.count;
+                // console.log('data.cpage : ' + data.currentPage);
+                // console.log('data.cnt : ' + data.count);
+                if (data.items.length == 0) {
+                    var html = noDataHtml();
+                    $(".tbody").append(html);
+                } else {
+                    for (let i = 0; i < items.length; i++) {
+                        // var newHtml = createHtml(items[i]);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                            data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+                        $(".tbody").append(newHtml);
+                    }
+                    if (page.needPrev == true) {
+                        var pagingHtml = createPaging1(page);
                         $(".pagingDiv").append(pagingHtml);
                     }
-                }
-                if (page.needNext == true) {
-                    var pagingHtml = createPaging2(page);
-                    $(".pagingDiv").append(pagingHtml);
+                    for (let k = page.startNavi; k <= page.endNavi; k++) {
+                        if (data.currentPage == k) {
+                            var pagingHtml = createPaging3(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        } else {
+                            var pagingHtml = createPaging4(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        }
+                    }
+                    if (page.needNext == true) {
+                        var pagingHtml = createPaging2(page);
+                        $(".pagingDiv").append(pagingHtml);
+                    }
                 }
             }
         })
@@ -547,30 +654,44 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
+                console.log("list길이 : " + data.items.length);
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
                 let page = data.paging;
-                for (let i = 0; i < items.length; i++) {
-                    var newHtml = createHtml(items[i]);
-                    $(".tbody").append(newHtml);
-                }
-                if (page.needPrev == true) {
-                    var pagingHtml = createPaging1(page);
-                    $(".pagingDiv").append(pagingHtml);
-                }
-                for (let k = page.startNavi; k <= page.endNavi; k++) {
-                    if (data.currentPage == k) {
-                        var pagingHtml = createPaging3(k, page);
-                        $(".pagingDiv").append(pagingHtml);
-                    } else {
-                        var pagingHtml = createPaging4(k, page);
+                let cpage = data.currentPage;
+                let cnt = data.count;
+                // console.log('data.cpage : ' + data.currentPage);
+                // console.log('data.cnt : ' + data.count);
+                if (data.items.length == 0) {
+                    var html = noDataHtml();
+                    $(".tbody").append(html);
+                } else {
+                    for (let i = 0; i < items.length; i++) {
+                        // var newHtml = createHtml(items[i]);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                            data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+                        $(".tbody").append(newHtml);
+                    }
+                    if (page.needPrev == true) {
+                        var pagingHtml = createPaging1(page);
                         $(".pagingDiv").append(pagingHtml);
                     }
-                }
-                if (page.needNext == true) {
-                    var pagingHtml = createPaging2(page);
-                    $(".pagingDiv").append(pagingHtml);
+                    for (let k = page.startNavi; k <= page.endNavi; k++) {
+                        if (data.currentPage == k) {
+                            var pagingHtml = createPaging3(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        } else {
+                            var pagingHtml = createPaging4(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        }
+                    }
+                    if (page.needNext == true) {
+                        var pagingHtml = createPaging2(page);
+                        $(".pagingDiv").append(pagingHtml);
+                    }
                 }
             }
         })
@@ -596,30 +717,44 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
+                console.log("list길이 : " + data.items.length);
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
                 let page = data.paging;
-                for (let i = 0; i < items.length; i++) {
-                    var newHtml = createHtml(items[i]);
-                    $(".tbody").append(newHtml);
-                }
-                if (page.needPrev == true) {
-                    var pagingHtml = createPaging1(page);
-                    $(".pagingDiv").append(pagingHtml);
-                }
-                for (let k = page.startNavi; k <= page.endNavi; k++) {
-                    if (data.currentPage == k) {
-                        var pagingHtml = createPaging3(k, page);
-                        $(".pagingDiv").append(pagingHtml);
-                    } else {
-                        var pagingHtml = createPaging4(k, page);
+                let cpage = data.currentPage;
+                let cnt = data.count;
+                // console.log('data.cpage : ' + data.currentPage);
+                // console.log('data.cnt : ' + data.count);
+                if (data.items.length == 0) {
+                    var html = noDataHtml();
+                    $(".tbody").append(html);
+                } else {
+                    for (let i = 0; i < items.length; i++) {
+                        // var newHtml = createHtml(items[i]);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                            data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+                        $(".tbody").append(newHtml);
+                    }
+                    if (page.needPrev == true) {
+                        var pagingHtml = createPaging1(page);
                         $(".pagingDiv").append(pagingHtml);
                     }
-                }
-                if (page.needNext == true) {
-                    var pagingHtml = createPaging2(page);
-                    $(".pagingDiv").append(pagingHtml);
+                    for (let k = page.startNavi; k <= page.endNavi; k++) {
+                        if (data.currentPage == k) {
+                            var pagingHtml = createPaging3(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        } else {
+                            var pagingHtml = createPaging4(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        }
+                    }
+                    if (page.needNext == true) {
+                        var pagingHtml = createPaging2(page);
+                        $(".pagingDiv").append(pagingHtml);
+                    }
                 }
             }
         })
@@ -645,30 +780,44 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
+                console.log("list길이 : " + data.items.length);
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
                 let page = data.paging;
-                for (let i = 0; i < items.length; i++) {
-                    var newHtml = createHtml(items[i]);
-                    $(".tbody").append(newHtml);
-                }
-                if (page.needPrev == true) {
-                    var pagingHtml = createPaging1(page);
-                    $(".pagingDiv").append(pagingHtml);
-                }
-                for (let k = page.startNavi; k <= page.endNavi; k++) {
-                    if (data.currentPage == k) {
-                        var pagingHtml = createPaging3(k, page);
-                        $(".pagingDiv").append(pagingHtml);
-                    } else {
-                        var pagingHtml = createPaging4(k, page);
+                let cpage = data.currentPage;
+                let cnt = data.count;
+                // console.log('data.cpage : ' + data.currentPage);
+                // console.log('data.cnt : ' + data.count);
+                if (data.items.length == 0) {
+                    var html = noDataHtml();
+                    $(".tbody").append(html);
+                } else {
+                    for (let i = 0; i < items.length; i++) {
+                        // var newHtml = createHtml(items[i]);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                            data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+                        $(".tbody").append(newHtml);
+                    }
+                    if (page.needPrev == true) {
+                        var pagingHtml = createPaging1(page);
                         $(".pagingDiv").append(pagingHtml);
                     }
-                }
-                if (page.needNext == true) {
-                    var pagingHtml = createPaging2(page);
-                    $(".pagingDiv").append(pagingHtml);
+                    for (let k = page.startNavi; k <= page.endNavi; k++) {
+                        if (data.currentPage == k) {
+                            var pagingHtml = createPaging3(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        } else {
+                            var pagingHtml = createPaging4(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        }
+                    }
+                    if (page.needNext == true) {
+                        var pagingHtml = createPaging2(page);
+                        $(".pagingDiv").append(pagingHtml);
+                    }
                 }
             }
         })
@@ -694,30 +843,44 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
+                console.log("list길이 : " + data.items.length);
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
                 let page = data.paging;
-                for (let i = 0; i < items.length; i++) {
-                    var newHtml = createHtml(items[i]);
-                    $(".tbody").append(newHtml);
-                }
-                if (page.needPrev == true) {
-                    var pagingHtml = createPaging1(page);
-                    $(".pagingDiv").append(pagingHtml);
-                }
-                for (let k = page.startNavi; k <= page.endNavi; k++) {
-                    if (data.currentPage == k) {
-                        var pagingHtml = createPaging3(k, page);
-                        $(".pagingDiv").append(pagingHtml);
-                    } else {
-                        var pagingHtml = createPaging4(k, page);
+                let cpage = data.currentPage;
+                let cnt = data.count;
+                // console.log('data.cpage : ' + data.currentPage);
+                // console.log('data.cnt : ' + data.count);
+                if (data.items.length == 0) {
+                    var html = noDataHtml();
+                    $(".tbody").append(html);
+                } else {
+                    for (let i = 0; i < items.length; i++) {
+                        // var newHtml = createHtml(items[i]);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                            data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+                        $(".tbody").append(newHtml);
+                    }
+                    if (page.needPrev == true) {
+                        var pagingHtml = createPaging1(page);
                         $(".pagingDiv").append(pagingHtml);
                     }
-                }
-                if (page.needNext == true) {
-                    var pagingHtml = createPaging2(page);
-                    $(".pagingDiv").append(pagingHtml);
+                    for (let k = page.startNavi; k <= page.endNavi; k++) {
+                        if (data.currentPage == k) {
+                            var pagingHtml = createPaging3(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        } else {
+                            var pagingHtml = createPaging4(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        }
+                    }
+                    if (page.needNext == true) {
+                        var pagingHtml = createPaging2(page);
+                        $(".pagingDiv").append(pagingHtml);
+                    }
                 }
             }
         })
@@ -743,30 +906,44 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
+                console.log("list길이 : " + data.items.length);
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
                 let page = data.paging;
-                for (let i = 0; i < items.length; i++) {
-                    var newHtml = createHtml(items[i]);
-                    $(".tbody").append(newHtml);
-                }
-                if (page.needPrev == true) {
-                    var pagingHtml = createPaging1(page);
-                    $(".pagingDiv").append(pagingHtml);
-                }
-                for (let k = page.startNavi; k <= page.endNavi; k++) {
-                    if (data.currentPage == k) {
-                        var pagingHtml = createPaging3(k, page);
-                        $(".pagingDiv").append(pagingHtml);
-                    } else {
-                        var pagingHtml = createPaging4(k, page);
+                let cpage = data.currentPage;
+                let cnt = data.count;
+                // console.log('data.cpage : ' + data.currentPage);
+                // console.log('data.cnt : ' + data.count);
+                if (data.items.length == 0) {
+                    var html = noDataHtml();
+                    $(".tbody").append(html);
+                } else {
+                    for (let i = 0; i < items.length; i++) {
+                        // var newHtml = createHtml(items[i]);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                            data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+                        $(".tbody").append(newHtml);
+                    }
+                    if (page.needPrev == true) {
+                        var pagingHtml = createPaging1(page);
                         $(".pagingDiv").append(pagingHtml);
                     }
-                }
-                if (page.needNext == true) {
-                    var pagingHtml = createPaging2(page);
-                    $(".pagingDiv").append(pagingHtml);
+                    for (let k = page.startNavi; k <= page.endNavi; k++) {
+                        if (data.currentPage == k) {
+                            var pagingHtml = createPaging3(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        } else {
+                            var pagingHtml = createPaging4(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        }
+                    }
+                    if (page.needNext == true) {
+                        var pagingHtml = createPaging2(page);
+                        $(".pagingDiv").append(pagingHtml);
+                    }
                 }
             }
         })
@@ -792,30 +969,44 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
+                console.log("list길이 : " + data.items.length);
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
                 let page = data.paging;
-                for (let i = 0; i < items.length; i++) {
-                    var newHtml = createHtml(items[i]);
-                    $(".tbody").append(newHtml);
-                }
-                if (page.needPrev == true) {
-                    var pagingHtml = createPaging1(page);
-                    $(".pagingDiv").append(pagingHtml);
-                }
-                for (let k = page.startNavi; k <= page.endNavi; k++) {
-                    if (data.currentPage == k) {
-                        var pagingHtml = createPaging3(k, page);
-                        $(".pagingDiv").append(pagingHtml);
-                    } else {
-                        var pagingHtml = createPaging4(k, page);
+                let cpage = data.currentPage;
+                let cnt = data.count;
+                // console.log('data.cpage : ' + data.currentPage);
+                // console.log('data.cnt : ' + data.count);
+                if (data.items.length == 0) {
+                    var html = noDataHtml();
+                    $(".tbody").append(html);
+                } else {
+                    for (let i = 0; i < items.length; i++) {
+                        // var newHtml = createHtml(items[i]);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                            data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+                        $(".tbody").append(newHtml);
+                    }
+                    if (page.needPrev == true) {
+                        var pagingHtml = createPaging1(page);
                         $(".pagingDiv").append(pagingHtml);
                     }
-                }
-                if (page.needNext == true) {
-                    var pagingHtml = createPaging2(page);
-                    $(".pagingDiv").append(pagingHtml);
+                    for (let k = page.startNavi; k <= page.endNavi; k++) {
+                        if (data.currentPage == k) {
+                            var pagingHtml = createPaging3(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        } else {
+                            var pagingHtml = createPaging4(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        }
+                    }
+                    if (page.needNext == true) {
+                        var pagingHtml = createPaging2(page);
+                        $(".pagingDiv").append(pagingHtml);
+                    }
                 }
             }
         })
