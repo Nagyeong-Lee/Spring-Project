@@ -142,6 +142,12 @@
             <c:if test="${searchType ne null and keyword ne null}">
                 <a href="javascript:void(0); onclick=paging(${startNavi-1},${count},'${searchType}','${keyword}');"><</a>
             </c:if>
+            <c:if test="${searchType eq null and keyword eq null}">
+                <a href="javascript:void(0); onclick=paging(1,${count});">맨 처음</a>
+            </c:if>
+            <c:if test="${searchType ne null and keyword ne null}">
+                <a href="javascript:void(0); onclick=paging(1,${count},'${searchType}','${keyword}');">맨 처음</a>
+            </c:if>
         </c:when>
     </c:choose>
     <%--<c:choose>
@@ -174,6 +180,12 @@
             </c:if>
             <c:if test="${searchType ne null and keyword ne null}">
                 <a href="javascript:void(0); onclick=paging(${endNavi+1},${count},'${searchType}','${keyword}');">></a>
+            </c:if>
+            <c:if test="${searchType eq null and keyword eq null}">
+                <a href="javascript:void(0); onclick=paging(${pageTotalCount},${count});">맨끝</a>
+            </c:if>
+            <c:if test="${searchType ne null and keyword ne null}">
+                <a href="javascript:void(0); onclick=paging(${pageTotalCount},${count},'${searchType}','${keyword}');">맨끝</a>
             </c:if>
         </c:when>
     </c:choose>
@@ -301,6 +313,7 @@
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
+                let pageTotalCnt = data.pageTotalCount;
                 console.log('data.cpage : ' + data.currentPage);
                 console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
@@ -326,7 +339,7 @@
                         }
                     }
                     if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
+                        var pagingHtml = createPaging2(page, pageTotalCnt);
                         $(".pagingDiv").append(pagingHtml);
                     }
                 }
@@ -389,15 +402,25 @@
         } else {
             pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + (page.startNavi - 1) + ',' + $('#count').val() + ',' + page.searchType + ',' + page.keyword + ');">' + "<" + '</a>';
         }
+        if (page.searchType == null && page.keyword == null) {
+            pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + (1) + ',' + $('#count').val() + ',\'\',\'\');">' + "맨 처음" + '</a>';
+        } else {
+            pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + (1) + ',' + $('#count').val() + ',' + page.searchType + ',' + page.keyword + ');">' + "맨 처음" + '</a>';
+        }
         return pagingHtml;
     }
 
-    function createPaging2(page) {
+    function createPaging2(page, pageTotalCount) {
         var pagingHtml = '';
         if (page.searchType == null && page.keyword == null) {
             pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + (page.endNavi + 1) + ',' + $('#count').val() + ',\'\',\'\');">' + ">" + '</a>';
         } else {
             pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + (page.endNavi + 1) + ',' + $('#count').val() + ',' + page.searchType + ',' + page.keyword + ');">' + ">" + '</a>';
+        }
+        if (page.searchType == null && page.keyword == null) {
+            pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + (pageTotalCount) + ',' + $('#count').val() + ',\'\',\'\');">' + "맨끝" + '</a>';
+        } else {
+            pagingHtml += '<a href="javascript:void(0);" onclick="paging(' + (pageTotalCount) + ',' + $('#count').val() + ',' + page.searchType + ',' + page.keyword + ');">' + "맨끝" + '</a>';
         }
         return pagingHtml;
     }
@@ -452,6 +475,7 @@
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
+                let pageTotalCnt = data.pageTotalCount;
                 console.log('data.cpage : ' + data.currentPage);
                 console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
@@ -477,7 +501,7 @@
                         }
                     }
                     if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
+                        var pagingHtml = createPaging2(page, pageTotalCnt);
                         $(".pagingDiv").append(pagingHtml);
                     }
                 }
@@ -515,6 +539,7 @@
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
+                let pageTotalCnt = data.pageTotalCount;
                 console.log('data.cpage : ' + data.currentPage);
                 console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
@@ -540,7 +565,7 @@
                         }
                     }
                     if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
+                        var pagingHtml = createPaging2(page, pageTotalCnt);
                         $(".pagingDiv").append(pagingHtml);
                     }
                 }
@@ -578,6 +603,7 @@
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
+                let pageTotalCnt = data.pageTotalCount;
                 console.log('data.cpage : ' + data.currentPage);
                 console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
@@ -603,7 +629,7 @@
                         }
                     }
                     if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
+                        var pagingHtml = createPaging2(page, pageTotalCnt);
                         $(".pagingDiv").append(pagingHtml);
                     }
                 }
@@ -641,6 +667,7 @@
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
+                let pageTotalCnt = data.pageTotalCount;
                 console.log('data.cpage : ' + data.currentPage);
                 console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
@@ -666,7 +693,7 @@
                         }
                     }
                     if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
+                        var pagingHtml = createPaging2(page, pageTotalCnt);
                         $(".pagingDiv").append(pagingHtml);
                     }
                 }
@@ -703,6 +730,7 @@
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
+                let pageTotalCnt = data.pageTotalCount;
                 console.log('data.cpage : ' + data.currentPage);
                 console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
@@ -728,7 +756,7 @@
                         }
                     }
                     if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
+                        var pagingHtml = createPaging2(page, pageTotalCnt);
                         $(".pagingDiv").append(pagingHtml);
                     }
                 }
@@ -765,6 +793,7 @@
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
+                let pageTotalCnt = data.pageTotalCount;
                 console.log('data.cpage : ' + data.currentPage);
                 console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
@@ -790,7 +819,7 @@
                         }
                     }
                     if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
+                        var pagingHtml = createPaging2(page, pageTotalCnt);
                         $(".pagingDiv").append(pagingHtml);
                     }
                 }
@@ -827,6 +856,7 @@
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
+                let pageTotalCnt = data.pageTotalCount;
                 console.log('data.cpage : ' + data.currentPage);
                 console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
@@ -852,7 +882,7 @@
                         }
                     }
                     if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
+                        var pagingHtml = createPaging2(page, pageTotalCnt);
                         $(".pagingDiv").append(pagingHtml);
                     }
                 }
@@ -900,6 +930,7 @@
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
+                let pageTotalCnt = data.pageTotalCount;
                 console.log('data.cpage : ' + data.currentPage);
                 console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
@@ -925,7 +956,7 @@
                         }
                     }
                     if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
+                        var pagingHtml = createPaging2(page, pageTotalCnt);
                         $(".pagingDiv").append(pagingHtml);
                     }
                 }
@@ -972,6 +1003,7 @@
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
+                let pageTotalCnt = data.pageTotalCount;
                 console.log('data.cpage : ' + data.currentPage);
                 console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
@@ -997,7 +1029,7 @@
                         }
                     }
                     if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
+                        var pagingHtml = createPaging2(page, pageTotalCnt);
                         $(".pagingDiv").append(pagingHtml);
                     }
                 }
@@ -1035,6 +1067,7 @@
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
+                let pageTotalCnt = data.pageTotalCount;
                 console.log('data.cpage : ' + data.currentPage);
                 console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
@@ -1060,7 +1093,7 @@
                         }
                     }
                     if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
+                        var pagingHtml = createPaging2(page, pageTotalCnt);
                         $(".pagingDiv").append(pagingHtml);
                     }
                 }
@@ -1098,6 +1131,7 @@
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
+                let pageTotalCnt = data.pageTotalCount;
                 console.log('data.cpage : ' + data.currentPage);
                 console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
@@ -1123,7 +1157,7 @@
                         }
                     }
                     if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
+                        var pagingHtml = createPaging2(page.pageTotalCnt);
                         $(".pagingDiv").append(pagingHtml);
                     }
                 }

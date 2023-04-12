@@ -192,6 +192,7 @@ public class ApiController {
         model.addAttribute("endNavi", Integer.parseInt(paging.get("endNavi").toString()));
         model.addAttribute("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));
         model.addAttribute("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
+        model.addAttribute("pageTotalCount", Integer.parseInt(paging.get("pageTotalCount").toString()));
         return "/api/hospitalInfo";
     }
 
@@ -295,12 +296,24 @@ public class ApiController {
         reMap.put("keyword", keyword);
 
         reMap.put("paging", paging);
+        reMap.put("pageTotalCount", Integer.parseInt(paging.get("pageTotalCount").toString()));
+        reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
+        reMap.put("endNavi", Integer.parseInt(paging.get("endNavi").toString()));
+        reMap.put("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));
+        reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
 
         System.out.println("====/list");
-        System.out.println("holidayYN : " + holidayYN);
-        System.out.println("holidayY : " + holidayY);
-        System.out.println("holidayN : " + holidayN);
+//        System.out.println("holidayYN : " + holidayYN);
+//        System.out.println("holidayY : " + holidayY);
+//        System.out.println("holidayN : " + holidayN);
 
+        System.out.println("=====처음 끝 페이지====");
+        System.out.println("pageTotalCount : "+Integer.parseInt(paging.get("pageTotalCount").toString()));
+        System.out.println("startNavi : "+Integer.parseInt(paging.get("startNavi").toString()));
+        System.out.println("endNavi : "+ Integer.parseInt(paging.get("endNavi").toString()));
+        System.out.println("needPrev : "+Boolean.parseBoolean(paging.get("needPrev").toString()));
+        System.out.println("needNext : "+Boolean.parseBoolean(paging.get("needNext").toString()));
+        System.out.println("=====처음 끝 페이지====");
 
         return reMap;
     }
