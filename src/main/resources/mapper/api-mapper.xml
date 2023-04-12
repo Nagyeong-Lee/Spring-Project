@@ -149,27 +149,6 @@
         <if test="city neq ''">
             <trim prefix="WHERE" prefixOverrides="AND">
                 AND city=#{city}
-                <!--            <if test="weekOpen != null">-->
-                <!--                AND weekOpen=${weekOpen}-->
-                <!--            </if>-->
-                <!--            <if test="weekClose != null">-->
-                <!--                AND weekClose=${weekClose}-->
-                <!--            </if>-->
-                <!--            <if test="satOpen != null">-->
-                <!--                AND satOpen=${satOpen}-->
-                <!--            </if>-->
-                <!--            <if test="satClose != null">-->
-                <!--                AND satClose=${satClose}-->
-                <!--            </if>-->
-                <!--            <if test="holidayYN != null">-->
-                <!--                AND holidayYN=${holidayYN}-->
-                <!--            </if>-->
-                <!--            <if test="holidayOpen != null">-->
-                <!--                AND holidayOpen=${holidayOpen}-->
-                <!--            </if>-->
-                <!--            <if test="holidayClose != null">-->
-                <!--                AND holidayClose=${holidayClose}-->
-                <!--            </if>-->
             </trim>
         </if>
         <if test="searchType eq 'hospital_name'.toString()">
@@ -245,18 +224,14 @@
                 AND roadAddress LIKE '%'||#{keyword}||'%'
             </if>
             <choose>
-                <when test="holidayY eq '진료'.toString() and holidayN eq '미진료'.toString()">
-                    <![CDATA[AND to_date(holidayOpen,'hh24:mi')>=to_date(#{holidayOpen},'hh24:mi')]]>
-                    <![CDATA[AND to_date(holidayClose,'hh24:mi')<=to_date(#{holidayClose},'hh24:mi')]]>
-                    or (holidayOpen='-' AND holidayClose is null)
-                </when>
-                <when test="holidayY eq '진료'.toString()">
+                <when test="holidayY eq '진료'.toString() and holidayN eq ''.toString()">
                     <![CDATA[AND to_date(holidayOpen,'hh24:mi')>=to_date(#{holidayOpen},'hh24:mi')]]>
                     <![CDATA[AND to_date(holidayClose,'hh24:mi')<=to_date(#{holidayClose},'hh24:mi')]]>
                 </when>
-                <when test="holidayN eq '미진료'.toString()">
-                    AND holidayOpen='-'
-                    AND holidayClose is null
+                <!-- 미진료만 선택 -->
+                <when test="holidayN eq '미진료'.toString() and holidayY eq ''.toString()">
+                    AND holidayOpen = '-'
+                    AND holidayClose = '-'
                 </when>
             </choose>
         </trim>
@@ -351,28 +326,6 @@
             <if test="satClose != null">
                 <![CDATA[AND to_date(satClose,'hh24:mi')<=to_date(#{satClose},'hh24:mi')]]>
             </if>
-            <!--            <if test="holidayYN eq '진료'.toString()">-->
-            <!--                <if test="holidayOpen != null">-->
-            <!--                    <![CDATA[AND to_date(holidayOpen,'hh24:mi')>=to_date(#{holidayOpen},'hh24:mi')]]>-->
-            <!--                </if>-->
-            <!--                <if test="holidayClose != null">-->
-            <!--                    <![CDATA[AND to_date(holidayClose,'hh24:mi')<=to_date(#{holidayClose},'hh24:mi')]]>-->
-            <!--                </if>-->
-            <!--            </if>-->
-<!--            <if test="holidayY eq '진료'.toString()">-->
-<!--                <![CDATA[AND to_date(holidayOpen,'hh24:mi')>=to_date(#{holidayOpen},'hh24:mi')]]>-->
-<!--                <![CDATA[AND to_date(holidayClose,'hh24:mi')<=to_date(#{holidayClose},'hh24:mi')]]>-->
-<!--            </if>-->
-<!--            <if test="holidayY eq '진료'.toString() and holidayN eq '미진료'.toString()">-->
-<!--                <![CDATA[AND to_date(holidayOpen,'hh24:mi')>=to_date(#{holidayOpen},'hh24:mi')]]>-->
-<!--                <![CDATA[AND to_date(holidayClose,'hh24:mi')<=to_date(#{holidayClose},'hh24:mi')]]>-->
-<!--                and holidayOpen='-'-->
-<!--                and holidayClose is null-->
-<!--            </if>-->
-<!--            <if test="holidayN eq '미진료'.toString()">-->
-<!--                and holidayOpen='-'-->
-<!--                and holidayClose is null-->
-<!--            </if>-->
             <if test="searchType eq 'hospital_name'.toString()">
                 and hospital_name like '%'||#{keyword}||'%'
             </if>
@@ -386,18 +339,14 @@
                 and roadAddress like '%'||#{keyword}||'%'
             </if>
             <choose>
-                <when test="holidayY eq '진료'.toString() and holidayN eq '미진료'.toString()">
-                    <![CDATA[AND to_date(holidayOpen,'hh24:mi')>=to_date(#{holidayOpen},'hh24:mi')]]>
-                    <![CDATA[AND to_date(holidayClose,'hh24:mi')<=to_date(#{holidayClose},'hh24:mi')]]>
-                    or (holidayOpen='-' AND holidayClose is null)
-                </when>
-                <when test="holidayY eq '진료'.toString()">
+                <when test="holidayY eq '진료'.toString() and holidayN eq ''.toString()">
                     <![CDATA[AND to_date(holidayOpen,'hh24:mi')>=to_date(#{holidayOpen},'hh24:mi')]]>
                     <![CDATA[AND to_date(holidayClose,'hh24:mi')<=to_date(#{holidayClose},'hh24:mi')]]>
                 </when>
-                <when test="holidayN eq '미진료'.toString()">
-                    AND holidayOpen='-'
-                    AND holidayClose is null
+                <!-- 미진료만 선택 -->
+                <when test="holidayN eq '미진료'.toString() and holidayY eq ''.toString()">
+                    AND holidayOpen = '-'
+                    AND holidayClose = '-'
                 </when>
             </choose>
         </trim>
@@ -461,14 +410,6 @@
             <if test="satClose != null">
                 <![CDATA[AND to_date(satClose,'hh24:mi')<=to_date(#{satClose},'hh24:mi')]]>
             </if>
-            <!--            <if test="holidayY eq '진료'.toString() ">-->
-            <!--                <if test="holidayOpen != null">-->
-            <!--                    <![CDATA[AND to_date(holidayOpen,'hh24:mi')>=to_date(#{holidayOpen},'hh24:mi')]]>-->
-            <!--                </if>-->
-            <!--                <if test="holidayClose != null">-->
-            <!--                    <![CDATA[AND to_date(holidayClose,'hh24:mi')<=to_date(#{holidayClose},'hh24:mi')]]>-->
-            <!--                </if>-->
-            <!--            </if>-->
 
             <if test="searchType eq 'hospital_name'.toString()">
                 and hospital_name like '%'||#{keyword}||'%'
@@ -483,18 +424,15 @@
                 and roadAddress like '%'||#{keyword}||'%'
             </if>
             <choose>
-                <when test="holidayY eq '진료'.toString() and holidayN eq '미진료'.toString()">
-                    <![CDATA[AND to_date(holidayOpen,'hh24:mi')>=to_date(#{holidayOpen},'hh24:mi')]]>
-                    <![CDATA[AND to_date(holidayClose,'hh24:mi')<=to_date(#{holidayClose},'hh24:mi')]]>
-                    or (holidayOpen='-' AND holidayClose is null)
-                </when>
-                <when test="holidayY eq '진료'.toString()">
+                <!-- 진료만 선택 -->
+                <when test="holidayY eq '진료'.toString() and holidayN eq ''.toString()">
                     <![CDATA[AND to_date(holidayOpen,'hh24:mi')>=to_date(#{holidayOpen},'hh24:mi')]]>
                     <![CDATA[AND to_date(holidayClose,'hh24:mi')<=to_date(#{holidayClose},'hh24:mi')]]>
                 </when>
-                <when test="holidayN eq '미진료'.toString()">
-                    AND holidayOpen='-'
-                    AND holidayClose is null
+                <!-- 미진료만 선택 -->
+                <when test="holidayN eq '미진료'.toString() and holidayY eq ''.toString()">
+                    AND holidayOpen = '-'
+                    AND holidayClose = '-'
                 </when>
             </choose>
         </trim>

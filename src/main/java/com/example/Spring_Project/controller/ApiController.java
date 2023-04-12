@@ -8,7 +8,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.taglibs.standard.lang.jstl.NullLiteral;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -125,10 +124,6 @@ public class ApiController {
             holidayCloseOption = map.get("holidayClose").toString();
         }
 
-        System.out.println("holidayYNOption : " + holidayYNOption);
-        System.out.println("holidayY : " + holidayY);
-        System.out.println("holidayN : " + holidayN);
-
         List<String> city = apiService.getCity(); //지역명
         List<String> weekOpen = apiService.getWeekOpen(); //평일 진료 시작 시간
         List<String> weekClose = apiService.getWeekClose(); //평일 진료 마감 시간
@@ -183,6 +178,11 @@ public class ApiController {
         reMap.put("items", list);
         reMap.put("paging", paging);
 
+        System.out.println("=====처음 끝 페이지====");
+        System.out.println("paging needNext : "+Boolean.parseBoolean(paging.get("needNext").toString()));
+        System.out.println("page totalCount : "+Integer.parseInt(paging.get("pageTotalCount").toString()));
+        System.out.println("=====처음 끝 페이지====");
+
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("count", count); //개수 선택
         model.addAttribute("searchType", searchType);
@@ -201,7 +201,6 @@ public class ApiController {
 
         System.out.println("/hospital/list map2 : " + map);
         Map<String, Object> reMap = new HashMap<>();
-
 
         //option 값
         Integer currentPage = Integer.parseInt(map.get("currentPage").toString());
@@ -246,17 +245,8 @@ public class ApiController {
         if (map.get("holidayClose") != null) {
             holidayClose = map.get("holidayClose").toString();
         }
-        if (map.get("holidayY") == null) {
-            holidayY = null;
-        }else{
             holidayY = map.get("holidayY").toString();
-        }
-
-        if (map.get("holidayN") == null) {
-            holidayN = null;
-        }else{
             holidayN = map.get("holidayN").toString();
-        }
 
         Integer start = currentPage * count - (count - 1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
@@ -333,17 +323,7 @@ public class ApiController {
 
         String holidayY = "";
         String holidayN = "";
-        if (map.get("holidayY") == null) {
-            holidayY = null;
-        }else{
-            holidayY = map.get("holidayY").toString();
-        }
 
-        if (map.get("holidayN") == null) {
-            holidayN =null;
-        }else{
-            holidayN = map.get("holidayN").toString();
-        }
         holidayY=map.get("holidayY").toString();
         holidayN=map.get("holidayN").toString();
 
