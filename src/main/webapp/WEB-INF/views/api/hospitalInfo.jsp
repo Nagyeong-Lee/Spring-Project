@@ -16,10 +16,11 @@
     </script>
 </head>
 <body>
+
 <select name="city" id="city">
     <option value="ALL" <c:out value="${cityOption eq 'ALL'  ? 'selected' :''}"/>>전체지역</option>
     <c:forEach var="i" items="${city}">
-        <option value="${i}" <c:out value="${cityOption eq i ? 'selected' :''}"/> >${i}</option>
+        <option value="${i}" <c:out value="${city ne 'ALL' and cityOption eq i ? 'selected' :''}"/> >${i}</option>
     </c:forEach>
 </select>
 <br>
@@ -48,16 +49,26 @@
 </c:forEach>
 <br>
 일요일/공휴일 진료 여부 :
-<c:forEach var="i" items="${holidayYN}">
-    ${i}<input type="checkbox" value="${i}" name="holidayYN" class="holidayYN"
-    <c:out
-            value="${i eq holidayYNOption? 'checked' : ''}"/>>
-</c:forEach>
+<%--<c:forEach var="i" items="${holidayYN}">--%>
+<%--    ${i}<input type="checkbox" value="${i}" name="holidayYN" class="holidayYN"--%>
+<%--    <c:out--%>
+<%--            value="${i eq holidayYNOption? 'checked' : ''}"/>>--%>
+<%--</c:forEach>--%>
+<input type="checkbox" value="${holidayY}" name="holidayY" class="holidayY"
+<c:out
+        value="${holidayY eq '진료'? 'checked' : ''}"/>>진료
+
+<input type="checkbox" value="${holidayN}" name="holidayN" class="holidayN"
+<c:out
+        value="${holidayN eq '미진료'? 'checked' : ''}"/>>미진료
+
 <br>
 일요일/공휴일 진료 시작 시간 :
 <c:forEach var="i" items="${holidayOpen}">
+    <c:if test="${i ne '-'}">
     ${i}<input type="radio" value="${i}" name="holidayOpen" class="holidayOpen" <c:out
         value="${i eq holidayOpenOption? 'checked' : ''}"/>>
+    </c:if>
 </c:forEach>
 <br>
 일요일/공휴일 진료 마감 시간 :
@@ -67,7 +78,6 @@
 </c:forEach>
 <br>
 <hr>
-
 <input type="hidden" name="currentPage" value="${currentPage}" id="boardCurrentPage">
 <input type="hidden" name="count" value="${count}" id="boardCount">
 <input type="hidden" name="searchType" value="${searchType}" id="boardSearchType">
@@ -77,15 +87,28 @@
 <input type="hidden" name="weekClose" value="${weekCloseOption}" id="boardWeekClose">
 <input type="hidden" name="satOpen" value="${satOpenOption}" id="boardSatOpen">
 <input type="hidden" name="satClose" value="${satCloseOption}" id="boardSatClose">
-<%--<input type="hidden" name="holidayYN" value="${holidayYNOption}" id="boardHolidayYN">--%>
 <input type="hidden" name="holidayOpen" value="${holidayOpenOption}" id="boardHolidayOpen">
 <input type="hidden" name="holidayClose" value="${holidayCloseOption}" id="boardHolidayClose">
+<input type="hidden" name="holidayYN" value="${holidayYNOption}" id="boardHolidayClose">
+<input type="hidden" name="holidayY" value="${holidayY}" id="boardHolidayY">
+<input type="hidden" name="holidayN" value="${holidayN}" id="boardHolidayN">
+
 
 <form method="post" action="/api/hospital" id="pagingFrm">
     <input type="hidden" name="currentPage" id="cpage">
     <input type="hidden" name="count" id="cnt">
     <input type="hidden" name="searchType" id="type">
     <input type="hidden" name="keyword" id="key">
+<%--    <input type="hidden" name="city" id="city1"/>--%>
+<%--    <input type="hidden" name="weekOpen" id="weekOpen1"/>--%>
+<%--    <input type="hidden" name="weekClose" id="weekClose1"/>--%>
+<%--    <input type="hidden" name="satOpen" id="satOpen1"/>--%>
+<%--    <input type="hidden" name="satClose" id="satClose1"/>--%>
+<%--    &lt;%&ndash;    <input type="hidden" name="holidayYN" id="holidayYN1"/>&ndash;%&gt;--%>
+<%--    <input type="hidden" name="holidayY" id="holidayY1"/>--%>
+<%--    <input type="hidden" name="holidayN" id="holidayN1"/>--%>
+<%--    <input type="hidden" name="holidayOpen" id="holidayOpen1"/>--%>
+<%--    <input type="hidden" name="holidayClose" id="holidayClose1"/>--%>
 </form>
 
 <table style="border: 1px solid black">
@@ -105,7 +128,7 @@
                     <td>${i.city}</td>
                     <td>
                         <a href="javascript:void(0);"
-                           onclick="detail(${i.hospital_seq},${currentPage},${count},'${cityOption}','${weekOpenOption}','${weekCloseOption}','${satOpenOption}','${satCloseOption}','${holidayOpenOption}','${holidayCloseOption}');">${i.hospital_name}</a>
+                           onclick="detail(${i.hospital_seq},${currentPage},${count},'${searchType}','${keyword}','${cityOption}','${weekOpenOption}','${weekCloseOption}','${satOpenOption}','${satCloseOption}','${holidayY}','${holidayN}','${holidayOpenOption}','${holidayCloseOption}');">${i.hospital_name}</a>
                     </td>
                     <td>${i.weekOpen}~${i.weekClose}&nbsp&nbsp</td>
                     <td>${i.satOpen}~${i.satClose}</td>
@@ -182,6 +205,7 @@
     <option value="30"<c:out value="${count eq '30' ? 'selected' : ''}"/>>30개씩 보기</option>
     <option value="50"<c:out value="${count eq '50' ? 'selected' : ''}"/>>50개씩 보기</option>
 </select>
+<button type="button" id="reset">리셋</button>
 
 <form id="frm" name="frm" method="post" action="/api/detail">
     <input type="hidden" name="hospital_seq" id="hospital_seq1"/>
@@ -194,7 +218,9 @@
     <input type="hidden" name="weekClose" id="weekClose1"/>
     <input type="hidden" name="satOpen" id="satOpen1"/>
     <input type="hidden" name="satClose" id="satClose1"/>
-<%--<input type="hidden" name="holidayYN" id="holidayYN1"/>--%>
+    <%--    <input type="hidden" name="holidayYN" id="holidayYN1"/>--%>
+    <input type="hidden" name="holidayY" id="holidayY1"/>
+    <input type="hidden" name="holidayN" id="holidayN1"/>
     <input type="hidden" name="holidayOpen" id="holidayOpen1"/>
     <input type="hidden" name="holidayClose" id="holidayClose1"/>
 
@@ -204,13 +230,14 @@
     <input type="hidden" name="count" id="count2"/>
     <input type="hidden" name="searchType" id="searchType2"/>
     <input type="hidden" name="keyword" id="keyword2"/>
-
     <input type="hidden" name="city" id="city2"/>
     <input type="hidden" name="weekOpen" id="weekOpen2"/>
     <input type="hidden" name="weekClose" id="weekClose2"/>
     <input type="hidden" name="satOpen" id="satOpen2"/>
     <input type="hidden" name="satClose" id="satClose2"/>
-    <%--<input type="hidden" name="holidayYN" id="holidayYN2"/>--%>
+    <%--    <input type="hidden" name="holidayYN" id="holidayYN2"/>--%>
+    <input type="hidden" name="holidayY" id="holidayY2"/>
+    <input type="hidden" name="holidayN" id="holidayN2"/>
     <input type="hidden" name="holidayOpen" id="holidayOpen2"/>
     <input type="hidden" name="holidayClose" id="holidayClose2"/>
 </form>
@@ -225,55 +252,111 @@
     <input type="hidden" name="weekClose" id="weekClose3"/>
     <input type="hidden" name="satOpen" id="satOpen3"/>
     <input type="hidden" name="satClose" id="satClose3"/>
-    <%--<input type="hidden" name="holidayYN" id="holidayYN3"/>--%>
+    <%--    <input type="hidden" name="holidayYN" id="holidayYN3"/>--%>
+    <input type="hidden" name="holidayY" id="holidayY3"/>
+    <input type="hidden" name="holidayN" id="holidayN3"/>
     <input type="hidden" name="holidayOpen" id="holidayOpen3"/>
     <input type="hidden" name="holidayClose" id="holidayClose3"/>
 </form>
 <script>
 
-    // function detail(hospital_seq/*, currentPage, count, searchType, keyword*/) {
-    //     $("#hospital_seq1").val(hospital_seq);
-    //     $("#currentPage1").val($("#boardCurrentPage").val());
-    //     $("#count1").val($("#boardCount").val());
-    //     $("#searchType1").val($("#boardSearchType").val());
-    //     $("#keyword1").val($("#boardKeyword").val());
-    //     $("#frm").submit();
-    // }
+    //리셋
+    $("#reset").on("click",function(){
+       location.reload();
+    });
 
-    // function detail(hospital_seq, cpage, count) {
-    //     $("#hospital_seq1").val(hospital_seq);
-    //     $("#currentPage1").val(cpage);
-    //     $("#count1").val(count);
-    //     $("#searchType1").val($("#boardSearchType").val());
-    //     $("#keyword1").val($("#boardKeyword").val());
-    //
-    //     $("#city1").val($("#boardKeyword").val());
-    //     $("#weekOpen1").val($("#boardKeyword").val());
-    //     $("#weekClose1").val($("#boardKeyword").val());
-    //     $("#satOpen1").val($("#boardKeyword").val());
-    //     $("#satClose1").val($("#boardKeyword").val());
-    //     $("#holidayOpen1").val($("#boardKeyword").val());
-    //     $("#holidayClose1").val($("#boardKeyword").val());
-    //
-    //     $("#frm").submit();
-    // }
+    function detail(hospital_seq, cpage, count,searchType,keyword, city, weekOpen, weekClose, satOpen, satClose, holidayY, holidayN, holidayOpen, holidayClose) {
 
-    function detail(hospital_seq, cpage, count, city, weekOpen, weekClose, satOpen, satClose, holidayOpen, holidayClose) {
         $("#hospital_seq1").val(hospital_seq);
         $("#currentPage1").val(cpage);
         $("#count1").val(count);
-        $("#searchType1").val($("#boardSearchType").val());
-        $("#keyword1").val($("#boardKeyword").val());
+        $("#searchType1").val(searchType);
+        $("#keyword1").val(keyword);
         $("#city1").val(city);
         $("#weekOpen1").val(weekOpen);
         $("#weekClose1").val(weekClose);
         $("#satOpen1").val(satOpen);
         $("#satClose1").val(satClose);
         // $("#holidayYN1").val($("#holidayYNOption").val());
+        $("#holidayY1").val(holidayY);
+        $("#holidayN1").val(holidayN);
         $("#holidayOpen1").val(holidayOpen);
         $("#holidayClose1").val(holidayClose);
         $("#frm").submit();
     }
+
+
+    // function paging(startNavi, count, searchType, keyword) {
+    //     /*$("#cpage").val(startNavi);
+    //     $("#cnt").val(count);
+    //     $("#type").val(searchType);
+    //     $("#key").val(keyword);
+    //     $("#pagingFrm").submit();*/
+    //     let result = changeOption();
+    //     $.ajax({
+    //         url: '/api/hospital/list',
+    //         type: 'post',
+    //         data: {
+    //             "currentPage": startNavi,
+    //             "count": result.count,
+    //             "searchType": result.searchType,
+    //             "keyword": result.keyword,
+    //             "city": result.city,
+    //             "weekOpen": result.weekOpen,
+    //             "weekClose": result.weekClose,
+    //             "satOpen": result.satOpen,
+    //             "satClose": result.satClose,
+    //             // "holidayYN": result.holidayYN,
+    //             "holidayY" : result.holidayY,
+    //             "holidayN" : result.holidayN,
+    //             "holidayOpen": result.holidayOpen,
+    //             "holidayClose": result.holidayClose
+    //         },
+    //         success: function (data) {
+    //             console.log("list길이 : " + data.items.length);
+    //             $(".tbody").children().remove();
+    //             $(".pagingDiv").children().remove();
+    //             let items = data.items;
+    //             let page = data.paging;
+    //             let cpage = data.currentPage;
+    //             let cnt = data.count;
+    //             console.log('data.cpage : ' + data.currentPage);
+    //             console.log('data.cnt : ' + data.count);
+    //             if (data.items.length == 0) {
+    //                 var html = noDataHtml();
+    //                 $(".tbody").append(html);
+    //             } else {
+    //                 for (let i = 0; i < items.length; i++) {
+    //                     // var newHtml = createHtml(items[i]);
+    //                     // var newHtml = createHtml(items[i], cpage, cnt);
+    //                     // var newHtml = createHtml(items[i], cpage, cnt);
+    //                     var newHtml = createHtml(items[i], cpage, cnt,data.searchType,data.keyword, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+    //                         data.satOpenOption, data.satCloseOption, data.holidayY, data.holidayN, data.holidayOpenOption, data.holidayCloseOption);
+    //                     $(".tbody").append(newHtml);
+    //                 }
+    //                 if (page.needPrev == true) {
+    //                     var pagingHtml = createPaging1(page);
+    //                     $(".pagingDiv").append(pagingHtml);
+    //                 }
+    //                 for (let k = page.startNavi; k <= page.endNavi; k++) {
+    //                     if (data.currentPage == k) {
+    //                         var pagingHtml = createPaging3(k, page);
+    //                         $(".pagingDiv").append(pagingHtml);
+    //                     } else {
+    //                         var pagingHtml = createPaging4(k, page);
+    //                         $(".pagingDiv").append(pagingHtml);
+    //                     }
+    //                 }
+    //                 if (page.needNext == true) {
+    //                     var pagingHtml = createPaging2(page);
+    //                     $(".pagingDiv").append(pagingHtml);
+    //                 }
+    //             }
+    //         }
+    //     })
+    // });
+
+
 
     function paging(startNavi, count, searchType, keyword) {
         /*$("#cpage").val(startNavi);
@@ -281,7 +364,6 @@
         $("#type").val(searchType);
         $("#key").val(keyword);
         $("#pagingFrm").submit();*/
-
         let result = changeOption();
         $.ajax({
             url: '/api/hospital/list',
@@ -301,8 +383,7 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
-                console.log("cpage : " + data.currentPage);
-                console.log("count : " + data.count);
+                console.log("list길이 : " + data.items.length);
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
@@ -311,126 +392,128 @@
                 let cnt = data.count;
                 console.log('data.cpage : ' + data.currentPage);
                 console.log('data.cnt : ' + data.count);
-                for (let i = 0; i < items.length; i++) {
-                    // var newHtml = createHtml(items[i]);
-                    // var newHtml = createHtml(items[i], cpage, cnt);
-                    var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
-                        data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
-                    $(".tbody").append(newHtml);
-                }
-                if (page.needPrev == true) {
-                    var pagingHtml = createPaging1(page);
-                    $(".pagingDiv").append(pagingHtml);
-                }
-                for (let k = page.startNavi; k <= page.endNavi; k++) {
-                    if (data.currentPage == k) {
-                        var pagingHtml = createPaging3(k, page);
+                if (data.items.length == 0) {
+                    var html = noDataHtml();
+                    $(".tbody").append(html);
+                } else {
+                    for (let i = 0; i < items.length; i++) {
+                        // var newHtml = createHtml(items[i]);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        var newHtml = createHtml(items[i], cpage, cnt,data.searchType,data.keyword, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                            data.satOpenOption, data.satCloseOption, data.holidayY, data.holidayN, data.holidayOpenOption, data.holidayCloseOption);
+                        $(".tbody").append(newHtml);
+                    }
+                    if (page.needPrev == true) {
+                        var pagingHtml = createPaging1(page);
                         $(".pagingDiv").append(pagingHtml);
-                    } else {
-                        var pagingHtml = createPaging4(k, page);
+                    }
+                    for (let k = page.startNavi; k <= page.endNavi; k++) {
+                        if (data.currentPage == k) {
+                            var pagingHtml = createPaging3(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        } else {
+                            var pagingHtml = createPaging4(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        }
+                    }
+                    if (page.needNext == true) {
+                        var pagingHtml = createPaging2(page);
                         $(".pagingDiv").append(pagingHtml);
                     }
                 }
-                if (page.needNext == true) {
-                    var pagingHtml = createPaging2(page);
-                    $(".pagingDiv").append(pagingHtml);
-                }
-
-                /*console.log(data);
-                $(".tbody").children().remove();
-                $(".pagingDiv").children().remove();
-                let items = data.items;
-                let page = data.paging;
-                for (let i = 0; i < items.length; i++) {
-                    var newHtml = createHtml(items[i]);
-                    $(".tbody").append(newHtml);
-                }
-                if (page.needPrev == true) {
-                    var pagingHtml = createPaging1(page);
-                    $(".pagingDiv").append(pagingHtml);
-                }
-                for (let k = page.startNavi; k <= page.endNavi; k++) {
-                    if (data.currentPage == k) {
-                        var pagingHtml = createPaging3(k, page);
-                        $(".pagingDiv").append(pagingHtml);
-                    } else {
-                        var pagingHtml = createPaging4(k, page);
-                        $(".pagingDiv").append(pagingHtml);
-                    }
-                }
-                if (page.needNext == true) {
-                    var pagingHtml = createPaging2(page);
-                    $(".pagingDiv").append(pagingHtml);
-                }*/
             }
         })
     }
 
-    $("#count").on("change", function () {
-        let count = $("#count").val();
-        countChange(count);
-    });
 
-    function countChange(count) {
-        $("#currentPage2").val(1);
-        $("#count2").val(count);
-        $("#searchType2").val($("#boardSearchType").val());
-        $("#keyword2").val($("#boardKeyword").val());
+    // $("#count").on("change", function () {
+    //     let count = $("#count").val();
+    //     countChange(count);
+    // });
+    //
+    // function countChange(count) {
+    //     $("#currentPage2").val(1);
+    //     $("#count2").val(count);
+    //     $("#searchType2").val($("#boardSearchType").val());
+    //     $("#keyword2").val($("#boardKeyword").val());
+    //
+    //     $("#city2").val($("#boardCity").val());
+    //     $("#weekOpen2").val($("#boardWeekOpen").val());
+    //     $("#weekClose2").val($("#boardWeekClose").val());
+    //     $("#satOpen2").val($("#boardSatOpen").val());
+    //     $("#satClose2").val($("#boardSatClose").val());
+    //     // $("#holidayYN2").val($("#boardHolidayYN").val());
+    //
+    //
+    //
+    //     $("#holidayY2").val($("#holidayY").val());
+    //     $("#holidayN2").val($("#holidayN").val());
+    //
+    //     $("#holidayOpen2").val($("#boardHolidayOpen").val());
+    //     $("#holidayClose2").val($("#boardHolidayClose").val());
+    //     $("#frm2").submit();
+    //
+    // }
+    //
+    // $("#searchBtn").on("click", function () {
+    //     let searchType = $("#searchType").val();
+    //     let keyword = $("#keyword").val();
+    //     let count = $("#count").val();
+    //     console.log("weekOpenOption : "+$("#weekOpenOption").val());
+    //     console.log("weekOpenOption : "+$("#boardWeekOpen").val());
+    //     // $("#currentPage3").val(1);
+    //     // $("#count3").val(count);
+    //     // $("#searchType3").val(searchType);
+    //     // $("#keyword3").val(keyword);
+    //     // $("#frm3").submit();
+    //     $("#currentPage3").val(1);
+    //     $("#count3").val(count);
+    //     $("#searchType3").val(searchType);
+    //     $("#keyword3").val(keyword);
+    //     $("#city3").val($("#city").val());
+    //     $("#weekOpen3").val($("#weekOpen").val());
+    //     $("#weekClose3").val($("#weekClose").val());
+    //     $("#satOpen3").val($("#satOpen").val());
+    //     $("#satClose3").val($("#satClose").val());
+    //     // $("#holidayYN3").val($("#boardHolidayYN").val());
+    //     $("#holidayY3").val($("#holidayY").val());
+    //     $("#holidayN3").val($("#holidayN").val());
+    //     $("#holidayOpen3").val($("#holidayOpen").val());
+    //     $("#holidayClose3").val($("#holidayClose").val());
+    //     // $("#frm3").submit();
+    // });
 
-        $("#city2").val($("#boardCity").val());
-        $("#weekOpen2").val($("#boardWeekOpen").val());
-        $("#weekClose2").val($("#boardWeekClose").val());
-        $("#satOpen2").val($("#boardSatOpen").val());
-        $("#satClose2").val($("#boardSatClose").val());
-        // $("#holidayYN2").val($("#boardHolidayYN").val());
-        $("#holidayOpen2").val($("#boardHolidayOpen").val());
-        $("#holidayClose2").val($("#boardHolidayClose").val());
-        $("#frm2").submit();
-
-    }
-
-    $("#searchBtn").on("click", function () {
-        let searchType = $("#searchType").val();
-        let keyword = $("#keyword").val();
-        let count = $("#count").val();
-
-        // $("#currentPage3").val(1);
-        // $("#count3").val(count);
-        // $("#searchType3").val(searchType);
-        // $("#keyword3").val(keyword);
-        // $("#frm3").submit();
-
-        $("#currentPage3").val(1);
-        $("#count3").val(count);
-        $("#searchType3").val($("#boardSearchType").val());
-        $("#keyword3").val($("#boardKeyword").val());
-
-        $("#city3").val($("#boardCity").val());
-        $("#weekOpen3").val($("#boardWeekOpen").val());
-        $("#weekClose3").val($("#boardWeekClose").val());
-        $("#satOpen3").val($("#boardSatOpen").val());
-        $("#satClose3").val($("#boardSatClose").val());
-        // $("#holidayYN3").val($("#boardHolidayYN").val());
-        $("#holidayOpen3").val($("#boardHolidayOpen").val());
-        $("#holidayClose3").val($("#boardHolidayClose").val());
-        $("#frm3").submit();
-    });
 
     //옵션 선택
     function changeOption() {
         let data = {
-            searchType: $("#searchType").val(),
-            keyword: $("#keyword").val(),
-            count: $("#count").val(),
-            city: $("#city").val(),
-            weekOpen: $(".weekOpen:checked").val(),
-            weekClose: $(".weekClose:checked").val(),
-            satOpen: $(".satOpen:checked").val(),
-            satClose: $(".satClose:checked").val(),
-            holidayYN: $(".holidayYN:checked").val(),
-            holidayOpen: $(".holidayOpen:checked").val(),
-            holidayClose: $(".holidayClose:checked").val()
+            // searchType: $("#searchType").val(),
+            // keyword: $("#keyword").val(),
+            // count: $("#count").val(),
+            // city: $("#city").val(),
+            // weekOpen: $(".weekOpen:checked").val(),
+            // weekClose: $(".weekClose:checked").val(),
+            // satOpen: $(".satOpen:checked").val(),
+            // satClose: $(".satClose:checked").val(),
+            // holidayYN: $(".holidayYN:checked").val(),
+            // holidayOpen: $(".holidayOpen:checked").val(),
+            // holidayClose: $(".holidayClose:checked").val()
+                searchType: $("#searchType").val(),
+                keyword: $("#keyword").val(),
+                count: $("#count").val(),
+                city: $("#city").val(),
+                weekOpen: $(".weekOpen:checked").val(),
+                weekClose: $(".weekClose:checked").val(),
+                satOpen: $(".satOpen:checked").val(),
+                satClose: $(".satClose:checked").val(),
+                // holidayYN: $(".holidayYN:checked").val(),
+                holidayOpen: $(".holidayOpen:checked").val(),
+                holidayClose: $(".holidayClose:checked").val(),
+                holidayY: $(".holidayY:checked").val(),
+                holidayN: $(".holidayN:checked").val(),
         };
+        console.log(data);
         return data;
     }
 
@@ -472,15 +555,15 @@
     // }
 
     //tbody생성
-    function createHtml(item, cpage, cnt, cityOption, weekOpenOption, weekCloseOption,
-                        satOpenOption, satCloseOption, holidayOpenOption, holidayCloseOption) {
+    function createHtml(item, cpage, cnt,searchType,keyword, cityOption, weekOpenOption, weekCloseOption,
+                        satOpenOption, satCloseOption, holidayY, holidayN, holidayOpenOption, holidayCloseOption) {
         // var arr = [item.hospital_seq, "\'"+item.city+"\'", "\'"+item.weekOpen + "\'", ];
         // "...onclick=detail(1, '홍길동'.....);
         // var b = "'" + item.city + "'";
 
         var html = '<tr><td>' + item.city + '</td>';
-        html += '<td><a href="javascript:void(0);" onclick="detail(' + item.hospital_seq + ',' + cpage + ',' + cnt + ',\'' + cityOption + '\'' + ',\'' + weekOpenOption + '\''
-            + ',\'' + weekCloseOption + '\'' + ',\'' + satOpenOption + '\'' + ',\'' + satCloseOption + '\'' + ',\'' + holidayOpenOption + '\'' + ',\'' + holidayCloseOption + '\'' + ');">' + item.hospital_name + '</a></td>';
+        html += '<td><a href="javascript:void(0);" onclick="detail(' + item.hospital_seq + ',' + cpage + ',' + cnt + ',\'' + searchType + '\'' + ',\'' + keyword + '\'' + ',\'' + cityOption + '\'' + ',\'' + weekOpenOption + '\''
+            + ',\'' + weekCloseOption + '\'' + ',\'' + satOpenOption + '\'' + ',\'' + satCloseOption + '\'' + ',\'' + holidayY + '\'' + ',\'' + holidayN + '\'' + ',\'' + holidayOpenOption + '\'' + ',\'' + holidayCloseOption + '\'' + ');">'+ item.hospital_name + '</a></td>';
         html += '<td>' + item.weekOpen + '~' + item.weekClose + '</td>';
         html += '<td>' + item.satOpen + '~' + item.satClose + '</td>';
         if (item.holidayOpen != null && item.holidayClose != null) {
@@ -543,8 +626,201 @@
         return pagingHtml;
     }
 
+    //카운트 변경
+    $("#count").on("change", function () {
+        let result = changeOption();
+        $.ajax({
+            url: '/api/hospital/list',
+            type: 'post',
+            data: {
+                "currentPage": 1,
+                "count": result.count,
+                "searchType": result.searchType,
+                "keyword": result.keyword,
+                "city": result.city,
+                "weekOpen": result.weekOpen,
+                "weekClose": result.weekClose,
+                "satOpen": result.satOpen,
+                "satClose": result.satClose,
+                "holidayYN": result.holidayYN,
+                "holidayY": result.holidayY,
+                "holidayN": result.holidayN,
+                "holidayOpen": result.holidayOpen,
+                "holidayClose": result.holidayClose
+            },
+            success: function (data) {
+                console.log("list길이 : " + data.items.length);
+                $(".tbody").children().remove();
+                $(".pagingDiv").children().remove();
+                let items = data.items;
+                let page = data.paging;
+                let cpage = data.currentPage;
+                let cnt = data.count;
+                console.log('data.cpage : ' + data.currentPage);
+                console.log('data.cnt : ' + data.count);
+                if (data.items.length == 0) {
+                    var html = noDataHtml();
+                    $(".tbody").append(html);
+                } else {
+                    for (let i = 0; i < items.length; i++) {
+                        // var newHtml = createHtml(items[i]);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        var newHtml = createHtml(items[i], cpage, cnt,data.searchType,data.keyword, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                            data.satOpenOption, data.satCloseOption, data.holidayY, data.holidayN, data.holidayOpenOption, data.holidayCloseOption);
+                        $(".tbody").append(newHtml);
+                    }
+                    if (page.needPrev == true) {
+                        var pagingHtml = createPaging1(page);
+                        $(".pagingDiv").append(pagingHtml);
+                    }
+                    for (let k = page.startNavi; k <= page.endNavi; k++) {
+                        if (data.currentPage == k) {
+                            var pagingHtml = createPaging3(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        } else {
+                            var pagingHtml = createPaging4(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        }
+                    }
+                    if (page.needNext == true) {
+                        var pagingHtml = createPaging2(page);
+                        $(".pagingDiv").append(pagingHtml);
+                    }
+                }
+            }
+        })
+    });
+
+    //검색
+    $("#searchBtn").on("click", function () {
+        let result = changeOption();
+        $.ajax({
+            url: '/api/hospital/list',
+            type: 'post',
+            data: {
+                "currentPage": 1,
+                "count": result.count,
+                "searchType": result.searchType,
+                "keyword": result.keyword,
+                "city": result.city,
+                "weekOpen": result.weekOpen,
+                "weekClose": result.weekClose,
+                "satOpen": result.satOpen,
+                "satClose": result.satClose,
+                "holidayYN": result.holidayYN,
+                "holidayY": result.holidayY,
+                "holidayN": result.holidayN,
+                "holidayOpen": result.holidayOpen,
+                "holidayClose": result.holidayClose
+            },
+            success: function (data) {
+                console.log("list길이 : " + data.items.length);
+                $(".tbody").children().remove();
+                $(".pagingDiv").children().remove();
+                let items = data.items;
+                let page = data.paging;
+                let cpage = data.currentPage;
+                let cnt = data.count;
+                console.log('data.cpage : ' + data.currentPage);
+                console.log('data.cnt : ' + data.count);
+                if (data.items.length == 0) {
+                    var html = noDataHtml();
+                    $(".tbody").append(html);
+                } else {
+                    for (let i = 0; i < items.length; i++) {
+                        // var newHtml = createHtml(items[i]);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        // var newHtml = createHtml(items[i], cpage, cnt);
+                        var newHtml = createHtml(items[i], cpage, cnt,data.searchType,data.keyword, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                            data.satOpenOption, data.satCloseOption, data.holidayY, data.holidayN, data.holidayOpenOption, data.holidayCloseOption);
+                        $(".tbody").append(newHtml);
+                    }
+                    if (page.needPrev == true) {
+                        var pagingHtml = createPaging1(page);
+                        $(".pagingDiv").append(pagingHtml);
+                    }
+                    for (let k = page.startNavi; k <= page.endNavi; k++) {
+                        if (data.currentPage == k) {
+                            var pagingHtml = createPaging3(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        } else {
+                            var pagingHtml = createPaging4(k, page);
+                            $(".pagingDiv").append(pagingHtml);
+                        }
+                    }
+                    if (page.needNext == true) {
+                        var pagingHtml = createPaging2(page);
+                        $(".pagingDiv").append(pagingHtml);
+                    }
+                }
+            }
+        })
+    });
+
+
     $("#city").on("change", function () {
         let result = changeOption();
+        //     $.ajax({
+        //         url: '/api/hospital/list',
+        //         type: 'post',
+        //         data: {
+        //             // "currentPage": 1,
+        //             // "count": result.count,
+        //             // "searchType": result.searchType,
+        //             // "keyword": result.keyword,
+        //             // "city": result.city,
+        //             // "weekOpen": result.weekOpen,
+        //             // "weekClose": result.weekClose,
+        //             // "satOpen": result.satOpen,
+        //             // "satClose": result.satClose,
+        //             // "holidayYN": result.holidayYN,
+        //             // "holidayOpen": result.holidayOpen,
+        //             // "holidayClose": result.holidayClose
+        //         },
+        //         success: function (data) {
+        //             console.log("list길이 : " + data.items.length);
+        //             $(".tbody").children().remove();
+        //             $(".pagingDiv").children().remove();
+        //             let items = data.items;
+        //             let page = data.paging;
+        //             let cpage = data.currentPage;
+        //             let cnt = data.count;
+        //             // console.log('data.cpage : ' + data.currentPage);
+        //             // console.log('data.cnt : ' + data.count);
+        //             if (data.items.length == 0) {
+        //                 var html = noDataHtml();
+        //                 $(".tbody").append(html);
+        //             } else {
+        //                 for (let i = 0; i < items.length; i++) {
+        //                     // var newHtml = createHtml(items[i]);
+        //                     // var newHtml = createHtml(items[i], cpage, cnt);
+        //                     // var newHtml = createHtml(items[i], cpage, cnt);
+        //                     var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+        //                         data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+        //                     $(".tbody").append(newHtml);
+        //                 }
+        //                 if (page.needPrev == true) {
+        //                     var pagingHtml = createPaging1(page);
+        //                     $(".pagingDiv").append(pagingHtml);
+        //                 }
+        //                 for (let k = page.startNavi; k <= page.endNavi; k++) {
+        //                     if (data.currentPage == k) {
+        //                         var pagingHtml = createPaging3(k, page);
+        //                         $(".pagingDiv").append(pagingHtml);
+        //                     } else {
+        //                         var pagingHtml = createPaging4(k, page);
+        //                         $(".pagingDiv").append(pagingHtml);
+        //                     }
+        //                 }
+        //                 if (page.needNext == true) {
+        //                     var pagingHtml = createPaging2(page);
+        //                     $(".pagingDiv").append(pagingHtml);
+        //                 }
+        //             }
+        //         }
+        //     })
+        // });
         $.ajax({
             url: '/api/hospital/list',
             type: 'post',
@@ -559,6 +835,8 @@
                 "satOpen": result.satOpen,
                 "satClose": result.satClose,
                 "holidayYN": result.holidayYN,
+                "holidayY": result.holidayY,
+                "holidayN": result.holidayN,
                 "holidayOpen": result.holidayOpen,
                 "holidayClose": result.holidayClose
             },
@@ -570,8 +848,8 @@
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
-                // console.log('data.cpage : ' + data.currentPage);
-                // console.log('data.cnt : ' + data.count);
+                console.log('data.cpage : ' + data.currentPage);
+                console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $(".tbody").append(html);
@@ -580,8 +858,8 @@
                         // var newHtml = createHtml(items[i]);
                         // var newHtml = createHtml(items[i], cpage, cnt);
                         // var newHtml = createHtml(items[i], cpage, cnt);
-                        var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
-                            data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+                        var newHtml = createHtml(items[i], cpage, cnt,data.searchType,data.keyword, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                            data.satOpenOption, data.satCloseOption, data.holidayY, data.holidayN, data.holidayOpenOption, data.holidayCloseOption);
                         $(".tbody").append(newHtml);
                     }
                     if (page.needPrev == true) {
@@ -606,8 +884,579 @@
         })
     });
 
-    $(".weekOpen").on("change", function () {
-        console.log("시작시간 변경할때");
+        $(".weekOpen").on("change", function () {
+            console.log("시작시간 변경할때");
+            let result = changeOption();
+            //     $.ajax({
+            //         url: '/api/hospital/list',
+            //         type: 'post',
+            //         data: {
+            //             "currentPage": 1,
+            //             "count": result.count,
+            //             "searchType": result.searchType,
+            //             "keyword": result.keyword,
+            //             "city": result.city,
+            //             "weekOpen": result.weekOpen,
+            //             "weekClose": result.weekClose,
+            //             "satOpen": result.satOpen,
+            //             "satClose": result.satClose,
+            //             "holidayYN": result.holidayYN,
+            //             "holidayOpen": result.holidayOpen,
+            //             "holidayClose": result.holidayClose
+            //         },
+            //         success: function (data) {
+            //             console.log("list길이 : " + data.items.length);
+            //             $(".tbody").children().remove();
+            //             $(".pagingDiv").children().remove();
+            //             let items = data.items;
+            //             let page = data.paging;
+            //             let cpage = data.currentPage;
+            //             let cnt = data.count;
+            //             // console.log('data.cpage : ' + data.currentPage);
+            //             // console.log('data.cnt : ' + data.count);
+            //             if (data.items.length == 0) {
+            //                 var html = noDataHtml();
+            //                 $(".tbody").append(html);
+            //             } else {
+            //                 for (let i = 0; i < items.length; i++) {
+            //                     // var newHtml = createHtml(items[i]);
+            //                     // var newHtml = createHtml(items[i], cpage, cnt);
+            //                     // var newHtml = createHtml(items[i], cpage, cnt);
+            //                     var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+            //                         data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+            //                     $(".tbody").append(newHtml);
+            //                 }
+            //                 if (page.needPrev == true) {
+            //                     var pagingHtml = createPaging1(page);
+            //                     $(".pagingDiv").append(pagingHtml);
+            //                 }
+            //                 for (let k = page.startNavi; k <= page.endNavi; k++) {
+            //                     if (data.currentPage == k) {
+            //                         var pagingHtml = createPaging3(k, page);
+            //                         $(".pagingDiv").append(pagingHtml);
+            //                     } else {
+            //                         var pagingHtml = createPaging4(k, page);
+            //                         $(".pagingDiv").append(pagingHtml);
+            //                     }
+            //                 }
+            //                 if (page.needNext == true) {
+            //                     var pagingHtml = createPaging2(page);
+            //                     $(".pagingDiv").append(pagingHtml);
+            //                 }
+            //             }
+            //         }
+            //     })
+            // });
+            $.ajax({
+                url: '/api/hospital/list',
+                type: 'post',
+                data: {
+                    "currentPage": 1,
+                    "count": result.count,
+                    "searchType": result.searchType,
+                    "keyword": result.keyword,
+                    "city": result.city,
+                    "weekOpen": result.weekOpen,
+                    "weekClose": result.weekClose,
+                    "satOpen": result.satOpen,
+                    "satClose": result.satClose,
+                    "holidayYN": result.holidayYN,
+                    "holidayY": result.holidayY,
+                    "holidayN": result.holidayN,
+                    "holidayOpen": result.holidayOpen,
+                    "holidayClose": result.holidayClose
+                },
+                success: function (data) {
+                    console.log("list길이 : " + data.items.length);
+                    $(".tbody").children().remove();
+                    $(".pagingDiv").children().remove();
+                    let items = data.items;
+                    let page = data.paging;
+                    let cpage = data.currentPage;
+                    let cnt = data.count;
+                    console.log('data.cpage : ' + data.currentPage);
+                    console.log('data.cnt : ' + data.count);
+                    if (data.items.length == 0) {
+                        var html = noDataHtml();
+                        $(".tbody").append(html);
+                    } else {
+                        for (let i = 0; i < items.length; i++) {
+                            // var newHtml = createHtml(items[i]);
+                            // var newHtml = createHtml(items[i], cpage, cnt);
+                            // var newHtml = createHtml(items[i], cpage, cnt);
+                            var newHtml = createHtml(items[i], cpage, cnt,data.searchType,data.keyword, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                                data.satOpenOption, data.satCloseOption, data.holidayY, data.holidayN, data.holidayOpenOption, data.holidayCloseOption);
+                            $(".tbody").append(newHtml);
+                        }
+                        if (page.needPrev == true) {
+                            var pagingHtml = createPaging1(page);
+                            $(".pagingDiv").append(pagingHtml);
+                        }
+                        for (let k = page.startNavi; k <= page.endNavi; k++) {
+                            if (data.currentPage == k) {
+                                var pagingHtml = createPaging3(k, page);
+                                $(".pagingDiv").append(pagingHtml);
+                            } else {
+                                var pagingHtml = createPaging4(k, page);
+                                $(".pagingDiv").append(pagingHtml);
+                            }
+                        }
+                        if (page.needNext == true) {
+                            var pagingHtml = createPaging2(page);
+                            $(".pagingDiv").append(pagingHtml);
+                        }
+                    }
+                }
+            })
+        });
+
+            $(".weekClose").on("change", function () {
+                let result = changeOption();
+                //     $.ajax({
+                //         url: '/api/hospital/list',
+                //         type: 'post',
+                //         data: {
+                //             "currentPage": 1,
+                //             "count": result.count,
+                //             "searchType": result.searchType,
+                //             "keyword": result.keyword,
+                //             "city": result.city,
+                //             "weekOpen": result.weekOpen,
+                //             "weekClose": result.weekClose,
+                //             "satOpen": result.satOpen,
+                //             "satClose": result.satClose,
+                //             "holidayYN": result.holidayYN,
+                //             "holidayOpen": result.holidayOpen,
+                //             "holidayClose": result.holidayClose
+                //         },
+                //         success: function (data) {
+                //             console.log("list길이 : " + data.items.length);
+                //             $(".tbody").children().remove();
+                //             $(".pagingDiv").children().remove();
+                //             let items = data.items;
+                //             let page = data.paging;
+                //             let cpage = data.currentPage;
+                //             let cnt = data.count;
+                //             // console.log('data.cpage : ' + data.currentPage);
+                //             // console.log('data.cnt : ' + data.count);
+                //             if (data.items.length == 0) {
+                //                 var html = noDataHtml();
+                //                 $(".tbody").append(html);
+                //             } else {
+                //                 for (let i = 0; i < items.length; i++) {
+                //                     // var newHtml = createHtml(items[i]);
+                //                     // var newHtml = createHtml(items[i], cpage, cnt);
+                //                     // var newHtml = createHtml(items[i], cpage, cnt);
+                //                     var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                //                         data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+                //                     $(".tbody").append(newHtml);
+                //                 }
+                //                 if (page.needPrev == true) {
+                //                     var pagingHtml = createPaging1(page);
+                //                     $(".pagingDiv").append(pagingHtml);
+                //                 }
+                //                 for (let k = page.startNavi; k <= page.endNavi; k++) {
+                //                     if (data.currentPage == k) {
+                //                         var pagingHtml = createPaging3(k, page);
+                //                         $(".pagingDiv").append(pagingHtml);
+                //                     } else {
+                //                         var pagingHtml = createPaging4(k, page);
+                //                         $(".pagingDiv").append(pagingHtml);
+                //                     }
+                //                 }
+                //                 if (page.needNext == true) {
+                //                     var pagingHtml = createPaging2(page);
+                //                     $(".pagingDiv").append(pagingHtml);
+                //                 }
+                //             }
+                //         }
+                //     })
+                // });
+                $.ajax({
+                    url: '/api/hospital/list',
+                    type: 'post',
+                    data: {
+                        "currentPage": 1,
+                        "count": result.count,
+                        "searchType": result.searchType,
+                        "keyword": result.keyword,
+                        "city": result.city,
+                        "weekOpen": result.weekOpen,
+                        "weekClose": result.weekClose,
+                        "satOpen": result.satOpen,
+                        "satClose": result.satClose,
+                        "holidayYN": result.holidayYN,
+                        "holidayY": result.holidayY,
+                        "holidayN": result.holidayN,
+                        "holidayOpen": result.holidayOpen,
+                        "holidayClose": result.holidayClose
+                    },
+                    success: function (data) {
+                        console.log("list길이 : " + data.items.length);
+                        $(".tbody").children().remove();
+                        $(".pagingDiv").children().remove();
+                        let items = data.items;
+                        let page = data.paging;
+                        let cpage = data.currentPage;
+                        let cnt = data.count;
+                        console.log('data.cpage : ' + data.currentPage);
+                        console.log('data.cnt : ' + data.count);
+                        if (data.items.length == 0) {
+                            var html = noDataHtml();
+                            $(".tbody").append(html);
+                        } else {
+                            for (let i = 0; i < items.length; i++) {
+                                // var newHtml = createHtml(items[i]);
+                                // var newHtml = createHtml(items[i], cpage, cnt);
+                                // var newHtml = createHtml(items[i], cpage, cnt);
+                                var newHtml = createHtml(items[i], cpage, cnt,data.searchType,data.keyword, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                                    data.satOpenOption, data.satCloseOption, data.holidayY, data.holidayN, data.holidayOpenOption, data.holidayCloseOption);
+                                $(".tbody").append(newHtml);
+                            }
+                            if (page.needPrev == true) {
+                                var pagingHtml = createPaging1(page);
+                                $(".pagingDiv").append(pagingHtml);
+                            }
+                            for (let k = page.startNavi; k <= page.endNavi; k++) {
+                                if (data.currentPage == k) {
+                                    var pagingHtml = createPaging3(k, page);
+                                    $(".pagingDiv").append(pagingHtml);
+                                } else {
+                                    var pagingHtml = createPaging4(k, page);
+                                    $(".pagingDiv").append(pagingHtml);
+                                }
+                            }
+                            if (page.needNext == true) {
+                                var pagingHtml = createPaging2(page);
+                                $(".pagingDiv").append(pagingHtml);
+                            }
+                        }
+                    }
+                })
+            });
+
+                $(".satOpen").on("change", function () {
+                    let result = changeOption();
+                    //     $.ajax({
+                    //         url: '/api/hospital/list',
+                    //         type: 'post',
+                    //         data: {
+                    //             "currentPage": 1,
+                    //             "count": result.count,
+                    //             "searchType": result.searchType,
+                    //             "keyword": result.keyword,
+                    //             "city": result.city,
+                    //             "weekOpen": result.weekOpen,
+                    //             "weekClose": result.weekClose,
+                    //             "satOpen": result.satOpen,
+                    //             "satClose": result.satClose,
+                    //             "holidayYN": result.holidayYN,
+                    //             "holidayOpen": result.holidayOpen,
+                    //             "holidayClose": result.holidayClose
+                    //         },
+                    //         success: function (data) {
+                    //             console.log("list길이 : " + data.items.length);
+                    //             $(".tbody").children().remove();
+                    //             $(".pagingDiv").children().remove();
+                    //             let items = data.items;
+                    //             let page = data.paging;
+                    //             let cpage = data.currentPage;
+                    //             let cnt = data.count;
+                    //             // console.log('data.cpage : ' + data.currentPage);
+                    //             // console.log('data.cnt : ' + data.count);
+                    //             if (data.items.length == 0) {
+                    //                 var html = noDataHtml();
+                    //                 $(".tbody").append(html);
+                    //             } else {
+                    //                 for (let i = 0; i < items.length; i++) {
+                    //                     // var newHtml = createHtml(items[i]);
+                    //                     // var newHtml = createHtml(items[i], cpage, cnt);
+                    //                     // var newHtml = createHtml(items[i], cpage, cnt);
+                    //                     var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                    //                         data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+                    //                     $(".tbody").append(newHtml);
+                    //                 }
+                    //                 if (page.needPrev == true) {
+                    //                     var pagingHtml = createPaging1(page);
+                    //                     $(".pagingDiv").append(pagingHtml);
+                    //                 }
+                    //                 for (let k = page.startNavi; k <= page.endNavi; k++) {
+                    //                     if (data.currentPage == k) {
+                    //                         var pagingHtml = createPaging3(k, page);
+                    //                         $(".pagingDiv").append(pagingHtml);
+                    //                     } else {
+                    //                         var pagingHtml = createPaging4(k, page);
+                    //                         $(".pagingDiv").append(pagingHtml);
+                    //                     }
+                    //                 }
+                    //                 if (page.needNext == true) {
+                    //                     var pagingHtml = createPaging2(page);
+                    //                     $(".pagingDiv").append(pagingHtml);
+                    //                 }
+                    //             }
+                    //         }
+                    //     })
+                    // });
+                    $.ajax({
+                        url: '/api/hospital/list',
+                        type: 'post',
+                        data: {
+                            "currentPage": 1,
+                            "count": result.count,
+                            "searchType": result.searchType,
+                            "keyword": result.keyword,
+                            "city": result.city,
+                            "weekOpen": result.weekOpen,
+                            "weekClose": result.weekClose,
+                            "satOpen": result.satOpen,
+                            "satClose": result.satClose,
+                            "holidayYN": result.holidayYN,
+                            "holidayY": result.holidayY,
+                            "holidayN": result.holidayN,
+                            "holidayOpen": result.holidayOpen,
+                            "holidayClose": result.holidayClose
+                        },
+                        success: function (data) {
+                            console.log("list길이 : " + data.items.length);
+                            $(".tbody").children().remove();
+                            $(".pagingDiv").children().remove();
+                            let items = data.items;
+                            let page = data.paging;
+                            let cpage = data.currentPage;
+                            let cnt = data.count;
+                            console.log('data.cpage : ' + data.currentPage);
+                            console.log('data.cnt : ' + data.count);
+                            if (data.items.length == 0) {
+                                var html = noDataHtml();
+                                $(".tbody").append(html);
+                            } else {
+                                for (let i = 0; i < items.length; i++) {
+                                    // var newHtml = createHtml(items[i]);
+                                    // var newHtml = createHtml(items[i], cpage, cnt);
+                                    // var newHtml = createHtml(items[i], cpage, cnt);
+                                    var newHtml = createHtml(items[i], cpage, cnt,data.searchType,data.keyword, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                                        data.satOpenOption, data.satCloseOption, data.holidayY, data.holidayN, data.holidayOpenOption, data.holidayCloseOption);
+                                    $(".tbody").append(newHtml);
+                                }
+                                if (page.needPrev == true) {
+                                    var pagingHtml = createPaging1(page);
+                                    $(".pagingDiv").append(pagingHtml);
+                                }
+                                for (let k = page.startNavi; k <= page.endNavi; k++) {
+                                    if (data.currentPage == k) {
+                                        var pagingHtml = createPaging3(k, page);
+                                        $(".pagingDiv").append(pagingHtml);
+                                    } else {
+                                        var pagingHtml = createPaging4(k, page);
+                                        $(".pagingDiv").append(pagingHtml);
+                                    }
+                                }
+                                if (page.needNext == true) {
+                                    var pagingHtml = createPaging2(page);
+                                    $(".pagingDiv").append(pagingHtml);
+                                }
+                            }
+                        }
+                    })
+                });
+
+                $(".satClose").on("change", function () {
+                    let result = changeOption();
+                    $.ajax({
+                        url: '/api/hospital/list',
+                        type: 'post',
+                        data: {
+                            "currentPage": 1,
+                            "count": result.count,
+                            "searchType": result.searchType,
+                            "keyword": result.keyword,
+                            "city": result.city,
+                            "weekOpen": result.weekOpen,
+                            "weekClose": result.weekClose,
+                            "satOpen": result.satOpen,
+                            "satClose": result.satClose,
+                            "holidayYN": result.holidayYN,
+                            "holidayY": result.holidayY,
+                            "holidayN": result.holidayN,
+                            "holidayOpen": result.holidayOpen,
+                            "holidayClose": result.holidayClose
+                        },
+                        success: function (data) {
+                            console.log("list길이 : " + data.items.length);
+                            $(".tbody").children().remove();
+                            $(".pagingDiv").children().remove();
+                            let items = data.items;
+                            let page = data.paging;
+                            let cpage = data.currentPage;
+                            let cnt = data.count;
+                            console.log('data.cpage : ' + data.currentPage);
+                            console.log('data.cnt : ' + data.count);
+                            if (data.items.length == 0) {
+                                var html = noDataHtml();
+                                $(".tbody").append(html);
+                            } else {
+                                for (let i = 0; i < items.length; i++) {
+                                    // var newHtml = createHtml(items[i]);
+                                    // var newHtml = createHtml(items[i], cpage, cnt);
+                                    // var newHtml = createHtml(items[i], cpage, cnt);
+                                    var newHtml = createHtml(items[i], cpage, cnt,data.searchType,data.keyword, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                                        data.satOpenOption, data.satCloseOption, data.holidayY, data.holidayN, data.holidayOpenOption, data.holidayCloseOption);
+                                    $(".tbody").append(newHtml);
+                                }
+                                if (page.needPrev == true) {
+                                    var pagingHtml = createPaging1(page);
+                                    $(".pagingDiv").append(pagingHtml);
+                                }
+                                for (let k = page.startNavi; k <= page.endNavi; k++) {
+                                    if (data.currentPage == k) {
+                                        var pagingHtml = createPaging3(k, page);
+                                        $(".pagingDiv").append(pagingHtml);
+                                    } else {
+                                        var pagingHtml = createPaging4(k, page);
+                                        $(".pagingDiv").append(pagingHtml);
+                                    }
+                                }
+                                if (page.needNext == true) {
+                                    var pagingHtml = createPaging2(page);
+                                    $(".pagingDiv").append(pagingHtml);
+                                }
+                            }
+                        }
+                    })
+                });
+
+                $(".holidayY").on("change", function () {
+                    console.log('change');
+                    let result = changeOption();
+                //     $.ajax({
+                //         url: '/api/hospital/list',
+                //         type: 'post',
+                //         data: {
+                //             "currentPage": 1,
+                //             "count": result.count,
+                //             "searchType": result.searchType,
+                //             "keyword": result.keyword,
+                //             "city": result.city,
+                //             "weekOpen": result.weekOpen,
+                //             "weekClose": result.weekClose,
+                //             "satOpen": result.satOpen,
+                //             "satClose": result.satClose,
+                //             "holidayYN": result.holidayYN,
+                //             "holidayOpen": result.holidayOpen,
+                //             "holidayClose": result.holidayClose
+                //         },
+                //         success: function (data) {
+                //             console.log("진료 여부");
+                //             console.log(data.holidayY);
+                //             console.log(data.holidayN);
+                //             console.log("list길이 : " + data.items.length);
+                //             $(".tbody").children().remove();
+                //             $(".pagingDiv").children().remove();
+                //             let items = data.items;
+                //             let page = data.paging;
+                //             let cpage = data.currentPage;
+                //             let cnt = data.count;
+                //             // console.log('data.cpage : ' + data.currentPage);
+                //             // console.log('data.cnt : ' + data.count);
+                //             if (data.items.length == 0) {
+                //                 var html = noDataHtml();
+                //                 $(".tbody").append(html);
+                //             } else {
+                //                 for (let i = 0; i < items.length; i++) {
+                //                     // var newHtml = createHtml(items[i]);
+                //                     // var newHtml = createHtml(items[i], cpage, cnt);
+                //                     // var newHtml = createHtml(items[i], cpage, cnt);
+                //                     var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                //                         data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+                //                     $(".tbody").append(newHtml);
+                //                 }
+                //                 if (page.needPrev == true) {
+                //                     var pagingHtml = createPaging1(page);
+                //                     $(".pagingDiv").append(pagingHtml);
+                //                 }
+                //                 for (let k = page.startNavi; k <= page.endNavi; k++) {
+                //                     if (data.currentPage == k) {
+                //                         var pagingHtml = createPaging3(k, page);
+                //                         $(".pagingDiv").append(pagingHtml);
+                //                     } else {
+                //                         var pagingHtml = createPaging4(k, page);
+                //                         $(".pagingDiv").append(pagingHtml);
+                //                     }
+                //                 }
+                //                 if (page.needNext == true) {
+                //                     var pagingHtml = createPaging2(page);
+                //                     $(".pagingDiv").append(pagingHtml);
+                //                 }
+                //             }
+                //         }
+                //     })
+                // });
+                    $.ajax({
+                        url: '/api/hospital/list',
+                        type: 'post',
+                        data: {
+                            "currentPage": 1,
+                            "count": result.count,
+                            "searchType": result.searchType,
+                            "keyword": result.keyword,
+                            "city": result.city,
+                            "weekOpen": result.weekOpen,
+                            "weekClose": result.weekClose,
+                            "satOpen": result.satOpen,
+                            "satClose": result.satClose,
+                            "holidayYN": result.holidayYN,
+                            "holidayY": result.holidayY,
+                            "holidayN": result.holidayN,
+                            "holidayOpen": result.holidayOpen,
+                            "holidayClose": result.holidayClose
+                        },
+                        success: function (data) {
+                            console.log("list길이 : " + data.items.length);
+                            $(".tbody").children().remove();
+                            $(".pagingDiv").children().remove();
+                            let items = data.items;
+                            let page = data.paging;
+                            let cpage = data.currentPage;
+                            let cnt = data.count;
+                            console.log('data.cpage : ' + data.currentPage);
+                            console.log('data.cnt : ' + data.count);
+                            if (data.items.length == 0) {
+                                var html = noDataHtml();
+                                $(".tbody").append(html);
+                            } else {
+                                for (let i = 0; i < items.length; i++) {
+                                    // var newHtml = createHtml(items[i]);
+                                    // var newHtml = createHtml(items[i], cpage, cnt);
+                                    // var newHtml = createHtml(items[i], cpage, cnt);
+                                    var newHtml = createHtml(items[i], cpage, cnt,data.searchType,data.keyword, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                                        data.satOpenOption, data.satCloseOption, data.holidayY, data.holidayN, data.holidayOpenOption, data.holidayCloseOption);
+                                    $(".tbody").append(newHtml);
+                                }
+                                if (page.needPrev == true) {
+                                    var pagingHtml = createPaging1(page);
+                                    $(".pagingDiv").append(pagingHtml);
+                                }
+                                for (let k = page.startNavi; k <= page.endNavi; k++) {
+                                    if (data.currentPage == k) {
+                                        var pagingHtml = createPaging3(k, page);
+                                        $(".pagingDiv").append(pagingHtml);
+                                    } else {
+                                        var pagingHtml = createPaging4(k, page);
+                                        $(".pagingDiv").append(pagingHtml);
+                                    }
+                                }
+                                if (page.needNext == true) {
+                                    var pagingHtml = createPaging2(page);
+                                    $(".pagingDiv").append(pagingHtml);
+                                }
+                            }
+                        }
+                    })
+                });
+
+
+
+    $(".holidayN").on("change", function () {
         let result = changeOption();
         $.ajax({
             url: '/api/hospital/list',
@@ -623,6 +1472,8 @@
                 "satOpen": result.satOpen,
                 "satClose": result.satClose,
                 "holidayYN": result.holidayYN,
+                "holidayY": result.holidayY,
+                "holidayN": result.holidayN,
                 "holidayOpen": result.holidayOpen,
                 "holidayClose": result.holidayClose
             },
@@ -634,8 +1485,8 @@
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
-                // console.log('data.cpage : ' + data.currentPage);
-                // console.log('data.cnt : ' + data.count);
+                console.log('data.cpage : ' + data.currentPage);
+                console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $(".tbody").append(html);
@@ -644,8 +1495,8 @@
                         // var newHtml = createHtml(items[i]);
                         // var newHtml = createHtml(items[i], cpage, cnt);
                         // var newHtml = createHtml(items[i], cpage, cnt);
-                        var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
-                            data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+                        var newHtml = createHtml(items[i], cpage, cnt,data.searchType,data.keyword, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                            data.satOpenOption, data.satCloseOption, data.holidayY, data.holidayN, data.holidayOpenOption, data.holidayCloseOption);
                         $(".tbody").append(newHtml);
                     }
                     if (page.needPrev == true) {
@@ -670,323 +1521,195 @@
         })
     });
 
-    $(".weekClose").on("change", function () {
-        let result = changeOption();
-        $.ajax({
-            url: '/api/hospital/list',
-            type: 'post',
-            data: {
-                "currentPage": 1,
-                "count": result.count,
-                "searchType": result.searchType,
-                "keyword": result.keyword,
-                "city": result.city,
-                "weekOpen": result.weekOpen,
-                "weekClose": result.weekClose,
-                "satOpen": result.satOpen,
-                "satClose": result.satClose,
-                "holidayYN": result.holidayYN,
-                "holidayOpen": result.holidayOpen,
-                "holidayClose": result.holidayClose
-            },
-            success: function (data) {
-                console.log("list길이 : " + data.items.length);
-                $(".tbody").children().remove();
-                $(".pagingDiv").children().remove();
-                let items = data.items;
-                let page = data.paging;
-                let cpage = data.currentPage;
-                let cnt = data.count;
-                // console.log('data.cpage : ' + data.currentPage);
-                // console.log('data.cnt : ' + data.count);
-                if (data.items.length == 0) {
-                    var html = noDataHtml();
-                    $(".tbody").append(html);
-                } else {
-                    for (let i = 0; i < items.length; i++) {
-                        // var newHtml = createHtml(items[i]);
-                        // var newHtml = createHtml(items[i], cpage, cnt);
-                        // var newHtml = createHtml(items[i], cpage, cnt);
-                        var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
-                            data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
-                        $(".tbody").append(newHtml);
-                    }
-                    if (page.needPrev == true) {
-                        var pagingHtml = createPaging1(page);
-                        $(".pagingDiv").append(pagingHtml);
-                    }
-                    for (let k = page.startNavi; k <= page.endNavi; k++) {
-                        if (data.currentPage == k) {
-                            var pagingHtml = createPaging3(k, page);
-                            $(".pagingDiv").append(pagingHtml);
-                        } else {
-                            var pagingHtml = createPaging4(k, page);
-                            $(".pagingDiv").append(pagingHtml);
-                        }
-                    }
-                    if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
-                        $(".pagingDiv").append(pagingHtml);
-                    }
-                }
-            }
-        })
-    });
 
-    $(".satOpen").on("change", function () {
-        let result = changeOption();
-        $.ajax({
-            url: '/api/hospital/list',
-            type: 'post',
-            data: {
-                "currentPage": 1,
-                "count": result.count,
-                "searchType": result.searchType,
-                "keyword": result.keyword,
-                "city": result.city,
-                "weekOpen": result.weekOpen,
-                "weekClose": result.weekClose,
-                "satOpen": result.satOpen,
-                "satClose": result.satClose,
-                "holidayYN": result.holidayYN,
-                "holidayOpen": result.holidayOpen,
-                "holidayClose": result.holidayClose
-            },
-            success: function (data) {
-                console.log("list길이 : " + data.items.length);
-                $(".tbody").children().remove();
-                $(".pagingDiv").children().remove();
-                let items = data.items;
-                let page = data.paging;
-                let cpage = data.currentPage;
-                let cnt = data.count;
-                // console.log('data.cpage : ' + data.currentPage);
-                // console.log('data.cnt : ' + data.count);
-                if (data.items.length == 0) {
-                    var html = noDataHtml();
-                    $(".tbody").append(html);
-                } else {
-                    for (let i = 0; i < items.length; i++) {
-                        // var newHtml = createHtml(items[i]);
-                        // var newHtml = createHtml(items[i], cpage, cnt);
-                        // var newHtml = createHtml(items[i], cpage, cnt);
-                        var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
-                            data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
-                        $(".tbody").append(newHtml);
-                    }
-                    if (page.needPrev == true) {
-                        var pagingHtml = createPaging1(page);
-                        $(".pagingDiv").append(pagingHtml);
-                    }
-                    for (let k = page.startNavi; k <= page.endNavi; k++) {
-                        if (data.currentPage == k) {
-                            var pagingHtml = createPaging3(k, page);
-                            $(".pagingDiv").append(pagingHtml);
-                        } else {
-                            var pagingHtml = createPaging4(k, page);
-                            $(".pagingDiv").append(pagingHtml);
+                $(".holidayOpen").on("change", function () {
+                    let result = changeOption();
+                //     $.ajax({
+                //         url: '/api/hospital/list',
+                //         type: 'post',
+                //         data: {
+                //             "currentPage": 1,
+                //             "count": result.count,
+                //             "searchType": result.searchType,
+                //             "keyword": result.keyword,
+                //             "city": result.city,
+                //             "weekOpen": result.weekOpen,
+                //             "weekClose": result.weekClose,
+                //             "satOpen": result.satOpen,
+                //             "satClose": result.satClose,
+                //             "holidayYN": result.holidayYN,
+                //             "holidayOpen": result.holidayOpen,
+                //             "holidayClose": result.holidayClose
+                //         },
+                //         success: function (data) {
+                //             console.log("list길이 : " + data.items.length);
+                //             $(".tbody").children().remove();
+                //             $(".pagingDiv").children().remove();
+                //             let items = data.items;
+                //             let page = data.paging;
+                //             let cpage = data.currentPage;
+                //             let cnt = data.count;
+                //             // console.log('data.cpage : ' + data.currentPage);
+                //             // console.log('data.cnt : ' + data.count);
+                //             if (data.items.length == 0) {
+                //                 var html = noDataHtml();
+                //                 $(".tbody").append(html);
+                //             } else {
+                //                 for (let i = 0; i < items.length; i++) {
+                //                     // var newHtml = createHtml(items[i]);
+                //                     // var newHtml = createHtml(items[i], cpage, cnt);
+                //                     // var newHtml = createHtml(items[i], cpage, cnt);
+                //                     var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                //                         data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+                //                     $(".tbody").append(newHtml);
+                //                 }
+                //                 if (page.needPrev == true) {
+                //                     var pagingHtml = createPaging1(page);
+                //                     $(".pagingDiv").append(pagingHtml);
+                //                 }
+                //                 for (let k = page.startNavi; k <= page.endNavi; k++) {
+                //                     if (data.currentPage == k) {
+                //                         var pagingHtml = createPaging3(k, page);
+                //                         $(".pagingDiv").append(pagingHtml);
+                //                     } else {
+                //                         var pagingHtml = createPaging4(k, page);
+                //                         $(".pagingDiv").append(pagingHtml);
+                //                     }
+                //                 }
+                //                 if (page.needNext == true) {
+                //                     var pagingHtml = createPaging2(page);
+                //                     $(".pagingDiv").append(pagingHtml);
+                //                 }
+                //             }
+                //         }
+                //     })
+                // });
+                    $.ajax({
+                        url: '/api/hospital/list',
+                        type: 'post',
+                        data: {
+                            "currentPage": 1,
+                            "count": result.count,
+                            "searchType": result.searchType,
+                            "keyword": result.keyword,
+                            "city": result.city,
+                            "weekOpen": result.weekOpen,
+                            "weekClose": result.weekClose,
+                            "satOpen": result.satOpen,
+                            "satClose": result.satClose,
+                            "holidayYN": result.holidayYN,
+                            "holidayY": result.holidayY,
+                            "holidayN": result.holidayN,
+                            "holidayOpen": result.holidayOpen,
+                            "holidayClose": result.holidayClose
+                        },
+                        success: function (data) {
+                            console.log("list길이 : " + data.items.length);
+                            $(".tbody").children().remove();
+                            $(".pagingDiv").children().remove();
+                            let items = data.items;
+                            let page = data.paging;
+                            let cpage = data.currentPage;
+                            let cnt = data.count;
+                            console.log('data.cpage : ' + data.currentPage);
+                            console.log('data.cnt : ' + data.count);
+                            if (data.items.length == 0) {
+                                var html = noDataHtml();
+                                $(".tbody").append(html);
+                            } else {
+                                for (let i = 0; i < items.length; i++) {
+                                    // var newHtml = createHtml(items[i]);
+                                    // var newHtml = createHtml(items[i], cpage, cnt);
+                                    // var newHtml = createHtml(items[i], cpage, cnt);
+                                    var newHtml = createHtml(items[i], cpage, cnt,data.searchType,data.keyword, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                                        data.satOpenOption, data.satCloseOption, data.holidayY, data.holidayN, data.holidayOpenOption, data.holidayCloseOption);
+                                    $(".tbody").append(newHtml);
+                                }
+                                if (page.needPrev == true) {
+                                    var pagingHtml = createPaging1(page);
+                                    $(".pagingDiv").append(pagingHtml);
+                                }
+                                for (let k = page.startNavi; k <= page.endNavi; k++) {
+                                    if (data.currentPage == k) {
+                                        var pagingHtml = createPaging3(k, page);
+                                        $(".pagingDiv").append(pagingHtml);
+                                    } else {
+                                        var pagingHtml = createPaging4(k, page);
+                                        $(".pagingDiv").append(pagingHtml);
+                                    }
+                                }
+                                if (page.needNext == true) {
+                                    var pagingHtml = createPaging2(page);
+                                    $(".pagingDiv").append(pagingHtml);
+                                }
+                            }
                         }
-                    }
-                    if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
-                        $(".pagingDiv").append(pagingHtml);
-                    }
-                }
-            }
-        })
-    });
+                    })
+                });
 
-    $(".satClose").on("change", function () {
-        let result = changeOption();
-        $.ajax({
-            url: '/api/hospital/list',
-            type: 'post',
-            data: {
-                "currentPage": 1,
-                "count": result.count,
-                "searchType": result.searchType,
-                "keyword": result.keyword,
-                "city": result.city,
-                "weekOpen": result.weekOpen,
-                "weekClose": result.weekClose,
-                "satOpen": result.satOpen,
-                "satClose": result.satClose,
-                "holidayYN": result.holidayYN,
-                "holidayOpen": result.holidayOpen,
-                "holidayClose": result.holidayClose
-            },
-            success: function (data) {
-                console.log("list길이 : " + data.items.length);
-                $(".tbody").children().remove();
-                $(".pagingDiv").children().remove();
-                let items = data.items;
-                let page = data.paging;
-                let cpage = data.currentPage;
-                let cnt = data.count;
-                // console.log('data.cpage : ' + data.currentPage);
-                // console.log('data.cnt : ' + data.count);
-                if (data.items.length == 0) {
-                    var html = noDataHtml();
-                    $(".tbody").append(html);
-                } else {
-                    for (let i = 0; i < items.length; i++) {
-                        // var newHtml = createHtml(items[i]);
-                        // var newHtml = createHtml(items[i], cpage, cnt);
-                        // var newHtml = createHtml(items[i], cpage, cnt);
-                        var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
-                            data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
-                        $(".tbody").append(newHtml);
-                    }
-                    if (page.needPrev == true) {
-                        var pagingHtml = createPaging1(page);
-                        $(".pagingDiv").append(pagingHtml);
-                    }
-                    for (let k = page.startNavi; k <= page.endNavi; k++) {
-                        if (data.currentPage == k) {
-                            var pagingHtml = createPaging3(k, page);
-                            $(".pagingDiv").append(pagingHtml);
-                        } else {
-                            var pagingHtml = createPaging4(k, page);
-                            $(".pagingDiv").append(pagingHtml);
-                        }
-                    }
-                    if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
-                        $(".pagingDiv").append(pagingHtml);
-                    }
-                }
-            }
-        })
-    });
-
-    $(".holidayYN").on("change", function () {
-        let result = changeOption();
-        $.ajax({
-            url: '/api/hospital/list',
-            type: 'post',
-            data: {
-                "currentPage": 1,
-                "count": result.count,
-                "searchType": result.searchType,
-                "keyword": result.keyword,
-                "city": result.city,
-                "weekOpen": result.weekOpen,
-                "weekClose": result.weekClose,
-                "satOpen": result.satOpen,
-                "satClose": result.satClose,
-                "holidayYN": result.holidayYN,
-                "holidayOpen": result.holidayOpen,
-                "holidayClose": result.holidayClose
-            },
-            success: function (data) {
-                console.log("list길이 : " + data.items.length);
-                $(".tbody").children().remove();
-                $(".pagingDiv").children().remove();
-                let items = data.items;
-                let page = data.paging;
-                let cpage = data.currentPage;
-                let cnt = data.count;
-                // console.log('data.cpage : ' + data.currentPage);
-                // console.log('data.cnt : ' + data.count);
-                if (data.items.length == 0) {
-                    var html = noDataHtml();
-                    $(".tbody").append(html);
-                } else {
-                    for (let i = 0; i < items.length; i++) {
-                        // var newHtml = createHtml(items[i]);
-                        // var newHtml = createHtml(items[i], cpage, cnt);
-                        // var newHtml = createHtml(items[i], cpage, cnt);
-                        var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
-                            data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
-                        $(".tbody").append(newHtml);
-                    }
-                    if (page.needPrev == true) {
-                        var pagingHtml = createPaging1(page);
-                        $(".pagingDiv").append(pagingHtml);
-                    }
-                    for (let k = page.startNavi; k <= page.endNavi; k++) {
-                        if (data.currentPage == k) {
-                            var pagingHtml = createPaging3(k, page);
-                            $(".pagingDiv").append(pagingHtml);
-                        } else {
-                            var pagingHtml = createPaging4(k, page);
-                            $(".pagingDiv").append(pagingHtml);
-                        }
-                    }
-                    if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
-                        $(".pagingDiv").append(pagingHtml);
-                    }
-                }
-            }
-        })
-    });
-
-    $(".holidayOpen").on("change", function () {
-        let result = changeOption();
-        $.ajax({
-            url: '/api/hospital/list',
-            type: 'post',
-            data: {
-                "currentPage": 1,
-                "count": result.count,
-                "searchType": result.searchType,
-                "keyword": result.keyword,
-                "city": result.city,
-                "weekOpen": result.weekOpen,
-                "weekClose": result.weekClose,
-                "satOpen": result.satOpen,
-                "satClose": result.satClose,
-                "holidayYN": result.holidayYN,
-                "holidayOpen": result.holidayOpen,
-                "holidayClose": result.holidayClose
-            },
-            success: function (data) {
-                console.log("list길이 : " + data.items.length);
-                $(".tbody").children().remove();
-                $(".pagingDiv").children().remove();
-                let items = data.items;
-                let page = data.paging;
-                let cpage = data.currentPage;
-                let cnt = data.count;
-                // console.log('data.cpage : ' + data.currentPage);
-                // console.log('data.cnt : ' + data.count);
-                if (data.items.length == 0) {
-                    var html = noDataHtml();
-                    $(".tbody").append(html);
-                } else {
-                    for (let i = 0; i < items.length; i++) {
-                        // var newHtml = createHtml(items[i]);
-                        // var newHtml = createHtml(items[i], cpage, cnt);
-                        // var newHtml = createHtml(items[i], cpage, cnt);
-                        var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
-                            data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
-                        $(".tbody").append(newHtml);
-                    }
-                    if (page.needPrev == true) {
-                        var pagingHtml = createPaging1(page);
-                        $(".pagingDiv").append(pagingHtml);
-                    }
-                    for (let k = page.startNavi; k <= page.endNavi; k++) {
-                        if (data.currentPage == k) {
-                            var pagingHtml = createPaging3(k, page);
-                            $(".pagingDiv").append(pagingHtml);
-                        } else {
-                            var pagingHtml = createPaging4(k, page);
-                            $(".pagingDiv").append(pagingHtml);
-                        }
-                    }
-                    if (page.needNext == true) {
-                        var pagingHtml = createPaging2(page);
-                        $(".pagingDiv").append(pagingHtml);
-                    }
-                }
-            }
-        })
-    });
 
     $(".holidayClose").on("change", function () {
-        let result = changeOption();
+                    let result = changeOption();
+                //     $.ajax({
+                //         url: '/api/hospital/list',
+                //         type: 'post',
+                //         data: {
+                //             "currentPage": 1,
+                //             "count": result.count,
+                //             "searchType": result.searchType,
+                //             "keyword": result.keyword,
+                //             "city": result.city,
+                //             "weekOpen": result.weekOpen,
+                //             "weekClose": result.weekClose,
+                //             "satOpen": result.satOpen,
+                //             "satClose": result.satClose,
+                //             "holidayYN": result.holidayYN,
+                //             "holidayOpen": result.holidayOpen,
+                //             "holidayClose": result.holidayClose
+                //         },
+                //         success: function (data) {
+                //             console.log("list길이 : " + data.items.length);
+                //             $(".tbody").children().remove();
+                //             $(".pagingDiv").children().remove();
+                //             let items = data.items;
+                //             let page = data.paging;
+                //             let cpage = data.currentPage;
+                //             let cnt = data.count;
+                //             // console.log('data.cpage : ' + data.currentPage);
+                //             // console.log('data.cnt : ' + data.count);
+                //             if (data.items.length == 0) {
+                //                 var html = noDataHtml();
+                //                 $(".tbody").append(html);
+                //             } else {
+                //                 for (let i = 0; i < items.length; i++) {
+                //                     // var newHtml = createHtml(items[i]);
+                //                     // var newHtml = createHtml(items[i], cpage, cnt);
+                //                     // var newHtml = createHtml(items[i], cpage, cnt);
+                //                     var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                //                         data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+                //                     $(".tbody").append(newHtml);
+                //                 }
+                //                 if (page.needPrev == true) {
+                //                     var pagingHtml = createPaging1(page);
+                //                     $(".pagingDiv").append(pagingHtml);
+                //                 }
+                //                 for (let k = page.startNavi; k <= page.endNavi; k++) {
+                //                     if (data.currentPage == k) {
+                //                         var pagingHtml = createPaging3(k, page);
+                //                         $(".pagingDiv").append(pagingHtml);
+                //                     } else {
+                //                         var pagingHtml = createPaging4(k, page);
+                //                         $(".pagingDiv").append(pagingHtml);
+                //                     }
+                //                 }
+                //                 if (page.needNext == true) {
+                //                     var pagingHtml = createPaging2(page);
+                //                     $(".pagingDiv").append(pagingHtml);
+                //                 }
+                //             }
+                //         }
+                //     })
+                // });
         $.ajax({
             url: '/api/hospital/list',
             type: 'post',
@@ -1001,6 +1724,8 @@
                 "satOpen": result.satOpen,
                 "satClose": result.satClose,
                 "holidayYN": result.holidayYN,
+                "holidayY": result.holidayY,
+                "holidayN": result.holidayN,
                 "holidayOpen": result.holidayOpen,
                 "holidayClose": result.holidayClose
             },
@@ -1012,8 +1737,8 @@
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
-                // console.log('data.cpage : ' + data.currentPage);
-                // console.log('data.cnt : ' + data.count);
+                console.log('data.cpage : ' + data.currentPage);
+                console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $(".tbody").append(html);
@@ -1022,8 +1747,8 @@
                         // var newHtml = createHtml(items[i]);
                         // var newHtml = createHtml(items[i], cpage, cnt);
                         // var newHtml = createHtml(items[i], cpage, cnt);
-                        var newHtml = createHtml(items[i], cpage, cnt, data.cityOption, data.weekOpenOption, data.weekCloseOption,
-                            data.satOpenOption, data.satCloseOption, data.holidayOpenOption, data.holidayCloseOption);
+                        var newHtml = createHtml(items[i], cpage, cnt,data.searchType,data.keyword, data.cityOption, data.weekOpenOption, data.weekCloseOption,
+                            data.satOpenOption, data.satCloseOption, data.holidayY, data.holidayN, data.holidayOpenOption, data.holidayCloseOption);
                         $(".tbody").append(newHtml);
                     }
                     if (page.needPrev == true) {
@@ -1047,6 +1772,7 @@
             }
         })
     });
+
 </script>
 </body>
 </html>

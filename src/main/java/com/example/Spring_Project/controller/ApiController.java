@@ -8,6 +8,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.taglibs.standard.lang.jstl.NullLiteral;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.*;
@@ -52,8 +54,9 @@ public class ApiController {
     }
 
     @RequestMapping("/hospital") //처음 들어갈때
-    public String hospitalInfo(HttpServletRequest request,Model model,@RequestParam Map<String, Object> map) throws Exception {
+    public String hospitalInfo(HttpServletRequest request, Model model, @RequestParam Map<String, Object> map) throws Exception {
 
+        System.out.println("MAP1 : " + map);
         Integer currentPage = Integer.parseInt(map.get("currentPage").toString());
         Integer count = Integer.parseInt(map.get("count").toString());
         String searchType = map.get("searchType").toString();
@@ -67,6 +70,8 @@ public class ApiController {
         String satOpenOption = "";
         String satCloseOption = "";
         String holidayYNOption = "";
+        String holidayY = "";
+        String holidayN = "";
         String holidayOpenOption = "";
         String holidayCloseOption = "";
 
@@ -96,11 +101,19 @@ public class ApiController {
         } else {
             satCloseOption = map.get("satClose").toString();
         }
-        if (map.get("holidayYN") == null) {
-            holidayYNOption = "미진료";
-        } else {
-            holidayYNOption = "미진료";
+
+        if (map.get("holidayY") == null) {
+            holidayY = "진료";
+        }else{
+            holidayY = map.get("holidayY").toString();
         }
+
+        if (map.get("holidayN") == null) {
+            holidayN = "미진료";
+        }else{
+            holidayN = map.get("holidayN").toString();
+        }
+
         if (map.get("holidayOpen") == null) {
             holidayOpenOption = "09:00";
         } else {
@@ -111,6 +124,10 @@ public class ApiController {
         } else {
             holidayCloseOption = map.get("holidayClose").toString();
         }
+
+        System.out.println("holidayYNOption : " + holidayYNOption);
+        System.out.println("holidayY : " + holidayY);
+        System.out.println("holidayN : " + holidayN);
 
         List<String> city = apiService.getCity(); //지역명
         List<String> weekOpen = apiService.getWeekOpen(); //평일 진료 시작 시간
@@ -129,6 +146,8 @@ public class ApiController {
         model.addAttribute("holidayYN", holidayYN);
         model.addAttribute("holidayOpen", holidayOpen);
         model.addAttribute("holidayClose", holidayClose);
+        model.addAttribute("holidayY", holidayY);
+        model.addAttribute("holidayN", holidayN);
 
         model.addAttribute("cityOption", cityOption);
         model.addAttribute("weekOpenOption", weekOpenOption);
@@ -149,7 +168,9 @@ public class ApiController {
         paramMap.put("weekClose", weekCloseOption);
         paramMap.put("satOpen", satOpenOption);
         paramMap.put("satClose", satCloseOption);
-        paramMap.put("holidayYN", holidayYNOption);
+//        paramMap.put("holidayYN", holidayYNOption);
+        paramMap.put("holidayY", holidayY);
+        paramMap.put("holidayN", holidayN);
         paramMap.put("holidayOpen", holidayOpenOption);
         paramMap.put("holidayClose", holidayCloseOption);
         paramMap.put("start", start);
@@ -157,8 +178,8 @@ public class ApiController {
 
         Map<String, Object> reMap = new HashMap<>();
         List<HospitalDTO> list = apiService.test(paramMap); //처음에 병원 list 가져오기
-        Map<String, Object> paging = apiService.getHospitalPageNavi2(currentPage, count, searchType, keyword,cityOption,weekOpenOption,
-                weekCloseOption,satOpenOption,satCloseOption,holidayYNOption,holidayOpenOption,holidayCloseOption);
+        Map<String, Object> paging = apiService.getHospitalPageNavi2(currentPage, count, searchType, keyword, cityOption, weekOpenOption,
+                weekCloseOption, satOpenOption, satCloseOption, holidayYNOption,holidayY,holidayN, holidayOpenOption, holidayCloseOption);
         reMap.put("items", list);
         reMap.put("paging", paging);
 
@@ -178,8 +199,9 @@ public class ApiController {
     @RequestMapping("/hospital/list") //옵션 수정할때
     public Map<String, Object> hospitalItems(HttpServletRequest request, Model model, @RequestParam Map<String, Object> map) throws Exception {
 
-        System.out.println("/hospital/list map : " + map);
+        System.out.println("/hospital/list map2 : " + map);
         Map<String, Object> reMap = new HashMap<>();
+
 
         //option 값
         Integer currentPage = Integer.parseInt(map.get("currentPage").toString());
@@ -192,6 +214,8 @@ public class ApiController {
         String satOpen = "";
         String satClose = "";
         String holidayYN = "";
+        String holidayY = "";
+        String holidayN = "";
         String holidayOpen = "";
         String holidayClose = "";
 
@@ -213,11 +237,25 @@ public class ApiController {
         if (map.get("holidayYN") != null) {
             holidayYN = map.get("holidayYN").toString();
         }
+//        if (map.get("holidayYN").toString().equals("진료")) {
+//            holidayYN = "진료";
+//        }
         if (map.get("holidayOpen") != null) {
             holidayOpen = map.get("holidayOpen").toString();
         }
         if (map.get("holidayClose") != null) {
             holidayClose = map.get("holidayClose").toString();
+        }
+        if (map.get("holidayY") == null) {
+            holidayY = null;
+        }else{
+            holidayY = map.get("holidayY").toString();
+        }
+
+        if (map.get("holidayN") == null) {
+            holidayN = null;
+        }else{
+            holidayN = map.get("holidayN").toString();
         }
 
         Integer start = currentPage * count - (count - 1); //시작 글 번호
@@ -233,15 +271,18 @@ public class ApiController {
         paramMap.put("weekClose", weekClose);
         paramMap.put("satOpen", satOpen);
         paramMap.put("satClose", satClose);
-        paramMap.put("holidayYN", holidayYN);
+//        paramMap.put("holidayYN", holidayYN);
+        paramMap.put("holidayY", holidayY);
+        paramMap.put("holidayN", holidayN);
         paramMap.put("holidayOpen", holidayOpen);
         paramMap.put("holidayClose", holidayClose);
         paramMap.put("start", start);
         paramMap.put("end", end);
 
+
         List<HospitalDTO> list = apiService.test2(paramMap);
-        Map<String, Object> paging = apiService.getHospitalPageNavi2(currentPage, count, searchType, keyword,city,weekOpen,
-                weekClose,satOpen,satClose,holidayYN,holidayOpen,holidayClose);
+        Map<String, Object> paging = apiService.getHospitalPageNavi2(currentPage, count, searchType, keyword, city, weekOpen,
+                weekClose, satOpen, satClose, holidayYN, holidayY,holidayN,holidayOpen, holidayClose);
         System.out.println("변경 후 전체 글 개수");
         System.out.println(paging.get("pageTotalCount"));
 
@@ -255,11 +296,22 @@ public class ApiController {
         reMap.put("holidayYNOption", holidayYN);
         reMap.put("holidayOpenOption", holidayOpen);
         reMap.put("holidayCloseOption", holidayClose);
+        reMap.put("holidayY", holidayY);
+        reMap.put("holidayN", holidayN);
 
         reMap.put("currentPage", currentPage);
         reMap.put("count", count);
         reMap.put("searchType", searchType);
         reMap.put("keyword", keyword);
+
+        reMap.put("paging", paging);
+
+        System.out.println("====/list");
+        System.out.println("holidayYN : " + holidayYN);
+        System.out.println("holidayY : " + holidayY);
+        System.out.println("holidayN : " + holidayN);
+
+
         return reMap;
     }
 
@@ -279,6 +331,25 @@ public class ApiController {
         String holidayOpen = map.get("holidayOpen").toString();
         String holidayClose = map.get("holidayClose").toString();
 
+        String holidayY = "";
+        String holidayN = "";
+        if (map.get("holidayY") == null) {
+            holidayY = null;
+        }else{
+            holidayY = map.get("holidayY").toString();
+        }
+
+        if (map.get("holidayN") == null) {
+            holidayN =null;
+        }else{
+            holidayN = map.get("holidayN").toString();
+        }
+        holidayY=map.get("holidayY").toString();
+        holidayN=map.get("holidayN").toString();
+
+        System.out.println("detail");
+        System.out.println(holidayY);
+        System.out.println(holidayN);
         HospitalDTO hospitalDTO = apiService.getInfo(hospital_seq); //병원 한 개 정보
         model.addAttribute("hospitalDTO", hospitalDTO);
         model.addAttribute("currentPage", currentPage);
@@ -291,6 +362,8 @@ public class ApiController {
         model.addAttribute("satOpen", satOpen);
         model.addAttribute("satClose", satClose);
 //      model.addAttribute("holidayYN", holidayYN);
+        model.addAttribute("holidayY", holidayY);
+        model.addAttribute("holidayN", holidayN);
         model.addAttribute("holidayOpen", holidayOpen);
         model.addAttribute("holidayClose", holidayClose);
         return "/api/detail";
@@ -331,7 +404,7 @@ public class ApiController {
             map.put("pubDate", jsonObject2.get("pubDate"));
             list.add(map);
         }
-
+        System.out.println(list);
         model.addAttribute("list", list);
         return "/api/search";
     }

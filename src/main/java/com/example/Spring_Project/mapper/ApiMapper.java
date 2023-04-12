@@ -51,9 +51,13 @@ public interface ApiMapper {
     ,@Param("satOpen") String satOpenOption
     ,@Param("satClose") String satCloseOption
     ,@Param("holidayYN") String holidayYNOption
+    ,@Param("holidayY") String holidayY
+    ,@Param("holidayN") String holidayN
     ,@Param("holidayOpen") String holidayOpenOption
     ,@Param("holidayClose") String holidayCloseOption
     );
+
+
     List<String> getCity();
     List<String> getWeekOpen();
     List<String> getWeekClose();

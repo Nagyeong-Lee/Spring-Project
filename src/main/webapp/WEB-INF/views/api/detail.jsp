@@ -34,7 +34,7 @@
 
 <a href="javascript:void(0);"
    onclick="toList(${currentPage},${count},'${searchType}','${keyword}','${city}','${weekOpen}','${weekClose}'
-           ,'${satOpen}','${satClose}','${holidayOpen}','${holidayClose}')">
+           ,'${satOpen}','${satClose}','${holidayY}','${holidayN}','${holidayOpen}','${holidayClose}')">
     <button type="button" id="toList">목록으로</button>
 </a>
 
@@ -50,11 +50,13 @@
     <input type="hidden" name="weekClose" id="weekClose"/>
     <input type="hidden" name="satOpen" id="satOpen"/>
     <input type="hidden" name="satClose" id="satClose"/>
+    <input type="hidden" name="holidayY" id="holidayY"/>
+    <input type="hidden" name="holidayN" id="holidayN"/>
     <input type="hidden" name="holidayOpen" id="holidayOpen"/>
     <input type="hidden" name="holidayClose" id="holidayClose"/>
 </form>
 <script>
-    function toList(currentPage, count, searchType, keyword, city, weekOpen, weekClose, satOpen, satClose, holidayOpen, holidayClose) {
+    function toList(currentPage, count, searchType, keyword, city, weekOpen, weekClose, satOpen, satClose,holidayY,holidayN, holidayOpen, holidayClose) {
         console.log("목록으로 눌렀을때");
         console.log(currentPage);
         console.log(count);
@@ -67,6 +69,8 @@
         console.log(satClose);
         console.log(holidayOpen);
         console.log(holidayClose);
+        console.log("holidayY : "+holidayY);
+        console.log("holidayN : "+holidayN);
 
         $("#currentPage").val(currentPage);
         $("#count").val(count);
@@ -78,6 +82,11 @@
         $("#weekClose").val(weekClose);
         $("#satOpen").val(satOpen);
         $("#satClose").val(satClose);
+
+        $("#holidayY").val(holidayY);
+        $("#holidayN").val(holidayN);
+
+
         $("#holidayOpen").val(holidayOpen);
         $("#holidayClose").val(holidayClose);
         $("#frm").submit();

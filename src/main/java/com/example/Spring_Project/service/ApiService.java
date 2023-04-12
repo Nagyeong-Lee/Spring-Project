@@ -158,10 +158,9 @@ public class ApiService {
 //    public Integer countPost(String searchType, String keyword) throws Exception {
 //        return apiMapper.countPost(searchType, keyword);
 //    }
-    public Integer countPost(String searchType, String keyword
-            ,String cityOption,String weekOpenOption,String weekCloseOption,String satOpenOption,
-                             String satCloseOption,String holidayYNOption,String holidayOpenOption,String holidayCloseOption) throws Exception {
-        return apiMapper.countPost(searchType, keyword,cityOption,weekOpenOption,weekCloseOption,satOpenOption,satCloseOption,holidayYNOption,holidayOpenOption,holidayCloseOption);
+    public Integer countPost( String searchType,String keyword,String cityOption,String weekOpenOption,
+                              String weekCloseOption,String satOpenOption, String satCloseOption,String holidayYNOption,String holidayY,String holidayN,String holidayOpenOption,String holidayCloseOption) throws Exception {
+        return apiMapper.countPost(searchType, keyword,cityOption,weekOpenOption,weekCloseOption,satOpenOption,satCloseOption,holidayYNOption,holidayY,holidayN,holidayOpenOption,holidayCloseOption);
     }
 
     //옵션 선택
@@ -268,15 +267,16 @@ public class ApiService {
 //        return sb.toString();
 //    }
 
+
+
     //페이징 처리
 //    public Map<String,Object> getHospitalPageNavi2(Integer currentPage, Integer count, String searchType, String keyword) throws Exception {
-    public Map<String,Object> getHospitalPageNavi2(Integer currentPage, Integer count, String searchType, String keyword,
-                                                   String cityOption,String weekOpenOption,String weekCloseOption,String satOpenOption,
-                                                   String satCloseOption,String holidayYNOption,String holidayOpenOption,String holidayCloseOption) throws Exception {
+    public Map<String,Object> getHospitalPageNavi2(Integer currentPage,Integer count, String searchType,String keyword,String cityOption,String weekOpenOption,
+                                                   String weekCloseOption,String satOpenOption, String satCloseOption,String holidayYNOption,String holidayY,String holidayN,String holidayOpenOption,String holidayCloseOption) throws Exception {
         Map<String,Object> reMap = new HashMap<>();
 //        int postTotalCount = this.countPost(searchType, keyword);
         int postTotalCount = this.countPost(searchType, keyword
-        ,cityOption,weekOpenOption,weekCloseOption,satOpenOption,satCloseOption,holidayYNOption,holidayOpenOption,holidayCloseOption);
+        ,cityOption,weekOpenOption,weekCloseOption,satOpenOption,satCloseOption,holidayYNOption,holidayY,holidayN,holidayOpenOption,holidayCloseOption);
 
         int recordCountPerPage = count; // 페이지 당 게시글 개수
         int naviCountPerPage = 10; // 내비 개수
