@@ -41,5 +41,8 @@ public class PathService {
     public List<PathDTO> getPathList() throws Exception {
         return mapper.getPathList();
     }
+    public List<PathDTO> getNewsPathList() throws Exception {
+        return mapper.getNewsPathList();
+    }
 
 }

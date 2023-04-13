@@ -58,4 +58,15 @@
             parent_path_seq
         from pathUrl
     </select>
+
+    <select id="getNewsPathList" resultType="com.example.Spring_Project.dto.PathDTO">
+        select
+            path_seq,
+            path,
+            name,
+            parent_path_seq
+        from pathUrl
+        where parent_path_seq=8
+    </select>
+
 </mapper>

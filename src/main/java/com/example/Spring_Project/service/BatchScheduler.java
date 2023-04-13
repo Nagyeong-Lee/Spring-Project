@@ -21,4 +21,9 @@ public class BatchScheduler {
     public void runScheduler() throws Exception{
         apiService.scheduler(); //api data insert
     }
+
+    @Scheduled(cron = "0 19 21 * * *")
+    public void getNews() throws Exception{
+       apiService.getNews();
+    }
 }

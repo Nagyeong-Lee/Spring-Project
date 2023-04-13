@@ -1,13 +1,13 @@
 package com.example.Spring_Project.controller;
 
-import com.example.Spring_Project.dto.HospitalDTO;
-import com.example.Spring_Project.dto.InfectionByMonthDTO2;
-import com.example.Spring_Project.dto.InfectionDTO;
+import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.service.ApiService;
+import com.example.Spring_Project.service.PathService;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +29,9 @@ import java.util.*;
 public class ApiController {
     @Autowired
     private ApiService apiService;
+
+    @Autowired
+    private PathService pathService;
 
     @PostMapping("/data")
     public String api(Model model) throws Exception {
@@ -103,13 +106,13 @@ public class ApiController {
 
         if (map.get("holidayY") == null) {
             holidayY = "진료";
-        }else{
+        } else {
             holidayY = map.get("holidayY").toString();
         }
 
         if (map.get("holidayN") == null) {
             holidayN = "미진료";
-        }else{
+        } else {
             holidayN = map.get("holidayN").toString();
         }
 
@@ -174,13 +177,13 @@ public class ApiController {
         Map<String, Object> reMap = new HashMap<>();
         List<HospitalDTO> list = apiService.test(paramMap); //처음에 병원 list 가져오기
         Map<String, Object> paging = apiService.getHospitalPageNavi2(currentPage, count, searchType, keyword, cityOption, weekOpenOption,
-                weekCloseOption, satOpenOption, satCloseOption, holidayYNOption,holidayY,holidayN, holidayOpenOption, holidayCloseOption);
+                weekCloseOption, satOpenOption, satCloseOption, holidayYNOption, holidayY, holidayN, holidayOpenOption, holidayCloseOption);
         reMap.put("items", list);
         reMap.put("paging", paging);
 
         System.out.println("=====처음 끝 페이지====");
-        System.out.println("paging needNext : "+Boolean.parseBoolean(paging.get("needNext").toString()));
-        System.out.println("page totalCount : "+Integer.parseInt(paging.get("pageTotalCount").toString()));
+        System.out.println("paging needNext : " + Boolean.parseBoolean(paging.get("needNext").toString()));
+        System.out.println("page totalCount : " + Integer.parseInt(paging.get("pageTotalCount").toString()));
         System.out.println("=====처음 끝 페이지====");
 
         model.addAttribute("currentPage", currentPage);
@@ -246,8 +249,8 @@ public class ApiController {
         if (map.get("holidayClose") != null) {
             holidayClose = map.get("holidayClose").toString();
         }
-            holidayY = map.get("holidayY").toString();
-            holidayN = map.get("holidayN").toString();
+        holidayY = map.get("holidayY").toString();
+        holidayN = map.get("holidayN").toString();
 
         Integer start = currentPage * count - (count - 1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
@@ -273,7 +276,7 @@ public class ApiController {
 
         List<HospitalDTO> list = apiService.test2(paramMap);
         Map<String, Object> paging = apiService.getHospitalPageNavi2(currentPage, count, searchType, keyword, city, weekOpen,
-                weekClose, satOpen, satClose, holidayYN, holidayY,holidayN,holidayOpen, holidayClose);
+                weekClose, satOpen, satClose, holidayYN, holidayY, holidayN, holidayOpen, holidayClose);
         System.out.println("변경 후 전체 글 개수");
         System.out.println(paging.get("pageTotalCount"));
 
@@ -308,11 +311,11 @@ public class ApiController {
 //        System.out.println("holidayN : " + holidayN);
 
         System.out.println("=====처음 끝 페이지====");
-        System.out.println("pageTotalCount : "+Integer.parseInt(paging.get("pageTotalCount").toString()));
-        System.out.println("startNavi : "+Integer.parseInt(paging.get("startNavi").toString()));
-        System.out.println("endNavi : "+ Integer.parseInt(paging.get("endNavi").toString()));
-        System.out.println("needPrev : "+Boolean.parseBoolean(paging.get("needPrev").toString()));
-        System.out.println("needNext : "+Boolean.parseBoolean(paging.get("needNext").toString()));
+        System.out.println("pageTotalCount : " + Integer.parseInt(paging.get("pageTotalCount").toString()));
+        System.out.println("startNavi : " + Integer.parseInt(paging.get("startNavi").toString()));
+        System.out.println("endNavi : " + Integer.parseInt(paging.get("endNavi").toString()));
+        System.out.println("needPrev : " + Boolean.parseBoolean(paging.get("needPrev").toString()));
+        System.out.println("needNext : " + Boolean.parseBoolean(paging.get("needNext").toString()));
         System.out.println("=====처음 끝 페이지====");
 
         return reMap;
@@ -337,8 +340,8 @@ public class ApiController {
         String holidayY = "";
         String holidayN = "";
 
-        holidayY=map.get("holidayY").toString();
-        holidayN=map.get("holidayN").toString();
+        holidayY = map.get("holidayY").toString();
+        holidayN = map.get("holidayN").toString();
 
         System.out.println("detail");
         System.out.println(holidayY);
@@ -362,43 +365,47 @@ public class ApiController {
         return "/api/detail";
     }
 
-    @GetMapping("/search")
-    public String list(Model model) throws Exception {
-//      String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
-        URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
-                .path("v1/search/news.json")
-                .queryParam("query", "코로나")
-                .queryParam("display", 5)
-                .queryParam("start", 1)
-                .queryParam("sort", "sim")
-                .encode()
-                .build()
-                .toUri();
-
-        RestTemplate restTemplate = new RestTemplate();
-        RequestEntity<Void> req = RequestEntity
-                .get(uri)
-                .header("X-Naver-Client-Id", "w59f0ilmFqCGefTg1E7_")
-                .header("X-Naver-Client-Secret", "tHQhEtLMVk")
-                .build();
-        ResponseEntity<String> result = restTemplate.exchange(req, String.class);
-
-        List<Map<String, Object>> list = new ArrayList<>();
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = (JsonObject) jsonParser.parse(result.getBody());
-        JsonArray jsonArray = (JsonArray) jsonObject.get("items");
-
-        for (Integer i = 0; i < jsonArray.size(); i++) {
-            Map<String, Object> map = new HashMap<>();
-            JsonObject jsonObject2 = (JsonObject) jsonArray.get(i);
-            map.put("title", jsonObject2.get("title"));
-            map.put("link", jsonObject2.get("link"));
-            map.put("description", jsonObject2.get("description"));
-            map.put("pubDate", jsonObject2.get("pubDate"));
-            list.add(map);
-        }
-        System.out.println(list);
+    @RequestMapping("/searchNews")
+    public String searchNews(Model model) throws Exception {
+        List<CodeInfoDTO> list = apiService.getCode_info();
+        List<PathDTO> pathList = pathService.getNewsPathList();
+        List<NewsDTO> newsList = apiService.getNewsList(); // 전체 뉴스 가져오기
         model.addAttribute("list", list);
+        model.addAttribute("pathList", pathList);
+        model.addAttribute("newsList", newsList);
+        return "/api/news";
+    }
+
+    @GetMapping("/search/covid")  //코로나
+    public String searchCovid(Model model) throws Exception {
+        apiService.getNewsCovid();
         return "/api/search";
+    }
+
+    @GetMapping("/search/quarantine") //자가격리
+    public String searchCovid19(Model model) throws Exception {
+        return "/api/search";
+    }
+
+    @GetMapping("/search/distancing") //거리두기
+    public String searchDistance(Model model) throws Exception {
+        return "/api/search";
+    }
+
+    @GetMapping("/search/mask")  //마스크
+    public String searchMask(Model model) throws Exception {
+        return "/api/search";
+    }
+
+    @GetMapping("/search/vaccine")  //마스크
+    public String searchVaccine(Model model) throws Exception {
+        return "/api/search";
+    }
+
+    @ResponseBody
+    @RequestMapping("/newsByKeyword")
+    public List<NewsDTO> newsByKeyword(String keyword) throws Exception {
+        List<NewsDTO> news = apiService.getNewsByKeyword(keyword);
+        return news;
     }
 }

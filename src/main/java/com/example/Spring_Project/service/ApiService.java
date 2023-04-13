@@ -1,23 +1,24 @@
 package com.example.Spring_Project.service;
 
-import com.example.Spring_Project.dto.HospitalDTO;
-import com.example.Spring_Project.dto.InfectionByMonthDTO2;
-import com.example.Spring_Project.dto.InfectionDTO;
+import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.mapper.ApiMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -107,6 +108,310 @@ public class ApiService {
         }
     }
 
+    public void getNews() throws Exception{
+        this.getNewsCovid();
+        this.getNewsQuarantine();
+        this.getNewsDistance();
+        this.getNewsMask();
+        this.getNewsVaccine();
+    }
+
+    public List<Map<String, Object>> covid() throws Exception {
+        //        String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
+        String keyword="코로나";
+        URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
+                .path("v1/search/news.json")
+                .queryParam("query", keyword)
+                .queryParam("display", 100)
+                .queryParam("start", 1)
+                .queryParam("sort", "sim")
+                .encode()
+                .build()
+                .toUri();
+
+        RestTemplate restTemplate = new RestTemplate();
+        RequestEntity<Void> req = RequestEntity
+                .get(uri)
+                .header("X-Naver-Client-Id", "w59f0ilmFqCGefTg1E7_")
+                .header("X-Naver-Client-Secret", "tHQhEtLMVk")
+                .build();
+        ResponseEntity<String> result = restTemplate.exchange(req, String.class);
+
+        List<Map<String, Object>> list = new ArrayList<>();
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = (JsonObject) jsonParser.parse(result.getBody());
+        JsonArray jsonArray = (JsonArray) jsonObject.get("items");
+
+        for (Integer i = 0; i < jsonArray.size(); i++) {
+            Map<String, Object> map = new HashMap<>();
+            JsonObject jsonObject2 = (JsonObject) jsonArray.get(i);
+            String parsedTitle = jsonObject2.get("title").toString().substring(1, ((JsonObject) jsonArray.get(i)).get("title").toString().length() - 1);
+            String parsedLink = jsonObject2.get("link").toString().substring(1, ((JsonObject) jsonArray.get(i)).get("link").toString().length() - 1);
+            String parsedDescription = jsonObject2.get("description").toString().substring(1, ((JsonObject) jsonArray.get(i)).get("description").toString().length() - 1);
+            map.put("title", parsedTitle);
+            map.put("link", parsedLink);
+            map.put("keyword", keyword);
+            map.put("description", parsedDescription);
+            list.add(map);
+        }
+        return list;
+    }
+
+    public List<Map<String, Object>> quarantine() throws Exception {
+        //        String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
+        String keyword="자가격리";
+        URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
+                .path("v1/search/news.json")
+                .queryParam("query", keyword)
+                .queryParam("display", 100)
+                .queryParam("start", 1)
+                .queryParam("sort", "sim")
+                .encode()
+                .build()
+                .toUri();
+
+        RestTemplate restTemplate = new RestTemplate();
+        RequestEntity<Void> req = RequestEntity
+                .get(uri)
+                .header("X-Naver-Client-Id", "w59f0ilmFqCGefTg1E7_")
+                .header("X-Naver-Client-Secret", "tHQhEtLMVk")
+                .build();
+        ResponseEntity<String> result = restTemplate.exchange(req, String.class);
+
+        List<Map<String, Object>> list = new ArrayList<>();
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = (JsonObject) jsonParser.parse(result.getBody());
+        JsonArray jsonArray = (JsonArray) jsonObject.get("items");
+
+        for (Integer i = 0; i < jsonArray.size(); i++) {
+            Map<String, Object> map = new HashMap<>();
+            JsonObject jsonObject2 = (JsonObject) jsonArray.get(i);
+            String parsedTitle = jsonObject2.get("title").toString().substring(1, ((JsonObject) jsonArray.get(i)).get("title").toString().length() - 1);
+            String parsedLink = jsonObject2.get("link").toString().substring(1, ((JsonObject) jsonArray.get(i)).get("link").toString().length() - 1);
+            String parsedDescription = jsonObject2.get("description").toString().substring(1, ((JsonObject) jsonArray.get(i)).get("description").toString().length() - 1);
+            map.put("title", parsedTitle);
+            map.put("link", parsedLink);
+            map.put("keyword", keyword);
+            map.put("description", parsedDescription);
+            list.add(map);
+        }
+        return list;
+    }
+
+    public List<Map<String, Object>> distancing() throws Exception {
+        //        String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
+        String keyword = "거리두기";
+        URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
+                .path("v1/search/news.json")
+                .queryParam("query", keyword)
+                .queryParam("display", 100)
+                .queryParam("start", 1)
+                .queryParam("sort", "sim")
+                .encode()
+                .build()
+                .toUri();
+
+        RestTemplate restTemplate = new RestTemplate();
+        RequestEntity<Void> req = RequestEntity
+                .get(uri)
+                .header("X-Naver-Client-Id", "w59f0ilmFqCGefTg1E7_")
+                .header("X-Naver-Client-Secret", "tHQhEtLMVk")
+                .build();
+        ResponseEntity<String> result = restTemplate.exchange(req, String.class);
+
+        List<Map<String, Object>> list = new ArrayList<>();
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = (JsonObject) jsonParser.parse(result.getBody());
+        JsonArray jsonArray = (JsonArray) jsonObject.get("items");
+
+        for (Integer i = 0; i < jsonArray.size(); i++) {
+            Map<String, Object> map = new HashMap<>();
+            JsonObject jsonObject2 = (JsonObject) jsonArray.get(i);
+            String parsedTitle = jsonObject2.get("title").toString().substring(1, ((JsonObject) jsonArray.get(i)).get("title").toString().length() - 1);
+            String parsedLink = jsonObject2.get("link").toString().substring(1, ((JsonObject) jsonArray.get(i)).get("link").toString().length() - 1);
+            String parsedDescription = jsonObject2.get("description").toString().substring(1, ((JsonObject) jsonArray.get(i)).get("description").toString().length() - 1);
+            map.put("title", parsedTitle);
+            map.put("link", parsedLink);
+            map.put("keyword", keyword);
+            map.put("description", parsedDescription);
+            list.add(map);
+        }
+        return list;
+    }
+
+    public List<Map<String, Object>> mask() throws Exception {
+        //        String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
+        String keyword="마스크";
+        URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
+                .path("v1/search/news.json")
+                .queryParam("query", keyword)
+                .queryParam("display", 100)
+                .queryParam("start", 1)
+                .queryParam("sort", "sim")
+                .encode()
+                .build()
+                .toUri();
+
+        RestTemplate restTemplate = new RestTemplate();
+        RequestEntity<Void> req = RequestEntity
+                .get(uri)
+                .header("X-Naver-Client-Id", "w59f0ilmFqCGefTg1E7_")
+                .header("X-Naver-Client-Secret", "tHQhEtLMVk")
+                .build();
+        ResponseEntity<String> result = restTemplate.exchange(req, String.class);
+
+        List<Map<String, Object>> list = new ArrayList<>();
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = (JsonObject) jsonParser.parse(result.getBody());
+        JsonArray jsonArray = (JsonArray) jsonObject.get("items");
+
+        for (Integer i = 0; i < jsonArray.size(); i++) {
+            Map<String, Object> map = new HashMap<>();
+            JsonObject jsonObject2 = (JsonObject) jsonArray.get(i);
+            String parsedTitle = jsonObject2.get("title").toString().substring(1, ((JsonObject) jsonArray.get(i)).get("title").toString().length() - 1);
+            String parsedLink = jsonObject2.get("link").toString().substring(1, ((JsonObject) jsonArray.get(i)).get("link").toString().length() - 1);
+            String parsedDescription = jsonObject2.get("description").toString().substring(1, ((JsonObject) jsonArray.get(i)).get("description").toString().length() - 1);
+            map.put("title", parsedTitle);
+            map.put("link", parsedLink);
+            map.put("keyword", keyword);
+            map.put("description", parsedDescription);
+            list.add(map);
+        }
+        return list;
+    }
+
+    public List<Map<String, Object>> vaccine() throws Exception {
+        //        String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
+        String keyword="백신";
+        URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
+                .path("v1/search/news.json")
+                .queryParam("query", keyword)
+                .queryParam("display", 100)
+                .queryParam("start", 1)
+                .queryParam("sort", "sim")
+                .encode()
+                .build()
+                .toUri();
+
+        RestTemplate restTemplate = new RestTemplate();
+        RequestEntity<Void> req = RequestEntity
+                .get(uri)
+                .header("X-Naver-Client-Id", "w59f0ilmFqCGefTg1E7_")
+                .header("X-Naver-Client-Secret", "tHQhEtLMVk")
+                .build();
+        ResponseEntity<String> result = restTemplate.exchange(req, String.class);
+
+        List<Map<String, Object>> list = new ArrayList<>();
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = (JsonObject) jsonParser.parse(result.getBody());
+        JsonArray jsonArray = (JsonArray) jsonObject.get("items");
+
+        for (Integer i = 0; i < jsonArray.size(); i++) {
+            Map<String, Object> map = new HashMap<>();
+            JsonObject jsonObject2 = (JsonObject) jsonArray.get(i);
+            String parsedTitle = jsonObject2.get("title").toString().substring(1, ((JsonObject) jsonArray.get(i)).get("title").toString().length() - 1);
+            String parsedLink = jsonObject2.get("link").toString().substring(1, ((JsonObject) jsonArray.get(i)).get("link").toString().length() - 1);
+            String parsedDescription = jsonObject2.get("description").toString().substring(1, ((JsonObject) jsonArray.get(i)).get("description").toString().length() - 1);
+            map.put("title", parsedTitle);
+            map.put("link", parsedLink);
+            map.put("keyword", keyword);
+            map.put("description", parsedDescription);
+            list.add(map);
+        }
+        return list;
+    }
+
+    //뉴스 db 업데이트 함수
+    @Transactional
+    public void commonUpdate(List<Map<String, Object>> news, List<NewsDTO> list, String keyword, List<Map<String, Object>> newLinks, Integer isLinkEmpty) throws Exception {
+        for (Integer i = 0; i < news.size(); i++) {
+            for (Integer k = 0; k < list.size(); k++) {
+                isLinkEmpty = this.isLinkEmpty(news.get(i).get("link").toString(), keyword);
+                if (isLinkEmpty != 0) {
+                    this.updateNewsStatus(news.get(i).get("link").toString(), keyword); //있으면 Y로
+                } else {
+                    Map<String, Object> newLinksMap = new HashMap<>(); //없으면 list에 저장
+                    newLinksMap.put("link", news.get(i).get("link").toString());
+                    newLinksMap.put("title", news.get(i).get("title").toString());
+                    newLinksMap.put("description", news.get(i).get("description").toString());
+                    newLinks.add(newLinksMap);
+                    break;
+                }
+            }
+        }
+        List<NewsDTO> link = this.getStatusN(keyword);
+        for (Integer i = 0; i < link.size(); i++) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("keyword", keyword);
+            map.put("link", link.get(i).getLink());
+            map.put("title", link.get(i).getTitle());
+            map.put("description", link.get(i).getDescription());
+            //나중거로 변경
+            map.put("updLink", newLinks.get(i).get("link").toString());
+            map.put("updTitle", newLinks.get(i).get("title").toString());
+            map.put("updDescription", newLinks.get(i).get("description").toString());
+            this.updateLink(map);
+        }
+        this.updStatusToN(keyword);
+    }
+
+
+    //코로나 뉴스
+    public void getNewsCovid() throws Exception {
+//        this.insertNews(this.covid()); //처음에 인서트
+        String keyword = "코로나";
+        Integer isLinkEmpty = 0;
+        List<NewsDTO> list = this.getCovidNews(keyword); //저장된 코로나 뉴스
+        List<Map<String, Object>> news = this.covid(); //실시간 코로나 뉴스
+        List<Map<String, Object>> newLinks = new ArrayList<>();
+        this.commonUpdate(news, list, keyword, newLinks, isLinkEmpty);
+    }
+
+
+    //자가격리 뉴스
+    public void getNewsQuarantine() throws Exception {
+//        this.insertNews(this.quarantine());
+        String keyword = "자가격리";
+        Integer isLinkEmpty = 0;
+        List<NewsDTO> list = this.getCovidNews(keyword); //저장된 자가격리 뉴스
+        List<Map<String, Object>> news = this.quarantine(); //실시간 자가격리 뉴스
+        List<Map<String, Object>> newLinks = new ArrayList<>();
+        this.commonUpdate(news, list, keyword, newLinks, isLinkEmpty);
+    }
+
+    //거리두기 뉴스
+    public void getNewsDistance() throws Exception {
+//        this.insertNews(this.distancing());
+        String keyword = "거리두기";
+        Integer isLinkEmpty = 0;
+        List<NewsDTO> list = this.getCovidNews(keyword); //저장된 거리두기 뉴스
+        List<Map<String, Object>> news = this.distancing(); //실시간 거리두기 뉴스
+        List<Map<String, Object>> newLinks = new ArrayList<>();
+        this.commonUpdate(news, list, keyword, newLinks, isLinkEmpty);
+    }
+
+    //마스크 뉴스
+    public void getNewsMask() throws Exception {
+//        this.insertNews(this.mask());
+        String keyword = "마스크";
+        Integer isLinkEmpty = 0;
+        List<NewsDTO> list = this.getCovidNews(keyword); //저장된 거리두기 뉴스
+        List<Map<String, Object>> news = this.mask(); //실시간 거리두기 뉴스
+        List<Map<String, Object>> newLinks = new ArrayList<>();
+        this.commonUpdate(news, list, keyword, newLinks, isLinkEmpty);
+    }
+
+    //백신 뉴스
+    public void getNewsVaccine() throws Exception {
+//        this.insertNews(this.vaccine());
+        String keyword = "백신";
+        Integer isLinkEmpty = 0;
+        List<NewsDTO> list = this.getCovidNews(keyword); //저장된 거리두기 뉴스
+        List<Map<String, Object>> news = this.vaccine(); //실시간 거리두기 뉴스
+        List<Map<String, Object>> newLinks = new ArrayList<>();
+        this.commonUpdate(news, list, keyword, newLinks, isLinkEmpty);
+    }
+
     public void insertInfectionInfo(InfectionDTO infectionDTO) throws Exception {
         apiMapper.insertInfectionInfo(infectionDTO);
     }
@@ -127,7 +432,8 @@ public class ApiService {
         apiMapper.updateStatus(infection_seq);
     }
 
-    public void insertInfectionByMonth(@RequestParam String mmdd, @RequestParam String cnt, @RequestParam String month, @RequestParam String year) throws Exception {
+    public void insertInfectionByMonth(@RequestParam String mmdd, @RequestParam String cnt, @RequestParam String
+            month, @RequestParam String year) throws Exception {
         apiMapper.insertInfectionByMonth(mmdd, cnt, month, year);
     }
 
@@ -139,7 +445,8 @@ public class ApiService {
         return apiMapper.getInfectionByMonthInfo();
     }
 
-    public List<HospitalDTO> getHospitalInfo(String searchType, String keyword, Integer start, Integer end, String city) throws Exception {
+    public List<HospitalDTO> getHospitalInfo(String searchType, String keyword, Integer start, Integer end, String
+            city) throws Exception {
         return apiMapper.getHospitalInfo(searchType, keyword, start, end, city);
     }
 
@@ -155,12 +462,13 @@ public class ApiService {
         return apiMapper.getInfo(hospital_seq);
     }
 
-//    public Integer countPost(String searchType, String keyword) throws Exception {
+    //    public Integer countPost(String searchType, String keyword) throws Exception {
 //        return apiMapper.countPost(searchType, keyword);
 //    }
-    public Integer countPost( String searchType,String keyword,String cityOption,String weekOpenOption,
-                              String weekCloseOption,String satOpenOption, String satCloseOption,String holidayYNOption,String holidayY,String holidayN,String holidayOpenOption,String holidayCloseOption) throws Exception {
-        return apiMapper.countPost(searchType, keyword,cityOption,weekOpenOption,weekCloseOption,satOpenOption,satCloseOption,holidayYNOption,holidayY,holidayN,holidayOpenOption,holidayCloseOption);
+    public Integer countPost(String searchType, String keyword, String cityOption, String weekOpenOption,
+                             String weekCloseOption, String satOpenOption, String satCloseOption, String holidayYNOption, String
+                                     holidayY, String holidayN, String holidayOpenOption, String holidayCloseOption) throws Exception {
+        return apiMapper.countPost(searchType, keyword, cityOption, weekOpenOption, weekCloseOption, satOpenOption, satCloseOption, holidayYNOption, holidayY, holidayN, holidayOpenOption, holidayCloseOption);
     }
 
     //옵션 선택
@@ -268,15 +576,16 @@ public class ApiService {
 //    }
 
 
-
     //페이징 처리
 //    public Map<String,Object> getHospitalPageNavi2(Integer currentPage, Integer count, String searchType, String keyword) throws Exception {
-    public Map<String,Object> getHospitalPageNavi2(Integer currentPage,Integer count, String searchType,String keyword,String cityOption,String weekOpenOption,
-                                                   String weekCloseOption,String satOpenOption, String satCloseOption,String holidayYNOption,String holidayY,String holidayN,String holidayOpenOption,String holidayCloseOption) throws Exception {
-        Map<String,Object> reMap = new HashMap<>();
+    public Map<String, Object> getHospitalPageNavi2(Integer currentPage, Integer count, String searchType, String
+            keyword, String cityOption, String weekOpenOption,
+                                                    String weekCloseOption, String satOpenOption, String satCloseOption, String holidayYNOption, String
+                                                            holidayY, String holidayN, String holidayOpenOption, String holidayCloseOption) throws Exception {
+        Map<String, Object> reMap = new HashMap<>();
 //        int postTotalCount = this.countPost(searchType, keyword);
         int postTotalCount = this.countPost(searchType, keyword
-        ,cityOption,weekOpenOption,weekCloseOption,satOpenOption,satCloseOption,holidayYNOption,holidayY,holidayN,holidayOpenOption,holidayCloseOption);
+                , cityOption, weekOpenOption, weekCloseOption, satOpenOption, satCloseOption, holidayYNOption, holidayY, holidayN, holidayOpenOption, holidayCloseOption);
 
         int recordCountPerPage = count; // 페이지 당 게시글 개수
         int naviCountPerPage = 10; // 내비 개수
@@ -312,13 +621,13 @@ public class ApiService {
 
         System.out.println("startNavi : " + startNavi);
         System.out.println("endNavi : " + endNavi);
-        System.out.println("전체 글 개수 : "+pageTotalCount);
+        System.out.println("전체 글 개수 : " + pageTotalCount);
 
-        reMap.put("pageTotalCount",pageTotalCount);
-        reMap.put("startNavi",startNavi);
-        reMap.put("endNavi",endNavi);
-        reMap.put("needPrev",needPrev);
-        reMap.put("needNext",needNext);
+        reMap.put("pageTotalCount", pageTotalCount);
+        reMap.put("startNavi", startNavi);
+        reMap.put("endNavi", endNavi);
+        reMap.put("needPrev", needPrev);
+        reMap.put("needNext", needNext);
         return reMap;
     }
 
@@ -326,4 +635,50 @@ public class ApiService {
         return apiMapper.test2(paramMap);
     }
 
+    public List<CodeInfoDTO> getCode_info() throws Exception {
+        return apiMapper.getCode_Info();
+    }
+
+    public void insertNews(List<Map<String, Object>> list) throws Exception {
+        apiMapper.insertNews(list);
+    }
+
+    //뉴스 키워드 == 코로나 가져오기
+    public List<NewsDTO> getCovidNews(String keyword) throws Exception {
+        return apiMapper.getCovidNews(keyword);
+    }
+
+    //실시간 뉴스랑 비교
+    public Integer isLinkEmpty(String link, String keyword) throws Exception {
+        return apiMapper.isLinkEmpty(link, keyword);
+    }
+
+    //뉴스 업데이트
+    public void updateLink(Map<String, Object> map) throws Exception {
+        apiMapper.updateLink(map);
+    }
+
+    public void updateNewsStatus(String link, String keyword) throws Exception {
+        apiMapper.updateNewsStatus(link, keyword);
+    }
+
+    public List<NewsDTO> getStatusN(String keyword) throws Exception {
+        return apiMapper.getStatusN(keyword);
+    }
+
+    //키워드별 뉴스 가져오기
+    public List<NewsDTO> getNewsByKeyword(String keyword) throws Exception {
+        return apiMapper.getNewsByKeyword(keyword);
+    }
+
+    //마지막에 상태 n으로
+    public void updStatusToN(String keyword) throws Exception {
+        apiMapper.updateStatusToN(keyword);
+    }
+
+    //전체 뉴스 가져오기
+    public List<NewsDTO> getNewsList() throws Exception {
+        return apiMapper.getNewsList();
+    }
 }
+

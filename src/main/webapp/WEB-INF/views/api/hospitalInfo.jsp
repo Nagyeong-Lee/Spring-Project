@@ -205,6 +205,7 @@
     <option value="50"<c:out value="${count eq '50' ? 'selected' : ''}"/>>50개씩 보기</option>
 </select>
 <button type="button" id="reset">리셋</button>
+<a href="/member/myPage"><button type="button">마이페이지로</button></a>
 
 <form id="frm" name="frm" method="post" action="/api/detail">
     <input type="hidden" name="hospital_seq" id="hospital_seq1"/>

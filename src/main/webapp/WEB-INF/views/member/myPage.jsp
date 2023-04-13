@@ -26,8 +26,6 @@
 </c:forEach>
 
 <a href=${list.get(7).path}><button type="submit">${list.get(7).name}</button></a>
-
-
 <script>
     let id = $("#sessionID").val();
     //커뮤니티로 이동

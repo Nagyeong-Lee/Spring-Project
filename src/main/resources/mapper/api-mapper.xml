@@ -441,4 +441,99 @@
         where rn between ${start} and #{end}
     </select>
 
+
+    <select id="getCode_Info" resultType="com.example.Spring_Project.dto.CodeInfoDTO">
+        select
+            code,
+            code_type,
+            reg_date
+        from code_info
+    </select>
+
+<!--    <insert id="insertNews" parameterType="java.util.List">-->
+<!--                 insert all-->
+<!--        <foreach collection="list" item="item" separator=",">-->
+<!--            into covid-->
+<!--            values(-->
+<!--            #{item.link},-->
+<!--            #{item.title}-->
+<!--            )-->
+<!--        </foreach>-->
+<!--        select * from dual-->
+<!--    </insert>-->
+
+
+    <insert id="insertNews" parameterType="java.util.List">
+        INSERT
+        INTO news
+        SELECT news_seq.NEXTVAL, A.*
+        FROM
+        (
+        <foreach collection="list" item="item" separator="UNION ALL">
+            SELECT #{item.link},#{item.title},#{item.keyword},'N',#{item.description}
+            FROM DUAL
+        </foreach>
+        ) A
+    </insert>
+
+
+<!--    <update id="insertNews" parameterType="java.util.List">-->
+<!--        <foreach collection="list" item="item" open="INSERT ALL" close="SELECT * FROM DUAL" separator=" ">-->
+<!--            INTO news values(news_seq.nextval,#{item.link},#{item.title},#{item.keyword},'N',#{item.description})-->
+<!--        </foreach>-->
+<!--    </update>-->
+
+    <select id="getCovidNews" resultType="com.example.Spring_Project.dto.NewsDTO">
+<!--        select link,title from news where keyword='코로나'-->
+        select link,title from news where keyword=#{keyword}
+    </select>
+
+    <select id="isLinkEmpty" resultType="Integer">
+<!--        select count(*)-->
+<!--        from news-->
+<!--        where link=#{link} and keyword='코로나'-->
+        select count(*)
+        from news
+        where link=#{link} and keyword=#{keyword}
+    </select>
+
+    <update id="updateLink" parameterType="java.util.HashMap">
+        update news set link=#{updLink},title=#{updTitle},description=#{updDescription}
+        where link=#{link} and title=#{title} and keyword=#{keyword} and title=#{description}
+    </update>
+
+    <update id="updateNewsStatus" parameterType="String">
+        update news set status = 'Y' where link = #{link} and keyword=#{keyword}
+    </update>
+
+    <select id="getStatusN" resultType="com.example.Spring_Project.dto.NewsDTO">
+        select link,title from news where status='N' and keyword=#{keyword}
+    </select>
+
+
+    <select id="getNewsByKeyword" resultType="com.example.Spring_Project.dto.NewsDTO">
+        select
+            link,
+            title,
+            keyword,
+            status,
+            description
+        from news
+        where keyword=#{keyword}
+    </select>
+
+    <update id="updateStatusToN">
+        update news set status='N'
+        where keyword=#{keyword}
+    </update>
+
+    <select id="getNewsList" resultType="com.example.Spring_Project.dto.NewsDTO">
+        select
+            link,
+            title,
+            keyword,
+            status,
+            description
+        from news
+    </select>
 </mapper>

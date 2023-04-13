@@ -20,4 +20,5 @@ public interface PathMapper {
     String getDaily();
     String getMonthly();
     List<PathDTO> getPathList();
+    List<PathDTO> getNewsPathList();
 }
