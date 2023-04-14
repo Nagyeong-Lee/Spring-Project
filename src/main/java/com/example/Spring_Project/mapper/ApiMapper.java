@@ -90,11 +90,20 @@ public interface ApiMapper {
 
 
     //키워드별 뉴스 가져오기
-    List<NewsDTO> getNewsByKeyword(String keyword);
+    List<NewsDTO> getNewsByKeyword(@Param("keyword") String keyword,@Param("start") Integer start,@Param("end") Integer end);
 
     //마지막에 상태 n
     void updateStatusToN(String keyword);
 
     //전체 뉴스 가져오기
-    List<NewsDTO> getNewsList();
+    List<NewsDTO> getNewsList(@Param("start") Integer start,@Param("end") Integer end);
+
+
+
+    //merge into
+    void upd(List<Map<String, Object>> news);
+    void upd2(Map<String, Object> map);
+
+   Integer countNews(String keyword);
+   Integer countWholeNews();
 }

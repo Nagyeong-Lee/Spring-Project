@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Timestamp;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,6 +16,7 @@ public class NewsDTO {
     private String link;
     private String title;
     private String keyword;
-    private String status;
     private String description;
+    private Timestamp checkDate;
+    private Timestamp lastUpdateDate;
 }

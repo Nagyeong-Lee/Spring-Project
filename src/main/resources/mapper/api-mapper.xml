@@ -238,7 +238,6 @@
     </select>
 
 
-
     <select id="getCity" resultType="String">
         SELECT city FROM hospital GROUP BY city order by 1
     </select>
@@ -444,23 +443,23 @@
 
     <select id="getCode_Info" resultType="com.example.Spring_Project.dto.CodeInfoDTO">
         select
-            code,
-            code_type,
-            reg_date
+        code,
+        code_type,
+        reg_date
         from code_info
     </select>
 
-<!--    <insert id="insertNews" parameterType="java.util.List">-->
-<!--                 insert all-->
-<!--        <foreach collection="list" item="item" separator=",">-->
-<!--            into covid-->
-<!--            values(-->
-<!--            #{item.link},-->
-<!--            #{item.title}-->
-<!--            )-->
-<!--        </foreach>-->
-<!--        select * from dual-->
-<!--    </insert>-->
+    <!--    <insert id="insertNews" parameterType="java.util.List">-->
+    <!--                 insert all-->
+    <!--        <foreach collection="list" item="item" separator=",">-->
+    <!--            into covid-->
+    <!--            values(-->
+    <!--            #{item.link},-->
+    <!--            #{item.title}-->
+    <!--            )-->
+    <!--        </foreach>-->
+    <!--        select * from dual-->
+    <!--    </insert>-->
 
 
     <insert id="insertNews" parameterType="java.util.List">
@@ -477,21 +476,21 @@
     </insert>
 
 
-<!--    <update id="insertNews" parameterType="java.util.List">-->
-<!--        <foreach collection="list" item="item" open="INSERT ALL" close="SELECT * FROM DUAL" separator=" ">-->
-<!--            INTO news values(news_seq.nextval,#{item.link},#{item.title},#{item.keyword},'N',#{item.description})-->
-<!--        </foreach>-->
-<!--    </update>-->
+    <!--    <update id="insertNews" parameterType="java.util.List">-->
+    <!--        <foreach collection="list" item="item" open="INSERT ALL" close="SELECT * FROM DUAL" separator=" ">-->
+    <!--            INTO news values(news_seq.nextval,#{item.link},#{item.title},#{item.keyword},'N',#{item.description})-->
+    <!--        </foreach>-->
+    <!--    </update>-->
 
     <select id="getCovidNews" resultType="com.example.Spring_Project.dto.NewsDTO">
-<!--        select link,title from news where keyword='코로나'-->
+        <!--        select link,title from news where keyword='코로나'-->
         select link,title from news where keyword=#{keyword}
     </select>
 
     <select id="isLinkEmpty" resultType="Integer">
-<!--        select count(*)-->
-<!--        from news-->
-<!--        where link=#{link} and keyword='코로나'-->
+        <!--        select count(*)-->
+        <!--        from news-->
+        <!--        where link=#{link} and keyword='코로나'-->
         select count(*)
         from news
         where link=#{link} and keyword=#{keyword}
@@ -513,13 +512,29 @@
 
     <select id="getNewsByKeyword" resultType="com.example.Spring_Project.dto.NewsDTO">
         select
-            link,
-            title,
-            keyword,
-            status,
-            description
+        link,
+        title,
+        keyword,
+        checkDate,
+        lastUpdateDate,
+        description
+        from(
+        select ROWNUM rn,a.*
+        from
+        (select
+        link,
+        title,
+        keyword,
+        checkDate,
+        lastUpdateDate,
+        description
         from news
-        where keyword=#{keyword}
+        <if test="keyword != null">
+            where keyword=#{keyword}
+        </if>
+        order by lastUpdateDate desc) a
+        )
+        where rn between ${start} and #{end}
     </select>
 
     <update id="updateStatusToN">
@@ -528,12 +543,68 @@
     </update>
 
     <select id="getNewsList" resultType="com.example.Spring_Project.dto.NewsDTO">
+<!--        select-->
+<!--        link,-->
+<!--        title,-->
+<!--        keyword,-->
+<!--        checkDate,-->
+<!--        lastUpdateDate,-->
+<!--        description-->
+<!--        from news-->
+
         select
-            link,
-            title,
-            keyword,
-            status,
-            description
+        link,
+        title,
+        keyword,
+        checkDate,
+        lastUpdateDate,
+        description
+        from(
+        select ROWNUM rn,a.*
+        from
+        (select
+        link,
+        title,
+        keyword,
+        checkDate,
+        lastUpdateDate,
+        description
+        from news
+        order by lastUpdateDate desc) a
+        )
+        where rn between ${start} and #{end}
+</select>
+
+    <update id="upd" parameterType="java.util.HashMap">
+        MERGE INTO news n
+        USING DUAL
+        ON (n.link = #{link} AND n.keyword = #{keyword})
+        WHEN MATCHED THEN
+        UPDATE SET n.checkDate = sysdate
+        WHEN NOT MATCHED THEN
+        INSERT (n.link, n.title, n.description,n.lastUpdateDate)
+        VALUES (#{link},#{title},#{description},sysdate)
+    </update>
+
+    <update id="upd2" parameterType="java.util.HashMap">
+        MERGE INTO news n
+        USING DUAL
+        ON (n.link = #{link} AND n.keyword = #{keyword})
+        WHEN MATCHED THEN
+        UPDATE SET n.checkDate = sysdate
+        WHEN NOT MATCHED THEN
+        INSERT (news_seq,n.link, n.title,n.keyword,n.checkDate,n.lastUpdateDate,n.description)
+        VALUES (news_seq.nextval,#{link},#{title},#{keyword},sysdate,sysdate,#{description})
+    </update>
+
+    <select id="countNews" resultType="Integer">
+        select count(*)
+        from news
+        where keyword=#{keyword}
+    </select>
+
+    <select id="countWholeNews" resultType="Integer">
+        select count(*)
         from news
     </select>
 </mapper>

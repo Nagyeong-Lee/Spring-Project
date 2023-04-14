@@ -13,8 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -108,16 +111,9 @@ public class ApiService {
         }
     }
 
-    public void getNews() throws Exception{
-        this.getNewsCovid();
-        this.getNewsQuarantine();
-        this.getNewsDistance();
-        this.getNewsMask();
-        this.getNewsVaccine();
-    }
-
-    public List<Map<String, Object>> covid() throws Exception {
+    public  void  covid() throws Exception {
         //        String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
+
         String keyword="코로나";
         URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
                 .path("v1/search/news.json")
@@ -135,13 +131,12 @@ public class ApiService {
                 .header("X-Naver-Client-Id", "w59f0ilmFqCGefTg1E7_")
                 .header("X-Naver-Client-Secret", "tHQhEtLMVk")
                 .build();
-        ResponseEntity<String> result = restTemplate.exchange(req, String.class);
 
+        ResponseEntity<String> result = restTemplate.exchange(req, String.class);
         List<Map<String, Object>> list = new ArrayList<>();
         JsonParser jsonParser = new JsonParser();
         JsonObject jsonObject = (JsonObject) jsonParser.parse(result.getBody());
         JsonArray jsonArray = (JsonArray) jsonObject.get("items");
-
         for (Integer i = 0; i < jsonArray.size(); i++) {
             Map<String, Object> map = new HashMap<>();
             JsonObject jsonObject2 = (JsonObject) jsonArray.get(i);
@@ -152,13 +147,11 @@ public class ApiService {
             map.put("link", parsedLink);
             map.put("keyword", keyword);
             map.put("description", parsedDescription);
-            list.add(map);
+            apiMapper.upd2(map);
         }
-        return list;
     }
 
-    public List<Map<String, Object>> quarantine() throws Exception {
-        //        String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
+    public void quarantine() throws Exception {
         String keyword="자가격리";
         URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
                 .path("v1/search/news.json")
@@ -193,12 +186,11 @@ public class ApiService {
             map.put("link", parsedLink);
             map.put("keyword", keyword);
             map.put("description", parsedDescription);
-            list.add(map);
+            apiMapper.upd2(map);
         }
-        return list;
     }
 
-    public List<Map<String, Object>> distancing() throws Exception {
+    public void distancing() throws Exception {
         //        String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
         String keyword = "거리두기";
         URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
@@ -234,12 +226,11 @@ public class ApiService {
             map.put("link", parsedLink);
             map.put("keyword", keyword);
             map.put("description", parsedDescription);
-            list.add(map);
+            apiMapper.upd2(map);
         }
-        return list;
     }
 
-    public List<Map<String, Object>> mask() throws Exception {
+    public void mask() throws Exception {
         //        String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
         String keyword="마스크";
         URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
@@ -275,12 +266,11 @@ public class ApiService {
             map.put("link", parsedLink);
             map.put("keyword", keyword);
             map.put("description", parsedDescription);
-            list.add(map);
+            apiMapper.upd2(map);
         }
-        return list;
     }
 
-    public List<Map<String, Object>> vaccine() throws Exception {
+    public void vaccine() throws Exception {
         //        String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
         String keyword="백신";
         URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
@@ -316,9 +306,8 @@ public class ApiService {
             map.put("link", parsedLink);
             map.put("keyword", keyword);
             map.put("description", parsedDescription);
-            list.add(map);
+            apiMapper.upd2(map);
         }
-        return list;
     }
 
     //뉴스 db 업데이트 함수
@@ -357,60 +346,72 @@ public class ApiService {
 
 
     //코로나 뉴스
-    public void getNewsCovid() throws Exception {
-//        this.insertNews(this.covid()); //처음에 인서트
+    public synchronized void getNewsCovid() throws Exception {
+//      this.insertNews(this.covid()); //처음에 인서트
         String keyword = "코로나";
         Integer isLinkEmpty = 0;
-        List<NewsDTO> list = this.getCovidNews(keyword); //저장된 코로나 뉴스
-        List<Map<String, Object>> news = this.covid(); //실시간 코로나 뉴스
-        List<Map<String, Object>> newLinks = new ArrayList<>();
-        this.commonUpdate(news, list, keyword, newLinks, isLinkEmpty);
+        //List<NewsDTO> list = this.getCovidNews(keyword); //저장된 코로나 뉴스
+
+//        List<Map<String, Object>> news = this.covid(); //실시간 코로나 뉴스
+//        System.out.println("코로나  : "+news);
+//        apiMapper.upd(news);
+
+        //List<Map<String, Object>> newLinks = new ArrayList<>();
+        //this.commonUpdate(news, list, keyword, newLinks, isLinkEmpty);
     }
 
+    //merge into
+    public synchronized void upd(List<Map<String, Object>> news) throws Exception{
+        System.out.println("upd : "+news);
+        apiMapper.upd(news);
+    }
 
     //자가격리 뉴스
-    public void getNewsQuarantine() throws Exception {
+    public synchronized void getNewsQuarantine() throws Exception {
 //        this.insertNews(this.quarantine());
         String keyword = "자가격리";
-        Integer isLinkEmpty = 0;
-        List<NewsDTO> list = this.getCovidNews(keyword); //저장된 자가격리 뉴스
-        List<Map<String, Object>> news = this.quarantine(); //실시간 자가격리 뉴스
-        List<Map<String, Object>> newLinks = new ArrayList<>();
-        this.commonUpdate(news, list, keyword, newLinks, isLinkEmpty);
+        //Integer isLinkEmpty = 0;
+        //List<NewsDTO> list = this.getCovidNews(keyword); //저장된 자가격리 뉴스
+//        List<Map<String, Object>> news = this.quarantine(); //실시간 자가격리 뉴스
+//        System.out.println("자가격리  : "+news);
+//        apiMapper.upd(news);
+        //this.upd(news);
+        //List<Map<String, Object>> newLinks = new ArrayList<>();
+        //this.commonUpdate(news, list, keyword, newLinks, isLinkEmpty);
     }
 
     //거리두기 뉴스
-    public void getNewsDistance() throws Exception {
-//        this.insertNews(this.distancing());
-        String keyword = "거리두기";
-        Integer isLinkEmpty = 0;
-        List<NewsDTO> list = this.getCovidNews(keyword); //저장된 거리두기 뉴스
-        List<Map<String, Object>> news = this.distancing(); //실시간 거리두기 뉴스
-        List<Map<String, Object>> newLinks = new ArrayList<>();
-        this.commonUpdate(news, list, keyword, newLinks, isLinkEmpty);
-    }
+//    public void getNewsDistance() throws Exception {
+////        this.insertNews(this.distancing());
+//        String keyword = "거리두기";
+//        Integer isLinkEmpty = 0;
+//        List<NewsDTO> list = this.getCovidNews(keyword); //저장된 거리두기 뉴스
+//        List<Map<String, Object>> news = this.distancing(); //실시간 거리두기 뉴스
+//        List<Map<String, Object>> newLinks = new ArrayList<>();
+//        this.commonUpdate(news, list, keyword, newLinks, isLinkEmpty);
+//    }
 
     //마스크 뉴스
-    public void getNewsMask() throws Exception {
-//        this.insertNews(this.mask());
-        String keyword = "마스크";
-        Integer isLinkEmpty = 0;
-        List<NewsDTO> list = this.getCovidNews(keyword); //저장된 거리두기 뉴스
-        List<Map<String, Object>> news = this.mask(); //실시간 거리두기 뉴스
-        List<Map<String, Object>> newLinks = new ArrayList<>();
-        this.commonUpdate(news, list, keyword, newLinks, isLinkEmpty);
-    }
+//    public void getNewsMask() throws Exception {
+////        this.insertNews(this.mask());
+//        String keyword = "마스크";
+//        Integer isLinkEmpty = 0;
+//        List<NewsDTO> list = this.getCovidNews(keyword); //저장된 거리두기 뉴스
+//        List<Map<String, Object>> news = this.mask(); //실시간 거리두기 뉴스
+//        List<Map<String, Object>> newLinks = new ArrayList<>();
+//        this.commonUpdate(news, list, keyword, newLinks, isLinkEmpty);
+//    }
 
     //백신 뉴스
-    public void getNewsVaccine() throws Exception {
-//        this.insertNews(this.vaccine());
-        String keyword = "백신";
-        Integer isLinkEmpty = 0;
-        List<NewsDTO> list = this.getCovidNews(keyword); //저장된 거리두기 뉴스
-        List<Map<String, Object>> news = this.vaccine(); //실시간 거리두기 뉴스
-        List<Map<String, Object>> newLinks = new ArrayList<>();
-        this.commonUpdate(news, list, keyword, newLinks, isLinkEmpty);
-    }
+//    public void getNewsVaccine() throws Exception {
+////        this.insertNews(this.vaccine());
+//        String keyword = "백신";
+//        Integer isLinkEmpty = 0;
+//        List<NewsDTO> list = this.getCovidNews(keyword); //저장된 거리두기 뉴스
+//        List<Map<String, Object>> news = this.vaccine(); //실시간 거리두기 뉴스
+//        List<Map<String, Object>> newLinks = new ArrayList<>();
+//        this.commonUpdate(news, list, keyword, newLinks, isLinkEmpty);
+//    }
 
     public void insertInfectionInfo(InfectionDTO infectionDTO) throws Exception {
         apiMapper.insertInfectionInfo(infectionDTO);
@@ -631,6 +632,106 @@ public class ApiService {
         return reMap;
     }
 
+
+    //뉴스 커뮤니티 페이징1
+    public Map<String, Object> newsPaging1(Integer currentPage, Integer count) throws Exception {
+        Map<String, Object> reMap = new HashMap<>();
+        int postTotalCount = this.countWholeNews();
+
+        int recordCountPerPage = count; // 페이지 당 게시글 개수
+        int naviCountPerPage = 10; // 내비 개수
+
+        int pageTotalCount = 0; // 전체 내비 수
+        if (postTotalCount % recordCountPerPage > 0) {
+            pageTotalCount = postTotalCount / recordCountPerPage + 1;
+        } else {
+            pageTotalCount = postTotalCount / recordCountPerPage;
+        }
+
+        if (currentPage < 1) {
+            currentPage = 1;
+        } else if (currentPage > pageTotalCount) {
+            currentPage = pageTotalCount;
+        }
+
+        int startNavi = (currentPage - 1) / naviCountPerPage * naviCountPerPage + 1; // 페이지 시작 내비 값
+        int endNavi = startNavi + naviCountPerPage - 1; // 페이지 마지막 내비 값
+
+        if (endNavi > pageTotalCount) {
+            endNavi = pageTotalCount;
+        }
+        boolean needPrev = true;
+        boolean needNext = true;
+
+        if (startNavi == 1) {
+            needPrev = false;
+        }
+        if (endNavi == pageTotalCount) {
+            needNext = false;
+        }
+
+        System.out.println("startNavi : " + startNavi);
+        System.out.println("endNavi : " + endNavi);
+        System.out.println("전체 글 개수 : " + pageTotalCount);
+
+        reMap.put("pageTotalCount", pageTotalCount);
+        reMap.put("startNavi", startNavi);
+        reMap.put("endNavi", endNavi);
+        reMap.put("needPrev", needPrev);
+        reMap.put("needNext", needNext);
+        return reMap;
+    }
+
+
+    //뉴스 커뮤니티 페이징2
+    public Map<String, Object> newsPaging2(Integer currentPage, Integer count,String keyword) throws Exception {
+        Map<String, Object> reMap = new HashMap<>();
+        int postTotalCount = this.countNews(keyword);
+
+        int recordCountPerPage = count; // 페이지 당 게시글 개수
+        int naviCountPerPage = 10; // 내비 개수
+
+        int pageTotalCount = 0; // 전체 내비 수
+        if (postTotalCount % recordCountPerPage > 0) {
+            pageTotalCount = postTotalCount / recordCountPerPage + 1;
+        } else {
+            pageTotalCount = postTotalCount / recordCountPerPage;
+        }
+
+        if (currentPage < 1) {
+            currentPage = 1;
+        } else if (currentPage > pageTotalCount) {
+            currentPage = pageTotalCount;
+        }
+
+        int startNavi = (currentPage - 1) / naviCountPerPage * naviCountPerPage + 1; // 페이지 시작 내비 값
+        int endNavi = startNavi + naviCountPerPage - 1; // 페이지 마지막 내비 값
+
+        if (endNavi > pageTotalCount) {
+            endNavi = pageTotalCount;
+        }
+        boolean needPrev = true;
+        boolean needNext = true;
+
+        if (startNavi == 1) {
+            needPrev = false;
+        }
+        if (endNavi == pageTotalCount) {
+            needNext = false;
+        }
+
+        System.out.println("startNavi : " + startNavi);
+        System.out.println("endNavi : " + endNavi);
+        System.out.println("전체 글 개수 : " + pageTotalCount);
+
+        reMap.put("pageTotalCount", pageTotalCount);
+        reMap.put("startNavi", startNavi);
+        reMap.put("endNavi", endNavi);
+        reMap.put("needPrev", needPrev);
+        reMap.put("needNext", needNext);
+        return reMap;
+    }
+
     public List<HospitalDTO> test2(Map<String, Object> paramMap) {
         return apiMapper.test2(paramMap);
     }
@@ -643,7 +744,7 @@ public class ApiService {
         apiMapper.insertNews(list);
     }
 
-    //뉴스 키워드 == 코로나 가져오기
+    //키워드로 뉴스 가져오기
     public List<NewsDTO> getCovidNews(String keyword) throws Exception {
         return apiMapper.getCovidNews(keyword);
     }
@@ -667,8 +768,8 @@ public class ApiService {
     }
 
     //키워드별 뉴스 가져오기
-    public List<NewsDTO> getNewsByKeyword(String keyword) throws Exception {
-        return apiMapper.getNewsByKeyword(keyword);
+    public List<NewsDTO> getNewsByKeyword(String keyword,Integer start,Integer end) throws Exception {
+        return apiMapper.getNewsByKeyword(keyword,start,end);
     }
 
     //마지막에 상태 n으로
@@ -677,8 +778,16 @@ public class ApiService {
     }
 
     //전체 뉴스 가져오기
-    public List<NewsDTO> getNewsList() throws Exception {
-        return apiMapper.getNewsList();
+    public List<NewsDTO> getNewsList(Integer start,Integer end) throws Exception {
+        return apiMapper.getNewsList(start,end);
+    }
+
+    public Integer countNews(String keyword) throws Exception{
+        return apiMapper.countNews(keyword);
+    }
+
+    public Integer countWholeNews() throws Exception{
+        return apiMapper.countWholeNews();
     }
 }
 

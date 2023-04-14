@@ -25,7 +25,7 @@
     <a href="javascript:api${status.count}()"><button type="button" id="apiBtn${status.count}"><input type="hidden" value="${i.path}" id="api${status.count}">${i.name}</button></a>
 </c:forEach>
 
-<a href=${list.get(7).path}><button type="submit">${list.get(7).name}</button></a>
+<a href=${list.get(7).path}?currentPage=1&count=10&keyword=><button type="submit">${list.get(7).name}</button></a>
 <script>
     let id = $("#sessionID").val();
     //커뮤니티로 이동
