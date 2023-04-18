@@ -105,4 +105,42 @@ public class FileController {
             throw new Exception("download error");
         }
     }
+
+    @ResponseBody
+    @RequestMapping("/addFile")
+    public Object addFile(@RequestParam("file") List<MultipartFile> file) throws Exception {
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+
+        if (!file.isEmpty()) {  //파일 있을 때
+
+            String path = "D:/storage/";
+            File dir = new File(path);
+            if (!dir.isDirectory()) {
+                dir.mkdirs();
+            }
+
+            for (MultipartFile f : file) {
+                Map<String, Object> map = new HashMap<>();
+
+                String oriname = f.getOriginalFilename();
+
+                UUID uuid = UUID.randomUUID();
+                String sysname = uuid + "_" + oriname;
+
+                String savePath = path + sysname;
+
+                f.transferTo(new File(savePath));
+                map.put("oriname", oriname);
+                map.put("sysname", sysname);
+                list.add(map);
+            }
+        }
+
+        Integer size = list.size();
+        for (int i = 0; i < size; i++) {
+            fileService.insertMap(list.get(i));
+        }
+        return list;
+    }
+
 }

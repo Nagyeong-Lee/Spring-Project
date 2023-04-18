@@ -90,7 +90,7 @@ public interface ApiMapper {
 
 
     //키워드별 뉴스 가져오기
-    List<NewsDTO> getNewsByKeyword(@Param("keyword") String keyword,@Param("start") Integer start,@Param("end") Integer end);
+    List<NewsDTO> getNewsByKeyword(@Param("start") Integer start,@Param("end") Integer end,@Param("keyword") String keyword);
 
     //마지막에 상태 n
     void updateStatusToN(String keyword);

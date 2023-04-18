@@ -1,6 +1,6 @@
 package com.example.Spring_Project.service;
 
-import com.example.Spring_Project.dto.MemberDTO;
+import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.mailSender.MailDTO;
 import com.example.Spring_Project.mapper.MemberMapper;
 import org.apache.ibatis.annotations.Param;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-
+import java.util.List;
 
 @Service
 public class MemberService {
@@ -125,6 +125,38 @@ public class MemberService {
     public String getUserType(@Param("id") String id) throws Exception{
         return mapper.getUserType(id);
     }
+
+    //이벤트 seq 증가
+    public Integer getEventNextval() throws Exception{
+        return mapper.getEventNextval();
+    }
+    public void insertEvent(EventDTO eventDTO) throws Exception{
+        mapper.insertEvent(eventDTO);
+    }
+
+    //등록된 이벤트 가져오기
+    public List<EventDTO> getEvents() throws Exception{
+        return mapper.getEvents();
+    }
+
+    public List<EventFileDTO> getEventFile() throws Exception{
+        return mapper.getEventFile();
+    }
+
+    //쿠폰 발급
+    public void insertCoupon(Integer m_seq) throws Exception{
+         mapper.insertCoupon(m_seq);
+    }
+
+    //로그인 한 아이디의 seq
+    public Integer getmSeq(String id) throws Exception{
+        return mapper.getmSeq(id);
+    }
+    //쿠폰 가져오기
+    public List<CouponDTO>getCoupon(Integer m_seq) throws Exception{
+        return mapper.getCoupon(m_seq);
+    }
+
 
 
 }

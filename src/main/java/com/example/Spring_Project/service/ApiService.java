@@ -271,7 +271,6 @@ public class ApiService {
     }
 
     public void vaccine() throws Exception {
-        //        String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
         String keyword="백신";
         URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
                 .path("v1/search/news.json")
@@ -682,9 +681,11 @@ public class ApiService {
         return reMap;
     }
 
-
     //뉴스 커뮤니티 페이징2
     public Map<String, Object> newsPaging2(Integer currentPage, Integer count,String keyword) throws Exception {
+        if(keyword == null){
+            keyword="all";
+        }
         Map<String, Object> reMap = new HashMap<>();
         int postTotalCount = this.countNews(keyword);
 
@@ -768,8 +769,8 @@ public class ApiService {
     }
 
     //키워드별 뉴스 가져오기
-    public List<NewsDTO> getNewsByKeyword(String keyword,Integer start,Integer end) throws Exception {
-        return apiMapper.getNewsByKeyword(keyword,start,end);
+    public List<NewsDTO> getNewsByKeyword(Integer start,Integer end,String keyword) throws Exception {
+        return apiMapper.getNewsByKeyword(start,end,keyword);
     }
 
     //마지막에 상태 n으로

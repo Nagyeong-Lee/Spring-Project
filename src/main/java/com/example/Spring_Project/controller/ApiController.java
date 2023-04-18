@@ -366,7 +366,7 @@ public class ApiController {
     }
 
     @RequestMapping("/searchNews")
-    public String searchNews(Model model,Integer currentPage,Integer count,String keyword) throws Exception {
+    public String searchNews(Model model,Integer currentPage,Integer count) throws Exception {
         List<CodeInfoDTO> list = apiService.getCode_info();
         List<PathDTO> pathList = pathService.getNewsPathList();
         Integer start = currentPage * count - (count - 1); //시작 글 번호
@@ -389,17 +389,19 @@ public class ApiController {
         model.addAttribute("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
         model.addAttribute("pageTotalCount", Integer.parseInt(paging.get("pageTotalCount").toString()));
         model.addAttribute("paging",paging);
+        model.addAttribute("count",count);
         return "/api/news";
     }
 
     @ResponseBody
     @RequestMapping("/covid")
-    public Map<String, Object> covidNews(String keyword,Integer currentPage,Integer count) throws Exception {
+    public Map<String, Object> covidNews(Integer currentPage,Integer count) throws Exception {
         Map<String, Object> reMap = new HashMap<>();
         apiService.covid();
         Integer start = currentPage * count - (count - 1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
-        List<NewsDTO>list = apiService.getNewsByKeyword(keyword,start,end);
+        String keyword="코로나";
+        List<NewsDTO>list = apiService.getNewsByKeyword(start,end,keyword);
         Map<String,Object>paging=apiService.newsPaging2(currentPage,count,keyword);
         reMap.put("pageTotalCount", Integer.parseInt(paging.get("pageTotalCount").toString()));
         reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
@@ -408,17 +410,23 @@ public class ApiController {
         reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
         reMap.put("items", list);
         reMap.put("paging", paging);
+        reMap.put("count", count);
+        reMap.put("currentPage", currentPage);
+        reMap.put("keyword", "코로나");
         return reMap;
     }
 
     @ResponseBody
     @RequestMapping("/quarantine")
-    public Map<String, Object> quarantineNews(String keyword,Integer currentPage,Integer count) throws Exception {
+    public Map<String, Object> quarantineNews(Integer currentPage,Integer count) throws Exception {
         Map<String, Object> reMap = new HashMap<>();
         apiService.quarantine();
         Integer start = currentPage * count - (count - 1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
-        List<NewsDTO>list = apiService.getNewsByKeyword(keyword,start,end);
+//        List<NewsDTO>list = apiService.getNewsByKeyword(keyword,start,end);
+//        Map<String,Object>paging=apiService.newsPaging2(currentPage,count,keyword);
+        String keyword="자가격리";
+        List<NewsDTO>list = apiService.getNewsByKeyword(start,end,keyword);
         Map<String,Object>paging=apiService.newsPaging2(currentPage,count,keyword);
         reMap.put("pageTotalCount", Integer.parseInt(paging.get("pageTotalCount").toString()));
         reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
@@ -427,17 +435,21 @@ public class ApiController {
         reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
         reMap.put("items", list);
         reMap.put("paging", paging);
+        reMap.put("count", count);
+        reMap.put("currentPage", currentPage);
+        reMap.put("keyword",keyword);
         return reMap;
     }
 
     @ResponseBody
     @RequestMapping("/distancing")
-    public Map<String, Object> distancingNews(String keyword,Integer currentPage,Integer count) throws Exception {
+    public Map<String, Object> distancingNews(Integer currentPage,Integer count) throws Exception {
         Map<String, Object> reMap = new HashMap<>();
         apiService.distancing();
         Integer start = currentPage * count - (count - 1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
-        List<NewsDTO>list = apiService.getNewsByKeyword(keyword,start,end);
+        String keyword="거리두기";
+        List<NewsDTO>list = apiService.getNewsByKeyword(start,end,keyword);
         Map<String,Object>paging=apiService.newsPaging2(currentPage,count,keyword);
         reMap.put("pageTotalCount", Integer.parseInt(paging.get("pageTotalCount").toString()));
         reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
@@ -446,17 +458,21 @@ public class ApiController {
         reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
         reMap.put("items", list);
         reMap.put("paging", paging);
+        reMap.put("count", count);
+        reMap.put("currentPage", currentPage);
+        reMap.put("keyword",keyword);
         return reMap;
     }
 
     @ResponseBody
     @RequestMapping("/mask")
-    public Map<String, Object> mask(String keyword,Integer currentPage,Integer count) throws Exception {
+    public Map<String, Object> mask(Integer currentPage,Integer count) throws Exception {
         Map<String, Object> reMap = new HashMap<>();
         apiService.mask();
         Integer start = currentPage * count - (count - 1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
-        List<NewsDTO>list = apiService.getNewsByKeyword(keyword,start,end);
+        String keyword="마스크";
+        List<NewsDTO>list = apiService.getNewsByKeyword(start,end,keyword);
         Map<String,Object>paging=apiService.newsPaging2(currentPage,count,keyword);
         reMap.put("pageTotalCount", Integer.parseInt(paging.get("pageTotalCount").toString()));
         reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
@@ -465,17 +481,21 @@ public class ApiController {
         reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
         reMap.put("items", list);
         reMap.put("paging", paging);
+        reMap.put("count", count);
+        reMap.put("currentPage", currentPage);
+        reMap.put("keyword",keyword);
         return reMap;
     }
 
     @ResponseBody
     @RequestMapping("/vaccine")
-    public Map<String, Object>  vaccineNews(String keyword,Integer currentPage,Integer count) throws Exception {
+    public Map<String, Object>  vaccineNews(Integer currentPage,Integer count) throws Exception {
         Map<String, Object> reMap = new HashMap<>();
         apiService.vaccine();
         Integer start = currentPage * count - (count - 1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
-        List<NewsDTO>list = apiService.getNewsByKeyword(keyword,start,end);
+        String keyword="백신";
+        List<NewsDTO>list = apiService.getNewsByKeyword(start,end,keyword);
         Map<String,Object>paging=apiService.newsPaging2(currentPage,count,keyword);
         reMap.put("pageTotalCount", Integer.parseInt(paging.get("pageTotalCount").toString()));
         reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
@@ -484,17 +504,23 @@ public class ApiController {
         reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
         reMap.put("items", list);
         reMap.put("paging", paging);
+        reMap.put("count", count);
+        reMap.put("currentPage", currentPage);
+        reMap.put("keyword",keyword);
         return reMap;
     }
 
     @ResponseBody
     @RequestMapping("/repaging")
-    public Map<String, Object> repaging(Integer currentPage,Integer count,String keyword) throws Exception{
+    public Map<String, Object> repaging(Integer currentPage,Integer count,@RequestParam(required = false) String keyword) throws Exception{
 
+        if(keyword == null){
+            keyword="all";
+        }
         Map<String, Object> reMap = new HashMap<>();
         Integer start = currentPage * count - (count - 1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
-        List<NewsDTO>list = apiService.getNewsByKeyword(keyword,start,end);
+        List<NewsDTO>list = apiService.getNewsByKeyword(start,end,keyword);
         Map<String,Object>paging=apiService.newsPaging2(currentPage,count,keyword);
         reMap.put("pageTotalCount", Integer.parseInt(paging.get("pageTotalCount").toString()));
         reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
@@ -503,6 +529,8 @@ public class ApiController {
         reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
         reMap.put("items", list);
         reMap.put("paging", paging);
+        reMap.put("count", count);
+        reMap.put("currentPage", currentPage);
         return reMap;
     }
 }

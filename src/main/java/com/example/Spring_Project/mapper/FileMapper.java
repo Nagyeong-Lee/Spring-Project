@@ -13,6 +13,7 @@ public interface FileMapper {
     void insert(List<Map<String, Object>> list);
 
     void insertMap(Map<String, Object> map);
+    void insertEventMap(Map<String, Object> map);
 
     List<FileDTO> getFile(@Param("b_seq") Integer b_seq);
 

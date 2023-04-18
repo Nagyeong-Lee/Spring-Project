@@ -55,4 +55,15 @@
         from file_info
         where f_seq=#{f_seq}
     </select>
+
+    <insert id="insertEventMap" parameterType="java.util.HashMap">
+        insert into event_file
+        values(
+        file_seq.nextval,
+        #{event_seq},
+        #{oriname},
+        #{sysname},
+        'Y'
+        )
+    </insert>
 </mapper>

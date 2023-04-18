@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.Spring_Project.mapper.ProductMapper">
+
+    <select id="getProducts" resultType="com.example.Spring_Project.dto.ProductDTO">
+        select
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        from product
+    </select>
+
+    <select id="getProductDetail" resultType="com.example.Spring_Project.dto.ProductDTO">
+        select
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        from product
+        where pd_seq=#{pd_seq}
+    </select>
+
+
+    <select id="getWProduct" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category IN (
+        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ =1)
+    </select>
+
+    <select id="getWOuter" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category = 2
+    </select>
+
+    <select id="getWTop" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category = 3
+    </select>
+
+    <select id="getWPants" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category = 4
+    </select>
+
+    <select id="getWAccessories" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category = 5
+    </select>
+
+
+    <select id="getMProduct" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category IN (
+        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ =6)
+    </select>
+
+
+    <select id="getMOuter" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category = 7
+    </select>
+
+    <select id="getMTop" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category = 8
+    </select>
+    <select id="getMPants" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category = 9
+    </select>
+    <select id="getMAccessories" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category = 10
+    </select>
+
+
+    <select id="getNewProduct" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category IN (
+        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ =11)
+    </select>
+
+    <select id="getNewOuter" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category = 12
+    </select>
+
+    <select id="getNewTop" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category = 13
+    </select>
+
+    <select id="getNewPants" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category = 14
+    </select>
+
+    <select id="getNewAccessories" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category = 15
+    </select>
+
+
+    <select id="getOptions" resultType="com.example.Spring_Project.dto.OptionDTO">
+        select
+        option_seq,
+        category,
+        name,
+        stock,
+        status,
+        pd_seq
+        from options
+        where pd_seq=#{pd_seq}
+    </select>
+
+
+    <select id="getCategory" resultType="String">
+        SELECT category
+        FROM (
+        SELECT category,count(*)
+        FROM OPTIONS
+        WHERE pd_seq=#{pd_seq}
+        GROUP BY category)
+    </select>
+
+    <select id="optionByCategory" resultType="String">
+        SELECT category
+        FROM (
+        SELECT category,count(*)
+        FROM OPTIONS
+        WHERE pd_seq=#{pd_seq}
+        GROUP BY category)
+    </select>
+
+
+    <select id="getOptionByGroup" resultType="com.example.Spring_Project.dto.OptionListDTO">
+        SELECT
+            name,
+            status,
+            stock
+        FROM OPTIONS
+        WHERE category= #{category} and pd_seq=#{pd_seq}
+    </select>
+
+</mapper>

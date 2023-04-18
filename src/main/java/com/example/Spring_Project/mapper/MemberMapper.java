@@ -1,12 +1,14 @@
 package com.example.Spring_Project.mapper;
 
 
-import com.example.Spring_Project.dto.MemberDTO;
+import com.example.Spring_Project.dto.*;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestParam;
+import java.util.List;
 
 @Repository
 @Mapper
@@ -65,5 +67,20 @@ public interface MemberMapper {
     void activeMember(@Param("id") String id, @Param("email") String email);
 
     void modifyLastLoginDateNull(@Param("id") String id, @Param("email") String email);
+
+    Integer getEventNextval();
+
+    void insertEvent(EventDTO eventDTO);
+    List<EventDTO>getEvents();
+    List<EventFileDTO>getEventFile();
+
+
+    //쿠폰 발급
+    void insertCoupon(@Param("m_seq")Integer m_seq);
+
+    //로그인한 아이디의 seq
+    Integer getmSeq(@Param("id") String id);
+    //쿠폰 가져오기
+    List<CouponDTO>getCoupon(@Param("m_seq") Integer m_seq);
 
 }

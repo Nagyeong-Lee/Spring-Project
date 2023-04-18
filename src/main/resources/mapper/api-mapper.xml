@@ -529,7 +529,7 @@
         lastUpdateDate,
         description
         from news
-        <if test="keyword != null">
+        <if test="keyword != 'all'.toString()">
             where keyword=#{keyword}
         </if>
         order by lastUpdateDate desc) a
@@ -549,6 +549,7 @@
 <!--        keyword,-->
 <!--        checkDate,-->
 <!--        lastUpdateDate,-->
+<!--        description-->
 <!--        description-->
 <!--        from news-->
 
@@ -598,9 +599,12 @@
     </update>
 
     <select id="countNews" resultType="Integer">
+
         select count(*)
         from news
+        <if test="keyword neq 'all'.toString()">
         where keyword=#{keyword}
+        </if>
     </select>
 
     <select id="countWholeNews" resultType="Integer">

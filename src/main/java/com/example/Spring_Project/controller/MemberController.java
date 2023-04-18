@@ -1,16 +1,10 @@
 package com.example.Spring_Project.controller;
 
-import com.example.Spring_Project.dto.BatchDTO;
-import com.example.Spring_Project.dto.LogDTO;
-import com.example.Spring_Project.dto.MemberDTO;
-import com.example.Spring_Project.dto.PathDTO;
+import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.mailSender.MailDTO;
-import com.example.Spring_Project.service.BatchService;
-import com.example.Spring_Project.service.LogService;
-import com.example.Spring_Project.service.MemberService;
-import com.example.Spring_Project.service.PathService;
+import com.example.Spring_Project.service.*;
 import lombok.extern.slf4j.Slf4j;
-import oracle.ucp.proxy.annotation.Post;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -21,10 +15,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpSession;
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 
 @Slf4j
@@ -49,6 +40,12 @@ public class MemberController {
 
     @Autowired
     private LogService logService;
+
+    @Autowired
+    private FileService fileService;
+
+    @Autowired
+    private ProductService productService;
 
     @GetMapping("/toSignUpForm")  // 회원가입폼으로 이동
     public String toSignUpForm() throws Exception {
@@ -79,6 +76,8 @@ public class MemberController {
         memberDTO.setPw(bCryptPasswordEncoder.encode(memberDTO.getPw())); //pw 암호화
 
         service.signUp(memberDTO, mailDTO, file, request);
+        service.insertCoupon(memberDTO.getM_seq());
+
 
         return "/member/index";
 
@@ -299,7 +298,7 @@ public class MemberController {
         String monthly = pathService.getLogoutPath();
         String hospitalPath = pathService.getHospitalPath();
 
-        List<PathDTO>list = pathService.getPathList();
+        List<PathDTO> list = pathService.getPathList();
         model.addAttribute("updateFormPath", updateFormPath);
         model.addAttribute("deletePath", deletePath);
         model.addAttribute("logoutPath", logoutPath);
@@ -334,5 +333,98 @@ public class MemberController {
     @GetMapping("/toActiveMemberPage")
     public String toActiveMemberPage() throws Exception {
         return "/member/activeMemberPage";
+    }
+
+    @RequestMapping("/toDoList")
+    public String calendar() throws Exception {
+        return "/member/calendar";
+    }
+
+    @RequestMapping("/popup")
+    public String popup() throws Exception {
+        return "/member/popup";
+    }
+
+    @RequestMapping("/showEvent")
+    public String showEvent() throws Exception {
+        return "/member/showEvent";
+    }
+
+    @ResponseBody
+    @PostMapping("/addEvent")  //이벤트 등록 (파일 업로드 같이)
+    public String insert(EventDTO eventDTO, @RequestParam(required = false) List<MultipartFile> file) throws Exception {
+
+        Integer event_seq = service.getEventNextval();   //b_seq nextval
+        eventDTO.setEvent_seq(event_seq);
+
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        boolean flag = true;
+
+        if (file == null) { //파일 없을때
+            service.insertEvent(eventDTO);
+        } else if (file != null) {  //파일 있을때
+            service.insertEvent(eventDTO);
+            String path = "D:/storage/";
+            File dir = new File(path);
+            if (!dir.isDirectory()) {
+                dir.mkdirs();
+            }
+
+            for (MultipartFile f : file) {
+                Map<String, Object> map = new HashMap<>();
+
+                String oriname = f.getOriginalFilename();
+                if (oriname.equals("")) {
+                    flag = false;
+                }
+
+                UUID uuid = UUID.randomUUID();
+                String sysname = uuid + "_" + oriname;
+                String savePath = path + sysname;
+
+                f.transferTo(new File(savePath));
+                map.put("event_seq", event_seq);
+                map.put("oriname", oriname);
+                map.put("sysname", sysname);
+                list.add(map);
+            }
+            Integer size = list.size();
+            for (int i = 0; i < size; i++) {
+                fileService.insertEventMap(list.get(i));
+            }
+        }
+        return "success";
+    }
+
+
+    @ResponseBody
+    @PostMapping("/registeredEvent")
+    public List<EventDTO> registeredEvent() throws Exception {
+        List<EventDTO> list = service.getEvents(); //등록된 이벤트 가져오기
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i).getTitle());
+        }
+//        for (Integer i = 0; i<list.size(); i++){
+//            if(list.get(i).getEvent_seq()){
+//
+//            }
+//        }
+//        List<EventDTO> fileList = service.getEventFile(); //등록된 파일 가져오기
+        return list;
+    }
+
+    @RequestMapping("/coupon")
+    public String coupon(Model model) throws Exception {
+        String id = (String) session.getAttribute("id");
+        Integer m_seq = service.getmSeq(id); //로그인한 회원의 seq
+        List<CouponDTO> coupon = service.getCoupon(m_seq);
+        model.addAttribute("coupon", coupon);
+        return "/member/coupon";
+    }
+
+
+    @RequestMapping("/cart")
+    public String cart() throws Exception {
+        return "/member/cart";
     }
 }

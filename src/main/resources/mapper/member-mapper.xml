@@ -241,4 +241,71 @@
     </update>
 
 
+<!-- 달력-->
+    <select id="getEventNextval" resultType="Integer">
+        select event_seq.nextval from dual
+    </select>
+
+    <insert id="insertEvent">
+        insert into event
+        values(
+        event_seq.currval,
+        #{id},
+        #{title},
+        #{startDate},
+        #{startTime},
+        #{endDate},
+        #{endTime},
+        #{content},
+        'Y'
+        )
+    </insert>
+
+    <select id="getEvents" resultType="com.example.Spring_Project.dto.EventDTO">
+        select
+            event_seq,
+            id,
+            title,
+            startDate,
+            startTime,
+            endDate,
+            endTime,
+            content
+        from event
+    </select>
+
+    <select id="getEventFile" resultType="com.example.Spring_Project.dto.EventFileDTO">
+        select
+            event_seq,
+            oriname,
+            sysname
+        from event_file
+    </select>
+
+    <!--쿠폰 발급-->
+    <insert id="insertCoupon">
+        insert into coupon
+        values (
+        cp_seq.nextval,
+        '회원가입 축하 쿠폰',
+        10,
+        #{m_seq}
+        )
+    </insert>
+
+    <select id="getmSeq" resultType="Integer">
+        select
+            m_seq
+        from member
+        where id=#{id}
+    </select>
+
+    <!--쿠폰 가져오기-->
+    <select id="getCoupon" resultType="com.example.Spring_Project.dto.CouponDTO">
+        select
+            title,
+            discount
+        from coupon
+        where m_seq=#{m_seq}
+    </select>
 </mapper>

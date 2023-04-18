@@ -25,7 +25,17 @@
     <a href="javascript:api${status.count}()"><button type="button" id="apiBtn${status.count}"><input type="hidden" value="${i.path}" id="api${status.count}">${i.name}</button></a>
 </c:forEach>
 
-<a href=${list.get(7).path}?currentPage=1&count=10&keyword=><button type="submit">${list.get(7).name}</button></a>
+<%--뉴스 검색--%>
+<a href=${list.get(7).path}?currentPage=1&count=10><button type="submit">${list.get(7).name}</button></a>
+<%--쿠폰함--%>
+<%--<a href="${list.get(14).path}"><button type="button">${list.get(14).name}</button></a>--%>
+<%--상품목록--%>
+<a href="${list.get(15).path}"><button type="button">${list.get(15).name}</button></a>
+<%--장바구니--%>
+<a href="${list.get(16).path}"><button type="button">${list.get(16).name}</button></a>
+
+
+
 <script>
     let id = $("#sessionID").val();
     //커뮤니티로 이동

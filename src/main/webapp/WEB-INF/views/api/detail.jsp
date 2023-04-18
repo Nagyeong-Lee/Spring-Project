@@ -28,7 +28,12 @@
     <div id="satBsHour">토요일 진료 시간 : ${hospitalDTO.satOpen} ~ ${hospitalDTO.satClose}</div>
 </c:if>
 <c:if test="${not empty hospitalDTO.holidayOpen}">
-    <div id="holidayBsHour">일요일 및 공휴일 진료시간 : ${hospitalDTO.holidayOpen} ~ ${hospitalDTO.holidayClose}</div>
+    <c:if test="${hospitalDTO.holidayOpen ne '-'}">
+        <div id="holidayBsHour">일요일 및 공휴일 진료시간 : ${hospitalDTO.holidayOpen} ~ ${hospitalDTO.holidayClose}</div>
+    </c:if>
+    <c:if test="${hospitalDTO.holidayOpen eq '-'}">
+    <div id="holidayBsHour">일요일 및 공휴일 진료시간 : -</div>
+    </c:if>
 </c:if>
 <div id="map" style="width:50%;height:350px;"></div>
 
@@ -37,7 +42,7 @@
            ,'${satOpen}','${satClose}','${holidayY}','${holidayN}','${holidayOpen}','${holidayClose}')">
     <button type="button" id="toList">목록으로</button>
 </a>
-
+0
 <%--<a href="javascript:void(0);" onclick="toList(${currentPage},${count},'${searchType}','${keyword}')"><button type="button" id="toList">목록으로</button></a>--%>
 
 <form id="frm" name="frm" method="post" action="/api/hospital">

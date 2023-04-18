@@ -22,6 +22,10 @@ public class FileService {
         mapper.insertMap(map);
     }
 
+    public void insertEventMap(Map<String, Object> map) throws Exception {
+        mapper.insertEventMap(map);
+    }
+
     public List<FileDTO> getFile(@RequestParam Integer b_seq) throws Exception{
         return mapper.getFile(b_seq);
     }
