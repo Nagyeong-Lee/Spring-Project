@@ -273,4 +273,44 @@
         WHERE category= #{category} and pd_seq=#{pd_seq}
     </select>
 
+    <insert id="insertCart" parameterType="java.util.Map">
+        insert into cart
+        values(
+            cart_seq.nextval,
+            #{id},
+            #{count},
+            #{pd_seq},
+            #{options}
+        )
+    </insert>
+
+    <update id="minusOption">
+        update option set stock=stock-1 where pd_seq=#{pd_seq} and name=#{optionName}
+    </update>
+
+    <update id="minusPd">
+        update product set stock=stock-1 where pd_seq=#{pd_seq}
+    </update>
+
+    <select id="getOptionStock" resultType="Integer">
+        select
+          option_seq
+        from options
+        where pd_seq=#{pd_seq} and name=#{optionName}
+    </select>
+
+    <update id="updateOptionStatus">
+        update options set status='N' where option_seq=#{option_seq}
+    </update>
+
+    <select id="getPdStock" resultType="Integer">
+        select
+          pd_seq
+        from options
+        where pd_seq=#{pd_seq}
+    </select>
+
+    <update id="updatePdStatus">
+        update product set status='N' where pd_seq=#{pd_seq}
+    </update>
 </mapper>

@@ -98,7 +98,34 @@ public class ProductService {
     }
 
     public List<OptionListDTO> getOptionByGroup(String category, Integer pd_seq) throws Exception { //ex 색상 항목들
-        return productMapper.getOptionByGroup(category,pd_seq);
+        return productMapper.getOptionByGroup(category, pd_seq);
     }
 
+    public void insertCart(Map<String, Object> map) throws Exception {
+        productMapper.insertCart(map);
+    }
+
+    public void minusOption(Integer pd_seq, String optionName) throws Exception {
+        productMapper.minusOption(pd_seq, optionName);
+    }
+
+    public void minusPd(Integer pd_seq) throws Exception {
+        productMapper.minusPd(pd_seq);
+    }
+
+    public Integer getOptionStock(Integer pd_seq, String optionName) throws Exception {
+        return productMapper.getOptionStock(pd_seq, optionName);
+    }
+
+    public void updateOptionStatus(Integer option_seq) throws Exception {
+        productMapper.updateOptionStatus(option_seq);
+    }
+
+    public void updatePdStatus(Integer product_seq) throws Exception {
+        productMapper.updatePdStatus(product_seq);
+    }
+
+    public Integer getPdStock(Integer pd_seq) throws Exception {
+        return productMapper.getPdStock(pd_seq);
+    }
 }

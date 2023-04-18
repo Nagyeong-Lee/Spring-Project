@@ -13,103 +13,61 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
-
-    <style>
-        * {
-            padding: 0;
-            margin: 0
-        }
-
-        li {
-            list-style: none
-        }
-
-        a {
-            text-decoration: none;
-            font-size: 14px
-        }
-
-        .menu {
-            width: 800px;
-            overflow: hidden;
-            margin: auto;
-        }
-
-        .menu > li {
-            width: 25%; /*20*5=100%*/
-            float: left;
-            text-align: center;
-            line-height: 40px;
-            /*background-color: black;*/
-        }
-
-        .menu a {
-            color: black;
-        }
-
-        .submenu > li {
-            line-height: 50px;
-            /*background-color: black;*/
-        }
-
-        .submenu {
-            height: 0; /*ul의 높이를 안보이게 처리*/
-            overflow: hidden;
-        }
-
-        .menu > li:hover {
-            /*background-color: black;*/
-            transition-duration: 0.1s;
-            font-weight: bold;
-        }
-
-        .menu > li:hover .submenu {
-            height: 250px; /*서브메뉴 li한개의 높이 50*5*/
-            transition-duration: 1s;
-        }
-
-        .product-list {
-            width: 735px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .products h3 {
-            font-size: 24px;
-            color: #545454;
-            margin-top: 60px;
-            margin-bottom: 60px;
-            text-align: center;
-        }
-
-        .product {
-            display: block;
-            width: 225px;
-            text-align: center;
-            text-decoration: none;
-            color: black;
-            float: left;
-            margin-left: 10px;
-            margin-right: 10px;
-            margin-bottom: 30px;
-        }
-
-        .product-name {
-            margin-top: 20px;
-            margin-bottom: 4px;
-        }
-
-        .clearfix {
-            clear: both;
-        }
-
-        .img {
-            width: 500px;
-            height: 500px;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="/resources/navUtil.css">
 </head>
 <body>
+<%@ include file="/WEB-INF/views/product/navUtil.jsp" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+<link rel="stylesheet" type="text/css" href="/resources/cart.css">
+</head>
+<body>
+<div class="cart">
+    <table class="cart__list">
+        <form>
+            <thead>
+            <tr>
+                <td colspan="3">상품 이미지</td>
+                <td colspan="3">상품정보</td>
+                <td>상품금액</td>
+            </tr>
+            </thead>
+            <tbody>
+            <%--foreach--%>
+            <tr class="cart__list__detail">
+                <td colspan="3"><img src="image/keyboard.jpg" ></td>
+                <td colspan="3">
+                    <p>Apple 매직 키보드</p>
+                    <p>모델명 : 키보드 - 한국어 MK2A3KH/A / 1개</p>
+                </td>
+                <td><span class="price">116,620원</span></td>
+            </tr>
+            </tbody>
+        </form>
+    </table>
+    <hr>
+    <div class="pay">
+        <div>수량</div>
+        <div>가격</div>
+        <div>할인</div>
+        <hr>
+        <div>합계</div>
+    </div>
+    <div class="cart__mainbtns">
+        <button class="cart__bigorderbtn left" id="continue">쇼핑 계속하기</button>
+        <button class="cart__bigorderbtn right">결제하기</button>
+    </div>
+</div>
 
+<script>
+    $("#continue").on("click",function(){
+       history.back();
+    });
+</script>
 </body>
 </html>

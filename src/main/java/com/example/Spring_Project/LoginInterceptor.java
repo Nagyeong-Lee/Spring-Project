@@ -41,7 +41,8 @@ public class LoginInterceptor implements HandlerInterceptor {
             String type = String.valueOf(service.getUserType(id));
 
             if (admin == false) { // 회원일때
-                if (uri.startsWith("/admin")) {
+                if (uri.startsWith("/admin") || uri.startsWith("/api")
+                    || uri.startsWith("/products")) {
                     response.sendRedirect("/");
                     return false;
                 }

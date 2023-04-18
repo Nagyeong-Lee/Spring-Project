@@ -14,137 +14,10 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
-
-    <style>
-        * {
-            padding: 0;
-            margin: 0
-        }
-
-        li {
-            list-style: none
-        }
-
-        a {
-            text-decoration: none;
-            font-size: 14px
-        }
-
-        .menu {
-            width: 800px;
-            overflow: hidden;
-            margin: auto;
-        }
-
-        .menu > li {
-            width: 25%; /*20*5=100%*/
-            float: left;
-            text-align: center;
-            line-height: 40px;
-            /*background-color: black;*/
-        }
-
-        .menu a {
-            color: black;
-        }
-
-        .submenu > li {
-            line-height: 50px;
-            /*background-color: black;*/
-        }
-
-        .submenu {
-            height: 0; /*ul의 높이를 안보이게 처리*/
-            overflow: hidden;
-        }
-
-        .menu > li:hover {
-            /*background-color: black;*/
-            transition-duration: 0.1s;
-            font-weight: bold;
-        }
-
-        .menu > li:hover .submenu {
-            height: 250px; /*서브메뉴 li한개의 높이 50*5*/
-            transition-duration: 1s;
-        }
-
-        .product-list {
-            width: 735px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .products h3 {
-            font-size: 24px;
-            color: #545454;
-            margin-top: 60px;
-            margin-bottom: 60px;
-            text-align: center;
-        }
-
-        .product {
-            display: block;
-            width: 225px;
-            text-align: center;
-            text-decoration: none;
-            color: black;
-            float: left;
-            margin-left: 10px;
-            margin-right: 10px;
-            margin-bottom: 30px;
-        }
-
-        .product-name {
-            margin-top: 20px;
-            margin-bottom: 4px;
-        }
-
-        .clearfix {
-            clear: both;
-        }
-
-        .img {
-            width: 500px;
-            height: 500px;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="/resources/navUtil.css">
 </head>
 <body>
-
-
-<ul class="menu">
-    <li>
-        <a href="/product/list">전체 상품</a>
-    </li>
-    <li>
-        <a href="/product/women">여성</a>
-        <ul class="submenu">
-            <li><a href="/product/women/outer">아우터</a></li>
-            <li><a href="/product/women/top">상의</a></li>
-            <li><a href="/product/women/pants">하의</a></li>
-            <li><a href="/product/women/accessories">악세사리</a></li>
-        </ul>
-    </li>
-    <li>
-        <a href="/product/men">남성</a>
-        <ul class="submenu">
-            <li><a href="/product/men/outer">아우터</a></li>
-            <li><a href="/product/men/top">상의</a></li>
-            <li><a href="/product/men/pants">하의</a></li>
-            <li><a href="/product/men/accessories">악세사리</a></li>
-        </ul>
-    </li>
-    <li>
-        <a href="/product/new">신상품</a>
-        <ul class="submenu">
-            <li><a href="/product/new/outer">아우터</a></li>
-            <li><a href="/product/new/top">상의</a></li>
-            <li><a href="/product/new/pants">하의</a></li>
-            <li><a href="/product/new/accessories">악세사리</a></li>
-        </ul>
-    </li>
-</ul>
+<%@ include file="/WEB-INF/views/product/navUtil.jsp" %>
 
 <div class="productDetail">
     <div class="img">
@@ -157,6 +30,9 @@
         재고 : <span id="totalStock">${productDTO.stock}</span>개
     </div>
 </div>
+
+<input type="hidden" value="${id}" id="id" name="id">
+<input type="hidden" value="${productDTO.pd_seq}" id="pd_seq" name="pd_seq">
 
 <c:choose>
     <c:when test="${!empty optionList}">
@@ -207,7 +83,7 @@
     $("#plus").click(async function () {
         let str = optionCount;
         let numbers = str.match(/\d+/g);
-        // console.log(numbers); // ["40", "50"]s
+        // console.log(numbers); // ["40", "50"]
         let count = parseInt($("#count").val());
 
         let integerArray = [];
@@ -229,12 +105,15 @@
             let totalStock = parseInt($("#totalStock").text());
             totalStock--;
             // console.log(totalStock);
-            $("#totalStock").text(totalStock);
+            if (totalStock >= 0) { //전체 수량 0개일때
+                alert('구매가 불가능한 상품입니다.');
+            } else {
+                $("#totalStock").text(totalStock);
+            }
         } else if (!(count >= 0 && count < min)) {
             alert('개수를 다시 선택해주세요');
         }
     });
-
 
     //수량 -
     $("#minus").click(async function () {
@@ -258,10 +137,14 @@
             count--
             $("#count").val(count);
             // console.log("count : " + count);
-            //총 수량 -
+            //총 수량 +
             let totalStock = parseInt($("#totalStock").text());
             totalStock++;
-            $("#totalStock").text(totalStock);
+            if (totalStock > parseInt($("#totalStock").text())) { //원래 전체 수량 보다 많을때
+                alert('구매가능한 수량이 아닙니다.');
+            } else {
+                $("#totalStock").text(totalStock);
+            }
         }
     });
 
@@ -270,7 +153,7 @@
         let str = optionCount;
         let regex = /([A-Z]+\(\d+\))/g;
         let numbers = str.match(regex);
-        console.log(numbers); // ["40", "50"]s
+        console.log(numbers); //
         let count = parseInt($("#count").val());
         let integerArray2 = [];
         for (let i = 0; i < numbers.length; i++) {
@@ -278,20 +161,39 @@
         }
         console.log(integerArray2);
 
+        let cnt=$("#count").val(); //수량
+        let id=$("#id").val(); //아이디
+        let pd_seq=$("#pd_seq").val(); //상품 seq
+
+        $.ajax({
+           url:'/product/addProduct',
+           type:'post',
+           data:{
+               "count":cnt,
+               "id":id,
+               "pd_seq":pd_seq,
+               "optionList":integerArray2
+           },
+           success:function(data){
+               if(data == 'success'){
+                   alert('상품을 장바구니에 추가했습니다.');
+               }
+           }
+        });
         //장바구니 db 저장
         //옵션들 -1
         //총 수량 -1
         //만약 수량이 0이면 N처리
         //만약 옵션 수량이 0이면 N처리
-        // $.ajax({
-        //
-        // })
-        // alert('장바구니에 담았습니다.');
+        if (confirm("장바구니로 이동하시겠습니까?")) {
+            location.href = "/product/cart";
+        }
+
     });
 
     $("#cart").on("click", function () { //장바구니 클릭
 
-    })
+    });
 
     $("#back").on("click", function () {
         history.back();
