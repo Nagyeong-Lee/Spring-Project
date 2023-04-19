@@ -1,9 +1,14 @@
 package com.example.Spring_Project.controller;
 
+import com.example.Spring_Project.dto.CartDTO;
 import com.example.Spring_Project.dto.OptionDTO;
 import com.example.Spring_Project.dto.OptionListDTO;
 import com.example.Spring_Project.dto.ProductDTO;
 import com.example.Spring_Project.service.ProductService;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +29,9 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private HttpSession httpSession;
 
     //전체 상품
     @RequestMapping("/list")
@@ -163,11 +172,6 @@ public class ProductController {
         return "/product/new/accessories";
     }
 
-    //장바구니로 이동
-    @RequestMapping("/cart")
-    public String toCart() throws Exception {
-        return "/product/cart";
-    }
 
     //장바구니에 상품 추가
     @ResponseBody
@@ -177,35 +181,113 @@ public class ProductController {
 //        "id":id,
 //        "pd_seq":pd_seq,
 //        "optionList":integerArray2
+        System.out.println("map : " + map);
+        System.out.println("optionList : " + map.get("optionList").toString());
         Integer count = Integer.parseInt(map.get("count").toString());
         String id = map.get("id").toString();
         Integer pd_seq = Integer.parseInt(map.get("pd_seq").toString());
-        List<String> optionList = (List) map.get("optionList");
-        List<String> changeOption = new ArrayList<>();
 
-        Integer product_seq=0,option_seq=0;
-        for (String str : optionList) {
-            changeOption.add(str);
+        System.out.println("length : " + map.get("optionList").toString().split(",").length);
+        String[] test = map.get("optionList").toString().split(",");
+        System.out.println("test 배열 길이 : " + map.get("optionList").toString().split(",").length);
+        for (Integer i = 0; i < test.length; i++) {
+            test[i] = map.get("optionList").toString().split(",")[i];
         }
-//        Map<String,Object> param = new HashMap<>();
 
-        for (Integer i = 0; i < optionList.size(); i++) { //옵션 수량 0일때
-            option_seq=productService.getOptionStock(pd_seq, optionList.get(i));
-            if(option_seq !=0){
-                productService.updateOptionStatus(option_seq);
+        List<String> list = new ArrayList<>();
+        Map<String, List<String>> optionList = new HashMap<>();
+        for (Integer i = 0; i < test.length; i++) {
+            Map<String, Object> options = new HashMap<>();
+            String option_name = test[i].substring(0, test[i].indexOf("("));
+            System.out.println("옵션 이름 : " + option_name);
+            list.add(option_name);
+            optionList.put("name", list);
+        }
+        System.out.println("optionList : " + optionList);
+
+        //장바구니 insert
+        productService.insertCart(id, count, pd_seq, optionList.toString());
+
+//        for (Integer i = 0; i < optionList.size(); i++) { //옵션 수량 0일때
+//            option_seq=productService.getOptionStock(pd_seq, optionList.get(i));
+//            if(option_seq !=0){
+//                productService.updateOptionStatus(option_seq);
+//            }
+//        }
+//        product_seq=productService.getPdStock(pd_seq);
+//        if (product_seq != 0) { //상품 수량 0일때 상태 n으로
+//            productService.updatePdStatus(product_seq);
+//        }
+//        else{
+//            productService.insertCart(map); //장바구니 table insert
+//            for (Integer i = 0; i < optionList.size(); i++) {
+//                productService.minusOption(pd_seq, optionList.get(i));
+//            }//옵션들 -1
+//            productService.minusPd(pd_seq);//총 수량 -1
+//        }
+        return "success";
+    }
+
+    //장바구니로 이동
+    @PostMapping("/cart")
+    public String toCart(Model model, @RequestParam String id) throws Exception {
+        List<Map<String, Object>> optionList = new ArrayList<>();
+        System.out.println("id : " + id);
+        JsonParser jsonParser = new JsonParser();
+        JsonArray jsonArray = new JsonArray();
+        JsonObject jsonObject = new JsonObject();
+        List<CartDTO> cartInfo = productService.getCartInfo(id);
+        List<String> list = new ArrayList<>();
+        List<Map<String,Object>> cart = new ArrayList<>();
+        for (Integer i = 0; i < cartInfo.size(); i++) {
+            Object object = jsonParser.parse(cartInfo.get(i).getOptions());
+            jsonObject = (JsonObject) object;
+            jsonArray = (JsonArray) jsonObject.get("name");
+            list = productService.getOptionCategory(cartInfo.get(i).getCart_seq());
+            System.out.println("list : " + list);
+            List<Map<String, Object>> optionMap = new ArrayList<>();
+            for (Integer k = 0; k < list.size(); k++) {
+                Map<String, Object> map = new HashMap<>();
+                String category = list.get(k);
+                String option = String.valueOf(jsonArray.get(k)).replace("\"", "");
+                map.put(category, option);
+                optionMap.add(map);
             }
+            Map<String,Object> item = new HashMap<>();
+            item.put("id",cartInfo.get(i).getId());
+            item.put("count",cartInfo.get(i).getCount());
+            item.put("cart_seq",cartInfo.get(i).getCart_seq());
+            item.put("status",cartInfo.get(i).getStatus());
+            item.put("pd_seq",cartInfo.get(i).getPd_seq());
+            item.put("name",cartInfo.get(i).getName());
+            item.put("description",cartInfo.get(i).getDescription());
+            item.put("price",cartInfo.get(i).getPrice());
+            item.put("stock",cartInfo.get(i).getStock());
+            item.put("img",cartInfo.get(i).getImg());
+            item.put("category",cartInfo.get(i).getCategory());
+            item.put("option",optionMap);
+            cart.add(item);
+            System.out.println(cartInfo.get(i).getId());
+            System.out.println(cartInfo.get(i).getCount());
+            System.out.println(cartInfo.get(i).getPd_seq());
+            System.out.println(cartInfo.get(i).getOptions());
+            System.out.println("optionMap : "+optionMap);
+            System.out.println("cart : "+cart);
         }
-        product_seq=productService.getPdStock(pd_seq);
-        if (product_seq != 0) { //상품 수량 0일때 상태 n으로
-            productService.updatePdStatus(product_seq);
-        }
-        else{
-            productService.insertCart(map); //장바구니 table insert
-            for (Integer i = 0; i < optionList.size(); i++) {
-                productService.minusOption(pd_seq, optionList.get(i));
-            }//옵션들 -1
-            productService.minusPd(pd_seq);//총 수량 -1
-        }
+
+//        model.addAttribute("optionMap",optionMap);
+//        model.addAttribute("cartInfo",cartInfo);
+//        System.out.println(optionMap);
+//        System.out.println("LIST : "+cart);
+        model.addAttribute("cart",cart);
+        return "/product/cart";
+    }
+
+
+    @ResponseBody
+    @RequestMapping("/cart/delete")
+    public String deleteItem(Integer cart_seq) throws Exception{
+        productService.deleteItem(cart_seq);
         return "success";
     }
 

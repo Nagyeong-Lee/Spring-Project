@@ -1,5 +1,6 @@
 package com.example.Spring_Project.service;
 
+import com.example.Spring_Project.dto.CartDTO;
 import com.example.Spring_Project.dto.OptionDTO;
 import com.example.Spring_Project.dto.OptionListDTO;
 import com.example.Spring_Project.dto.ProductDTO;
@@ -101,8 +102,12 @@ public class ProductService {
         return productMapper.getOptionByGroup(category, pd_seq);
     }
 
-    public void insertCart(Map<String, Object> map) throws Exception {
-        productMapper.insertCart(map);
+//    public void insertCart(Map<String, Object> map) throws Exception {
+//        productMapper.insertCart(map);
+//    }
+
+    public void insertCart(String id,Integer count,Integer pd_seq, String optionList) throws Exception {
+        productMapper.insertCart(id,count,pd_seq,optionList);
     }
 
     public void minusOption(Integer pd_seq, String optionName) throws Exception {
@@ -127,5 +132,17 @@ public class ProductService {
 
     public Integer getPdStock(Integer pd_seq) throws Exception {
         return productMapper.getPdStock(pd_seq);
+    }
+
+    public List<CartDTO> getCartInfo(String id) throws Exception{
+        return productMapper.getCartInfo(id);
+    }
+
+    public List<String> getOptionCategory(Integer cart_seq) throws Exception{
+        return productMapper.getOptionCategory(cart_seq);
+    }
+
+    public void deleteItem(Integer cart_seq) throws Exception{  //장바구니에서 아이템 삭제
+        productMapper.deleteItem(cart_seq);
     }
 }

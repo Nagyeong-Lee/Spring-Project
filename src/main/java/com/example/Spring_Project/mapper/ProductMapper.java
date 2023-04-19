@@ -1,5 +1,6 @@
 package com.example.Spring_Project.mapper;
 
+import com.example.Spring_Project.dto.CartDTO;
 import com.example.Spring_Project.dto.OptionDTO;
 import com.example.Spring_Project.dto.OptionListDTO;
 import com.example.Spring_Project.dto.ProductDTO;
@@ -39,11 +40,14 @@ public interface ProductMapper {
     List<String> getCategory(@Param("pd_seq") Integer pd_seq); //상품 옵션 정보 가져오기
     List<String> optionByCategory(@Param("pd_seq") Integer pd_seq); //상품 카테고리별 옵션 정보
     List<OptionListDTO> getOptionByGroup(@Param("category") String category,@Param("pd_seq") Integer pd_seq); //상품 카테고리별 옵션 정보
-    void insertCart(Map<String,Object>map);
+    void insertCart(@Param("id") String id,@Param("count") Integer count,@Param("pd_seq") Integer pd_seq, @Param("optionList")String optionList);
     void minusOption(@Param("pd_seq") Integer pd_seq,@Param("optionName") String optionName);
     void minusPd(@Param("pd_seq") Integer pd_seq);
     Integer getOptionStock(@Param("pd_seq") Integer pd_seq,@Param("optionName") String optionName);
     Integer updateOptionStatus(@Param("option_seq") Integer option_seq);
     Integer updatePdStatus(@Param("pd_seq") Integer pd_seq);
     Integer getPdStock(@Param("pd_seq") Integer pd_seq);
+    List<CartDTO>getCartInfo(@Param("id")String id);
+    List<String>getOptionCategory(@Param("cart_seq")Integer cart_seq);
+    void deleteItem(@Param("cart_seq")Integer cart_seq);
 }

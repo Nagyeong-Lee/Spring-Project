@@ -273,14 +273,15 @@
         WHERE category= #{category} and pd_seq=#{pd_seq}
     </select>
 
-    <insert id="insertCart" parameterType="java.util.Map">
+    <insert id="insertCart" >
         insert into cart
         values(
             cart_seq.nextval,
             #{id},
             #{count},
             #{pd_seq},
-            #{options}
+            #{optionList}
+            ,'Y'
         )
     </insert>
 
@@ -312,5 +313,42 @@
 
     <update id="updatePdStatus">
         update product set status='N' where pd_seq=#{pd_seq}
+    </update>
+
+    <select id="getCartInfo" resultType="com.example.Spring_Project.dto.CartDTO">
+<!--        select-->
+<!--            cart_seq,-->
+<!--            id,-->
+<!--            count,-->
+<!--            pd_seq,-->
+<!--            options,-->
+<!--            status-->
+<!--        from cart-->
+<!--        where id=#{id}-->
+<!--        and status = 'Y'-->
+        select
+            c.cart_seq,
+            c.id,c.count,
+            c.OPTIONS,
+            c.status,
+            c.PD_SEQ,
+            p.NAME,
+            p.DESCRIPTION,
+            p.PRICE,
+            p.STOCK,
+            p.IMG,
+            p.CATEGORY
+            from cart c JOIN product p ON c.pd_seq = p.PD_SEQ
+            where c.id=#{id} and c.status = 'Y'
+    </select>
+
+    <select id="getOptionCategory" resultType="String">
+        SELECT DISTINCT category FROM OPTIONS WHERE pd_seq in(
+        SELECT pd_seq FROM cart WHERE cart_seq=#{cart_seq})
+    </select>
+
+    <update id="deleteItem">
+        update cart set status = 'N'
+        where cart_seq=#{cart_seq}
     </update>
 </mapper>

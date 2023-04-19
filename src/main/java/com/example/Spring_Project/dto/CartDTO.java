@@ -18,6 +18,12 @@ public class CartDTO {
     private String id;
     private Integer count;
     private Integer pd_seq;
-    private CLOB options; //JSON
-
+    private String options; //JSON
+    private String status;
+    private String name;
+    private String description;
+    private Integer price;
+    private Integer stock;
+    private String img;
+    private String category;
 }

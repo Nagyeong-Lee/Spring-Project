@@ -32,8 +32,10 @@
 <%--상품목록--%>
 <a href="${list.get(15).path}"><button type="button">${list.get(15).name}</button></a>
 <%--장바구니--%>
-<a href="${list.get(16).path}"><button type="button">${list.get(16).name}</button></a>
-
+<form name="frm" method="post" action="/product/cart">
+    <input type="hidden" name="id" value="${id}" id="id">
+    <button type="submit">${list.get(16).name}</button>
+</form>
 
 
 <script>

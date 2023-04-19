@@ -6,6 +6,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
@@ -24,7 +25,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-<link rel="stylesheet" type="text/css" href="/resources/cart.css">
+    <link rel="stylesheet" type="text/css" href="/resources/cart.css">
 </head>
 <body>
 <div class="cart">
@@ -32,30 +33,57 @@
         <form>
             <thead>
             <tr>
-                <td colspan="3">상품 이미지</td>
-                <td colspan="3">상품정보</td>
-                <td>상품금액</td>
+                <td colspan="2">상품 이미지</td>
+                <td colspan="2">상품정보</td>
+                <td colspan="2">상품금액</td>
+                <td colspan="2">삭제</td>
             </tr>
             </thead>
             <tbody>
             <%--foreach--%>
-            <tr class="cart__list__detail">
-                <td colspan="3"><img src="image/keyboard.jpg" ></td>
-                <td colspan="3">
-                    <p>Apple 매직 키보드</p>
-                    <p>모델명 : 키보드 - 한국어 MK2A3KH/A / 1개</p>
-                </td>
-                <td><span class="price">116,620원</span></td>
-            </tr>
+            <c:choose>
+                <c:when test="${!empty cart}">
+                    <c:forEach var="i" items="${cart}">
+                        <tr class="itemDiv">
+                            <td colspan="2"><img src="/resources/img/products/${i.get("img")}"></td>
+                            <td colspan="2">
+                                <p>${i.get("name")}</p>
+                                <p>수량 : ${i.get("count")}</p>
+                                <c:choose>
+                                    <c:when test="${!empty i.get('option')}">
+                                        <c:forEach var="k" items="${i.get('option')}">
+                                            <c:forEach var="j" items="${k}">
+                                                <p>&nbsp${j}</p>
+                                            </c:forEach>
+                                        </c:forEach>
+                                    </c:when>
+                                </c:choose>
+                            </td>
+                            <td colspan="2"><span class="price"><fmt:formatNumber pattern="#,###"
+                                                                                  value="${i.get('price')}"/>원</span>
+                            </td>
+                            <td>
+                                <button type="button" class="delBtn">삭제
+                                    <input type="hidden" value="${i.get('cart_seq')}">
+                                </button>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </c:when>
+                <c:otherwise>
+                    <tr>
+                        <td colspan="8">장바구니가 비었습니다.</td>
+                    </tr>
+                </c:otherwise>
+            </c:choose>
             </tbody>
         </form>
     </table>
     <hr>
+    <br>
     <div class="pay">
-        <div>수량</div>
-        <div>가격</div>
+        <div>전체 가격</div>
         <div>할인</div>
-        <hr>
         <div>합계</div>
     </div>
     <div class="cart__mainbtns">
@@ -65,8 +93,22 @@
 </div>
 
 <script>
-    $("#continue").on("click",function(){
-       history.back();
+    $("#continue").on("click", function () {
+        location.href = "/product/list";
+    });
+
+    $(".delBtn").on("click", function () { //해당 cart_seq status n으로
+        let cart_seq = $(this).closest("tr").find("input").val();
+        $(this).closest(".itemDiv").remove();
+        $.ajax({
+            url: '/product/cart/delete',
+            type: 'post',
+            data: {
+                "cart_seq" : cart_seq
+            },
+            success:function(data){
+            }
+        })
     });
 </script>
 </body>
