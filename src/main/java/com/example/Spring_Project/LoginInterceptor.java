@@ -32,7 +32,8 @@ public class LoginInterceptor implements HandlerInterceptor {
                         || uri.startsWith("/admin")
                         || uri.startsWith("/comment")
                         || uri.startsWith("/file")
-                        || uri.startsWith("/api"))
+                        || uri.startsWith("/api")
+                        || uri.startsWith("/products"))
                     response.sendRedirect("/");
                 return false;
             }
@@ -41,8 +42,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             String type = String.valueOf(service.getUserType(id));
 
             if (admin == false) { // 회원일때
-                if (uri.startsWith("/admin") || uri.startsWith("/api")
-                    || uri.startsWith("/products")) {
+                if (uri.startsWith("/admin")) {
                     response.sendRedirect("/");
                     return false;
                 }

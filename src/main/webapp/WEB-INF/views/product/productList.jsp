@@ -157,7 +157,7 @@
                         <a href="/product/detail?pd_seq=${i.pd_seq}">${i.name}</a>
                     </div>
                     <div class="product-price">
-                            ${i.price}원
+                           <fmt:formatNumber value="${i.price}" pattern="#,###"/>원
                     </div>
                 </div>
             </c:forEach>

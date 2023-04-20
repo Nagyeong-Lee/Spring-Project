@@ -10,7 +10,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-
 <ul class="menu">
     <li>
         <a href="/product/list">전체 상품</a>

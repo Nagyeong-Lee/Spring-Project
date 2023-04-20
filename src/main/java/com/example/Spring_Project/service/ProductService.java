@@ -1,9 +1,6 @@
 package com.example.Spring_Project.service;
 
-import com.example.Spring_Project.dto.CartDTO;
-import com.example.Spring_Project.dto.OptionDTO;
-import com.example.Spring_Project.dto.OptionListDTO;
-import com.example.Spring_Project.dto.ProductDTO;
+import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.mapper.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -145,4 +142,25 @@ public class ProductService {
     public void deleteItem(Integer cart_seq) throws Exception{  //장바구니에서 아이템 삭제
         productMapper.deleteItem(cart_seq);
     }
+    public Map<String,Object> getCartOption(Integer cart_seq) throws Exception{  // 상품 하나당 옵션 가져오기
+        return productMapper.getCartOption(cart_seq);
+    }
+
+    public Integer getOptionCount(Integer pd_seq,String option) throws Exception{
+        return productMapper.getOptionCount(pd_seq,option);
+    }
+
+    public Integer getPdPrice(Integer pd_seq) throws Exception{
+        return productMapper.getPdPrice(pd_seq);
+    }
+
+    public Integer getMemberSeq(String id) throws Exception{ //m_seq 가져오기
+        return productMapper.getMemberSeq(id);
+    }
+
+    public List<CouponDTO> getCoupon(Integer m_seq) throws Exception{ //쿠폰리스트 가져오기
+        return productMapper.getCoupon(m_seq);
+    }
+
+
 }

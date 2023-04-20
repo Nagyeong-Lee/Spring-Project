@@ -1,9 +1,6 @@
 package com.example.Spring_Project.mapper;
 
-import com.example.Spring_Project.dto.CartDTO;
-import com.example.Spring_Project.dto.OptionDTO;
-import com.example.Spring_Project.dto.OptionListDTO;
-import com.example.Spring_Project.dto.ProductDTO;
+import com.example.Spring_Project.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.security.core.parameters.P;
@@ -50,4 +47,9 @@ public interface ProductMapper {
     List<CartDTO>getCartInfo(@Param("id")String id);
     List<String>getOptionCategory(@Param("cart_seq")Integer cart_seq);
     void deleteItem(@Param("cart_seq")Integer cart_seq);
+    Map<String,Object> getCartOption(@Param("cart_seq")Integer cart_seq);
+    Integer getOptionCount(@Param("pd_seq") Integer pd_seq, @Param("option") String option);
+    Integer getPdPrice(@Param("pd_seq") Integer pd_seq);
+    Integer getMemberSeq(@Param("id") String id);
+    List<CouponDTO> getCoupon(@Param("m_seq") Integer m_seq);
 }

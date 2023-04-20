@@ -351,4 +351,36 @@
         update cart set status = 'N'
         where cart_seq=#{cart_seq}
     </update>
+
+    <select id="getCartOption" resultType="java.util.Map">
+        select
+            pd_seq,
+            options
+        from cart
+        where cart_seq=#{cart_seq}
+    </select>
+
+    <select id="getOptionCount" resultType="Integer">
+        SELECT stock FROM OPTIONS WHERE name=#{option} AND PD_SEQ=#{pd_seq}
+    </select>
+
+    <select id="getPdPrice" resultType="Integer">
+        select
+            price
+        from product
+        where pd_seq=#{pd_seq}
+    </select>
+
+    <select id="getMemberSeq" resultType="Integer">
+        select m_seq from member where id=#{id}
+    </select>
+
+    <select id="getCoupon" resultType="com.example.Spring_Project.dto.CouponDTO">
+        select
+          cp_seq,
+          title,
+          discount
+        from  coupon
+        where m_seq=#{m_seq}
+    </select>
 </mapper>

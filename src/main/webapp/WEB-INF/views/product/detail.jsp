@@ -71,6 +71,7 @@
 </div>
 
 <button type="button" id="back">목록으로</button>
+<button type="button" id="toCart">장바구니로</button>
 
 <form id="frm" method="post" action="/product/cart">
     <input type="hidden" name="id" value="${id}" id="sessionId">
@@ -106,7 +107,6 @@
         let count = parseInt($("#count").val());
 
         //옵션 모두 선택하게
-
 
         let integerArray = [];
         for (let i = 0; i < numbers.length; i++) {
@@ -238,8 +238,8 @@
         //만약 옵션 수량이 0이면 N처리
     });
 
-    $("#cart").on("click", function () { //장바구니 클릭
-
+    $("#toCart").on("click",function(){
+       $("#frm").submit();
     });
 
     $("#back").on("click", function () {
