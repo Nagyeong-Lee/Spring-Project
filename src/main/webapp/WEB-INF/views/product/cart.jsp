@@ -121,10 +121,16 @@
     <span style="text-align: right" id="sum"> 총 수량 : ${totalSum}개</span><br>
     <span style="text-align: right" id="total"> 총 합계 : <fmt:formatNumber pattern="#,###" value="${totalPrice}"/>원</span>
     <input type="hidden" value="${totalPrice}" id="hiddenTotalPrice">
-    <input type="hidden" value="${totalSum}" id="hiddenTotalSum">
+    <input type="hidden" value="${totalSum}" id="hiddenTotalSum"><br>
 
-
-
+    <select name="discount">
+        <option value="coupon">--coupon--</option>
+        <c:if test="${!empty couponDTOList}">
+            <c:forEach var="i" items="${couponDTOList}">
+                <option value="${i.discount}">${i.title}${i.discount}%</option>
+            </c:forEach>
+        </c:if>
+    </select>
 
     <div class="cart__mainbtns">
         <button class="cart__bigorderbtn left" id="continue">쇼핑 계속하기</button>
@@ -161,8 +167,8 @@
         console.log('삭제할때 총 수량 변경 : ' + $(this).closest(".itemDiv").find(".stock").val());
 
         //삭제할때 총 수량 변경
-        let changedSum = parseInt($("#hiddenTotalSum").val())-$(this).closest(".itemDiv").find(".stock").val();
-        console.log('123132 : '+changedSum);
+        let changedSum = parseInt($("#hiddenTotalSum").val()) - $(this).closest(".itemDiv").find(".stock").val();
+        console.log('123132 : ' + changedSum);
         $("#sum").text('총 수량 : ' + changedSum + '개');
         $("#hiddenTotalSum").val(changedSum); //변경된 수량 저장
 
@@ -294,6 +300,11 @@
             }
         });
     });
+
+    //쿠폰 선택할때 -> ajax로 가격 변경된거 가져옴
+    // let tPrice = $("#total").
+
+
 
     //결제하기 버튼 클릭
     //옵션,상품 개수 변경
