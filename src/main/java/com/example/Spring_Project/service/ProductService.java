@@ -162,5 +162,15 @@ public class ProductService {
         return productMapper.getCoupon(m_seq);
     }
 
+    public void updateCount(Integer count,Integer cart_seq) throws Exception{
+        productMapper.updateCount(count,cart_seq);
+    }
+    public Integer getChangedPrice(Integer discount,Integer price) throws Exception{  //쿠폰 먹여서 가격 변경하기
+        return productMapper.getChangedPrice(discount,price);
+    }
+
+    public List<String> getDeliInfo(String id) throws Exception{
+        return productMapper.getDeliInfo(id);
+    }
 
 }

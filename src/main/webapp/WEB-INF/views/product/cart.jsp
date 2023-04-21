@@ -15,19 +15,15 @@
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
     <link rel="stylesheet" type="text/css" href="/resources/navUtil.css">
-</head>
-<body>
-<%@ include file="/WEB-INF/views/product/navUtil.jsp" %>
-<!DOCTYPE html>
-<html lang="en">
-<head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
     <link rel="stylesheet" type="text/css" href="/resources/cart.css">
 </head>
 <body>
+<%@ include file="/WEB-INF/views/product/navUtil.jsp" %>
+<input type="hidden" value="${cart}" id="hiddenCart">
+<input type="hidden" value="${id}" id="session">
 <div class="cart">
     <input type="hidden" id="cartLength" value="${cart.size()}">
     <table class="cart__list">
@@ -75,11 +71,10 @@
                                     </button>
                                 </div>
                             </td>
-                                <%--                            <td colspan="2"><span class="price"><fmt:formatNumber pattern="#,###"--%>
-                                <%--                                                                                  value="${i.get('price')}"/>원</span>--%>
                             <input type="hidden" value="${i.get('price')}" class="productPrice">
                             <td colspan="2"><span class="price"><fmt:formatNumber pattern="#,###"
                                                                                   value="${i.get('totalPrice')}"/>원</span>
+                                <input type="hidden" class="thisPrice" value="${i.get('totalPrice')}">
                             </td>
                             <td>
                                 <button type="button" class="delBtn">삭제
@@ -90,12 +85,6 @@
                     </c:forEach>
                     </tbody>
                 </c:when>
-                <%--                <c:otherwise>--%>
-                <%--                    <tr>--%>
-                <%--                        <td colspan="8">장바구니가 비었습니다.</td>--%>
-                <%--                    </tr>--%>
-                <%--                </c:otherwise>--%>
-
             </c:choose>
             <c:choose>
                 <c:when test="${empty cart}">
@@ -106,50 +95,51 @@
                     </thead>
                 </c:when>
             </c:choose>
-
         </form>
     </table>
     <hr>
     <br>
-    <%--    <div class="pay">--%>
-    <%--        <div>전체 가격</div>--%>
-    <%--        <div>할인</div>--%>
-    <%--        <div>합계</div>--%>
-    <%--    </div>--%>
     <hr id="priceHr">
-    <%--    총 합계 : <span style="text-align: right" id="total"><fmt:formatNumber pattern="#,###" value="${totalPrice}"/></span>원--%>
+
+    <%--쿠폰--%>
+    <select name="discount" id="discount">
+        <option value="coupon">--coupon--</option>
+        <c:if test="${!empty couponDTOList}">
+            <c:forEach var="i" items="${couponDTOList}">
+                <option value="${i.discount}" class="useCoupon">${i.title}${i.discount}%</option>
+            </c:forEach>
+        </c:if>
+    </select><br>
     <span style="text-align: right" id="sum"> 총 수량 : ${totalSum}개</span><br>
     <span style="text-align: right" id="total"> 총 합계 : <fmt:formatNumber pattern="#,###" value="${totalPrice}"/>원</span>
     <input type="hidden" value="${totalPrice}" id="hiddenTotalPrice">
     <input type="hidden" value="${totalSum}" id="hiddenTotalSum"><br>
+    <input type="hidden" value="${totalPrice}" id="hiddenTotalPreviousTotalPrice"><br>
 
-    <select name="discount">
-        <option value="coupon">--coupon--</option>
-        <c:if test="${!empty couponDTOList}">
-            <c:forEach var="i" items="${couponDTOList}">
-                <option value="${i.discount}">${i.title}${i.discount}%</option>
-            </c:forEach>
-        </c:if>
-    </select>
 
     <div class="cart__mainbtns">
         <button class="cart__bigorderbtn left" id="continue">쇼핑 계속하기</button>
-        <button class="cart__bigorderbtn right" id="pay">결제하기</button>
+        <button class="cart__bigorderbtn right" id="pay" type="button">결제하기</button>
     </div>
 </div>
 
 <script>
-
     if ($(".itemDiv").length == 0) {
         $(".pay").remove();
         $("#total").remove();
+        $("#sum").remove();
+        $("#discount").remove();
     }
+
     $("#continue").on("click", function () {
         location.href = "/product/list";
     });
 
     $(".delBtn").on("click", function () { //해당 cart_seq status n으로
-        let total_price = $("#hiddenTotalPrice").val();
+        // let total_price = $("#hiddenTotalPrice").val();
+        $("#discount  option:eq(0)").prop("selected", true);
+        $("#discount option:not(select)").show();
+        let total_price = $("#hiddenTotalPreviousTotalPrice").val();
         console.log("원래 상품 가격 : " + total_price);
 
         //삭제할때 총합계 변경
@@ -162,6 +152,7 @@
         //총 합계 변경해주기
         $("#total").text('총 합계 : ' + (parseInt(total_price) - chgPrice).toLocaleString() + '원');
         $("#hiddenTotalPrice").val(parseInt(total_price) - chgPrice); //변경된 상품 가격
+        $("#hiddenTotalPreviousTotalPrice").val($("#hiddenTotalPrice").val()); //변경된 상품 가격
 
         //삭제할때 총 수량 변경
         console.log('삭제할때 총 수량 변경 : ' + $(this).closest(".itemDiv").find(".stock").val());
@@ -171,6 +162,7 @@
         console.log('123132 : ' + changedSum);
         $("#sum").text('총 수량 : ' + changedSum + '개');
         $("#hiddenTotalSum").val(changedSum); //변경된 수량 저장
+
 
         let cart_seq = $(this).closest(".itemDiv").find(".cartSeq").val();
         console.log(cart_seq);
@@ -188,6 +180,8 @@
                 if ($(".itemDiv").length == 0) {
                     $("#thead").children().remove();
                     $("#total").remove();
+                    $("#discount").remove();
+                    $("#sum").remove();
                     var html = '<td colspan="5">장바구니가 비었습니다.</td>';
                     $("#thead").append(html);
                 }
@@ -197,9 +191,10 @@
 
     //+버튼 누를때 수량
     $(".plus").on("click", function () {
-        let total_price = $("#hiddenTotalPrice").val();
-        console.log("원래 상품 가격 : " + total_price);
-
+        $("#discount  option:eq(0)").prop("selected", true);
+        $("#discount option:not(select)").show();
+        let total_price = $("#hiddenTotalPreviousTotalPrice").val();
+        console.log("+눌렀을때 : " + total_price);
         let $this = $(this);
         let cart_seq = $this.closest(".count").find(".cartSeq").val();
         let count = $this.closest(".count").find(".stock").val();
@@ -209,17 +204,10 @@
         //가격 변경
         let totalPrice = $this.closest(".count").find(".pd_price").val() * count;
         var price = $this.closest(".itemDiv").find(".price").text(totalPrice.toLocaleString() + '원');
+        console.log('프라이스 : ' + $(".thisPrice").val());
 
         let productPrice = $this.closest(".itemDiv").find(".productPrice").val();
-        let changedTotalPrice = parseInt(total_price) + parseInt(productPrice);
-
-        console.log("해당 상품 한개 가격 : " + productPrice);
-        console.log("changedTotalPrice : " + changedTotalPrice);
-
-        //총 합계 변경해주기
-        $("#total").text('총 합계 : ' + changedTotalPrice.toLocaleString() + '원');
-        $("#hiddenTotalPrice").val(changedTotalPrice); //변경된 상품 가격
-
+        console.log("pdpd : " + productPrice);
 
         //총 수량 변경
         let changedSum = parseInt($("#hiddenTotalSum").val()) + 1;
@@ -227,6 +215,14 @@
         $("#hiddenTotalSum").val(changedSum); //변경된 수량 저장
 
         console.log("$this.closest : " + totalPrice);
+        console.log('할인 : ' + $("#hiddenTotalPreviousTotalPrice").val());
+        let changedTotalPrice = parseInt(total_price) + parseInt(productPrice);
+        console.log("change : " + changedTotalPrice);
+
+        //총 합계 변경해주기
+        $("#hiddenTotalPreviousTotalPrice").val(changedTotalPrice);
+        $("#total").text('총 합계 : ' + changedTotalPrice.toLocaleString() + '원');
+        $("#hiddenTotalPrice").val(changedTotalPrice); //변경된 상품 가격
         $.ajax({
             url: '/product/count',
             type: 'post',
@@ -244,13 +240,26 @@
                 }
             }
         });
-    })
 
+        //수량 update
+        $.ajax({
+            url: '/product/updCount',
+            type: 'post',
+            data: {
+                "count": count,
+                "cart_seq": cart_seq
+            },
+            success: function (data) {
+
+            }
+        });
+    })
 
     //-버튼 누를때
     $(".minus").on("click", function () {
-
-        let total_price = $("#hiddenTotalPrice").val();
+        $("#discount  option:eq(0)").prop("selected", true);
+        $("#discount option:not(select)").show();
+        let total_price = $("#hiddenTotalPreviousTotalPrice").val();
         console.log("원래 상품 가격 : " + total_price);
 
         let $this = $(this);
@@ -283,6 +292,9 @@
             let changedSum = $("#hiddenTotalSum").val() - 1;
             $("#sum").text('총 수량 : ' + changedSum + '개');
             $("#hiddenTotalSum").val(changedSum); //변경된 수량 저장
+            $("#hiddenTotalPreviousTotalPrice").val(changedTotalPrice);
+            console.log("===========");
+            console.log("changedTotalPrice : " + changedTotalPrice);
         }
         $.ajax({
             url: '/product/count',
@@ -299,16 +311,99 @@
                 }
             }
         });
+
+        //수량 update
+        $.ajax({
+            url: '/product/updCount',
+            type: 'post',
+            data: {
+                "count": count,
+                "cart_seq": cart_seq
+            },
+            success: function (data) {
+
+            }
+        });
     });
 
     //쿠폰 선택할때 -> ajax로 가격 변경된거 가져옴
-    // let tPrice = $("#total").
 
-
+    $("#discount").on("change", function () {
+        let totalPrice = $("#hiddenTotalPreviousTotalPrice").val();
+        let exPrice = $("#hiddenTotalPreviousTotalPrice").val();
+        let usableCoupon = $("#discount option:selected").val();
+        console.log("totalPrice : " + totalPrice);
+        console.log("exPrice : " + exPrice);
+        console.log("usableCoupon : " + usableCoupon);
+        if (usableCoupon != 'coupon') { //할인되는거 선택했을때
+            totalPrice = $("#hiddenTotalPrice").val();
+            $.ajax({
+                url: '/product/discountedPrice',
+                type: 'post',
+                data: {
+                    "discount": usableCoupon,
+                    "price": totalPrice
+                },
+                success: function (data) {
+                    if (data != null) {
+                        //총 합계 변경
+                        $("#hiddenTotalPreviousTotalPrice").val(totalPrice);
+                        $("#total").text('총 합계 : ' + data.toLocaleString() + '원');
+                        $("#hiddenTotalPreviousTotalPrice").val(totalPrice);
+                        $("#hiddenTotalPrice").val(parseInt(data)); //변경된 상품 가격
+                        $("#discount option:selected").hide();
+                    }
+                }
+            })
+        } else {
+            $("#discount option:not(select)").show();
+            $("#total").text('총 합계 : ' + parseInt($("#hiddenTotalPreviousTotalPrice").val()).toLocaleString() + '원');
+            $("#hiddenTotalPrice").val(exPrice); //변경된 상품 가격
+        }
+    });
 
     //결제하기 버튼 클릭
     //옵션,상품 개수 변경
     $("#pay").on("click", function () {
+       var newForm = document.createElement("form");
+       var newInput = document.createElement("input");
+       newForm.setAttribute("action","/product/payInfo");
+       newForm.setAttribute("method","post");
+       // console.log(typeof data)
+       // console.log("data : "+data);
+       newInput.setAttribute("value",$("#session").val());
+       newInput.setAttribute("type","text");
+       newInput.setAttribute("name","data");
+       newForm.appendChild(newInput);
+       document.body.append(newForm);
+       newForm.submit();
+       console.log('서브밋 완')
+
+       // let count = $("#hiddenTotalSum").val();
+       // let price = $("#hiddenTotalPrice").val();
+       //
+       // console.log("count : "+count);
+       // console.log("price : "+price);
+       //
+       //  // 카카오페이 결제전송
+       //  $.ajax({
+       //      type: 'post'
+       //      , url: '/order/pay'
+       //      , data: {
+       //          total_amount: totalPayPrice
+       //          , payUserName: name
+       //          , sumPrice: totalPrice
+       //          , discountPrice: discountPrice
+       //          , totalPrice: totalPayPrice
+       //          , tel: tel
+       //          , email: email
+       //          , usePoint: usePoint
+       //          , useCouponNo: useUserCouponNo
+       //      },
+       //      success: function (response) {
+       //          location.href = response.next_redirect_pc_url
+       //      }
+       //  })
 
     });
 </script>

@@ -52,4 +52,7 @@ public interface ProductMapper {
     Integer getPdPrice(@Param("pd_seq") Integer pd_seq);
     Integer getMemberSeq(@Param("id") String id);
     List<CouponDTO> getCoupon(@Param("m_seq") Integer m_seq);
+    void updateCount(@Param("count") Integer count,@Param("cart_seq") Integer cart_seq);
+    Integer getChangedPrice(@Param("discount") Integer discount,@Param("price") Integer price);
+    List<String> getDeliInfo(@Param("id") String id);
 }

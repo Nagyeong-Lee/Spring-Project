@@ -383,4 +383,23 @@
         from  coupon
         where m_seq=#{m_seq}
     </select>
+
+    <update id="updateCount">
+        update cart
+        set count=#{count}
+        where cart_seq=#{cart_seq}
+    </update>
+
+    <select id="getChangedPrice" resultType="Integer">
+        SELECT #{price}-(#{price}*#{discount})/100 FROM dual
+    </select>
+
+    <select id="getDeliInfo" resultType="String">
+        select
+            defaultAddress,
+            additionalAddress1,
+            additionalAddress2
+        from deliInfo
+        where id=#{id}
+    </select>
 </mapper>

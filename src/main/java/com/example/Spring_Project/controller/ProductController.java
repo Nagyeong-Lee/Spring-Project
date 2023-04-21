@@ -91,7 +91,6 @@ public class ProductController {
         return "/product/women/accessories";
     }
 
-
     //남성 카테고리
     @RequestMapping("/men")
     public String mProduct(Model model) throws Exception {
@@ -163,7 +162,6 @@ public class ProductController {
         model.addAttribute("productDTOList", productDTOList);
         return "/product/new/accessories";
     }
-
 
     //장바구니에 상품 추가
     @ResponseBody
@@ -319,8 +317,7 @@ public class ProductController {
         JsonParser jsonParser = new JsonParser();
         JsonObject jsonObject = (JsonObject) jsonParser.parse((String) cartOption.get("OPTIONS"));
         JsonArray jsonArray = (JsonArray) jsonObject.get("name");
-//        System.out.println("Option = " + Option);
-//        List<Integer>list = new ArrayList<>();
+
         int[] list = new int[jsonArray.size()];
         int stock = 0;
         for (int i = 0; i < jsonArray.size(); i++) {
@@ -331,7 +328,86 @@ public class ProductController {
             System.out.println("list = " + list[i]);
         }
         stock = Arrays.stream(list).min().getAsInt();
-//        System.out.println("최소 :"+stock);
         return stock;
+    }
+
+    @ResponseBody
+    @RequestMapping("/discountedPrice")  //쿠폰 먹여서 다시 계산
+    public Integer changePrice(@RequestParam Map<String,Object> map) throws Exception{
+        Integer discount = Integer.parseInt(map.get("discount").toString());
+        Integer originalPrice = Integer.parseInt(map.get("price").toString());
+        Integer price = productService.getChangedPrice(discount,originalPrice);
+        System.out.println("price = " + price);
+        return price;
+    }
+
+    @ResponseBody
+    @RequestMapping("/updCount")
+    public String updCount(Integer count,Integer cart_seq) throws Exception{
+        productService.updateCount(count,cart_seq);
+        return "success";
+    }
+    @RequestMapping("/payInfo")
+    public String toPayInfo(Model model,String data) throws Exception{ //data : id
+        List<Map<String, Object>> optionList = new ArrayList<>();
+        JsonParser jsonParser = new JsonParser();
+        JsonArray jsonArray = new JsonArray();
+        JsonObject jsonObject = new JsonObject();
+        List<String> list = new ArrayList<>();
+        List<CartDTO> cartInfo = productService.getCartInfo(data);
+        List<Map<String, Object>> cart = new ArrayList<>();
+        Integer totalPrice = 0;  //상품 총 합계
+        Integer totalSum = 0;  //상품 총 개수
+        for (Integer i = 0; i < cartInfo.size(); i++) {
+            Object object = jsonParser.parse(cartInfo.get(i).getOptions());
+            jsonObject = (JsonObject) object;
+            jsonArray = (JsonArray) jsonObject.get("name");
+            list = productService.getOptionCategory(cartInfo.get(i).getCart_seq());
+            System.out.println("list : " + list);
+            List<Map<String, Object>> optionMap = new ArrayList<>();
+            for (Integer k = 0; k < list.size(); k++) {
+                Map<String, Object> map = new HashMap<>();
+                String category = list.get(k);
+                String option = String.valueOf(jsonArray.get(k)).replace("\"", "");
+                map.put(category, option);
+                optionMap.add(map);
+            }
+            Map<String, Object> item = new HashMap<>();
+            item.put("id", cartInfo.get(i).getId());
+            item.put("count", cartInfo.get(i).getCount());
+            item.put("cart_seq", cartInfo.get(i).getCart_seq());
+            item.put("status", cartInfo.get(i).getStatus());
+            item.put("pd_seq", cartInfo.get(i).getPd_seq());
+            item.put("name", cartInfo.get(i).getName());
+            item.put("description", cartInfo.get(i).getDescription());
+            item.put("price", cartInfo.get(i).getPrice());
+            item.put("stock", cartInfo.get(i).getStock());
+            item.put("img", cartInfo.get(i).getImg());
+            item.put("category", cartInfo.get(i).getCategory());
+            item.put("option", optionMap);
+            item.put("totalPrice", cartInfo.get(i).getPrice() * cartInfo.get(i).getCount());
+            cart.add(item);
+
+            //돌면서 상품 개수, 상품 가격 가져오고 더하기
+            Integer pdCount = cartInfo.get(i).getCount();
+            Integer pdProduct_seq = cartInfo.get(i).getPd_seq();
+            Integer pdPrice = productService.getPdPrice(pdProduct_seq);
+
+            System.out.println("pdCount = " + pdCount);
+            System.out.println("pdPrice = " + pdPrice);
+            System.out.println();
+            totalPrice += pdPrice * pdCount;
+            totalSum+=pdCount;
+        }
+        List<String>deliAddress = productService.getDeliInfo(data);
+        String defaultAddress = productService.getDeliInfo(data);
+        String additionalAddress1 = productService.getDeliInfo(data);
+        String additionalAddress2 = productService.getDeliInfo(data);
+
+        model.addAttribute("cart", cart);
+        model.addAttribute("totalPrice", totalPrice);
+        model.addAttribute("totalSum", totalSum);
+        model.addAttribute("deliAddress", deliAddress);
+        return "/product/payInfo";
     }
 }
