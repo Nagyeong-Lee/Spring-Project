@@ -348,7 +348,7 @@ public class ProductController {
         return "success";
     }
     @RequestMapping("/payInfo")
-    public String toPayInfo(Model model,String data) throws Exception{ //data : id
+    public String toPayInfo(Model model,String data,Integer price) throws Exception{ //data : id
         List<Map<String, Object>> optionList = new ArrayList<>();
         JsonParser jsonParser = new JsonParser();
         JsonArray jsonArray = new JsonArray();
@@ -399,15 +399,41 @@ public class ProductController {
             totalPrice += pdPrice * pdCount;
             totalSum+=pdCount;
         }
-        List<String>deliAddress = productService.getDeliInfo(data);
-        String defaultAddress = productService.getDeliInfo(data);
-        String additionalAddress1 = productService.getDeliInfo(data);
-        String additionalAddress2 = productService.getDeliInfo(data);
+        Map<String,Object>deliAddress = new HashMap<>();
+        String name = productService.getName(data);//이름
+        String phone = productService.getPhone(data);//폰
+        phone=phone.substring(0,3)+"-"+phone.substring(3,7)+"-"+phone.substring(7,11);
+        String defaultAddress = productService.getDefaultAddress(data);
+        deliAddress.put("name",name);
+        deliAddress.put("phone",phone);
+        deliAddress.put("defaultAddress",defaultAddress);
 
         model.addAttribute("cart", cart);
         model.addAttribute("totalPrice", totalPrice);
         model.addAttribute("totalSum", totalSum);
         model.addAttribute("deliAddress", deliAddress);
+        model.addAttribute("price", price); //실제 총 합계
         return "/product/payInfo";
+    }
+
+    @ResponseBody
+    @RequestMapping("/getAdditionalAddr")
+    public String getAdditionalAddr(String id) throws Exception{
+        String additionalAddress1 = productService.getAdditionalAddress1(id);
+        return additionalAddress1;
+    }
+
+    @ResponseBody
+    @RequestMapping("/getAdditionalAddr2")
+    public String getAdditionalAddr2(String id) throws Exception{
+        String additionalAddress2 = productService.getAdditionalAddress2(id);
+        return additionalAddress2;
+    }
+
+    @ResponseBody
+    @RequestMapping("/getDefaultAddr")
+    public String getDefaultAddr(String id) throws Exception{
+        String defaultAddress = productService.getDefaultAddress(id);
+        return defaultAddress;
     }
 }

@@ -103,8 +103,8 @@ public class ProductService {
 //        productMapper.insertCart(map);
 //    }
 
-    public void insertCart(String id,Integer count,Integer pd_seq, String optionList) throws Exception {
-        productMapper.insertCart(id,count,pd_seq,optionList);
+    public void insertCart(String id, Integer count, Integer pd_seq, String optionList) throws Exception {
+        productMapper.insertCart(id, count, pd_seq, optionList);
     }
 
     public void minusOption(Integer pd_seq, String optionName) throws Exception {
@@ -131,46 +131,64 @@ public class ProductService {
         return productMapper.getPdStock(pd_seq);
     }
 
-    public List<CartDTO> getCartInfo(String id) throws Exception{
+    public List<CartDTO> getCartInfo(String id) throws Exception {
         return productMapper.getCartInfo(id);
     }
 
-    public List<String> getOptionCategory(Integer cart_seq) throws Exception{
+    public List<String> getOptionCategory(Integer cart_seq) throws Exception {
         return productMapper.getOptionCategory(cart_seq);
     }
 
-    public void deleteItem(Integer cart_seq) throws Exception{  //장바구니에서 아이템 삭제
+    public void deleteItem(Integer cart_seq) throws Exception {  //장바구니에서 아이템 삭제
         productMapper.deleteItem(cart_seq);
     }
-    public Map<String,Object> getCartOption(Integer cart_seq) throws Exception{  // 상품 하나당 옵션 가져오기
+
+    public Map<String, Object> getCartOption(Integer cart_seq) throws Exception {  // 상품 하나당 옵션 가져오기
         return productMapper.getCartOption(cart_seq);
     }
 
-    public Integer getOptionCount(Integer pd_seq,String option) throws Exception{
-        return productMapper.getOptionCount(pd_seq,option);
+    public Integer getOptionCount(Integer pd_seq, String option) throws Exception {
+        return productMapper.getOptionCount(pd_seq, option);
     }
 
-    public Integer getPdPrice(Integer pd_seq) throws Exception{
+    public Integer getPdPrice(Integer pd_seq) throws Exception {
         return productMapper.getPdPrice(pd_seq);
     }
 
-    public Integer getMemberSeq(String id) throws Exception{ //m_seq 가져오기
+    public Integer getMemberSeq(String id) throws Exception { //m_seq 가져오기
         return productMapper.getMemberSeq(id);
     }
 
-    public List<CouponDTO> getCoupon(Integer m_seq) throws Exception{ //쿠폰리스트 가져오기
+    public List<CouponDTO> getCoupon(Integer m_seq) throws Exception { //쿠폰리스트 가져오기
         return productMapper.getCoupon(m_seq);
     }
 
-    public void updateCount(Integer count,Integer cart_seq) throws Exception{
-        productMapper.updateCount(count,cart_seq);
-    }
-    public Integer getChangedPrice(Integer discount,Integer price) throws Exception{  //쿠폰 먹여서 가격 변경하기
-        return productMapper.getChangedPrice(discount,price);
+    public void updateCount(Integer count, Integer cart_seq) throws Exception {
+        productMapper.updateCount(count, cart_seq);
     }
 
-    public List<String> getDeliInfo(String id) throws Exception{
-        return productMapper.getDeliInfo(id);
+    public Integer getChangedPrice(Integer discount, Integer price) throws Exception {  //쿠폰 먹여서 가격 변경하기
+        return productMapper.getChangedPrice(discount, price);
+    }
+
+    public String getDefaultAddress(String id) throws Exception {
+        return productMapper.getDefaultAddress(id);
+    }
+
+    public String getAdditionalAddress1(String id) throws Exception {
+        return productMapper.getAdditionalAddress1(id);
+    }
+
+    public String getAdditionalAddress2(String id) throws Exception {
+        return productMapper.getAdditionalAddress2(id);
+    }
+
+    public String getName(String id) throws Exception {
+        return productMapper.getName(id);
+    }
+
+    public String getPhone(String id) throws Exception {
+        return productMapper.getPhone(id);
     }
 
 }

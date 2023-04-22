@@ -367,14 +367,18 @@
     $("#pay").on("click", function () {
        var newForm = document.createElement("form");
        var newInput = document.createElement("input");
+       var newInput2=document.createElement("input");
        newForm.setAttribute("action","/product/payInfo");
        newForm.setAttribute("method","post");
-       // console.log(typeof data)
-       // console.log("data : "+data);
+
        newInput.setAttribute("value",$("#session").val());
-       newInput.setAttribute("type","text");
+       newInput.setAttribute("type","hidden");
        newInput.setAttribute("name","data");
+       newInput2.setAttribute("value",$("#hiddenTotalPrice").val());
+       newInput2.setAttribute("type","hidden");
+       newInput2.setAttribute("name","price");
        newForm.appendChild(newInput);
+       newForm.appendChild(newInput2);
        document.body.append(newForm);
        newForm.submit();
        console.log('서브밋 완')

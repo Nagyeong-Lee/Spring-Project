@@ -55,4 +55,10 @@ public interface ProductMapper {
     void updateCount(@Param("count") Integer count,@Param("cart_seq") Integer cart_seq);
     Integer getChangedPrice(@Param("discount") Integer discount,@Param("price") Integer price);
     List<String> getDeliInfo(@Param("id") String id);
+    String getDefaultAddress(String id);
+    String getAdditionalAddress1(String id);
+    String getAdditionalAddress2(String id);
+    String  getName(String id);
+    String  getPhone(String id);
+
 }

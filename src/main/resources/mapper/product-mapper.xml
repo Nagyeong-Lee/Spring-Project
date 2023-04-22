@@ -394,12 +394,33 @@
         SELECT #{price}-(#{price}*#{discount})/100 FROM dual
     </select>
 
-    <select id="getDeliInfo" resultType="String">
+    <select id="getDefaultAddress" resultType="String">
         select
-            defaultAddress,
-            additionalAddress1,
+            defaultAddress
+        from deliInfo
+        where id=#{id}
+    </select>
+
+    <select id="getAdditionalAddress1" resultType="String">
+        select
+            additionalAddress1
+        from deliInfo
+        where id=#{id}
+    </select>
+
+    <select id="getAdditionalAddress2" resultType="String">
+        select
             additionalAddress2
         from deliInfo
         where id=#{id}
     </select>
+
+    <select id="getName" resultType="String">
+        SELECT m.name FROM MEMBER m JOIN DELIINFO d ON m.ID = d.ID WHERE m.id=#{id}
+    </select>
+
+    <select id="getPhone" resultType="String">
+        SELECT m.phone FROM MEMBER m JOIN DELIINFO d ON m.ID = d.ID WHERE m.id=#{id}
+    </select>
+
 </mapper>

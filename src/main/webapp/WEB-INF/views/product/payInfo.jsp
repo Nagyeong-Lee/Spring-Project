@@ -22,7 +22,7 @@
 </head>
 <body>
 <%@ include file="/WEB-INF/views/product/navUtil.jsp" %>
-
+<input type="hidden" value="${id}" id="session">
 <div class="cart">
     <input type="hidden" id="cartLength" value="${cart.size()}">
     <table class="cart__list">
@@ -64,20 +64,23 @@
     <br>
 
 
-    <c:choose>
-        <c:when test="${!empty deliAddress}">
-            <c:forEach var="i" items="${deliAddress}">
-                <div class="deliInfo">
-                    <input type="text" value="${i}">
-                </div>
-            </c:forEach>
-        </c:when>
-    </c:choose>
+    <h3>배송지 선택</h3>
+        <input type="radio" name="address" checked value="default">기본 배송지
+        <input type="radio" name="address" value="additional1">추가 배송지1
+        <input type="radio" name="address" value="additional2">기본 배송지2
 
+    <div class="deliveryInfo">
+        <div>이름 : ${deliAddress.get("name")}</div>
+        <div id="phone"> 전화번호 : ${deliAddress.get("phone")}</div>
+        <div id="addr">기본주소 : <span id="defaultAddress" contenteditable="false">${deliAddress.get("defaultAddress")}</span>
+            <button type="button" id="updateBtn">배송지 수정</button></div>
+    </div>
 
     <div class="cart__mainbtns">
         <button class="cart__bigorderbtn left" id="continue">쇼핑 계속하기</button>
-        <button class="cart__bigorderbtn right" id="pay" type="button">결제하기</button>
+        <button class="cart__bigorderbtn right" id="pay" type="button">
+            <fmt:formatNumber pattern="#,###" value="${price}"/>원 결제하기
+        </button>
     </div>
 </div>
 
@@ -85,6 +88,71 @@
 <script>
     $("#continue").on("click", function () {
         location.href = "/product/list";
+    });
+
+    //배송지 수정 클릭 시
+    // $("#updateBtn").on("click", function () {
+    $(document).on("click","#updateBtn",function(){
+        $("#defaultAddress").attr("contentEditable",true);
+        $("#updateBtn").hide();
+
+        var button = '<button type="button" id="cplUpdate">수정 완료</button>';
+        $("#defaultAddress").after(button);
+    });
+
+    //수정 완료 클릭 시
+    $(document).on("click","#cplUpdate",function(){
+        $("#defaultAddress").attr("contentEditable",false);
+        $("#updateBtn").show();
+        $("#cplUpdate").hide();
+    });
+
+    //라디오 버튼 바뀔때
+    $("input[type=radio]").on("change",function(){
+        let checkedVal = $('input[name="address"]:checked').val();
+        if(checkedVal == 'additional1'){  //추가 배송지1
+                $("#addr").remove();
+                $.ajax({
+                   url:'/product/getAdditionalAddr',
+                    data: {
+                       "id":$("#session").val()
+                    },
+                    success:function(data){
+                       let addr = data;
+                       var html = '<div id="addr">기본주소 : '+'<span id="defaultAddress" contenteditable="false">'+data+'</span>'+
+                           '<button type="button" id="updateBtn">배송지 수정</button></div>';
+                       $("#phone").after(html);
+                   }
+                });
+        }else if(checkedVal == 'additional2'){ //추가 배송지2
+            $("#addr").remove();
+            $.ajax({
+                url:'/product/getAdditionalAddr2',
+                data: {
+                    "id":$("#session").val()
+                },
+                success:function(data){
+                    let addr = data;
+                    var html = '<div id="addr">기본주소 : '+'<span id="defaultAddress" contenteditable="false">'+data+'</span>'+
+                        '<button type="button" id="updateBtn">배송지 수정</button></div>';
+                    $("#phone").after(html);
+                }
+            });
+        }else{  //기본 배송지
+            $("#addr").remove();
+            $.ajax({
+                url:'/product/getDefaultAddr',
+                data: {
+                    "id":$("#session").val()
+                },
+                success:function(data){
+                    let addr = data;
+                    var html = '<div id="addr">기본주소 : '+'<span id="defaultAddress" contenteditable="false">'+data+'</span>'+
+                        '<button type="button" id="updateBtn">배송지 수정</button></div>';
+                    $("#phone").after(html);
+                }
+            });
+        }
     });
 </script>
 </body>

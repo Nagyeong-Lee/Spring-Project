@@ -70,7 +70,7 @@
 
 </div>
 
-<button type="button" id="back">목록으로</button>
+<button type="button" id="back">상품 목록으로</button>
 <button type="button" id="toCart">장바구니로</button>
 
 <form id="frm" method="post" action="/product/cart">
@@ -243,7 +243,7 @@
     });
 
     $("#back").on("click", function () {
-        history.back();
+        location.href="/product/list";
     });
 
 </script>
