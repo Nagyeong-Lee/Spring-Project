@@ -289,7 +289,9 @@
         cp_seq.nextval,
         '회원가입 축하 쿠폰',
         10,
-        #{m_seq}
+        #{m_seq},
+        '20230501',
+        'Y'
         )
     </insert>
 
@@ -307,5 +309,15 @@
             discount
         from coupon
         where m_seq=#{m_seq}
+        where status = 'Y'
+    </select>
+
+    <select id="getMemInfo"  resultType="com.example.Spring_Project.dto.MemberDTO">
+        select
+          name,
+          phone,
+          email
+        from member
+        where id=#{id}
     </select>
 </mapper>

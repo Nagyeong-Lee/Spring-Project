@@ -14,5 +14,7 @@ public class CouponDTO {
     private String title;
     private Integer discount;
     private Integer m_seq;
+    private String coupon_period;
+    private String status;
 
 }

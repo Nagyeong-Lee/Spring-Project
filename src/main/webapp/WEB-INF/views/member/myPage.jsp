@@ -30,11 +30,11 @@
 <%--쿠폰함--%>
 <%--<a href="${list.get(14).path}"><button type="button">${list.get(14).name}</button></a>--%>
 <%--상품목록--%>
-<a href="${list.get(15).path}"><button type="button">${list.get(15).name}</button></a>
+<a href="${list.get(8).path}"><button type="button">${list.get(8).name}</button></a>
 <%--장바구니--%>
 <form name="frm" method="post" action="/product/cart">
     <input type="hidden" name="id" value="${id}" id="id">
-    <button type="submit">${list.get(16).name}</button>
+    <button type="submit">${list.get(9).name}</button>
 </form>
 
 
@@ -42,7 +42,7 @@
     let id = $("#sessionID").val();
     //커뮤니티로 이동
     $("#btn1").on("click", function () {
-        location.href = $("#1").val();``
+        location.href = $("#1").val();
     });
 
     //계정 탈퇴

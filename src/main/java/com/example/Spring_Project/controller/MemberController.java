@@ -184,6 +184,17 @@ public class MemberController {
                     model.addAttribute("deletePath", deletePath);
                     model.addAttribute("logoutPath", logoutPath);
                     model.addAttribute("communityPath", communityPath);
+
+
+                    //쿠폰 만료 확인
+                    Integer m_seq = productService.getMemberSeq(id);//m_seq 가져오기
+                    List<CouponDTO> couponDTOList = productService.getCoupon(m_seq);//쿠폰 리스트 가져오기
+                    for(int i = 0 ; i<couponDTOList.size(); i++){
+                        List<CouponDTO> val = productService.checkCouponPr();
+                       for(int k=0; k<val.size(); k++){
+                           productService.updCoupon(val.get(k).getCp_seq());
+                       }
+                    }
                     result = "redirect:/member/myPage";
                 } else {
                     result = "redirect:/";

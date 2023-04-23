@@ -382,6 +382,7 @@
           discount
         from  coupon
         where m_seq=#{m_seq}
+        and status = 'Y'
     </select>
 
     <update id="updateCount">
@@ -423,4 +424,20 @@
         SELECT m.phone FROM MEMBER m JOIN DELIINFO d ON m.ID = d.ID WHERE m.id=#{id}
     </select>
 
+    <select id="checkCouponPr" resultType="com.example.Spring_Project.dto.CouponDTO">
+        SELECT
+            cp_seq,
+            title,
+            discount,
+            m_seq,
+            coupon_period,
+            status
+        FROM coupon WHERE cp_seq in(
+        select cp_seq from coupon WHERE trunc(sysdate)-TO_DATE(coupon_period,'YYYYMMDD')>0 and status = 'Y')
+
+    </select>
+
+    <update id="updCoupon">
+        update coupon set status = 'N' where cp_seq=#{cp_seq}
+    </update>
 </mapper>

@@ -1,6 +1,8 @@
 package com.example.Spring_Project.controller;
 
 import com.example.Spring_Project.dto.*;
+import com.example.Spring_Project.service.MemberService;
+import com.example.Spring_Project.service.PayService;
 import com.example.Spring_Project.service.ProductService;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -26,6 +28,12 @@ public class ProductController {
 
     @Autowired
     private HttpSession httpSession;
+
+    @Autowired
+    private MemberService memberService;
+
+    @Autowired
+    private PayService payService;
 
     //전체 상품
     @RequestMapping("/list")
@@ -222,6 +230,7 @@ public class ProductController {
     //장바구니로 이동
     @PostMapping("/cart")
     public String toCart(Model model, @RequestParam String id) throws Exception {
+
         List<Map<String, Object>> optionList = new ArrayList<>();
         JsonParser jsonParser = new JsonParser();
         JsonArray jsonArray = new JsonArray();
@@ -410,11 +419,14 @@ public class ProductController {
         deliAddress.put("phone", phone);
         deliAddress.put("defaultAddress", defaultAddress);
 
+        MemberDTO memberDTO = memberService.getMemInfo(data);
+
         model.addAttribute("cart", cart);
         model.addAttribute("totalPrice", totalPrice);
         model.addAttribute("totalSum", totalSum);
         model.addAttribute("deliAddress", deliAddress);
         model.addAttribute("price", price); //실제 총 합계
+        model.addAttribute("memberDTO", memberDTO); //회원 정보
         return "/product/payInfo";
     }
 
@@ -448,5 +460,69 @@ public class ProductController {
             productService.deleteItem(i);
         }
         return "success";
+    }
+
+    @RequestMapping("/paymentDetails")
+    public String paymentDetails(Model model, String id,Integer price) throws Exception{
+        //결제 테이블에 인서트
+        Map<String,Object>param = new HashMap<>();
+        param.put("id",id);
+        param.put("price",price);
+        payService.insertPayInfo(param);
+        //상품 수량 -
+        List<Map<String, Object>> optionList = new ArrayList<>();
+        JsonParser jsonParser = new JsonParser();
+        JsonArray jsonArray = new JsonArray();
+        JsonObject jsonObject = new JsonObject();
+        List<String> list = new ArrayList<>();
+        List<CartDTO> cartInfo = productService.getCartInfo(id);
+        List<Map<String, Object>> cart = new ArrayList<>();
+        Integer totalPrice = 0;  //상품 총 합계
+        Integer totalSum = 0;  //상품 총 개수
+        for (Integer i = 0; i < cartInfo.size(); i++) {
+            Object object = jsonParser.parse(cartInfo.get(i).getOptions());
+            jsonObject = (JsonObject) object;
+            jsonArray = (JsonArray) jsonObject.get("name");
+            list = productService.getOptionCategory(cartInfo.get(i).getCart_seq());
+            System.out.println("list : " + list);
+            List<Map<String, Object>> optionMap = new ArrayList<>();
+            for (Integer k = 0; k < list.size(); k++) {
+                Map<String, Object> map = new HashMap<>();
+                String category = list.get(k);
+                String option = String.valueOf(jsonArray.get(k)).replace("\"", "");
+                map.put(category, option);
+                optionMap.add(map);
+            }
+            Map<String, Object> item = new HashMap<>();
+            item.put("id", cartInfo.get(i).getId());
+            item.put("count", cartInfo.get(i).getCount());
+            item.put("cart_seq", cartInfo.get(i).getCart_seq());
+            item.put("status", cartInfo.get(i).getStatus());
+            item.put("pd_seq", cartInfo.get(i).getPd_seq());
+            item.put("name", cartInfo.get(i).getName());
+            item.put("description", cartInfo.get(i).getDescription());
+            item.put("price", cartInfo.get(i).getPrice());
+            item.put("stock", cartInfo.get(i).getStock());
+            item.put("img", cartInfo.get(i).getImg());
+            item.put("category", cartInfo.get(i).getCategory());
+            item.put("option", optionMap);
+            item.put("totalPrice", cartInfo.get(i).getPrice() * cartInfo.get(i).getCount());
+            cart.add(item);
+
+            //돌면서 상품 개수, 상품 가격 가져오고 더하기
+            Integer pdCount = cartInfo.get(i).getCount();
+            Integer pdProduct_seq = cartInfo.get(i).getPd_seq();
+            Integer pdPrice = productService.getPdPrice(pdProduct_seq);
+
+            System.out.println("pdCount = " + pdCount);
+            System.out.println("pdPrice = " + pdPrice);
+            System.out.println();
+            totalPrice += pdPrice * pdCount;
+            totalSum += pdCount;
+        }
+        model.addAttribute("cart",cart);
+        model.addAttribute("totalPrice", totalPrice);
+        model.addAttribute("totalSum", totalSum);
+        return "/product/paymentDetail";
     }
 }

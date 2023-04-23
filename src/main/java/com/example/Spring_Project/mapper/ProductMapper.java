@@ -60,5 +60,7 @@ public interface ProductMapper {
     String getAdditionalAddress2(String id);
     String  getName(String id);
     String  getPhone(String id);
+    List<CouponDTO> checkCouponPr();
+    void updCoupon(@Param("cp_seq")Integer cp_seq);
 
 }

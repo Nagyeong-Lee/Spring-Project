@@ -191,4 +191,12 @@ public class ProductService {
         return productMapper.getPhone(id);
     }
 
+    public List<CouponDTO> checkCouponPr() throws Exception {
+        return productMapper.checkCouponPr();
+    }
+
+    public void updCoupon(Integer cp_seq) throws Exception {
+       productMapper.updCoupon(cp_seq);
+    }
+
 }

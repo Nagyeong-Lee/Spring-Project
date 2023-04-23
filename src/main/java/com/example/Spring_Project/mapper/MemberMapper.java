@@ -82,5 +82,6 @@ public interface MemberMapper {
     Integer getmSeq(@Param("id") String id);
     //쿠폰 가져오기
     List<CouponDTO>getCoupon(@Param("m_seq") Integer m_seq);
+    MemberDTO getMemInfo(@Param("id") String id);
 
 }

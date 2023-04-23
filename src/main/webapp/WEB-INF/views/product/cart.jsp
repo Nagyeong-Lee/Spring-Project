@@ -140,6 +140,7 @@
 
     //삭제시 실행될 함수
     function deleteCart() {
+
         let deleteCartSeq = []; //삭제할 cart_seq 담을 배열
         $("input[name=delete]:checked").each(function () {
             var cart_seq = $(this).val();
@@ -173,10 +174,7 @@
                 console.log('123132 : ' + changedSum);
                 $("#sum").text('총 수량 : ' + changedSum + '개');
                 $("#hiddenTotalSum").val(changedSum); //변경된 수량 저장
-
-                $("input[name=delete]:checked").closest(".itemDiv").children().remove();
             })
-
             console.log(deleteCartSeq);
             $.ajax({
                 url: '/product/cart/delCart',
@@ -184,10 +182,16 @@
                     "deleteCartSeq": deleteCartSeq
                 },
                 success: function (data) {
-                   console.log("data : "+data);
+                    $("input[name=delete]:checked").closest(".itemDiv").remove();
+                    console.log($(".itemDiv").length);
+                    if ($(".itemDiv").length == 0) {
+                        $(".pay").remove();
+                        $("#total").remove();
+                        $("#sum").remove();
+                        $("#discount").remove();
+                    }
                 }
             });
-
         }
     }
 
@@ -421,6 +425,7 @@
     //결제하기 버튼 클릭
     //옵션,상품 개수 변경
     $("#pay").on("click", function () {
+        console.log($("#discount option:selected").val());
         var newForm = document.createElement("form");
         var newInput = document.createElement("input");
         var newInput2 = document.createElement("input");
@@ -437,33 +442,6 @@
         newForm.appendChild(newInput2);
         document.body.append(newForm);
         newForm.submit();
-        console.log('서브밋 완')
-
-        // let count = $("#hiddenTotalSum").val();
-        // let price = $("#hiddenTotalPrice").val();
-        //
-        // console.log("count : "+count);
-        // console.log("price : "+price);
-        //
-        //  // 카카오페이 결제전송
-        //  $.ajax({
-        //      type: 'post'
-        //      , url: '/order/pay'
-        //      , data: {
-        //          total_amount: totalPayPrice
-        //          , payUserName: name
-        //          , sumPrice: totalPrice
-        //          , discountPrice: discountPrice
-        //          , totalPrice: totalPayPrice
-        //          , tel: tel
-        //          , email: email
-        //          , usePoint: usePoint
-        //          , useCouponNo: useUserCouponNo
-        //      },
-        //      success: function (response) {
-        //          location.href = response.next_redirect_pc_url
-        //      }
-        //  })
 
     });
 </script>

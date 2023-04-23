@@ -158,5 +158,9 @@ public class MemberService {
     }
 
 
+    public MemberDTO getMemInfo(String id) throws Exception{
+        return mapper.getMemInfo(id);
+    }
+
 
 }
