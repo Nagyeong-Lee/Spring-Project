@@ -115,8 +115,8 @@ public class ProductService {
         productMapper.minusPd(pd_seq);
     }
 
-    public Integer getOptionStock(Integer pd_seq, String optionName) throws Exception {
-        return productMapper.getOptionStock(pd_seq, optionName);
+    public OptionDTO getOptionStock(Map<String,Object>map) throws Exception {
+        return productMapper.getOptionStock(map);
     }
 
     public void updateOptionStatus(Integer option_seq) throws Exception {
@@ -191,12 +191,24 @@ public class ProductService {
         return productMapper.getPhone(id);
     }
 
-    public List<CouponDTO> checkCouponPr() throws Exception {
+    public List<CouponDTO> checkCouponPr() throws Exception {  //쿠폰 리스트
         return productMapper.checkCouponPr();
     }
 
-    public void updCoupon(Integer cp_seq) throws Exception {
-       productMapper.updCoupon(cp_seq);
+    public void updCoupon(Integer cp_seq) throws Exception {  //쿠폰 상태 변경
+        productMapper.updCoupon(cp_seq);
+    }
+
+    public void updCartStatus(String id) throws Exception {
+        productMapper.updCartStatus(id);
+    }
+
+    public void chgPdCount(Integer pd_seq, Integer count) throws Exception {  //상품 수량 변경
+        productMapper.chgPdCount(pd_seq, count);
+    }
+
+    public void chgOptionCount(Map<String,Object>map) throws Exception {  //상품 옵션 수량 변경
+        productMapper.chgOptionCount(map);
     }
 
 }

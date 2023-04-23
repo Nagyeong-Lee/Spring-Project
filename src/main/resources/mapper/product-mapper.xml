@@ -293,11 +293,16 @@
         update product set stock=stock-1 where pd_seq=#{pd_seq}
     </update>
 
-    <select id="getOptionStock" resultType="Integer">
+    <select id="getOptionStock" resultType="com.example.Spring_Project.dto.OptionDTO">
         select
-          option_seq
+            option_seq,
+            category,
+            name,
+            stock,
+            status,
+            pd_seq
         from options
-        where pd_seq=#{pd_seq} and name=#{optionName}
+        where pd_seq=#{pd_seq} and name=#{option}
     </select>
 
     <update id="updateOptionStatus">
@@ -306,8 +311,8 @@
 
     <select id="getPdStock" resultType="Integer">
         select
-          pd_seq
-        from options
+          stock
+        from product
         where pd_seq=#{pd_seq}
     </select>
 
@@ -439,5 +444,17 @@
 
     <update id="updCoupon">
         update coupon set status = 'N' where cp_seq=#{cp_seq}
+    </update>
+
+    <update id="updCartStatus">
+        update cart set status = 'N' where id = #{id}
+    </update>
+
+    <update id="chgPdCount">
+        update product set stock = stock - #{count} where pd_seq = #{pd_seq}
+    </update>
+
+    <update id="chgOptionCount">
+        update option set stock = stock - #{count} where pd_seq = #{pd_seq} and name = #{option}
     </update>
 </mapper>

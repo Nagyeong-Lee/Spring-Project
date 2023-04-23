@@ -40,7 +40,7 @@ public interface ProductMapper {
     void insertCart(@Param("id") String id,@Param("count") Integer count,@Param("pd_seq") Integer pd_seq, @Param("optionList")String optionList);
     void minusOption(@Param("pd_seq") Integer pd_seq,@Param("optionName") String optionName);
     void minusPd(@Param("pd_seq") Integer pd_seq);
-    Integer getOptionStock(@Param("pd_seq") Integer pd_seq,@Param("optionName") String optionName);
+    OptionDTO getOptionStock(Map<String,Object>map);
     Integer updateOptionStatus(@Param("option_seq") Integer option_seq);
     Integer updatePdStatus(@Param("pd_seq") Integer pd_seq);
     Integer getPdStock(@Param("pd_seq") Integer pd_seq);
@@ -62,5 +62,8 @@ public interface ProductMapper {
     String  getPhone(String id);
     List<CouponDTO> checkCouponPr();
     void updCoupon(@Param("cp_seq")Integer cp_seq);
+    void updCartStatus(@Param("id") String id);
+    void chgPdCount(@Param("pd_seq")  Integer pd_seq,@Param("count") Integer count);
+    void chgOptionCount(Map<String,Object>map);
 
 }
