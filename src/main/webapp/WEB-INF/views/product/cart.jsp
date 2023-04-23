@@ -36,7 +36,9 @@
                         <td colspan="2">상품정보</td>
                         <td colspan="2">수량</td>
                         <td colspan="2">상품금액</td>
-                        <td colspan="2">삭제</td>
+                        <td colspan="2">
+                            <button type="button" class="delBtn" onclick="deleteCart()">삭제</button>
+                        </td>
                     </tr>
                     </thead>
                     <tbody>
@@ -77,9 +79,10 @@
                                 <input type="hidden" class="thisPrice" value="${i.get('totalPrice')}">
                             </td>
                             <td>
-                                <button type="button" class="delBtn">삭제
-                                    <input type="hidden" value="${i.get('cart_seq')}">
-                                </button>
+                                <input type="checkbox" name="delete" value="${i.get('cart_seq')}" class="deleteSeq">
+                                    <%--                                <button type="button" class="delBtn">삭제--%>
+                                    <%--                                    <input type="hidden" value="${i.get('cart_seq')}">--%>
+                                    <%--                                </button>--%>
                             </td>
                         </tr>
                     </c:forEach>
@@ -135,59 +138,112 @@
         location.href = "/product/list";
     });
 
-    $(".delBtn").on("click", function () { //해당 cart_seq status n으로
-        // let total_price = $("#hiddenTotalPrice").val();
-        $("#discount  option:eq(0)").prop("selected", true);
-        $("#discount option:not(select)").show();
-        let total_price = $("#hiddenTotalPreviousTotalPrice").val();
-        console.log("원래 상품 가격 : " + total_price);
+    //삭제시 실행될 함수
+    function deleteCart() {
+        let deleteCartSeq = []; //삭제할 cart_seq 담을 배열
+        $("input[name=delete]:checked").each(function () {
+            var cart_seq = $(this).val();
+            deleteCartSeq.push(cart_seq);
+            console.log("체크된 값 : " + cart_seq);
+            console.log("deleteCartSeq : " + deleteCartSeq);
+        });
+        if (deleteCartSeq.length == 0) {
+            alert('삭제할 항목을 선택해주세요.');
+        } else {  //체크된 tr 제거
+            $("input[name=delete]:checked").each(function () {
+                $("#discount  option:eq(0)").prop("selected", true);
+                $("#discount option:not(select)").show();
+                let total_price = $("#hiddenTotalPreviousTotalPrice").val();
+                console.log("원래 상품 가격 : " + total_price);
 
-        //삭제할때 총합계 변경
-        console.log('삭제 클릭 : ' + $(this).closest(".itemDiv").find(".productPrice").val());
-        console.log('삭제 클릭 시 수량 : ' + $(this).closest(".itemDiv").find(".stock").val());
+                //삭제할때 총합계 변경
+                console.log('삭제 클릭 : ' + $("input[name=delete]:checked").closest(".itemDiv").find(".thisPrice").val());
+                console.log('삭제 클릭 시 수량 : ' + $("input[name=delete]:checked").closest(".itemDiv").find(".stock").val());
 
-        let chgPrice = $(this).closest(".itemDiv").find(".productPrice").val() * $(this).closest(".itemDiv").find(".stock").val();  //변경된 총 합계
-        console.log("chgPrice : " + chgPrice);
-
-        //총 합계 변경해주기
-        $("#total").text('총 합계 : ' + (parseInt(total_price) - chgPrice).toLocaleString() + '원');
-        $("#hiddenTotalPrice").val(parseInt(total_price) - chgPrice); //변경된 상품 가격
-        $("#hiddenTotalPreviousTotalPrice").val($("#hiddenTotalPrice").val()); //변경된 상품 가격
-
-        //삭제할때 총 수량 변경
-        console.log('삭제할때 총 수량 변경 : ' + $(this).closest(".itemDiv").find(".stock").val());
-
-        //삭제할때 총 수량 변경
-        let changedSum = parseInt($("#hiddenTotalSum").val()) - $(this).closest(".itemDiv").find(".stock").val();
-        console.log('123132 : ' + changedSum);
-        $("#sum").text('총 수량 : ' + changedSum + '개');
-        $("#hiddenTotalSum").val(changedSum); //변경된 수량 저장
+                let chgPrice = $(this).closest(".itemDiv").find(".productPrice").val() * $(this).closest(".itemDiv").find(".stock").val();  //변경된 총 합계
+                console.log("변경된 총 합계 : " + chgPrice);
+                // 총 합계 변경해주기
+                $("#total").text('총 합계 : ' + (parseInt(total_price) - chgPrice).toLocaleString() + '원');
+                $("#hiddenTotalPrice").val(parseInt(total_price) - chgPrice); //변경된 상품 가격
+                $("#hiddenTotalPreviousTotalPrice").val($("#hiddenTotalPrice").val()); //변경된 상품 가격
 
 
-        let cart_seq = $(this).closest(".itemDiv").find(".cartSeq").val();
-        console.log(cart_seq);
-        $(this).closest(".itemDiv").remove();
-        if ($(".itemDiv").length == 0) {
-            $(".pay").remove();
-        }
-        $.ajax({
-            url: '/product/cart/delete',
-            type: 'post',
-            data: {
-                "cart_seq": cart_seq
-            },
-            success: function (data) {
-                if ($(".itemDiv").length == 0) {
-                    $("#thead").children().remove();
-                    $("#total").remove();
-                    $("#discount").remove();
-                    $("#sum").remove();
-                    var html = '<td colspan="5">장바구니가 비었습니다.</td>';
-                    $("#thead").append(html);
+                //삭제할때 총 수량 변경
+                let changedSum = parseInt($("#hiddenTotalSum").val()) - $(this).closest(".itemDiv").find(".stock").val();
+                console.log('123132 : ' + changedSum);
+                $("#sum").text('총 수량 : ' + changedSum + '개');
+                $("#hiddenTotalSum").val(changedSum); //변경된 수량 저장
+
+                $("input[name=delete]:checked").closest(".itemDiv").children().remove();
+            })
+
+            console.log(deleteCartSeq);
+            $.ajax({
+                url: '/product/cart/delCart',
+                data: {
+                    "deleteCartSeq": deleteCartSeq
+                },
+                success: function (data) {
+                   console.log("data : "+data);
                 }
-            }
-        })
-    });
+            });
+
+        }
+    }
+
+    // $(".delBtn").on("click", function () { //해당 cart_seq status n으로
+    //     // let total_price = $("#hiddenTotalPrice").val();
+    //     $("#discount  option:eq(0)").prop("selected", true);
+    //     $("#discount option:not(select)").show();
+    //     let total_price = $("#hiddenTotalPreviousTotalPrice").val();
+    //     console.log("원래 상품 가격 : " + total_price);
+    //
+    //     //삭제할때 총합계 변경
+    //     console.log('삭제 클릭 : ' + $(this).closest(".itemDiv").find(".productPrice").val());
+    //     console.log('삭제 클릭 시 수량 : ' + $(this).closest(".itemDiv").find(".stock").val());
+    //
+    //     let chgPrice = $(this).closest(".itemDiv").find(".productPrice").val() * $(this).closest(".itemDiv").find(".stock").val();  //변경된 총 합계
+    //     console.log("chgPrice : " + chgPrice);
+    //
+    //     //총 합계 변경해주기
+    //     $("#total").text('총 합계 : ' + (parseInt(total_price) - chgPrice).toLocaleString() + '원');
+    //     $("#hiddenTotalPrice").val(parseInt(total_price) - chgPrice); //변경된 상품 가격
+    //     $("#hiddenTotalPreviousTotalPrice").val($("#hiddenTotalPrice").val()); //변경된 상품 가격
+    //
+    //     //삭제할때 총 수량 변경
+    //     console.log('삭제할때 총 수량 변경 : ' + $(this).closest(".itemDiv").find(".stock").val());
+    //
+    //     //삭제할때 총 수량 변경
+    //     let changedSum = parseInt($("#hiddenTotalSum").val()) - $(this).closest(".itemDiv").find(".stock").val();
+    //     console.log('123132 : ' + changedSum);
+    //     $("#sum").text('총 수량 : ' + changedSum + '개');
+    //     $("#hiddenTotalSum").val(changedSum); //변경된 수량 저장
+    //
+    //
+    //     let cart_seq = $(this).closest(".itemDiv").find(".cartSeq").val();
+    //     console.log(cart_seq);
+    //     $(this).closest(".itemDiv").remove();
+    //     if ($(".itemDiv").length == 0) {
+    //         $(".pay").remove();
+    //     }
+    //     $.ajax({
+    //         url: '/product/cart/delete',
+    //         type: 'post',
+    //         data: {
+    //             "cart_seq": cart_seq
+    //         },
+    //         success: function (data) {
+    //             if ($(".itemDiv").length == 0) {
+    //                 $("#thead").children().remove();
+    //                 $("#total").remove();
+    //                 $("#discount").remove();
+    //                 $("#sum").remove();
+    //                 var html = '<td colspan="5">장바구니가 비었습니다.</td>';
+    //                 $("#thead").append(html);
+    //             }
+    //         }
+    //     })
+    // });
 
     //+버튼 누를때 수량
     $(".plus").on("click", function () {
@@ -365,49 +421,49 @@
     //결제하기 버튼 클릭
     //옵션,상품 개수 변경
     $("#pay").on("click", function () {
-       var newForm = document.createElement("form");
-       var newInput = document.createElement("input");
-       var newInput2=document.createElement("input");
-       newForm.setAttribute("action","/product/payInfo");
-       newForm.setAttribute("method","post");
+        var newForm = document.createElement("form");
+        var newInput = document.createElement("input");
+        var newInput2 = document.createElement("input");
+        newForm.setAttribute("action", "/product/payInfo");
+        newForm.setAttribute("method", "post");
 
-       newInput.setAttribute("value",$("#session").val());
-       newInput.setAttribute("type","hidden");
-       newInput.setAttribute("name","data");
-       newInput2.setAttribute("value",$("#hiddenTotalPrice").val());
-       newInput2.setAttribute("type","hidden");
-       newInput2.setAttribute("name","price");
-       newForm.appendChild(newInput);
-       newForm.appendChild(newInput2);
-       document.body.append(newForm);
-       newForm.submit();
-       console.log('서브밋 완')
+        newInput.setAttribute("value", $("#session").val());
+        newInput.setAttribute("type", "hidden");
+        newInput.setAttribute("name", "data");
+        newInput2.setAttribute("value", $("#hiddenTotalPrice").val());
+        newInput2.setAttribute("type", "hidden");
+        newInput2.setAttribute("name", "price");
+        newForm.appendChild(newInput);
+        newForm.appendChild(newInput2);
+        document.body.append(newForm);
+        newForm.submit();
+        console.log('서브밋 완')
 
-       // let count = $("#hiddenTotalSum").val();
-       // let price = $("#hiddenTotalPrice").val();
-       //
-       // console.log("count : "+count);
-       // console.log("price : "+price);
-       //
-       //  // 카카오페이 결제전송
-       //  $.ajax({
-       //      type: 'post'
-       //      , url: '/order/pay'
-       //      , data: {
-       //          total_amount: totalPayPrice
-       //          , payUserName: name
-       //          , sumPrice: totalPrice
-       //          , discountPrice: discountPrice
-       //          , totalPrice: totalPayPrice
-       //          , tel: tel
-       //          , email: email
-       //          , usePoint: usePoint
-       //          , useCouponNo: useUserCouponNo
-       //      },
-       //      success: function (response) {
-       //          location.href = response.next_redirect_pc_url
-       //      }
-       //  })
+        // let count = $("#hiddenTotalSum").val();
+        // let price = $("#hiddenTotalPrice").val();
+        //
+        // console.log("count : "+count);
+        // console.log("price : "+price);
+        //
+        //  // 카카오페이 결제전송
+        //  $.ajax({
+        //      type: 'post'
+        //      , url: '/order/pay'
+        //      , data: {
+        //          total_amount: totalPayPrice
+        //          , payUserName: name
+        //          , sumPrice: totalPrice
+        //          , discountPrice: discountPrice
+        //          , totalPrice: totalPayPrice
+        //          , tel: tel
+        //          , email: email
+        //          , usePoint: usePoint
+        //          , useCouponNo: useUserCouponNo
+        //      },
+        //      success: function (response) {
+        //          location.href = response.next_redirect_pc_url
+        //      }
+        //  })
 
     });
 </script>

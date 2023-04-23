@@ -2,6 +2,7 @@ package com.example.Spring_Project.controller;
 
 import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.service.ProductService;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -269,7 +270,7 @@ public class ProductController {
             System.out.println("pdPrice = " + pdPrice);
             System.out.println();
             totalPrice += pdPrice * pdCount;
-            totalSum+=pdCount;
+            totalSum += pdCount;
 //            System.out.println(cartInfo.get(i).getId());
 //            System.out.println(cartInfo.get(i).getCount());
 //            System.out.println(cartInfo.get(i).getPd_seq());
@@ -286,7 +287,7 @@ public class ProductController {
         //m_seq 가져오기
         Integer m_seq = productService.getMemberSeq(id);
         //쿠폰 리스트 가져오기
-        List<CouponDTO>couponDTOList=productService.getCoupon(m_seq);
+        List<CouponDTO> couponDTOList = productService.getCoupon(m_seq);
         model.addAttribute("cart", cart);
         model.addAttribute("totalPrice", totalPrice);
         model.addAttribute("totalSum", totalSum);
@@ -333,22 +334,23 @@ public class ProductController {
 
     @ResponseBody
     @RequestMapping("/discountedPrice")  //쿠폰 먹여서 다시 계산
-    public Integer changePrice(@RequestParam Map<String,Object> map) throws Exception{
+    public Integer changePrice(@RequestParam Map<String, Object> map) throws Exception {
         Integer discount = Integer.parseInt(map.get("discount").toString());
         Integer originalPrice = Integer.parseInt(map.get("price").toString());
-        Integer price = productService.getChangedPrice(discount,originalPrice);
+        Integer price = productService.getChangedPrice(discount, originalPrice);
         System.out.println("price = " + price);
         return price;
     }
 
     @ResponseBody
     @RequestMapping("/updCount")
-    public String updCount(Integer count,Integer cart_seq) throws Exception{
-        productService.updateCount(count,cart_seq);
+    public String updCount(Integer count, Integer cart_seq) throws Exception {
+        productService.updateCount(count, cart_seq);
         return "success";
     }
+
     @RequestMapping("/payInfo")
-    public String toPayInfo(Model model,String data,Integer price) throws Exception{ //data : id
+    public String toPayInfo(Model model, String data, Integer price) throws Exception { //data : id
         List<Map<String, Object>> optionList = new ArrayList<>();
         JsonParser jsonParser = new JsonParser();
         JsonArray jsonArray = new JsonArray();
@@ -397,16 +399,16 @@ public class ProductController {
             System.out.println("pdPrice = " + pdPrice);
             System.out.println();
             totalPrice += pdPrice * pdCount;
-            totalSum+=pdCount;
+            totalSum += pdCount;
         }
-        Map<String,Object>deliAddress = new HashMap<>();
+        Map<String, Object> deliAddress = new HashMap<>();
         String name = productService.getName(data);//이름
         String phone = productService.getPhone(data);//폰
-        phone=phone.substring(0,3)+"-"+phone.substring(3,7)+"-"+phone.substring(7,11);
+        phone = phone.substring(0, 3) + "-" + phone.substring(3, 7) + "-" + phone.substring(7, 11);
         String defaultAddress = productService.getDefaultAddress(data);
-        deliAddress.put("name",name);
-        deliAddress.put("phone",phone);
-        deliAddress.put("defaultAddress",defaultAddress);
+        deliAddress.put("name", name);
+        deliAddress.put("phone", phone);
+        deliAddress.put("defaultAddress", defaultAddress);
 
         model.addAttribute("cart", cart);
         model.addAttribute("totalPrice", totalPrice);
@@ -418,22 +420,33 @@ public class ProductController {
 
     @ResponseBody
     @RequestMapping("/getAdditionalAddr")
-    public String getAdditionalAddr(String id) throws Exception{
+    public String getAdditionalAddr(String id) throws Exception {
         String additionalAddress1 = productService.getAdditionalAddress1(id);
         return additionalAddress1;
     }
 
     @ResponseBody
     @RequestMapping("/getAdditionalAddr2")
-    public String getAdditionalAddr2(String id) throws Exception{
+    public String getAdditionalAddr2(String id) throws Exception {
         String additionalAddress2 = productService.getAdditionalAddress2(id);
         return additionalAddress2;
     }
 
     @ResponseBody
     @RequestMapping("/getDefaultAddr")
-    public String getDefaultAddr(String id) throws Exception{
+    public String getDefaultAddr(String id) throws Exception {
         String defaultAddress = productService.getDefaultAddress(id);
         return defaultAddress;
+    }
+
+    //선택삭제 테스트
+    @ResponseBody
+    @RequestMapping("/cart/delCart")
+    public String deleteItem(@RequestParam(value = "deleteCartSeq[]")List<Integer>deleteCartSeq) throws Exception {
+        System.out.println("deleteCartSeq = " + deleteCartSeq);
+        for(Integer i : deleteCartSeq){
+            productService.deleteItem(i);
+        }
+        return "success";
     }
 }
