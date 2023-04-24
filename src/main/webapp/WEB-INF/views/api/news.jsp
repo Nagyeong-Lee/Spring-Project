@@ -16,8 +16,11 @@
     </script>
 </head>
 <body>
+<input type="hidden" value="" id="nowKeyWord">
 <c:forEach var="i" items="${list}" varStatus="status">
-    <button type="button" id="${status.count}">${i.code}</button>
+    <button type="button" id="${status.count}">${i.code}
+        <input type="hidden" value="${i.code}" class="keyword">
+    </button>
 </c:forEach>
 <button type="button" id="toMyPageBtn">마이페이지로</button>
 
@@ -25,7 +28,7 @@
 <div class="header">
     <h2>전체 뉴스</h2>
 </div>
-<%--<input type="hidden" value="${keyword}" id="keyword" name="keyword">--%>
+<input type="hidden" value="${keyword}" id="keyword" name="keyword">
 <select name="count" id="count">
     <option value="10"<c:out value="${count eq '10' ? 'selected' : ''}"/>>10개씩 보기</option>
     <option value="30"<c:out value="${count eq '30' ? 'selected' : ''}"/>>30개씩 보기</option>
@@ -52,57 +55,54 @@
 <div class="pagingDiv">
     <c:choose>
         <c:when test="${needPrev eq true}">
-                <a href="javascript:void(0); onclick=newsPaging(${startNavi-1},${count}});"><</a>
-                <a href="javascript:void(0); onclick=newsPaging(1,${count});">맨 처음</a>
+            <a href="javascript:void(0); onclick=newsPaging(${startNavi-1},${count}});"><</a>
+            <a href="javascript:void(0); onclick=newsPaging(1,${count});">맨 처음</a>
         </c:when>
     </c:choose>
     <%--<c:choose>
         <c:when test="${needNext eq true}">--%>
     <c:forEach var="i" begin="${startNavi}" end="${endNavi}" varStatus="var">
         <c:if test="${currentPage eq i}">
-                <a href="javascript:void(0); onclick=newsPaging(${i},${count});" style="font-weight: bold;">${i}</a>
+            <a href="javascript:void(0); onclick=newsPaging(${i},${count});" style="font-weight: bold;">${i}</a>
         </c:if>
         <c:if test="${currentPage ne i}">
-                <a href="javascript:void(0); onclick=newsPaging(${i},${count});">${i}</a>
+            <a href="javascript:void(0); onclick=newsPaging(${i},${count});">${i}</a>
         </c:if>
     </c:forEach>
     <%--</c:when>
 </c:choose>--%>
     <c:choose>
         <c:when test="${needNext eq true}">
-                <a href="javascript:void(0); onclick=newsPaging(${endNavi+1},${count});">></a>
-                <a href="javascript:void(0); onclick=newsPaging(${pageTotalCount},${count});">맨끝</a>
+            <a href="javascript:void(0); onclick=newsPaging(${endNavi+1},${count});">></a>
+            <a href="javascript:void(0); onclick=newsPaging(${pageTotalCount},${count});">맨끝</a>
         </c:when>
     </c:choose>
 </div>
 
-
-
 <script>
-
-    function changeOptions() {
+    function changeOptions(keyword) {
         let data = {
-            count: $("#count").val()
-            // keyword:$("#keyword").val()
+            count: $("#count").val(),
+            keyword: keyword
         };
         console.log(data.count);
-        console.log(data.keyword);
+        console.log('키워드 : ' + data.keyword);
         return data;
     }
 
-    $("#toMyPageBtn").on("click",function(){
-       location.href="/member/myPage";
+    $("#toMyPageBtn").on("click", function () {
+        location.href = "/member/myPage";
     });
-
     //카운트 변경
     $(" #count").on("change", function () {
+        console.log('카운트 변경 시 키워드 값 : ' + $(this).children().val());
         let result = changeOptions();
-        console.log("카운트변경 시 count : "+result);
         $.ajax({
             url: '/api/repaging',
             data: {
                 "currentPage": 1,
-                "count": result.count
+                "count": result.count,
+                "keyword": $('#nowKeyWord').val()
             },
             success: function (data) {
                 console.log("list길이 : " + data.items.length);
@@ -120,8 +120,8 @@
                     $("#tbody").append(html);
                 } else {
                     for (let i = 0; i < items.length; i++) {
-                        // var newHtml = createHtmlNews(items[i],cpage, cnt, data.keyword);
-                        var newHtml = createHtmlNews(items[i],cpage, cnt);
+// var newHtml = createHtmlNews(items[i],cpage, cnt, data.keyword);
+                        var newHtml = createHtmlNews(items[i], cpage, cnt);
                         $("#tbody").append(newHtml);
                     }
                     if (page.needPrev == true) {
@@ -147,15 +147,14 @@
     });
 
     function newsPaging(startNavi) {
-
-        let result=changeOptions();
-        let count=result.count;
+        let result = changeOptions();
+        let count = result.count;
         $.ajax({
             url: '/api/repaging',
             data: {
                 "currentPage": startNavi,
-                "count": count
-                // "keyword":result.keyword
+                "count": count,
+                "keyword": $('#nowKeyWord').val()
             },
             success: function (data) {
                 console.log("list길이 : " + data.items.length);
@@ -173,9 +172,9 @@
                     $("#tbody").append(html);
                 } else {
                     for (let i = 0; i < items.length; i++) {
-                        console.log("items : "+items);
-                        // var newHtml = createHtmlNews(items[i],cpage, cnt, data.keyword);
-                        var newHtml = createHtmlNews(items[i],cpage, cnt);
+                        console.log("items : " + items);
+// var newHtml = createHtmlNews(items[i],cpage, cnt, data.keyword);
+                        var newHtml = createHtmlNews(items[i], cpage, cnt);
                         $("#tbody").append(newHtml);
                     }
                     if (page.needPrev == true) {
@@ -203,47 +202,47 @@
     //페이징 새로
     function createPagingNews1(page) {
         var pagingHtml = '';
-            pagingHtml += '<a href="javascript:void(0);" onclick="newsPaging(' + (page.startNavi - 1) + ',' + $('#count').val() + ');">' + "<" + '</a>';
-            pagingHtml += '<a href="javascript:void(0);" onclick="newsPaging(' + (1) + ',' + $('#count').val() + ');">' + "맨 처음" + '</a>';
+        pagingHtml += '<a href="javascript:void(0);" onclick="newsPaging(' + (page.startNavi - 1) + ',' + $('#count').val() + ');">' + "<" + '</a>';
+        pagingHtml += '<a href="javascript:void(0);" onclick="newsPaging(' + (1) + ',' + $('#count').val() + ');">' + "맨 처음" + '</a>';
         return pagingHtml;
     }
 
     function createPagingNews2(page, pageTotalCount) {
         var pagingHtml = '';
-            pagingHtml += '<a href="javascript:void(0);" onclick="newsPaging(' + (page.endNavi + 1) + ',' + $('#count').val() + ');">' + ">" + '</a>';
-            pagingHtml += '<a href="javascript:void(0);" onclick="newsPaging(' + (pageTotalCount) + ',' + $('#count').val() + ');">' + "맨끝" + '</a>';
+        pagingHtml += '<a href="javascript:void(0);" onclick="newsPaging(' + (page.endNavi + 1) + ',' + $('#count').val() + ');">' + ">" + '</a>';
+        pagingHtml += '<a href="javascript:void(0);" onclick="newsPaging(' + (pageTotalCount) + ',' + $('#count').val() + ');">' + "맨끝" + '</a>';
         return pagingHtml;
     }
 
     function createPagingNews3(k, page) {
         var pagingHtml = '';
-            pagingHtml += '<a href="javascript:void(0);" onclick="newsPaging(' + k + ',' + $('#count').val() + ')" style="font-weight: bold"> ' + k + ' </a>';
+        pagingHtml += '<a href="javascript:void(0);" onclick="newsPaging(' + k + ',' + $('#count').val() + ')" style="font-weight: bold"> ' + k + ' </a>';
         return pagingHtml;
     }
 
     function createPagingNews4(k, page) {
         var pagingHtml = '';
-            pagingHtml += '<a href="javascript:void(0);" onclick="newsPaging(' + k + ',' + $('#count').val() + ')"> ' + k + ' </a>';
-
+        pagingHtml += '<a href="javascript:void(0);" onclick="newsPaging(' + k + ',' + $('#count').val() + ')"> ' + k + ' </a>';
         return pagingHtml;
     }
 
-    function createHtmlNews(item,cpage,cnt) {
-        var html = '<tr><td>' + item.keyword+ '</td>';
-        html += '<td><a href='+item.link+' target=_blank>' + item.title+ '</a></td>';
+    function createHtmlNews(item, cpage, cnt) {
+        var html = '<tr><td>' + item.keyword + '</td>';
+        html += '<td><a href=' + item.link + ' target=_blank>' + item.title + '</a></td>';
         html += '<td>' + item.description + '</td></tr>';
         return html;
     }
 
-
-    var title='';
+    var title = '';
     //코로나 클릭
     $("#1").on("click", function () {
+        let keyword = $(this).children().val();
+        console.log('코로나 눌렀을때 : ' + keyword);
         $(".pagingDiv").children().remove();
-        let result=changeOptions();
-        let count=result.count;
-        console.log('카운 : '+count);
-        title='<h2>코로나 관련 뉴스</h2>';
+        let result = changeOptions($(this).children().val());
+        let count = result.count;
+        console.log('카운 : ' + count);
+        title = '<h2>코로나 관련 뉴스</h2>';
         $(".header").children().remove();
         $(".header").append(title);
         $("#tbody").children().remove();
@@ -251,8 +250,8 @@
             url: "/api/covid",
             data:
                 {
-                 "currentPage":1,
-                 "count":count
+                    "currentPage": 1,
+                    "count": count
                 },
             success: function (data) {
                 let items = data.items;
@@ -260,16 +259,17 @@
                 let cpage = data.currentPage;
                 let cnt = data.count;
                 let keyword = data.keyword;
-                console.log("받은 keyword : "+keyword);
-                console.log("받은 startNavi : "+data.startNavi);
-                console.log("받은 keyword : "+data.endNavi);
+                console.log("받은 keyword : " + keyword);
+                $('#nowKeyWord').val(keyword);
+                console.log("받은 startNavi : " + data.startNavi);
+                console.log("받은 keyword : " + data.endNavi);
                 let pageTotalCnt = data.pageTotalCount;
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $("#tbody").append(html);
                 } else {
                     for (let i = 0; i < items.length; i++) {
-                        var html = createHtmlNews(items[i],cpage,cnt);
+                        var html = createHtmlNews(items[i], cpage, cnt);
                         $("#tbody").append(html);
                     }
                     if (page.needPrev == true) {
@@ -293,11 +293,13 @@
             }
         })
     });
-
     $("#2").on("click", function () {
-        let result=changeOptions();
-        let count=result.count;
-        title='<h2>자가격리 관련 뉴스</h2>';
+        let keyword = $(this).children().val();
+        console.log('자가격리 눌렀을때 : ' + keyword);
+        $(".pagingDiv").children().remove();
+        let result = changeOptions(keyword);
+        let count = result.count;
+        title = '<h2>자가격리 관련 뉴스</h2>';
         $(".header").children().remove();
         $(".header").append(title);
         $("#tbody").children().remove();
@@ -305,20 +307,22 @@
             url: "/api/quarantine",
             data:
                 {
-                    "currentPage":1,
-                    "count":count},
+                    "currentPage": 1,
+                    "count": count
+                },
             success: function (data) {
                 let items = data.items;
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
+                $('#nowKeyWord').val(keyword);
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $("#tbody").append(html);
                 } else {
                     for (let i = 0; i < items.length; i++) {
-                        var html = createHtmlNews(items[i],cpage,cnt);
+                        var html = createHtmlNews(items[i], cpage, cnt);
                         $("#tbody").append(html);
                     }
                     if (page.needPrev == true) {
@@ -342,11 +346,13 @@
             }
         })
     });
-
     $("#3").on("click", function () {
-        let result=changeOptions();
-        let count=result.count;
-        title='<h2>거리두기 관련 뉴스</h2>';
+        let keyword = $(this).children().val();
+        console.log('거리두기 눌렀을때 : ' + $(this).children().val());
+        $(".pagingDiv").children().remove();
+        let result = changeOptions(keyword);
+        let count = result.count;
+        title = '<h2>거리두기 관련 뉴스</h2>';
         $(".header").children().remove();
         $(".header").append(title);
         $("#tbody").children().remove();
@@ -354,20 +360,22 @@
             url: "/api/distancing",
             data:
                 {
-                    "currentPage":1,
-                    "count":count},
+                    "currentPage": 1,
+                    "count": count
+                },
             success: function (data) {
                 let items = data.items;
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
+                $('#nowKeyWord').val(keyword);
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $("#tbody").append(html);
-                }else {
+                } else {
                     for (let i = 0; i < items.length; i++) {
-                        var html = createHtmlNews(items[i],cpage,cnt);
+                        var html = createHtmlNews(items[i], cpage, cnt);
                         $("#tbody").append(html);
                     }
                     if (page.needPrev == true) {
@@ -391,11 +399,13 @@
             }
         })
     });
-
     $("#4").on("click", function () {
-        let result=changeOptions();
-        let count=result.count;
-        title='<h2>마스크 관련 뉴스</h2>';
+        let keyword = $(this).children().val();
+        $(".pagingDiv").children().remove();
+        console.log('마스크 눌렀을때 : ' + $(this).children().val());
+        let result = changeOptions(keyword);
+        let count = result.count;
+        title = '<h2>마스크 관련 뉴스</h2>';
         $(".header").children().remove();
         $(".header").append(title);
         $("#tbody").children().remove();
@@ -403,23 +413,25 @@
             url: "/api/mask",
             data:
                 {
-                    "currentPage":1,
-                    "count":count},
+                    "currentPage": 1,
+                    "count": count
+                },
             success: function (data) {
                 $(".pagingDiv").children().remove();
                 let items = data.items;
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
-                console.log('start :'+data.startNavi);
-                console.log('start :'+data.endNavi);
+                $('#nowKeyWord').val(keyword);
+                console.log('start :' + data.startNavi);
+                console.log('start :' + data.endNavi);
                 let pageTotalCnt = data.pageTotalCount;
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $("#tbody").append(html);
                 } else {
                     for (let i = 0; i < items.length; i++) {
-                        var html = createHtmlNews(items[i],cpage,cnt);
+                        var html = createHtmlNews(items[i], cpage, cnt);
                         $("#tbody").append(html);
                     }
                     if (page.needPrev == true) {
@@ -443,11 +455,13 @@
             }
         })
     });
-
     $("#5").on("click", function () {
-        let result=changeOptions();
-        let count=result.count;
-        title='<h2>백신 관련 뉴스</h2>';
+        let keyword = $(this).children().val();
+        $(".pagingDiv").children().remove();
+        console.log('백신 눌렀을때 : ' + $(this).children().val());
+        let result = changeOptions(keyword);
+        let count = result.count;
+        title = '<h2>백신 관련 뉴스</h2>';
         $(".header").children().remove();
         $(".header").append(title);
         $("#tbody").children().remove();
@@ -455,20 +469,22 @@
             url: "/api/vaccine",
             data:
                 {
-                    "currentPage":1,
-                    "count":count},
+                    "currentPage": 1,
+                    "count": count
+                },
             success: function (data) {
                 let items = data.items;
                 let page = data.paging;
                 let cpage = data.currentPage;
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
+                $('#nowKeyWord').val(keyword);
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $("#tbody").append(html);
                 } else {
                     for (let i = 0; i < items.length; i++) {
-                        var html = createHtmlNews(items[i],cpage,cnt);
+                        var html = createHtmlNews(items[i], cpage, cnt);
                         $("#tbody").append(html);
                     }
                     if (page.needPrev == true) {
@@ -492,10 +508,9 @@
             }
         })
     });
-
     //전체보기
-    $("#6").on("click",function(){
-       location.reload();
+    $("#6").on("click", function () {
+        location.reload();
     });
 </script>
 </body>

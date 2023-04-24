@@ -10,12 +10,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
-
     <title>상품 상세</title>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
     <link rel="stylesheet" type="text/css" href="/resources/navUtil.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 </head>
 <body>
 <%@ include file="/WEB-INF/views/product/navUtil.jsp" %>
@@ -64,11 +65,15 @@
     <button type="button" id="addItems">담기</button>
 </div>
 
+<%--좋아요--%>
+<button type="button" id="likeBtn"><i class="far fa-thumbs-up" id="like"></i></button>
+<button type="button" id="likeBtn2"><i class="fas fa-thumbs-up" id="like2"></i></button>
 
 <hr>
-<div class="price">
 
-</div>
+<%--<div class="price">--%>
+
+<%--</div>--%>
 
 <button type="button" id="back">상품 목록으로</button>
 <button type="button" id="toCart">장바구니로</button>
@@ -76,8 +81,60 @@
 <form id="frm" method="post" action="/product/cart">
     <input type="hidden" name="id" value="${id}" id="sessionId">
 </form>
-
 <script>
+
+    //좋아요 여부
+    $.ajax({
+        url: '/product/likeYN',
+        type: 'post',
+        data: {
+            "id": $("#id").val(),
+            "pd_seq": $("#pd_seq").val()
+        },
+        success: function (data) {
+            console.log("data : " + data);
+            if (data == 0) {
+                $("#likeBtn2").hide();
+                $("#likeBtn").show();
+            }else{
+                $("#likeBtn2").show();
+                $("#likeBtn").hide();
+            }
+        }
+    });
+
+    $("#likeBtn").click(function () {
+        $.ajax({
+            url: '/product/like',
+            type: 'post',
+            data: {
+                "id": $("#id").val(),
+                "pd_seq": $("#pd_seq").val()
+            },
+            success: function (data) {
+                console.log("data : " + data);
+                $("#likeBtn").hide();
+                $("#likeBtn2").show();
+            }
+        })
+    });
+
+    $("#likeBtn2").click(function () {
+        $.ajax({
+            url: '/product/cancleLike',
+            type: 'post',
+            data: {
+                "id": $("#id").val(),
+                "pd_seq": $("#pd_seq").val()
+            },
+            success: function (data) {
+                console.log("data : " + data);
+                $("#likeBtn").show();
+                $("#likeBtn2").hide();
+            }
+        })
+    });
+
 
     var optionCount = '0';
     var changFlag = false;

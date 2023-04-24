@@ -22,7 +22,6 @@
             <c:forEach var="i" items="${list}">
                 <a href=${i.get("link")}>바로가기</a><br>
                 제목 : ${i.get("title")}<br>
-<%--                ${i.get("description")}<br>--%>
                <hr>
             </c:forEach>
         </c:when>

@@ -683,7 +683,9 @@ public class ApiService {
 
     //뉴스 커뮤니티 페이징2
     public Map<String, Object> newsPaging2(Integer currentPage, Integer count,String keyword) throws Exception {
-        if(keyword == null){
+        System.out.println("APIService : " + keyword);
+        if(keyword == null || keyword == "" || keyword.length() != 0){
+            System.out.println("key  변경");
             keyword="all";
         }
         Map<String, Object> reMap = new HashMap<>();

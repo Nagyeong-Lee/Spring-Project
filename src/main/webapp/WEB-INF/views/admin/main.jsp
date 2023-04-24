@@ -28,12 +28,18 @@
 <br>
 <button type="button" id="logout"><input type="hidden" id="toLogOut" value="${logoutPath}">로그아웃</button>
 <input type="hidden" id="session" name="session" value="${id}">
-
+<br>
+<button type="button" id="register">상품 등록</button>
 <script>
     let path=$("#toLogOut").val();
     let session=$("#session").val();
     $("#logout").on("click",function(){
         location.href=path+session;
+    });
+
+    //상품 등록
+    $("#register").click(function(){
+       location.href='/admin/registerPd';
     });
 </script>
 </body>

@@ -36,7 +36,7 @@
 <input type="hidden" value="${memberDTO.phone}" id="mem_phone">
 <input type="hidden" value="${memberDTO.email}" id="mem_email">
 <div class="cart">
-    <input type="hidden" id="cartLength" value="${cart.size()}">
+    <input type="hidden" id="cartLength" value="${cart.size()}">(
     <table class="cart__list">
         <form>
             <c:choose>
@@ -51,7 +51,7 @@
                     <c:forEach var="i" items="${cart}" varStatus="status">
                         <tr class="itemDiv">
                             <td colspan="2"><a href="/product/detail?pd_seq=${i.get('pd_seq')}"><img
-                                    src="/resources/img/products/${i.get("img")}"></a></td>
+                                    src="/resources/img/products/${i.get("img")}" style="width: 120px; height: 100px;"></a></td>
                             <td colspan="2">
                                 <p class="pdName${status.count}">${i.get("name")}</p>
                                 <p>수량 : ${i.get("count")}</p>

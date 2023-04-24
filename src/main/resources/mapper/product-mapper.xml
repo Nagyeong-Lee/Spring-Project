@@ -43,7 +43,7 @@
         img,
         category
         FROM PRODUCT p WHERE category IN (
-        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ =1)
+        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ =1 ) order by 1
     </select>
 
     <select id="getWOuter" resultType="com.example.Spring_Project.dto.ProductDTO">
@@ -110,7 +110,7 @@
         img,
         category
         FROM PRODUCT p WHERE category IN (
-        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ =6)
+        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ =6) order by 1
     </select>
 
 
@@ -176,7 +176,7 @@
         img,
         category
         FROM PRODUCT p WHERE category IN (
-        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ =11)
+        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ =11) order by 1
     </select>
 
     <select id="getNewOuter" resultType="com.example.Spring_Project.dto.ProductDTO">
@@ -476,5 +476,17 @@
 
     <update id="updOptionStock">
         update options set stock = 0 where option_seq=#{option_seq} and pd_seq = #{pd_seq}
+    </update>
+
+    <select id="likeYN" resultType="Integer">
+        SELECT count(*) FROM likes WHERE id=#{id} AND pd_seq=#{pd_seq} and status = 'Y'
+    </select>
+
+    <insert id="insertLike">
+        INSERT INTO likes values(likes_seq.nextval,#{id},#{pd_seq},'Y')
+    </insert>
+
+    <update id="cancleLike">
+        update likes set status = 'N' where id = #{id} and pd_seq = #{pd_seq}
     </update>
 </mapper>

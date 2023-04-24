@@ -212,6 +212,10 @@ public class AdminController {
         return "/admin/logCheck";
     }
 
+    @RequestMapping("/registerPd")
+    public String registerPd()throws Exception{
+        return "/admin/registerPd";
+    }
 
 }
 

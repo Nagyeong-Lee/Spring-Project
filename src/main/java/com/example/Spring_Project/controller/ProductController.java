@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.util.*;
 
 @Controller
@@ -206,7 +209,7 @@ public class ProductController {
 
             //장바구니 insert 옵션 있을때
             productService.insertCart(id, count, pd_seq, optionList.toString());
-        } else if(map.get("optionList") == null){
+        } else if (map.get("optionList") == null) {
             //옵션 없을때
             productService.insertCartWtOption(id, count, pd_seq);
         }
@@ -315,7 +318,7 @@ public class ProductController {
     public Integer getCount(Integer cart_seq) throws Exception {
         Map<String, Object> cartOption = productService.getCartOption(cart_seq);
         int stock = 0;
-        if(cartOption.size()!=1){
+        if (cartOption.size() != 1) {
             //pd_seq
             Integer pd_seq = Integer.parseInt(cartOption.get("PD_SEQ").toString());
             //옵션
@@ -333,10 +336,10 @@ public class ProductController {
                 list[i] = stock;
             }
             stock = Arrays.stream(list).min().getAsInt();
-        }else if(cartOption.size()==1){
-              Integer pd_seq = productService.getPdSeq(cart_seq);// pd_seq 가져오기
-             stock =  productService.getPdStock(pd_seq);
-            }
+        } else if (cartOption.size() == 1) {
+            Integer pd_seq = productService.getPdSeq(cart_seq);// pd_seq 가져오기
+            stock = productService.getPdStock(pd_seq);
+        }
         return stock;
     }
 
@@ -537,7 +540,7 @@ public class ProductController {
 
                 totalPrice += pdPrice * pdCount;
                 totalSum += pdCount;
-            } else if(cartInfo.get(i).getOptions() == null){
+            } else if (cartInfo.get(i).getOptions() == null) {
                 list = productService.getOptionCategory(cartInfo.get(i).getCart_seq());
                 Map<String, Object> item = new HashMap<>();
                 item.put("id", cartInfo.get(i).getId());
@@ -568,10 +571,10 @@ public class ProductController {
             Integer pd_seq = cartInfo.get(i).getPd_seq();
             Integer count = cartInfo.get(i).getCount();
             if (cartInfo.get(i).getOptions() != null) {
-            Object object = jsonParser.parse(cartInfo.get(i).getOptions());
-            JsonObject jsonObject1 = (JsonObject) object;
-            JsonArray jsonArray1 = (JsonArray) jsonObject1.get("name");
-            //상품 옵션 수량 변경
+                Object object = jsonParser.parse(cartInfo.get(i).getOptions());
+                JsonObject jsonObject1 = (JsonObject) object;
+                JsonArray jsonArray1 = (JsonArray) jsonObject1.get("name");
+                //상품 옵션 수량 변경
                 //상품 수량 변경
                 productService.chgPdCount(pd_seq, count);
                 //상품 수량이 0일때 status n으로
@@ -595,13 +598,13 @@ public class ProductController {
                         productService.updateOptionStatus(optionStock.getOption_seq());
                         productService.chgOptionCount(map);
                         //재고가 음수일떄 0으로 update해주기
-                        productService.updOptionStock(optionStock.getOption_seq(),optionStock.getPd_seq());
+                        productService.updOptionStock(optionStock.getOption_seq(), optionStock.getPd_seq());
                     } else if (optionStock.getStock() > 0) {
                         //옵션 있고 옵션 수량 0이 아닐때
                         productService.chgOptionCount(map);
                     }
                 }
-            }else  if (cartInfo.get(i).getOptions() == null) {
+            } else if (cartInfo.get(i).getOptions() == null) {
                 //옵션 없을때
                 //상품 수량 변경
                 productService.chgPdCount(pd_seq, count);
@@ -619,5 +622,62 @@ public class ProductController {
         model.addAttribute("totalPrice", totalPrice);
         model.addAttribute("totalSum", totalSum);
         return "/product/paymentDetail";
+    }
+
+
+    @ResponseBody
+    @RequestMapping("/likeYN") //좋아요 눌렀는지 여부
+    public Integer likeYN(String id, Integer pd_seq) throws Exception {
+        System.out.println("id = " + id);
+        System.out.println("pd_seq = " + pd_seq);
+        Integer yn = productService.likeYN(id, pd_seq);
+        return yn;
+    }
+
+    @ResponseBody
+    @RequestMapping("/like") //좋아요 테이블 인서트
+    public String like(String id, Integer pd_seq) throws Exception {
+        System.out.println("id = " + id);
+        System.out.println("pd_seq = " + pd_seq);
+        productService.insertLike(id, pd_seq);
+        return "success";
+    }
+
+    @ResponseBody
+    @RequestMapping("/cancleLike") //좋아요 취소
+    public String cancleLike(String id, Integer pd_seq) throws Exception {
+        System.out.println("id = " + id);
+        System.out.println("pd_seq = " + pd_seq);
+        productService.cancleLike(id, pd_seq); //좋아요 취소 상태 n
+        return "success";
+    }
+
+    @PostMapping("/addPd")
+    public String addPd(@RequestParam Map<String, Object> map, HttpServletRequest request) throws Exception {
+        System.out.println("map = " + map);
+        String path = "/resources/img/products/";
+
+        String savePath = request.getServletContext().getRealPath(path); //webapp 폴더
+        File fileSavePath = new File(savePath);
+
+        if (!fileSavePath.exists()) {
+            fileSavePath.mkdir();
+        }
+
+        File file = new File((String) map.get("img"));
+        String oriname =file.getName();
+        String sysname = UUID.randomUUID() + "_" + file.getName();
+
+        System.out.println("oriname = " + oriname);
+        System.out.println("sysname = " + sysname);
+
+        /*Integer pdNextVal = productService.getPdNextVal(); //상품 nextVal
+        //상품 인서트
+        //옵션 인서트
+        */
+//        ProductDTO productDTO = new ProductDTO();
+//        productDTO.setImg(sysname);
+
+        return "";
     }
 }

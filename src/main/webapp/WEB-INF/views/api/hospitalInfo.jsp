@@ -90,7 +90,6 @@
 <input type="hidden" name="holidayY" value="${holidayY}" id="boardHolidayY">
 <input type="hidden" name="holidayN" value="${holidayN}" id="boardHolidayN">
 
-
 <form method="post" action="/api/hospital" id="pagingFrm">
     <input type="hidden" name="currentPage" id="cpage">
     <input type="hidden" name="count" id="cnt">
@@ -347,8 +346,6 @@
             }
         })
     }
-
-
 
     //옵션 선택
     function changeOption() {

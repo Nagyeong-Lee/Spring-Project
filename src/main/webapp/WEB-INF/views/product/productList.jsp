@@ -86,6 +86,7 @@
         .product {
             display: block;
             width: 225px;
+            height: 355px;
             text-align: center;
             text-decoration: none;
             color: black;
@@ -148,7 +149,7 @@
 
 
 <div class="product-list">
-    <c:choose>
+    <%--<c:choose>
         <c:when test="${!empty product}">
             <c:forEach var="i" items="${product}">
                 <div class="product">
@@ -162,7 +163,23 @@
                 </div>
             </c:forEach>
         </c:when>
-    </c:choose>
+    </c:choose>--%>
+
+        <c:choose>
+            <c:when test="${!empty product}">
+                <c:forEach var="i" items="${product}" >
+                        <div class="product">
+                            <img src="/resources/img/products/${i.img}" width="225" class="img" >
+                            <div class="product-name">
+                                <a href="/product/detail?pd_seq=${i.pd_seq}">${i.name}</a>
+                            </div>
+                            <div class="product-price">
+                                <fmt:formatNumber value="${i.price}" pattern="#,###"/>원
+                            </div>
+                       </div>
+                </c:forEach>
+            </c:when>
+        </c:choose>
 </div>
 </body>
 </html>

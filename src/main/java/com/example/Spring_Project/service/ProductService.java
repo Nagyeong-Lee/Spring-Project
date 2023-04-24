@@ -222,4 +222,16 @@ public class ProductService {
     public void updOptionStock(Integer option_seq,Integer pd_seq) throws Exception{
         productMapper.updOptionStock(option_seq,pd_seq);
     }
+
+    public Integer likeYN(String id,Integer pd_seq) throws Exception{
+        return productMapper.likeYN(id,pd_seq);
+    }
+
+    public void insertLike(String id,Integer pd_seq) throws Exception{
+         productMapper.insertLike(id,pd_seq);
+    }
+
+    public void cancleLike(String id,Integer pd_seq) throws Exception{
+         productMapper.cancleLike(id,pd_seq);
+    }
 }

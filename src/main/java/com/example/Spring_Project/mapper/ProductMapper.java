@@ -68,5 +68,7 @@ public interface ProductMapper {
     void chgOptionCount(Map<String,Object>map);
     Integer getPdSeq(@Param("cart_seq") Integer cart_seq);
     void updOptionStock(@Param("option_seq") Integer option_seq,@Param("pd_seq") Integer pd_seq);
-
+    Integer likeYN(@Param("id") String id,@Param("pd_seq") Integer pd_seq);
+    void insertLike(@Param("id") String id,@Param("pd_seq") Integer pd_seq);
+    void cancleLike(@Param("id") String id,@Param("pd_seq") Integer pd_seq);
 }

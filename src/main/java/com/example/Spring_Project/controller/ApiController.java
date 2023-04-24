@@ -366,7 +366,7 @@ public class ApiController {
     }
 
     @RequestMapping("/searchNews")
-    public String searchNews(Model model,Integer currentPage,Integer count) throws Exception {
+    public String searchNews(Model model,Integer currentPage,Integer count,String keyword) throws Exception {
         List<CodeInfoDTO> list = apiService.getCode_info();
         List<PathDTO> pathList = pathService.getNewsPathList();
         Integer start = currentPage * count - (count - 1); //시작 글 번호
@@ -390,7 +390,9 @@ public class ApiController {
         model.addAttribute("pageTotalCount", Integer.parseInt(paging.get("pageTotalCount").toString()));
         model.addAttribute("paging",paging);
         model.addAttribute("count",count);
+        model.addAttribute("keyword",keyword);
         return "/api/news";
+
     }
 
     @ResponseBody
@@ -402,6 +404,7 @@ public class ApiController {
         Integer end = currentPage * count; // 끝 글 번호
         String keyword="코로나";
         List<NewsDTO>list = apiService.getNewsByKeyword(start,end,keyword);
+        System.out.println("list.s\\ = " + list.size());
         Map<String,Object>paging=apiService.newsPaging2(currentPage,count,keyword);
         reMap.put("pageTotalCount", Integer.parseInt(paging.get("pageTotalCount").toString()));
         reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
@@ -514,7 +517,8 @@ public class ApiController {
     @RequestMapping("/repaging")
     public Map<String, Object> repaging(Integer currentPage,Integer count,@RequestParam(required = false) String keyword) throws Exception{
 
-        if(keyword == null){
+        System.out.println("키워드 = " + keyword);
+        if(keyword == null || keyword == "" || keyword.length() == 0){
             keyword="all";
         }
         Map<String, Object> reMap = new HashMap<>();
