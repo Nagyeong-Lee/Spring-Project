@@ -30,11 +30,11 @@
 <%--쿠폰함--%>
 <%--<a href="${list.get(14).path}"><button type="button">${list.get(14).name}</button></a>--%>
 <%--상품목록--%>
-<a href="${list.get(8).path}"><button type="button">${list.get(8).name}</button></a>
+<a href="${list.get(9).path}"><button type="button">${list.get(9).name}</button></a>
 <%--장바구니--%>
 <form name="frm" method="post" action="/product/cart">
     <input type="hidden" name="id" value="${id}" id="id">
-    <button type="submit">${list.get(9).name}</button>
+    <button type="submit">${list.get(10).name}</button>
 </form>
 
 

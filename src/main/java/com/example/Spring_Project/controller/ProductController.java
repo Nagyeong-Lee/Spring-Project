@@ -4,7 +4,6 @@ import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.service.MemberService;
 import com.example.Spring_Project.service.PayService;
 import com.example.Spring_Project.service.ProductService;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -48,19 +47,21 @@ public class ProductController {
     public String detail(Model model, Integer pd_seq) throws Exception {
         ProductDTO productDTO = productService.getProductDetail(pd_seq); //상품 상세 정보
         List<OptionDTO> optionDTO = productService.getOptions(pd_seq); //상품 옵션 정보
-//      List<OptionDTO>optionByCategory = productService.optionByCategory(pd_seq); //상품 카테고리별 옵션 정보
         List<String> category = productService.getCategory(pd_seq);//옵션 카테고리
 
         Map<String, List<OptionListDTO>> optionList = new HashMap();
-        for (Integer i = 0; i < category.size(); i++) {
-            String cg = category.get(i);
-            List<OptionListDTO> getOptionByGroup = productService.getOptionByGroup(category.get(i), pd_seq);  //카테고리별 optionList
-            optionList.put(cg, getOptionByGroup);
+        System.out.println("optionDTO.size() = " + optionDTO.size());
+        if (optionDTO != null) {
+            for (Integer i = 0; i < category.size(); i++) {
+                String cg = category.get(i);
+                List<OptionListDTO> getOptionByGroup = productService.getOptionByGroup(category.get(i), pd_seq);  //카테고리별 optionList
+                optionList.put(cg, getOptionByGroup);
+            }
+            model.addAttribute("productDTO", productDTO);
+            model.addAttribute("optionDTO", optionDTO);
+            model.addAttribute("category", category);
+            model.addAttribute("optionList", optionList);
         }
-        model.addAttribute("productDTO", productDTO);
-        model.addAttribute("optionDTO", optionDTO);
-        model.addAttribute("category", category);
-        model.addAttribute("optionList", optionList);
         return "/product/detail";
     }
 
@@ -180,31 +181,35 @@ public class ProductController {
 //        "id":id,
 //        "pd_seq":pd_seq,
 //        "optionList":integerArray2
-        System.out.println("map : " + map);
-        System.out.println("optionList : " + map.get("optionList").toString());
+
         Integer count = Integer.parseInt(map.get("count").toString());
         String id = map.get("id").toString();
         Integer pd_seq = Integer.parseInt(map.get("pd_seq").toString());
 
-        System.out.println("length : " + map.get("optionList").toString().split(",").length);
-        String[] test = map.get("optionList").toString().split(",");
-        System.out.println("test 배열 길이 : " + map.get("optionList").toString().split(",").length);
-        for (Integer i = 0; i < test.length; i++) {
-            test[i] = map.get("optionList").toString().split(",")[i];
-        }
+        if (map.get("optionList") != null) {
+            System.out.println("length : " + map.get("optionList").toString().split(",").length);
+            String[] test = map.get("optionList").toString().split(",");
+            System.out.println("test 배열 길이 : " + map.get("optionList").toString().split(",").length);
+            for (Integer i = 0; i < test.length; i++) {
+                test[i] = map.get("optionList").toString().split(",")[i];
+            }
 
-        List<String> list = new ArrayList<>();
-        Map<String, List<String>> optionList = new HashMap<>();
-        for (Integer i = 0; i < test.length; i++) {
-            Map<String, Object> options = new HashMap<>();
-            String option_name = test[i].substring(0, test[i].indexOf("("));
-            System.out.println("옵션 이름 : " + option_name);
-            list.add(option_name);
-            optionList.put("name", list);
-        }
+            List<String> list = new ArrayList<>();
+            Map<String, List<String>> optionList = new HashMap<>();
+            for (Integer i = 0; i < test.length; i++) {
+                Map<String, Object> options = new HashMap<>();
+                String option_name = test[i].substring(0, test[i].indexOf("("));
+                System.out.println("옵션 이름 : " + option_name);
+                list.add(option_name);
+                optionList.put("name", list);
+            }
 
-        //장바구니 insert
-        productService.insertCart(id, count, pd_seq, optionList.toString());
+            //장바구니 insert 옵션 있을때
+            productService.insertCart(id, count, pd_seq, optionList.toString());
+        } else if(map.get("optionList") == null){
+            //옵션 없을때
+            productService.insertCartWtOption(id, count, pd_seq);
+        }
 
         return "success";
     }
@@ -223,42 +228,67 @@ public class ProductController {
         Integer totalPrice = 0;  //상품 총 합계
         Integer totalSum = 0;  //상품 총 개수
         for (Integer i = 0; i < cartInfo.size(); i++) {
-            Object object = jsonParser.parse(cartInfo.get(i).getOptions());
-            jsonObject = (JsonObject) object;
-            jsonArray = (JsonArray) jsonObject.get("name");
-            list = productService.getOptionCategory(cartInfo.get(i).getCart_seq());
-            List<Map<String, Object>> optionMap = new ArrayList<>();
-            for (Integer k = 0; k < list.size(); k++) {
-                Map<String, Object> map = new HashMap<>();
-                String category = list.get(k);
-                String option = String.valueOf(jsonArray.get(k)).replace("\"", "");
-                map.put(category, option);
-                optionMap.add(map);
+            if (cartInfo.get(i).getOptions() != null) {  //상품 옵션 있을때
+                Object object = jsonParser.parse(cartInfo.get(i).getOptions());
+                jsonObject = (JsonObject) object;
+                jsonArray = (JsonArray) jsonObject.get("name");
+                list = productService.getOptionCategory(cartInfo.get(i).getCart_seq());
+                List<Map<String, Object>> optionMap = new ArrayList<>();
+                for (Integer k = 0; k < list.size(); k++) {
+                    Map<String, Object> map = new HashMap<>();
+                    String category = list.get(k);
+                    String option = String.valueOf(jsonArray.get(k)).replace("\"", "");
+                    map.put(category, option);
+                    optionMap.add(map);
+                }
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", cartInfo.get(i).getId());
+                item.put("count", cartInfo.get(i).getCount());
+                item.put("cart_seq", cartInfo.get(i).getCart_seq());
+                item.put("status", cartInfo.get(i).getStatus());
+                item.put("pd_seq", cartInfo.get(i).getPd_seq());
+                item.put("name", cartInfo.get(i).getName());
+                item.put("description", cartInfo.get(i).getDescription());
+                item.put("price", cartInfo.get(i).getPrice());
+                item.put("stock", cartInfo.get(i).getStock());
+                item.put("img", cartInfo.get(i).getImg());
+                item.put("category", cartInfo.get(i).getCategory());
+                item.put("option", optionMap);
+                item.put("totalPrice", cartInfo.get(i).getPrice() * cartInfo.get(i).getCount());
+                cart.add(item);
+
+                //돌면서 상품 개수, 상품 가격 가져오고 더하기
+                Integer pdCount = cartInfo.get(i).getCount();
+                Integer pdProduct_seq = cartInfo.get(i).getPd_seq();
+                Integer pdPrice = productService.getPdPrice(pdProduct_seq);
+
+                totalPrice += pdPrice * pdCount;
+                totalSum += pdCount;
+            } else {
+                list = productService.getOptionCategory(cartInfo.get(i).getCart_seq());
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", cartInfo.get(i).getId());
+                item.put("count", cartInfo.get(i).getCount());
+                item.put("cart_seq", cartInfo.get(i).getCart_seq());
+                item.put("status", cartInfo.get(i).getStatus());
+                item.put("pd_seq", cartInfo.get(i).getPd_seq());
+                item.put("name", cartInfo.get(i).getName());
+                item.put("description", cartInfo.get(i).getDescription());
+                item.put("price", cartInfo.get(i).getPrice());
+                item.put("stock", cartInfo.get(i).getStock());
+                item.put("img", cartInfo.get(i).getImg());
+                item.put("category", cartInfo.get(i).getCategory());
+                item.put("totalPrice", cartInfo.get(i).getPrice() * cartInfo.get(i).getCount());
+                cart.add(item);
+
+                //돌면서 상품 개수, 상품 가격 가져오고 더하기
+                Integer pdCount = cartInfo.get(i).getCount();
+                Integer pdProduct_seq = cartInfo.get(i).getPd_seq();
+                Integer pdPrice = productService.getPdPrice(pdProduct_seq);
+
+                totalPrice += pdPrice * pdCount;
+                totalSum += pdCount;
             }
-            Map<String, Object> item = new HashMap<>();
-            item.put("id", cartInfo.get(i).getId());
-            item.put("count", cartInfo.get(i).getCount());
-            item.put("cart_seq", cartInfo.get(i).getCart_seq());
-            item.put("status", cartInfo.get(i).getStatus());
-            item.put("pd_seq", cartInfo.get(i).getPd_seq());
-            item.put("name", cartInfo.get(i).getName());
-            item.put("description", cartInfo.get(i).getDescription());
-            item.put("price", cartInfo.get(i).getPrice());
-            item.put("stock", cartInfo.get(i).getStock());
-            item.put("img", cartInfo.get(i).getImg());
-            item.put("category", cartInfo.get(i).getCategory());
-            item.put("option", optionMap);
-            item.put("totalPrice", cartInfo.get(i).getPrice() * cartInfo.get(i).getCount());
-            cart.add(item);
-
-            //돌면서 상품 개수, 상품 가격 가져오고 더하기
-            Integer pdCount = cartInfo.get(i).getCount();
-            Integer pdProduct_seq = cartInfo.get(i).getPd_seq();
-            Integer pdPrice = productService.getPdPrice(pdProduct_seq);
-
-            totalPrice += pdPrice * pdCount;
-            totalSum += pdCount;
-
         }
 
         //m_seq 가져오기
@@ -284,23 +314,29 @@ public class ProductController {
     @RequestMapping("/count")
     public Integer getCount(Integer cart_seq) throws Exception {
         Map<String, Object> cartOption = productService.getCartOption(cart_seq);
-
-        //pd_seq
-        Integer pd_seq = Integer.parseInt(cartOption.get("PD_SEQ").toString());
-        //옵션
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = (JsonObject) jsonParser.parse((String) cartOption.get("OPTIONS"));
-        JsonArray jsonArray = (JsonArray) jsonObject.get("name");
-
-        int[] list = new int[jsonArray.size()];
         int stock = 0;
-        for (int i = 0; i < jsonArray.size(); i++) {
-            int index = jsonArray.get(i).toString().indexOf("\"");
-            String option = jsonArray.get(i).toString().substring(index + 1, jsonArray.get(i).toString().length() - 1);
-            stock = productService.getOptionCount(pd_seq, option);
-            list[i] = stock;
-        }
-        stock = Arrays.stream(list).min().getAsInt();
+        if(cartOption.size()!=1){
+            //pd_seq
+            Integer pd_seq = Integer.parseInt(cartOption.get("PD_SEQ").toString());
+            //옵션
+            JsonParser jsonParser = new JsonParser();
+            JsonObject jsonObject = (JsonObject) jsonParser.parse((String) cartOption.get("OPTIONS"));
+
+            JsonArray jsonArray = (JsonArray) jsonObject.get("name");
+
+            int[] list = new int[jsonArray.size()];
+
+            for (int i = 0; i < jsonArray.size(); i++) {
+                int index = jsonArray.get(i).toString().indexOf("\"");
+                String option = jsonArray.get(i).toString().substring(index + 1, jsonArray.get(i).toString().length() - 1);
+                stock = productService.getOptionCount(pd_seq, option);
+                list[i] = stock;
+            }
+            stock = Arrays.stream(list).min().getAsInt();
+        }else if(cartOption.size()==1){
+              Integer pd_seq = productService.getPdSeq(cart_seq);// pd_seq 가져오기
+             stock =  productService.getPdStock(pd_seq);
+            }
         return stock;
     }
 
@@ -332,41 +368,67 @@ public class ProductController {
         Integer totalPrice = 0;  //상품 총 합계
         Integer totalSum = 0;  //상품 총 개수
         for (Integer i = 0; i < cartInfo.size(); i++) {
-            Object object = jsonParser.parse(cartInfo.get(i).getOptions());
-            jsonObject = (JsonObject) object;
-            jsonArray = (JsonArray) jsonObject.get("name");
-            list = productService.getOptionCategory(cartInfo.get(i).getCart_seq());
-            List<Map<String, Object>> optionMap = new ArrayList<>();
-            for (Integer k = 0; k < list.size(); k++) {
-                Map<String, Object> map = new HashMap<>();
-                String category = list.get(k);
-                String option = String.valueOf(jsonArray.get(k)).replace("\"", "");
-                map.put(category, option);
-                optionMap.add(map);
+            if (cartInfo.get(i).getOptions() != null) {
+                Object object = jsonParser.parse(cartInfo.get(i).getOptions());
+                jsonObject = (JsonObject) object;
+                jsonArray = (JsonArray) jsonObject.get("name");
+                list = productService.getOptionCategory(cartInfo.get(i).getCart_seq());
+                List<Map<String, Object>> optionMap = new ArrayList<>();
+                for (Integer k = 0; k < list.size(); k++) {
+                    Map<String, Object> map = new HashMap<>();
+                    String category = list.get(k);
+                    String option = String.valueOf(jsonArray.get(k)).replace("\"", "");
+                    map.put(category, option);
+                    optionMap.add(map);
+                }
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", cartInfo.get(i).getId());
+                item.put("count", cartInfo.get(i).getCount());
+                item.put("cart_seq", cartInfo.get(i).getCart_seq());
+                item.put("status", cartInfo.get(i).getStatus());
+                item.put("pd_seq", cartInfo.get(i).getPd_seq());
+                item.put("name", cartInfo.get(i).getName());
+                item.put("description", cartInfo.get(i).getDescription());
+                item.put("price", cartInfo.get(i).getPrice());
+                item.put("stock", cartInfo.get(i).getStock());
+                item.put("img", cartInfo.get(i).getImg());
+                item.put("category", cartInfo.get(i).getCategory());
+                item.put("option", optionMap);
+                item.put("totalPrice", cartInfo.get(i).getPrice() * cartInfo.get(i).getCount());
+                cart.add(item);
+
+                //돌면서 상품 개수, 상품 가격 가져오고 더하기
+                Integer pdCount = cartInfo.get(i).getCount();
+                Integer pdProduct_seq = cartInfo.get(i).getPd_seq();
+                Integer pdPrice = productService.getPdPrice(pdProduct_seq);
+
+                totalPrice += pdPrice * pdCount;
+                totalSum += pdCount;
+            } else {
+                list = productService.getOptionCategory(cartInfo.get(i).getCart_seq());
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", cartInfo.get(i).getId());
+                item.put("count", cartInfo.get(i).getCount());
+                item.put("cart_seq", cartInfo.get(i).getCart_seq());
+                item.put("status", cartInfo.get(i).getStatus());
+                item.put("pd_seq", cartInfo.get(i).getPd_seq());
+                item.put("name", cartInfo.get(i).getName());
+                item.put("description", cartInfo.get(i).getDescription());
+                item.put("price", cartInfo.get(i).getPrice());
+                item.put("stock", cartInfo.get(i).getStock());
+                item.put("img", cartInfo.get(i).getImg());
+                item.put("category", cartInfo.get(i).getCategory());
+                item.put("totalPrice", cartInfo.get(i).getPrice() * cartInfo.get(i).getCount());
+                cart.add(item);
+
+                //돌면서 상품 개수, 상품 가격 가져오고 더하기
+                Integer pdCount = cartInfo.get(i).getCount();
+                Integer pdProduct_seq = cartInfo.get(i).getPd_seq();
+                Integer pdPrice = productService.getPdPrice(pdProduct_seq);
+
+                totalPrice += pdPrice * pdCount;
+                totalSum += pdCount;
             }
-            Map<String, Object> item = new HashMap<>();
-            item.put("id", cartInfo.get(i).getId());
-            item.put("count", cartInfo.get(i).getCount());
-            item.put("cart_seq", cartInfo.get(i).getCart_seq());
-            item.put("status", cartInfo.get(i).getStatus());
-            item.put("pd_seq", cartInfo.get(i).getPd_seq());
-            item.put("name", cartInfo.get(i).getName());
-            item.put("description", cartInfo.get(i).getDescription());
-            item.put("price", cartInfo.get(i).getPrice());
-            item.put("stock", cartInfo.get(i).getStock());
-            item.put("img", cartInfo.get(i).getImg());
-            item.put("category", cartInfo.get(i).getCategory());
-            item.put("option", optionMap);
-            item.put("totalPrice", cartInfo.get(i).getPrice() * cartInfo.get(i).getCount());
-            cart.add(item);
-
-            //돌면서 상품 개수, 상품 가격 가져오고 더하기
-            Integer pdCount = cartInfo.get(i).getCount();
-            Integer pdProduct_seq = cartInfo.get(i).getPd_seq();
-            Integer pdPrice = productService.getPdPrice(pdProduct_seq);
-
-            totalPrice += pdPrice * pdCount;
-            totalSum += pdCount;
         }
         Map<String, Object> deliAddress = new HashMap<>();
         String name = productService.getName(data);//이름
@@ -412,7 +474,8 @@ public class ProductController {
     //선택삭제 테스트
     @ResponseBody
     @RequestMapping("/cart/delCart")
-    public String deleteItem(@RequestParam(value = "deleteCartSeq[]") List<Integer> deleteCartSeq) throws Exception {
+    public String deleteItem(@RequestParam(value = "deleteCartSeq[]") List<Integer> deleteCartSeq) throws
+            Exception {
         System.out.println("deleteCartSeq = " + deleteCartSeq);
         for (Integer i : deleteCartSeq) {
             productService.deleteItem(i);
@@ -474,37 +537,78 @@ public class ProductController {
 
                 totalPrice += pdPrice * pdCount;
                 totalSum += pdCount;
+            } else if(cartInfo.get(i).getOptions() == null){
+                list = productService.getOptionCategory(cartInfo.get(i).getCart_seq());
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", cartInfo.get(i).getId());
+                item.put("count", cartInfo.get(i).getCount());
+                item.put("cart_seq", cartInfo.get(i).getCart_seq());
+                item.put("status", cartInfo.get(i).getStatus());
+                item.put("pd_seq", cartInfo.get(i).getPd_seq());
+                item.put("name", cartInfo.get(i).getName());
+                item.put("description", cartInfo.get(i).getDescription());
+                item.put("price", cartInfo.get(i).getPrice());
+                item.put("stock", cartInfo.get(i).getStock());
+                item.put("img", cartInfo.get(i).getImg());
+                item.put("category", cartInfo.get(i).getCategory());
+                item.put("totalPrice", cartInfo.get(i).getPrice() * cartInfo.get(i).getCount());
+                cart.add(item);
+
+                //돌면서 상품 개수, 상품 가격 가져오고 더하기
+                Integer pdCount = cartInfo.get(i).getCount();
+                Integer pdProduct_seq = cartInfo.get(i).getPd_seq();
+                Integer pdPrice = productService.getPdPrice(pdProduct_seq);
+
+                totalPrice += pdPrice * pdCount;
+                totalSum += pdCount;
             }
         }
-
         //상품 수량, 옵션 수량 변경
         for (int i = 0; i < cartInfo.size(); i++) {
+            Integer pd_seq = cartInfo.get(i).getPd_seq();
+            Integer count = cartInfo.get(i).getCount();
             if (cartInfo.get(i).getOptions() != null) {
-                Integer pd_seq = cartInfo.get(i).getPd_seq();
-                Integer count = cartInfo.get(i).getCount();
-                Object object = jsonParser.parse(cartInfo.get(i).getOptions());
-                JsonObject jsonObject1 = (JsonObject) object;
-                JsonArray jsonArray1 = (JsonArray) jsonObject1.get("name");
+            Object object = jsonParser.parse(cartInfo.get(i).getOptions());
+            JsonObject jsonObject1 = (JsonObject) object;
+            JsonArray jsonArray1 = (JsonArray) jsonObject1.get("name");
+            //상품 옵션 수량 변경
                 //상품 수량 변경
-                productService.chgPdCount(pd_seq,count);
+                productService.chgPdCount(pd_seq, count);
                 //상품 수량이 0일때 status n으로
                 Integer pdStock = productService.getPdStock(pd_seq);
-                if(pdStock<=0){
+                if (pdStock <= 0) {
                     productService.updatePdStatus(pd_seq);
                 }
-                //상품 옵션 수량 변경
-                for(int k=0; k<jsonArray1.size(); k++){
-                    String option = String.valueOf(jsonArray.get(k)).replace("\"", "");
-                    Map<String,Object>map = new HashMap<>();
-                    map.put("pd_seq",pd_seq);
-                    map.put("option",option);
-                    map.put("count",count);
-                    productService.chgOptionCount(map);
+                for (int k = 0; k < jsonArray1.size(); k++) {
+                    System.out.println("jsonArray1.size() = " + jsonArray1.size());
+                    String option = String.valueOf(jsonArray1.get(k)).replace("\"", "");
+                    System.out.println("option = " + option);
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("pd_seq", pd_seq);
+                    map.put("option", option);
+                    map.put("count", count);
                     //상품 수량이 0일때 status n으로
                     OptionDTO optionStock = productService.getOptionStock(map);
-                    if(optionStock.getStock()<=0){
+                    System.out.println("mapseq= " + map.get("pd_seq"));
+                    if (optionStock.getStock() <= 0) {
+                        //옵션 있고 옵션 수량이 0일때
                         productService.updateOptionStatus(optionStock.getOption_seq());
+                        productService.chgOptionCount(map);
+                        //재고가 음수일떄 0으로 update해주기
+                        productService.updOptionStock(optionStock.getOption_seq(),optionStock.getPd_seq());
+                    } else if (optionStock.getStock() > 0) {
+                        //옵션 있고 옵션 수량 0이 아닐때
+                        productService.chgOptionCount(map);
                     }
+                }
+            }else  if (cartInfo.get(i).getOptions() == null) {
+                //옵션 없을때
+                //상품 수량 변경
+                productService.chgPdCount(pd_seq, count);
+                //상품 수량이 0일때 status n으로
+                Integer pdStock = productService.getPdStock(pd_seq);
+                if (pdStock <= 0) {
+                    productService.updatePdStatus(pd_seq);
                 }
             }
         }

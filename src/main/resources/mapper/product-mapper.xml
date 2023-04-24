@@ -285,8 +285,20 @@
         )
     </insert>
 
+    <insert id="insertCartWtOption" >
+        insert into cart
+        values(
+            cart_seq.nextval,
+            #{id},
+            #{count},
+            #{pd_seq},
+            null
+            ,'Y'
+        )
+    </insert>
+
     <update id="minusOption">
-        update option set stock=stock-1 where pd_seq=#{pd_seq} and name=#{optionName}
+        update options set stock=stock-1 where pd_seq=#{pd_seq} and name=#{optionName}
     </update>
 
     <update id="minusPd">
@@ -455,6 +467,14 @@
     </update>
 
     <update id="chgOptionCount">
-        update option set stock = stock - #{count} where pd_seq = #{pd_seq} and name = #{option}
+        update options set stock = stock - #{count} where pd_seq = #{pd_seq} and name = #{option}
+    </update>
+
+    <select id="getPdSeq" resultType="Integer">
+        SELECT pd_seq FROM cart WHERE cart_seq=#{cart_seq}
+    </select>
+
+    <update id="updOptionStock">
+        update options set stock = 0 where option_seq=#{option_seq} and pd_seq = #{pd_seq}
     </update>
 </mapper>

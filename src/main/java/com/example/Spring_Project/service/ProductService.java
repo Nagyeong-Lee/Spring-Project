@@ -107,6 +107,10 @@ public class ProductService {
         productMapper.insertCart(id, count, pd_seq, optionList);
     }
 
+    public void insertCartWtOption(String id, Integer count, Integer pd_seq) throws Exception {
+        productMapper.insertCartWtOption(id, count, pd_seq);
+    }
+
     public void minusOption(Integer pd_seq, String optionName) throws Exception {
         productMapper.minusOption(pd_seq, optionName);
     }
@@ -211,4 +215,11 @@ public class ProductService {
         productMapper.chgOptionCount(map);
     }
 
+    public Integer getPdSeq(Integer cart_seq) throws Exception{
+        return productMapper.getPdSeq(cart_seq);
+    }
+
+    public void updOptionStock(Integer option_seq,Integer pd_seq) throws Exception{
+        productMapper.updOptionStock(option_seq,pd_seq);
+    }
 }

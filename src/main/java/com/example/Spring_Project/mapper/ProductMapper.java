@@ -37,7 +37,8 @@ public interface ProductMapper {
     List<String> getCategory(@Param("pd_seq") Integer pd_seq); //상품 옵션 정보 가져오기
     List<String> optionByCategory(@Param("pd_seq") Integer pd_seq); //상품 카테고리별 옵션 정보
     List<OptionListDTO> getOptionByGroup(@Param("category") String category,@Param("pd_seq") Integer pd_seq); //상품 카테고리별 옵션 정보
-    void insertCart(@Param("id") String id,@Param("count") Integer count,@Param("pd_seq") Integer pd_seq, @Param("optionList")String optionList);
+    void insertCart(@Param("id") String id,@Param("count") Integer count,@Param("pd_seq") Integer pd_seq, @Param("optionList")String optionList); //옵션 있을때
+    void insertCartWtOption(@Param("id") String id,@Param("count") Integer count,@Param("pd_seq") Integer pd_seq); //옵션 없을때
     void minusOption(@Param("pd_seq") Integer pd_seq,@Param("optionName") String optionName);
     void minusPd(@Param("pd_seq") Integer pd_seq);
     OptionDTO getOptionStock(Map<String,Object>map);
@@ -65,5 +66,7 @@ public interface ProductMapper {
     void updCartStatus(@Param("id") String id);
     void chgPdCount(@Param("pd_seq")  Integer pd_seq,@Param("count") Integer count);
     void chgOptionCount(Map<String,Object>map);
+    Integer getPdSeq(@Param("cart_seq") Integer cart_seq);
+    void updOptionStock(@Param("option_seq") Integer option_seq,@Param("pd_seq") Integer pd_seq);
 
 }

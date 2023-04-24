@@ -37,7 +37,6 @@
     <th>키워드</th>
     <th>제목</th>
     <th>설명</th>
-    <th>링크</th>
     </thead>
     <tbody id="tbody">
     <c:forEach var="i" items="${newsList}">

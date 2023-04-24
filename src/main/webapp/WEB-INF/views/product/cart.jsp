@@ -45,7 +45,7 @@
                     <c:forEach var="i" items="${cart}">
                         <tr class="itemDiv">
                             <td colspan="2"><a href="/product/detail?pd_seq=${i.get('pd_seq')}"><img
-                                    src="/resources/img/products/${i.get("img")}"></a></td>
+                                    src="/resources/img/products/${i.get("img")}" style="width: 120px; height: 100px;"></a></td>
                             <td colspan="2">
                                 <p>${i.get("name")}</p>
                                 <p>수량 : ${i.get("count")}</p>
@@ -189,6 +189,9 @@
                         $("#total").remove();
                         $("#sum").remove();
                         $("#discount").remove();
+                        $("#thead").remove();
+                        var html = '<tr><td colspan="5">장바구니가 비었습니다.</td></tr>';
+                        $("thead").append(html);
                     }
                 }
             });
@@ -283,6 +286,7 @@
         $("#hiddenTotalPreviousTotalPrice").val(changedTotalPrice);
         $("#total").text('총 합계 : ' + changedTotalPrice.toLocaleString() + '원');
         $("#hiddenTotalPrice").val(changedTotalPrice); //변경된 상품 가격
+
         $.ajax({
             url: '/product/count',
             type: 'post',

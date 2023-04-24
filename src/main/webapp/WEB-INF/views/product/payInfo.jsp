@@ -174,31 +174,31 @@
 
     //결제 하기 클릭
     $("#pay").on("click", function () {
-        // requestPay();
-        var msg = '결제가 완료되었습니다.';
-        //결제 내역으로 이동
-        let frm = document.createElement("form");
-        frm.setAttribute("method","post");
-        frm.setAttribute("action","/product/paymentDetails");
-        let newInput = document.createElement("input");
-        let newInput2 = document.createElement("input");
-        let newInput3 = document.createElement("input");
-        newInput.setAttribute("type","hidden");
-        newInput.setAttribute("value",$("#session").val());
-        newInput.setAttribute("name","id");
-
-        newInput2.setAttribute("type","hidden");
-        newInput2.setAttribute("value",$("#totalMoney").val());
-        newInput2.setAttribute("name","price");
-
-        newInput3.setAttribute("type","hidden");
-        newInput3.setAttribute("value",$("#cartInfo").val());
-        newInput3.setAttribute("name","carts");
-        frm.appendChild(newInput);
-        frm.appendChild(newInput2);
-        frm.appendChild(newInput3);
-        document.body.appendChild(frm);
-        frm.submit();
+        requestPay();
+        // var msg = '결제가 완료되었습니다.';
+        // //결제 내역으로 이동
+        // let frm = document.createElement("form");
+        // frm.setAttribute("method","post");
+        // frm.setAttribute("action","/product/paymentDetails");
+        // let newInput = document.createElement("input");
+        // let newInput2 = document.createElement("input");
+        // let newInput3 = document.createElement("input");
+        // newInput.setAttribute("type","hidden");
+        // newInput.setAttribute("value",$("#session").val());
+        // newInput.setAttribute("name","id");
+        //
+        // newInput2.setAttribute("type","hidden");
+        // newInput2.setAttribute("value",$("#totalMoney").val());
+        // newInput2.setAttribute("name","price");
+        //
+        // newInput3.setAttribute("type","hidden");
+        // newInput3.setAttribute("value",$("#cartInfo").val());
+        // newInput3.setAttribute("name","carts");
+        // frm.appendChild(newInput);
+        // frm.appendChild(newInput2);
+        // frm.appendChild(newInput3);
+        // document.body.appendChild(frm);
+        // frm.submit();
     });
 
     var IMP = window.IMP;
@@ -221,7 +221,7 @@
             pay_method: 'card',
             merchant_uid: 'merchant_' + new Date().getTime(),
             name: title,
-            amount: 100,
+            amount: price,
             buyer_email: email,
             buyer_name: name,
             buyer_tel: phone,
@@ -230,28 +230,29 @@
 
         IMP.request_pay(payInfo, function (rsp) {
             if (rsp.success) {
-                // var msg = '결제가 완료되었습니다.';
-                // //결제 내역으로 이동
-                // let frm = document.createElement("form");
-                // frm.setAttribute("method","post");
-                // frm.setAttribute("action","/product/paymentDetails");
-                // let newInput = document.createElement("input");
-                // let newInput2 = document.createElement("input");
-                // newInput.setAttribute("type","hidden");
-                // newInput.setAttribute("value",$("#session").val());
-                // newInput.setAttribute("name","id");
-                //
-                // newInput2.setAttribute("type","hidden");
-                // newInput2.setAttribute("value",$("#totalMoney").val());
-                // newInput2.setAttribute("name","price");
-                // frm.appendChild(newInput);
-                // frm.appendChild(newInput2);
-                // document.body.appendChild(frm);
-                // frm.submit();
+                var msg = '결제가 완료되었습니다.';
+                //결제 내역으로 이동
+                let frm = document.createElement("form");
+                frm.setAttribute("method","post");
+                frm.setAttribute("action","/product/paymentDetails");
+                let newInput = document.createElement("input");
+                let newInput2 = document.createElement("input");
+                newInput.setAttribute("type","hidden");
+                newInput.setAttribute("value",$("#session").val());
+                newInput.setAttribute("name","id");
+
+                newInput2.setAttribute("type","hidden");
+                newInput2.setAttribute("value",$("#totalMoney").val());
+                newInput2.setAttribute("name","price");
+                frm.appendChild(newInput);
+                frm.appendChild(newInput2);
+                document.body.appendChild(frm);
+                frm.submit();
+                alert(msg);
             } else {
                 // var msg = '결제에 실패했습니다.';
             }
-            alert(msg);
+            // alert(msg);
         });
     }
 </script>
