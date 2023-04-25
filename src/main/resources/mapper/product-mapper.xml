@@ -15,6 +15,7 @@
         img,
         category
         from product
+        where status = 'Y'
     </select>
 
     <select id="getProductDetail" resultType="com.example.Spring_Project.dto.ProductDTO">
@@ -489,4 +490,67 @@
     <update id="cancleLike">
         update likes set status = 'N' where id = #{id} and pd_seq = #{pd_seq}
     </update>
+
+    <select id="getCategorySeq" resultType="Integer">
+        SELECT
+            category_seq
+        FROM CATEGORY WHERE PARENT_CATEGORY_SEQ  = (SELECT CATEGORY_SEQ  FROM category WHERE name = #{category1}) AND name = #{category2}
+    </select>
+
+    <insert id="insertPd">
+        insert into
+        product
+        values(
+        pd_seq.nextval,
+        #{name},
+        #{description},
+        #{price},
+        #{stock},
+        'Y',
+        #{img},
+        #{category}
+        )
+    </insert>
+
+    <select id="getPdCurrVal" resultType="Integer">
+        select pd_seq.currval from dual
+    </select>
+
+    <insert id="insertOption">
+        insert into
+        options
+        values(
+          option_seq.nextval,
+          #{category},
+          #{name},
+          #{stock},
+          'Y',
+          #{pd_seq}
+        )
+    </insert>
+
+    <select id="isOptExist" resultType="Integer">
+        SELECT count(*) FROM OPTIONS WHERE pd_seq=#{pd_seq}
+    </select>
+
+    <select id="getOptByGroup" resultType="com.example.Spring_Project.dto.OptionDTO">
+        SELECT CATEGORY,name,stock FROM OPTIONS WHERE pd_seq = #{pd_seq} GROUP BY CATEGORY,name,stock ORDER BY 1
+    </select>
+
+    <update id="deletePd">
+        update product set status = 'N' where pd_seq = #{pd_seq}
+    </update>
+
+    <select id="getPdInfo" resultType="com.example.Spring_Project.dto.ProductDTO">
+        select
+            name,
+            description,
+            price,
+            stock,
+            status,
+            img,
+            category
+        from product
+        where pd_seq = #{pd_seq}
+    </select>
 </mapper>

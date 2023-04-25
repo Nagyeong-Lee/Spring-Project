@@ -112,59 +112,9 @@
     </style>
 </head>
 <body>
-
-
-<ul class="menu">
-    <li>
-        <a href="/product/list">전체 상품</a>
-    </li>
-    <li>
-        <a href="/product/women">여성</a>
-        <ul class="submenu">
-            <li><a href="/product/women/outer">아우터</a></li>
-            <li><a href="/product/women/top">상의</a></li>
-            <li><a href="/product/women/pants">하의</a></li>
-            <li><a href="/product/women/accessories">악세사리</a></li>
-        </ul>
-    </li>
-    <li>
-        <a href="/product/men">남성</a>
-        <ul class="submenu">
-            <li><a href="/product/men/outer">아우터</a></li>
-            <li><a href="/product/men/top">상의</a></li>
-            <li><a href="/product/men/pants">하의</a></li>
-            <li><a href="/product/men/accessories">악세사리</a></li>
-        </ul>
-    </li>
-    <li>
-        <a href="/product/new">신상품</a>
-        <ul class="submenu">
-            <li><a href="/product/new/outer">아우터</a></li>
-            <li><a href="/product/new/top">상의</a></li>
-            <li><a href="/product/new/pants">하의</a></li>
-            <li><a href="/product/new/accessories">악세사리</a></li>
-        </ul>
-    </li>
-</ul>
-
+<%@ include file="/WEB-INF/views/product/navUtil.jsp" %>
 
 <div class="product-list">
-    <%--<c:choose>
-        <c:when test="${!empty product}">
-            <c:forEach var="i" items="${product}">
-                <div class="product">
-                    <img src="/resources/img/products/${i.img}" width="225" class="img">
-                    <div class="product-name">
-                        <a href="/product/detail?pd_seq=${i.pd_seq}">${i.name}</a>
-                    </div>
-                    <div class="product-price">
-                           <fmt:formatNumber value="${i.price}" pattern="#,###"/>원
-                    </div>
-                </div>
-            </c:forEach>
-        </c:when>
-    </c:choose>--%>
-
         <c:choose>
             <c:when test="${!empty product}">
                 <c:forEach var="i" items="${product}" >
@@ -181,5 +131,20 @@
             </c:when>
         </c:choose>
 </div>
+
+<script>
+    function toCart(){
+        let newForm = document.createElement("form");
+        newForm.setAttribute("method","post");
+        newForm.setAttribute("action","/product/cart");
+        let newInput = document.createElement("input");
+        newInput.setAttribute("type","hidden");
+        newInput.setAttribute("name","id");
+        newInput.setAttribute("value",$("#session").val());
+        newForm.appendChild(newInput);
+        document.body.append(newForm);
+        newForm.submit();
+    }
+</script>
 </body>
 </html>

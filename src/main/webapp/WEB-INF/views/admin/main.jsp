@@ -30,6 +30,7 @@
 <input type="hidden" id="session" name="session" value="${id}">
 <br>
 <button type="button" id="register">상품 등록</button>
+<button type="button" id="registeredPd">등록한 상품 조회</button>
 <script>
     let path=$("#toLogOut").val();
     let session=$("#session").val();
@@ -40,6 +41,11 @@
     //상품 등록
     $("#register").click(function(){
        location.href='/admin/registerPd';
+    });
+
+    //등록한 상품 조회
+    $("#registeredPd").click(function(){
+       location.href='/admin/registeredPd';
     });
 </script>
 </body>

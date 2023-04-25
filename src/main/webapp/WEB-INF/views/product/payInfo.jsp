@@ -36,7 +36,7 @@
 <input type="hidden" value="${memberDTO.phone}" id="mem_phone">
 <input type="hidden" value="${memberDTO.email}" id="mem_email">
 <div class="cart">
-    <input type="hidden" id="cartLength" value="${cart.size()}">(
+    <input type="hidden" id="cartLength" value="${cart.size()}">
     <table class="cart__list">
         <form>
             <c:choose>
@@ -100,8 +100,21 @@
     </div>
 </div>
 
-
 <script>
+
+        function toCart(){ //장바구니로 이동
+        let newForm = document.createElement("form");
+        newForm.setAttribute("method","post");
+        newForm.setAttribute("action","/product/cart");
+        let newInput = document.createElement("input");
+        newInput.setAttribute("type","hidden");
+        newInput.setAttribute("name","id");
+        newInput.setAttribute("value",$("#session").val());
+        newForm.appendChild(newInput);
+        document.body.append(newForm);
+        newForm.submit();
+    }
+
 
     $("#continue").on("click", function () {
         location.href = "/product/list";
@@ -248,11 +261,10 @@
                 frm.appendChild(newInput2);
                 document.body.appendChild(frm);
                 frm.submit();
-                alert(msg);
             } else {
-                // var msg = '결제에 실패했습니다.';
+                var msg = '결제에 실패했습니다.';
             }
-            // alert(msg);
+            alert(msg);
         });
     }
 </script>

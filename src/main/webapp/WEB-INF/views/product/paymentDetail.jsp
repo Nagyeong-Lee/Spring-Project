@@ -68,6 +68,19 @@
   </div>
 </div>
 <script>
+  function toCart(){
+    let newForm = document.createElement("form");
+    newForm.setAttribute("method","post");
+    newForm.setAttribute("action","/product/cart");
+    let newInput = document.createElement("input");
+    newInput.setAttribute("type","hidden");
+    newInput.setAttribute("name","id");
+    newInput.setAttribute("value",$("#session").val());
+    newForm.appendChild(newInput);
+    document.body.append(newForm);
+    newForm.submit();
+  }
+
   $("#continue").on("click", function () {
     location.href = "/product/list";
   });

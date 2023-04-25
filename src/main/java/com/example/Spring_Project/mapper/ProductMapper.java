@@ -71,4 +71,12 @@ public interface ProductMapper {
     Integer likeYN(@Param("id") String id,@Param("pd_seq") Integer pd_seq);
     void insertLike(@Param("id") String id,@Param("pd_seq") Integer pd_seq);
     void cancleLike(@Param("id") String id,@Param("pd_seq") Integer pd_seq);
+    Integer getCategorySeq(@Param("category1") String category1,@Param("category2") String category2);
+    void insertPd(Map<String,Object>param);
+    Integer getPdCurrVal();
+    void insertOption(Map<String,Object>map1);
+    Integer isOptExist(@Param("pd_seq") Integer pd_seq);
+    List<OptionDTO> getOptByGroup(@Param("pd_seq") Integer pd_seq);
+    void deletePd(@Param("pd_seq") Integer pd_seq);
+    ProductDTO getPdInfo(@Param("pd_seq")Integer pd_seq);
 }

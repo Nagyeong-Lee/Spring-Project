@@ -8,6 +8,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.querydsl.binding.QuerydslPredicate;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -624,7 +626,6 @@ public class ProductController {
         return "/product/paymentDetail";
     }
 
-
     @ResponseBody
     @RequestMapping("/likeYN") //좋아요 눌렀는지 여부
     public Integer likeYN(String id, Integer pd_seq) throws Exception {
@@ -652,7 +653,8 @@ public class ProductController {
         return "success";
     }
 
-    @PostMapping("/addPd")
+    @ResponseBody
+    @PostMapping("/addPd")  //관리자 상품 추가
     public String addPd(@RequestParam Map<String, Object> map, HttpServletRequest request) throws Exception {
         System.out.println("map = " + map);
         String path = "/resources/img/products/";
@@ -665,19 +667,67 @@ public class ProductController {
         }
 
         File file = new File((String) map.get("img"));
-        String oriname =file.getName();
+        String oriname = file.getName();
         String sysname = UUID.randomUUID() + "_" + file.getName();
 
-        System.out.println("oriname = " + oriname);
-        System.out.println("sysname = " + sysname);
+        //option json으로 파싱
+        JsonParser jsonParser = new JsonParser();
+        Object object = jsonParser.parse((String) map.get("option"));
+        JsonArray optionArray = (JsonArray) object;
+        System.out.println("ㅅㅂ : "+optionArray);
 
-        /*Integer pdNextVal = productService.getPdNextVal(); //상품 nextVal
-        //상품 인서트
-        //옵션 인서트
-        */
-//        ProductDTO productDTO = new ProductDTO();
-//        productDTO.setImg(sysname);
+        // 상품 인서트
+        String name = map.get("name").toString();
+        String description = map.get("description").toString();
+        Integer stock = Integer.parseInt(map.get("stock").toString());
+        Integer price = Integer.parseInt(map.get("price").toString());
+        String category1 = map.get("category1").toString();
+        String category2 = map.get("category2").toString();
+        //상품 인서트할때 category_seq 가져오기
+        Integer category_seq = productService.getCategorySeq(category1, category2);
 
-        return "";
+        Map<String, Object> param = new HashMap<>();
+        param.put("name", name);
+        param.put("description", description);
+        param.put("price", price);
+        param.put("stock", stock);
+        param.put("img", sysname);
+        param.put("category", category_seq);
+
+        productService.insertPd(param);
+
+        //옵션이 없을때
+        if (optionArray.size() == 0) {
+            System.out.println("옵션 없음");
+        } else { //옵션이 있을때
+            for (int i = 0; i < optionArray.size(); i++) {
+                System.out.println("옵션 있을때 사이즈 : "+optionArray.size());
+                Object object1 = jsonParser.parse(optionArray.get(i).toString());
+                System.out.println("object1 : "+object1);
+                JsonObject jsonObject = (JsonObject)object1;
+                String category = jsonObject.get("category").toString().replace("\"","");
+                String optionName = jsonObject.get("name").toString().replace("\"","");
+                Integer optionStock = Integer.parseInt(jsonObject.get("stock").toString().replace("\"",""));
+
+                Integer currVal = productService.getPdCurrVal(); // 상품  currval 가져오기
+
+                Map<String, Object> map1 = new HashMap<>();
+                map1.put("category", category);
+                map1.put("name", optionName);
+                map1.put("stock", optionStock);
+                map1.put("pd_seq", currVal);
+                System.out.println("map1 : " + map1);
+                productService.insertOption(map1);///옵션 인서트
+            }
+        }
+        return "success";
+    }
+
+
+    @ResponseBody
+    @RequestMapping("/deletePd")   // 등록한 상품 삭제
+    public String deletePd(Integer pd_seq) throws Exception{
+        productService.deletePd(pd_seq);
+        return "success";
     }
 }

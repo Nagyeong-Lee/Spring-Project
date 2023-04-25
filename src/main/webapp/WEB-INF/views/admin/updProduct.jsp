@@ -1,8 +1,8 @@
 <%--
   Created by IntelliJ IDEA.
   User: weaver-gram-0020
-  Date: 2023-04-24
-  Time: 오후 5:44
+  Date: 2023-04-25
+  Time: 오후 6:22
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -10,20 +10,23 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
-    <title>상품 등록</title>
+    <title>상품 수정</title>
     <!--jQuery-->
     <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
 </head>
 <body>
 <div>
-    <h3>상품 등록</h3>
+    <h3>상품 수정</h3>
     <form action="/product/addPd" method="post" enctype="multipart/form-data" id="frm">
-        <div>상품명 : <input type="text" id="name" name="name"></div>
-        <div>상품 설명 : <input type="text" id="description" name="description"></div>
-        <div>가격 : <input type="number" min="1" id="price" name="price"></div>
-        <div>재고 : <input type="number" min="1" id="stock" name="stock"></div>
-        <div>이미지 : <input type="file" id="img" name="img"></div>
+        <div>상품명 : <input type="text" id="name" name="name" value="${map.productDTO.name}" readonly="readonly"></div>
+        <div>상품 설명 : <input type="text" id="description" name="description" value="${map.productDTO.description}"
+                            readonly="readonly"></div>
+        <div>가격 : <input type="number" min="1" id="price" name="price" value="${map.productDTO.price}"
+                         readonly="readonly"></div>
+        <div>재고 : <input type="number" min="1" id="stock" name="stock" value="${map.productDTO.stock}"
+                         readonly="readonly"></div>
+        <div>이미지 : <input type="file" id="img" name="img" value="${map.productDTO.img}"></div>
         <input type="hidden" id="img_name" name="img_name">
         카테고리
         <div id="mainCategory">
@@ -41,12 +44,24 @@
                 <option value="악세사리">악세사리</option>
             </select>
         </div>
+        <c:choose>
+            <c:when test="${!empty map.optionDTOList}">
+                <c:forEach var="i" items="${map.optionDTOList}">
+                    <div class="optionBox">카테고리 : <input type="text" class="optionCategory"><br>
+                    이름 : <input type="text" class="optionName"><br>
+                    재고:<input type="number" min="1" class="optionStock">
+                    <button type="button" class="delBtn" onclick="remove(' + key + ')">삭제</button>
+                    <button type="button" class="addOptionBtn">추가하기</button>
+                    </div><br>;
+                </c:forEach>
+            </c:when>
+        </c:choose>
         <div class="btn">
             <button type="button" id="addOption">옵션 추가</button>
         </div>
 
-        <button type="button" id="addPdBtn">상품 등록</button>
-        <button type="button" id="reset">초기화</button>
+        <button type="button" id="updBtn">상품 수정하기</button>
+        <button type="button" id="reset">취소</button>
     </form>
 </div>
 
@@ -174,7 +189,7 @@
             return false;
         }
 
-        for(let i = 0;  i<optionArr.length; i++){
+        for (let i = 0; i < optionArr.length; i++) {
             var param = Object.fromEntries(optionArr[i]);
             testArray.push(param);
         }
@@ -219,6 +234,14 @@
                 }
             }
         });
+    });
+
+
+    //상품 수정하기
+    $("#updBtn").on("click", function () {
+        let completeBtn = '<button type="button" id="completeBtn">수정완료</button>';
+        $(this).remove();
+        $("#reset").before(completeBtn);
     });
 </script>
 </body>

@@ -2,6 +2,8 @@ package com.example.Spring_Project.controller;
 
 import com.example.Spring_Project.dto.LogDTO;
 import com.example.Spring_Project.dto.MemberDTO;
+import com.example.Spring_Project.dto.OptionDTO;
+import com.example.Spring_Project.dto.ProductDTO;
 import com.example.Spring_Project.service.*;
 import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +51,9 @@ public class AdminController {
 
     @Autowired
     private BoardService boardService;
+
+    @Autowired
+    private ProductService productService;
 
     @RequestMapping("/main")  //회원 리스트 출력
     public String toAdminMain(Model model) throws Exception {
@@ -213,10 +218,42 @@ public class AdminController {
     }
 
     @RequestMapping("/registerPd")
-    public String registerPd()throws Exception{
+    public String registerPd() throws Exception {
         return "/admin/registerPd";
     }
 
+    //등록한 상품 조회
+    @RequestMapping("/registeredPd")
+    public String registeredPd(Model model) throws Exception {
+        Map<String, Object> optList = new HashMap<>();
+        List<ProductDTO> list = productService.getProducts(); //상품정보
+        optList.put("list", list);
+        for (int i = 0; i < list.size(); i++) {
+            Integer isOptExist = productService.isOptExist(list.get(i).getPd_seq()); //상품의 옵션이 있는지 확인
+            if (isOptExist != 0) { //상품의 옵션이 있을 경우
+                List<OptionDTO> optionDTOList = productService.getOptByGroup(list.get(i).getPd_seq());
+                optList.put("optionDTOList", optionDTOList);
+            }
+        }
+        System.out.println("map : " + optList);
+        model.addAttribute("optList", optList);
+        return "/admin/registeredPd";
+    }
+
+    @RequestMapping("/updProduct")
+    public String updProduct(Model model, Integer pd_seq) throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        ProductDTO productDTO = productService.getPdInfo(pd_seq); //상품정보
+        map.put("productDTO", productDTO);
+        Integer isOptExist = productService.isOptExist(pd_seq); //상품의 옵션이 있는지 확인
+        if (isOptExist != 0) { //상품의 옵션이 있을 경우
+            List<OptionDTO> optionDTOList = productService.getOptByGroup(pd_seq);
+            map.put("optionDTOList", optionDTOList);
+        }
+        model.addAttribute("map",map);
+        System.out.println("수정클릭 시 map : "+map);
+        return "/admin/updProduct";
+    }
 }
 
 

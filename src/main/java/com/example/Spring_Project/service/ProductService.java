@@ -2,7 +2,10 @@ package com.example.Spring_Project.service;
 
 import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.mapper.ProductMapper;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.relational.core.sql.In;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -119,7 +122,7 @@ public class ProductService {
         productMapper.minusPd(pd_seq);
     }
 
-    public OptionDTO getOptionStock(Map<String,Object>map) throws Exception {
+    public OptionDTO getOptionStock(Map<String, Object> map) throws Exception {
         return productMapper.getOptionStock(map);
     }
 
@@ -211,27 +214,59 @@ public class ProductService {
         productMapper.chgPdCount(pd_seq, count);
     }
 
-    public void chgOptionCount(Map<String,Object>map) throws Exception {  //상품 옵션 수량 변경
+    public void chgOptionCount(Map<String, Object> map) throws Exception {  //상품 옵션 수량 변경
         productMapper.chgOptionCount(map);
     }
 
-    public Integer getPdSeq(Integer cart_seq) throws Exception{
+    public Integer getPdSeq(Integer cart_seq) throws Exception {
         return productMapper.getPdSeq(cart_seq);
     }
 
-    public void updOptionStock(Integer option_seq,Integer pd_seq) throws Exception{
-        productMapper.updOptionStock(option_seq,pd_seq);
+    public void updOptionStock(Integer option_seq, Integer pd_seq) throws Exception {
+        productMapper.updOptionStock(option_seq, pd_seq);
     }
 
-    public Integer likeYN(String id,Integer pd_seq) throws Exception{
-        return productMapper.likeYN(id,pd_seq);
+    public Integer likeYN(String id, Integer pd_seq) throws Exception {
+        return productMapper.likeYN(id, pd_seq);
     }
 
-    public void insertLike(String id,Integer pd_seq) throws Exception{
-         productMapper.insertLike(id,pd_seq);
+    public void insertLike(String id, Integer pd_seq) throws Exception {
+        productMapper.insertLike(id, pd_seq);
     }
 
-    public void cancleLike(String id,Integer pd_seq) throws Exception{
-         productMapper.cancleLike(id,pd_seq);
+    public void cancleLike(String id, Integer pd_seq) throws Exception {
+        productMapper.cancleLike(id, pd_seq);
+    }
+
+    public Integer getCategorySeq(String category1, String category2) throws Exception {
+        return productMapper.getCategorySeq(category1, category2);
+    }
+
+    public void insertPd(Map<String, Object> param) throws Exception {
+        productMapper.insertPd(param);
+    }
+
+    public Integer getPdCurrVal() throws Exception {
+        return productMapper.getPdCurrVal();
+    }
+
+    public void insertOption(Map<String, Object> map1) throws Exception {
+        productMapper.insertOption(map1);
+    }
+
+    public Integer isOptExist(Integer pd_seq) throws Exception {
+        return productMapper.isOptExist(pd_seq);
+    }
+
+    public List<OptionDTO> getOptByGroup(Integer pd_seq) throws Exception {
+        return productMapper.getOptByGroup(pd_seq);
+    }
+
+    public void deletePd(Integer pd_seq) throws Exception{
+        productMapper.deletePd(pd_seq);
+    }
+
+    public ProductDTO getPdInfo(Integer pd_seq) throws Exception{
+        return productMapper.getPdInfo(pd_seq);
     }
 }

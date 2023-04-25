@@ -10,6 +10,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
+<input type="hidden" value="${id}" id="session">
+<div style="text-align: right">
+    <a href="/member/logout?id=${id}">로그아웃</a>
+    <a href="#" onclick="toCart()">장바구니로</a>
+</div>
 <ul class="menu">
     <li>
         <a href="/product/list">전체 상품</a>
