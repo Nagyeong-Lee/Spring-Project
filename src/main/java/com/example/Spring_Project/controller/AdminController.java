@@ -1,9 +1,6 @@
 package com.example.Spring_Project.controller;
 
-import com.example.Spring_Project.dto.LogDTO;
-import com.example.Spring_Project.dto.MemberDTO;
-import com.example.Spring_Project.dto.OptionDTO;
-import com.example.Spring_Project.dto.ProductDTO;
+import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.service.*;
 import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
@@ -245,6 +242,12 @@ public class AdminController {
         Map<String, Object> map = new HashMap<>();
         ProductDTO productDTO = productService.getPdInfo(pd_seq); //상품정보
         map.put("productDTO", productDTO);
+
+        CategoryDTO pdSubCategory = productService.getPdCategory(productDTO.getCategory());//상품 상위 카테고리 (상의/하의)
+        CategoryDTO pdMainCategory = productService.getPdSubCategory(pdSubCategory.getParent_category_seq());//상품 하위 카테고리 (남성/여성)
+        map.put("pdSubCategory",pdSubCategory.getName());
+        map.put("pdMainCategory",pdMainCategory.getName());
+
         Integer isOptExist = productService.isOptExist(pd_seq); //상품의 옵션이 있는지 확인
         if (isOptExist != 0) { //상품의 옵션이 있을 경우
             List<OptionDTO> optionDTOList = productService.getOptByGroup(pd_seq);

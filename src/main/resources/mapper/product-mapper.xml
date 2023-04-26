@@ -242,7 +242,7 @@
         status,
         pd_seq
         from options
-        where pd_seq=#{pd_seq}
+        where pd_seq=#{pd_seq} and status = 'Y'
     </select>
 
 
@@ -251,7 +251,7 @@
         FROM (
         SELECT category,count(*)
         FROM OPTIONS
-        WHERE pd_seq=#{pd_seq}
+        WHERE pd_seq=#{pd_seq} and status = 'Y'
         GROUP BY category)
     </select>
 
@@ -260,7 +260,7 @@
         FROM (
         SELECT category,count(*)
         FROM OPTIONS
-        WHERE pd_seq=#{pd_seq}
+        WHERE pd_seq=#{pd_seq} and status = 'Y'
         GROUP BY category)
     </select>
 
@@ -271,7 +271,7 @@
             status,
             stock
         FROM OPTIONS
-        WHERE category= #{category} and pd_seq=#{pd_seq}
+        WHERE category= #{category} and pd_seq=#{pd_seq} and status = 'Y'
     </select>
 
     <insert id="insertCart" >
@@ -534,7 +534,7 @@
     </select>
 
     <select id="getOptByGroup" resultType="com.example.Spring_Project.dto.OptionDTO">
-        SELECT CATEGORY,name,stock FROM OPTIONS WHERE pd_seq = #{pd_seq} GROUP BY CATEGORY,name,stock ORDER BY 1
+        SELECT CATEGORY,name,stock,option_seq FROM OPTIONS WHERE pd_seq = #{pd_seq} and status = 'Y' GROUP BY CATEGORY,name,stock,option_seq ORDER BY 4
     </select>
 
     <update id="deletePd">
@@ -543,6 +543,7 @@
 
     <select id="getPdInfo" resultType="com.example.Spring_Project.dto.ProductDTO">
         select
+            pd_seq,
             name,
             description,
             price,
@@ -552,5 +553,88 @@
             category
         from product
         where pd_seq = #{pd_seq}
+    </select>
+
+    <select id="getPdCategory" resultType="com.example.Spring_Project.dto.CategoryDTO">
+        SELECT
+            category_seq,
+            name,
+            parent_category_seq
+        FROM category WHERE CATEGORY_SEQ = #{category_seq}
+    </select>
+
+    <select id="getPdSubCategory" resultType="com.example.Spring_Project.dto.CategoryDTO">
+        SELECT
+            category_seq,
+            name,
+            parent_category_seq
+        FROM category WHERE CATEGORY_SEQ = #{category_seq}
+    </select>
+
+    <update id="updateImg">
+        update product set img=#{img} where pd_seq = #{pd_seq}
+    </update>
+
+    <update id="updPdImg">
+        update product set img = #{img} where pd_seq = #{pd_seq}
+    </update>
+    <update id="updProduct">
+        update product
+        set
+            name = #{name},
+            description = #{description},
+            price = #{price},
+            stock = ${stock},
+            category = #{category_seq}
+        where
+        pd_seq = #{pd_seq}
+    </update>
+
+    <update id="updOptionStatus">
+        update options
+        set status = 'N'
+        where option_seq = #{option_seq}
+    </update>
+
+    <select id="getNextOptSeq" resultType="Integer">
+        select option_seq.nextval from dual
+    </select>
+
+    <insert id="insertNewOptions">
+        insert into
+        options
+        values(
+            #{option_seq},
+            #{category},
+            #{option_name},
+            #{option_stock},
+            'Y',
+            #{pd_seq}
+        )
+    </insert>
+
+    <update id="updOptions">
+        update options
+        set
+            category = #{category},
+            name = #{option_name},
+            stock =#{option_stock},
+            status = 'Y',
+        where  option_seq = #{option_seq}
+    </update>
+
+    <select id="getProductsByKeyword" resultType="com.example.Spring_Project.dto.ProductDTO">
+        select
+            pd_seq,
+            name,
+            description,
+            price,
+            stock,
+            status,
+            img,
+            category
+        from product
+        where status = 'Y'
+        and name like '%'||#{keyword}||'%'
     </select>
 </mapper>

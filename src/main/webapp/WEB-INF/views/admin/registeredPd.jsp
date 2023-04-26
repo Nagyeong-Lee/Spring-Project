@@ -17,14 +17,8 @@
 </head>
 <body>
 <h3>등록한 상품 조회</h3>
+<button type="button" id="toList">관리자 메인페이지로</button>
 <table>
-    <thead>
-    <th>이미지</th>
-    <th>상품명</th>
-    <th colspan="5">옵션 정보</th>
-    <th>가격</th>
-    <th>재고</th>
-    </thead>
     <tbody>
     <c:choose>
         <c:when test="${!empty optList}">
@@ -53,6 +47,11 @@
 </table>
 
 <script>
+    //관리자 메인으로
+    $("#toList").click(function () {
+        location.href='/admin/main';
+    });
+
     // 상품 삭제 클릭 시
     $(".delBtn").on("click", function () {
         $this = $(this);

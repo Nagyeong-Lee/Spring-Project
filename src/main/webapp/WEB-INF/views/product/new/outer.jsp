@@ -20,6 +20,11 @@
 <%@ include file="/WEB-INF/views/product/navUtil.jsp" %>
 <%@ include file="/WEB-INF/views/product/pdListUtil.jsp"%>
 <script>
+  $("#search").on("click",function(){
+    let keyword = $("#keyword").val();
+    location.href='/product/searchPd?keyword='+keyword;
+  });
+
   function toCart(){
     let newForm = document.createElement("form");
     newForm.setAttribute("method","post");

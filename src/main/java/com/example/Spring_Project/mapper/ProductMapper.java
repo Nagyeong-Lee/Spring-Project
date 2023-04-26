@@ -79,4 +79,13 @@ public interface ProductMapper {
     List<OptionDTO> getOptByGroup(@Param("pd_seq") Integer pd_seq);
     void deletePd(@Param("pd_seq") Integer pd_seq);
     ProductDTO getPdInfo(@Param("pd_seq")Integer pd_seq);
+    CategoryDTO getPdCategory(@Param("category_seq") Integer category);
+    CategoryDTO getPdSubCategory(Integer category);
+    void updProduct(Map<String,Object>param);
+    void updPdImg(@Param("pd_seq") Integer pd_seq,@Param("img") String sysname);
+    void updOptionStatus(@Param("option_seq") Integer option_seq);
+    Integer getNextOptSeq();
+    void insertNewOptions(Map<String,Object>insertParam);
+    void updOptions(Map<String, Object> updParam);
+    List<ProductDTO> getProductsByKeyword(@Param("keyword") String keyword);
 }

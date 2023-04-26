@@ -11,6 +11,10 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <input type="hidden" value="${id}" id="session">
+<span style="margin-left: 400px;">
+    <input type="text" id="keyword" name="keyword">
+    <button type="button" id="search">찾기</button>
+</span>
 <div style="text-align: right">
     <a href="/member/logout?id=${id}">로그아웃</a>
     <a href="#" onclick="toCart()">장바구니로</a>
@@ -47,3 +51,4 @@
         </ul>
     </li>
 </ul>
+

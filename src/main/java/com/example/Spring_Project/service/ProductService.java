@@ -269,4 +269,40 @@ public class ProductService {
     public ProductDTO getPdInfo(Integer pd_seq) throws Exception{
         return productMapper.getPdInfo(pd_seq);
     }
+
+    public CategoryDTO getPdCategory(Integer category) throws Exception{
+        return productMapper.getPdCategory(category);
+    }
+
+    public CategoryDTO getPdSubCategory(Integer category) throws Exception {
+        return productMapper.getPdSubCategory(category);
+    }
+
+    public void updPdImg(Integer pd_seq,String sysname)throws Exception{
+        productMapper.updPdImg(pd_seq,sysname);
+    }
+
+    public void updProduct(Map<String,Object>param) throws Exception{
+        productMapper.updProduct(param);
+    }
+
+    public void updOptionStatus(Integer option_seq) throws Exception{
+        productMapper.updOptionStatus(option_seq);
+    }
+
+    public Integer getNextOptSeq() throws Exception{
+        return productMapper.getNextOptSeq();
+    }
+
+    public void insertNewOptions(Map<String,Object>insertParam) throws Exception{
+        productMapper.insertNewOptions(insertParam);
+    }
+
+    public void updOptions(Map<String, Object> updParam) throws Exception {
+        productMapper.updOptions(updParam);
+    }
+
+    public List<ProductDTO> getProductsByKeyword(String keyword) throws Exception{
+        return productMapper.getProductsByKeyword(keyword);
+    }
 }

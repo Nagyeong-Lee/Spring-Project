@@ -83,6 +83,11 @@
 </form>
 <script>
 
+    $("#search").on("click",function(){
+        let keyword = $("#keyword").val();
+        location.href='/product/searchPd?keyword='+keyword;
+    });
+
     function toCart(){
         let newForm = document.createElement("form");
         newForm.setAttribute("method","post");

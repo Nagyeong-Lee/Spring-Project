@@ -12,15 +12,16 @@ import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Controller
@@ -56,7 +57,7 @@ public class ProductController {
 
         Map<String, List<OptionListDTO>> optionList = new HashMap();
         System.out.println("optionDTO.size() = " + optionDTO.size());
-        if (optionDTO != null) {
+        if (optionDTO != null || optionDTO.size() != 0) {
             for (Integer i = 0; i < category.size(); i++) {
                 String cg = category.get(i);
                 List<OptionListDTO> getOptionByGroup = productService.getOptionByGroup(category.get(i), pd_seq);  //카테고리별 optionList
@@ -655,7 +656,8 @@ public class ProductController {
 
     @ResponseBody
     @PostMapping("/addPd")  //관리자 상품 추가
-    public String addPd(@RequestParam Map<String, Object> map, HttpServletRequest request) throws Exception {
+    public String addPd(@RequestParam Map<String, Object> map, HttpServletRequest request,
+                        @RequestPart(value = "img", required = false) MultipartFile img) throws Exception {
         System.out.println("map = " + map);
         String path = "/resources/img/products/";
 
@@ -666,15 +668,10 @@ public class ProductController {
             fileSavePath.mkdir();
         }
 
-        File file = new File((String) map.get("img"));
-        String oriname = file.getName();
-        String sysname = UUID.randomUUID() + "_" + file.getName();
+        String oriname = img.getOriginalFilename();
+        String sysname = UUID.randomUUID() + "_" + oriname;
 
-        //option json으로 파싱
-        JsonParser jsonParser = new JsonParser();
-        Object object = jsonParser.parse((String) map.get("option"));
-        JsonArray optionArray = (JsonArray) object;
-        System.out.println("ㅅㅂ : "+optionArray);
+        img.transferTo(new File(fileSavePath + "/" + sysname));
 
         // 상품 인서트
         String name = map.get("name").toString();
@@ -696,18 +693,24 @@ public class ProductController {
 
         productService.insertPd(param);
 
+        System.out.println(map.get("option").toString().length());
+        //option json으로 파싱
+        JsonParser jsonParser = new JsonParser();
+        Object object = jsonParser.parse((String) map.get("option"));
+        JsonArray optionArray = (JsonArray) object;
+
         //옵션이 없을때
         if (optionArray.size() == 0) {
             System.out.println("옵션 없음");
         } else { //옵션이 있을때
             for (int i = 0; i < optionArray.size(); i++) {
-                System.out.println("옵션 있을때 사이즈 : "+optionArray.size());
+                System.out.println("옵션 있을때 사이즈 : " + optionArray.size());
                 Object object1 = jsonParser.parse(optionArray.get(i).toString());
-                System.out.println("object1 : "+object1);
-                JsonObject jsonObject = (JsonObject)object1;
-                String category = jsonObject.get("category").toString().replace("\"","");
-                String optionName = jsonObject.get("name").toString().replace("\"","");
-                Integer optionStock = Integer.parseInt(jsonObject.get("stock").toString().replace("\"",""));
+                System.out.println("object1 : " + object1);
+                JsonObject jsonObject = (JsonObject) object1;
+                String category = jsonObject.get("category").toString().replace("\"", "");
+                String optionName = jsonObject.get("name").toString().replace("\"", "");
+                Integer optionStock = Integer.parseInt(jsonObject.get("stock").toString().replace("\"", ""));
 
                 Integer currVal = productService.getPdCurrVal(); // 상품  currval 가져오기
 
@@ -726,8 +729,129 @@ public class ProductController {
 
     @ResponseBody
     @RequestMapping("/deletePd")   // 등록한 상품 삭제
-    public String deletePd(Integer pd_seq) throws Exception{
+    public String deletePd(Integer pd_seq) throws Exception {
         productService.deletePd(pd_seq);
         return "success";
     }
+
+    @ResponseBody
+    @RequestMapping("/updProduct") //관리자 상품 수정
+    public String updProduct(@RequestParam Map<String, Object> map, HttpServletRequest request,
+                             @RequestPart(value = "img", required = false) MultipartFile img) throws Exception {
+        //상품 업데이트
+        String name = map.get("name").toString();
+        String description = map.get("description").toString();
+        Integer stock = Integer.parseInt(map.get("stock").toString());
+        Integer price = Integer.parseInt(map.get("price").toString());
+        String category1 = map.get("category1").toString();
+        String category2 = map.get("category2").toString();
+        Integer pd_seq = Integer.parseInt(map.get("pd_seq").toString());
+
+        System.out.println("map.get(\"img\").toString() : " + map.get("img").toString());
+        Map<String, Object> param = new HashMap<>();
+        if (map.get("img").toString().replace("\"", "").length() != 0) { //이미지 변경 될때
+
+            System.out.println("map = " + map);
+            String path = "/resources/img/products/";
+
+            String savePath = request.getServletContext().getRealPath(path); //webapp 폴더
+            File fileSavePath = new File(savePath);
+
+            if (!fileSavePath.exists()) {
+                fileSavePath.mkdir();
+            }
+
+            String oriname = img.getOriginalFilename();
+            String sysname = UUID.randomUUID() + "_" + oriname;
+
+            img.transferTo(new File(fileSavePath + "/" + sysname));
+
+            System.out.println("sysname : " + sysname);
+            productService.updPdImg(pd_seq, sysname);
+        }
+
+        //상품 업데이트할때 category_seq 가져오기
+        Integer category_seq = productService.getCategorySeq(category1, category2);
+        param.put("name", name);
+        param.put("description", description);
+        param.put("stock", stock);
+        param.put("price", price);
+        param.put("category_seq", category_seq);
+        param.put("pd_seq", pd_seq);
+        productService.updProduct(param);//상품 정보 update
+
+        /*옵션 업데이트*/
+        //deleteOpt json으로 파싱
+        JsonParser jsonParser = new JsonParser();
+        Object object = jsonParser.parse((String) map.get("deleteOpt"));
+        JsonArray deleteOpt = (JsonArray) object;
+        System.out.println("deleteOpt : " + deleteOpt);
+        System.out.println("deleteOpt.size() : " + deleteOpt.size());
+        //돌면서 삭제
+        if (deleteOpt.size() != 0) {
+            for (int i = 0; i < deleteOpt.size(); i++) {
+                Object object1 = jsonParser.parse(String.valueOf(deleteOpt.get(i)));
+                JsonObject jsonObject = (JsonObject) object1;
+                Integer option_seq = Integer.parseInt(String.valueOf(jsonObject.get("key")));
+                productService.updOptionStatus(option_seq); //옵션 삭제
+            }
+        }
+
+        //updOpt json으로 파싱
+        Object object1 = jsonParser.parse((String) map.get("updOpt"));
+        JsonArray updOpt = (JsonArray) object1;
+        System.out.println("updOpt : " + updOpt);
+        System.out.println("updOpt.size() : " + updOpt.size());
+        //돌면서 수정
+        if (updOpt.size() != 0) {
+            for (int i = 0; i < updOpt.size(); i++) {
+                Object object2 = jsonParser.parse(String.valueOf(updOpt.get(i)));
+                JsonObject jsonObject = (JsonObject) object2;
+                Integer option_seq = Integer.parseInt(String.valueOf(jsonObject.get("stock")).replace("\"", ""));
+                String category = String.valueOf(jsonObject.get("category")).replace("\"", "");
+                String option_name = String.valueOf(jsonObject.get("name")).replace("\"", "");
+                Integer option_stock = Integer.parseInt(String.valueOf(jsonObject.get("stock")).replace("\"", ""));
+                Map<String, Object> updParam = new HashMap<>();
+                updParam.put("category", category);
+                updParam.put("option_name", option_name);
+                updParam.put("option_stock", option_stock);
+                updParam.put("option_seq", option_seq);
+                productService.updOptions(updParam); //새로운 옵션 추가
+            }
+        }
+
+        //newOpt json으로 파싱
+        Object object2 = jsonParser.parse((String) map.get("newOpt"));
+        JsonArray newOpt = (JsonArray) object2;
+        System.out.println("newOpt : " + newOpt);
+        System.out.println(" newOpt.size() : " + newOpt.size());
+        //돌면서 추가
+        if (newOpt.size() != 0) {
+            for (int i = 0; i < newOpt.size(); i++) {
+                Object object3 = jsonParser.parse(String.valueOf(newOpt.get(i)));
+                JsonObject jsonObject = (JsonObject) object3;
+                Integer option_seq = productService.getNextOptSeq(); //option_seq nextval가져오기
+                String category = String.valueOf(jsonObject.get("category")).replace("\"", "");
+                String option_name = String.valueOf(jsonObject.get("name")).replace("\"", "");
+                Integer option_stock = Integer.parseInt(String.valueOf(jsonObject.get("stock")).replace("\"", ""));
+                Map<String, Object> insertParam = new HashMap<>();
+                insertParam.put("pd_seq", pd_seq);
+                insertParam.put("category", category);
+                insertParam.put("option_name", option_name);
+                insertParam.put("option_stock", option_stock);
+                insertParam.put("option_seq", option_seq);
+                productService.insertNewOptions(insertParam); //새로운 옵션 추가
+            }
+        }
+        return "success";
+    }
+
+    //상품 검색
+    @RequestMapping("/searchPd")
+    public String searchPd(String keyword, Model model) throws Exception {
+        List<ProductDTO> product = productService.getProductsByKeyword(keyword);
+        model.addAttribute("product", product);
+        return "/product/productList";
+    }
+
 }

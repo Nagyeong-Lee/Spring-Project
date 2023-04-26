@@ -102,6 +102,11 @@
 
 <script>
 
+    $("#search").on("click",function(){
+        let keyword = $("#keyword").val();
+        location.href='/product/searchPd?keyword='+keyword;
+    });
+
         function toCart(){ //장바구니로 이동
         let newForm = document.createElement("form");
         newForm.setAttribute("method","post");

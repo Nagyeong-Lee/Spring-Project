@@ -111,10 +111,10 @@ public class ApiService {
         }
     }
 
-    public  void  covid() throws Exception {
+    public void covid() throws Exception {
         //        String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
 
-        String keyword="코로나";
+        String keyword = "코로나";
         URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
                 .path("v1/search/news.json")
                 .queryParam("query", keyword)
@@ -152,7 +152,7 @@ public class ApiService {
     }
 
     public void quarantine() throws Exception {
-        String keyword="자가격리";
+        String keyword = "자가격리";
         URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
                 .path("v1/search/news.json")
                 .queryParam("query", keyword)
@@ -232,7 +232,7 @@ public class ApiService {
 
     public void mask() throws Exception {
         //        String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
-        String keyword="마스크";
+        String keyword = "마스크";
         URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
                 .path("v1/search/news.json")
                 .queryParam("query", keyword)
@@ -271,7 +271,7 @@ public class ApiService {
     }
 
     public void vaccine() throws Exception {
-        String keyword="백신";
+        String keyword = "백신";
         URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
                 .path("v1/search/news.json")
                 .queryParam("query", keyword)
@@ -360,8 +360,8 @@ public class ApiService {
     }
 
     //merge into
-    public synchronized void upd(List<Map<String, Object>> news) throws Exception{
-        System.out.println("upd : "+news);
+    public synchronized void upd(List<Map<String, Object>> news) throws Exception {
+        System.out.println("upd : " + news);
         apiMapper.upd(news);
     }
 
@@ -682,14 +682,15 @@ public class ApiService {
     }
 
     //뉴스 커뮤니티 페이징2
-    public Map<String, Object> newsPaging2(Integer currentPage, Integer count,String keyword) throws Exception {
+    public Map<String, Object> newsPaging2(Integer currentPage, Integer count, String keyword) throws Exception {
         System.out.println("APIService : " + keyword);
-        if(keyword == null || keyword == "" || keyword.length() != 0){
+        if (keyword == null || keyword == "" || keyword.length() != 0) {
             System.out.println("key  변경");
-            keyword="all";
+//            keyword="all";
         }
         Map<String, Object> reMap = new HashMap<>();
         int postTotalCount = this.countNews(keyword);
+        System.out.println("postTotalCount = " + postTotalCount);
 
         int recordCountPerPage = count; // 페이지 당 게시글 개수
         int naviCountPerPage = 10; // 내비 개수
@@ -771,8 +772,8 @@ public class ApiService {
     }
 
     //키워드별 뉴스 가져오기
-    public List<NewsDTO> getNewsByKeyword(Integer start,Integer end,String keyword) throws Exception {
-        return apiMapper.getNewsByKeyword(start,end,keyword);
+    public List<NewsDTO> getNewsByKeyword(Integer start, Integer end, String keyword) throws Exception {
+        return apiMapper.getNewsByKeyword(start, end, keyword);
     }
 
     //마지막에 상태 n으로
@@ -781,15 +782,15 @@ public class ApiService {
     }
 
     //전체 뉴스 가져오기
-    public List<NewsDTO> getNewsList(Integer start,Integer end) throws Exception {
-        return apiMapper.getNewsList(start,end);
+    public List<NewsDTO> getNewsList(Integer start, Integer end) throws Exception {
+        return apiMapper.getNewsList(start, end);
     }
 
-    public Integer countNews(String keyword) throws Exception{
+    public Integer countNews(String keyword) throws Exception {
         return apiMapper.countNews(keyword);
     }
 
-    public Integer countWholeNews() throws Exception{
+    public Integer countWholeNews() throws Exception {
         return apiMapper.countWholeNews();
     }
 }

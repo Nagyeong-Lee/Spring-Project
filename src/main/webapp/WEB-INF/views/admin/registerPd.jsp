@@ -23,7 +23,10 @@
         <div>상품 설명 : <input type="text" id="description" name="description"></div>
         <div>가격 : <input type="number" min="1" id="price" name="price"></div>
         <div>재고 : <input type="number" min="1" id="stock" name="stock"></div>
-        <div>이미지 : <input type="file" id="img" name="img"></div>
+<%--        <div>이미지 : <input type="file" id="img" name="img"></div>--%>
+        <img src="" style="width: 200px; height: 200px;"
+             id="pdImg">
+        <input type="file" id="img" name="img"><br>
         <input type="hidden" id="img_name" name="img_name">
         카테고리
         <div id="mainCategory">
@@ -47,6 +50,7 @@
 
         <button type="button" id="addPdBtn">상품 등록</button>
         <button type="button" id="reset">초기화</button>
+        <button type="button" id="toList">관리자 메인페지로</button>
     </form>
 </div>
 
@@ -61,6 +65,7 @@
         $("#img_name").val(fileName);
         console.log($("#img_name").val());
         checkFileName(fileName);
+        readURL(this);
     });
 
     function checkFileName(str) {
@@ -76,6 +81,17 @@
         }
     }
 
+    //사진 미리보기
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#pdImg').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
     //옵션 추가 클릭 시
     $("#addOption").on("click", function () {
         let optionBox = '<div class="optionBox">카테고리 : <input type="text" class="optionCategory" ><br>이름 : <input type="text" class="optionName"><br>재고: <input type="number" min="1" class="optionStock"><button type="button" class="delBtn" onclick="remove(' + key + ')">삭제</button><button type="button" class="addOptionBtn">추가하기</button></div><br>';
@@ -87,8 +103,8 @@
 
     //추가 클릭 시
     $(document).on("click", ".addOptionBtn", function () {
-        // let arr = [];
-        $(this).hide();
+
+        let $this = $(this);
         let optionCategory = $(this).closest(".optionBox").find(".optionCategory").val();
         let optionName = $(this).closest(".optionBox").find(".optionName").val();
         let optionStock = $(this).closest(".optionBox").find(".optionStock").val();
@@ -98,7 +114,6 @@
             map.set("category", optionCategory);
             map.set("name", optionName);
             map.set("stock", optionStock);
-            // arr.push(map);
             optionArr.push(map);
         } else {
             if (optionCategory.length == 0) {
@@ -115,11 +130,11 @@
             }
         }
         console.log(optionArr);
+        alert("옵션 추가 완료");
         key++;
     });
 
     function remove(key) {
-        //let splice = optionArr.splice(key, 1);
         let newArr = [];
         console.log(optionArr.length)
         for (let i = 0; i < optionArr.length; i++) {
@@ -146,8 +161,34 @@
         location.reload();
     });
 
+    //관리자 메인으로
+    $("#toList").click(function () {
+        location.href = '/admin/main';
+    });
+
+
     //상품 등록 버튼 클릭 시
     $("#addPdBtn").on("click", function () {
+
+        let optStockSum = 0;
+        console.log($(".optionBox").length);
+        for (let i = 0; i < $(".optionBox").length; i++) {
+            let optionBox =$(".optionBox")[i];
+            let optionStock = $(optionBox).find(".optionStock")[0];
+            console.log($(optionStock).val());
+            optStockSum+=Number($(optionStock).val());
+            console.log('옵션 재고 : ');
+            console.log(optionStock);
+        }
+        console.log("optStockSum");
+        console.log(optStockSum);
+
+        let pdStock = $("#stock").val(); //상품 재고
+        //상품재고보다 옵션재고 많을때
+        if(optStockSum>Number(pdStock)){
+            alert('옵션 재고가 상품 재고보다 많을 수 없습니다.');
+            return;
+        }
 
         if ($("#name").val().length == 0) {
             alert('상품명을 입력하세요');
@@ -174,7 +215,7 @@
             return false;
         }
 
-        for(let i = 0;  i<optionArr.length; i++){
+        for (let i = 0; i < optionArr.length; i++) {
             var param = Object.fromEntries(optionArr[i]);
             testArray.push(param);
         }
@@ -197,10 +238,10 @@
         data.append("description", description);
         data.append("price", price);
         data.append("stock", stock);
-        data.append("img", img);
         data.append("category1", category1);
         data.append("category2", category2);
         data.append("option", JSON.stringify(testArray));
+        data.append("img", img);
 
         $.ajax({
             url: "/product/addPd"
@@ -215,7 +256,7 @@
             , success: function (data) {
                 if (data === 'success') {
                     alert('상품 등록이 완료되었습니다.');
-                    location.reload();
+                    location.href='/admin/registeredPd';
                 }
             }
         });
