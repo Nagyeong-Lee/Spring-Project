@@ -48,7 +48,7 @@
                                     src="/resources/img/products/${i.get("img")}" style="width: 120px; height: 100px;"></a></td>
                             <td colspan="2">
                                 <p>${i.get("name")}</p>
-                                <p>수량 : ${i.get("count")}</p>
+                                <p class="chgCnt">수량 : ${i.get("count")}</p>
                                 <c:choose>
                                     <c:when test="${!empty i.get('option')}">
                                         <c:forEach var="k" items="${i.get('option')}">
@@ -218,59 +218,6 @@
         }
     }
 
-    // $(".delBtn").on("click", function () { //해당 cart_seq status n으로
-    //     // let total_price = $("#hiddenTotalPrice").val();
-    //     $("#discount  option:eq(0)").prop("selected", true);
-    //     $("#discount option:not(select)").show();
-    //     let total_price = $("#hiddenTotalPreviousTotalPrice").val();
-    //     console.log("원래 상품 가격 : " + total_price);
-    //
-    //     //삭제할때 총합계 변경
-    //     console.log('삭제 클릭 : ' + $(this).closest(".itemDiv").find(".productPrice").val());
-    //     console.log('삭제 클릭 시 수량 : ' + $(this).closest(".itemDiv").find(".stock").val());
-    //
-    //     let chgPrice = $(this).closest(".itemDiv").find(".productPrice").val() * $(this).closest(".itemDiv").find(".stock").val();  //변경된 총 합계
-    //     console.log("chgPrice : " + chgPrice);
-    //
-    //     //총 합계 변경해주기
-    //     $("#total").text('총 합계 : ' + (parseInt(total_price) - chgPrice).toLocaleString() + '원');
-    //     $("#hiddenTotalPrice").val(parseInt(total_price) - chgPrice); //변경된 상품 가격
-    //     $("#hiddenTotalPreviousTotalPrice").val($("#hiddenTotalPrice").val()); //변경된 상품 가격
-    //
-    //     //삭제할때 총 수량 변경
-    //     console.log('삭제할때 총 수량 변경 : ' + $(this).closest(".itemDiv").find(".stock").val());
-    //
-    //     //삭제할때 총 수량 변경
-    //     let changedSum = parseInt($("#hiddenTotalSum").val()) - $(this).closest(".itemDiv").find(".stock").val();
-    //     console.log('123132 : ' + changedSum);
-    //     $("#sum").text('총 수량 : ' + changedSum + '개');
-    //     $("#hiddenTotalSum").val(changedSum); //변경된 수량 저장
-    //
-    //
-    //     let cart_seq = $(this).closest(".itemDiv").find(".cartSeq").val();
-    //     console.log(cart_seq);
-    //     $(this).closest(".itemDiv").remove();
-    //     if ($(".itemDiv").length == 0) {
-    //         $(".pay").remove();
-    //     }
-    //     $.ajax({
-    //         url: '/product/cart/delete',
-    //         type: 'post',
-    //         data: {
-    //             "cart_seq": cart_seq
-    //         },
-    //         success: function (data) {
-    //             if ($(".itemDiv").length == 0) {
-    //                 $("#thead").children().remove();
-    //                 $("#total").remove();
-    //                 $("#discount").remove();
-    //                 $("#sum").remove();
-    //                 var html = '<td colspan="5">장바구니가 비었습니다.</td>';
-    //                 $("#thead").append(html);
-    //             }
-    //         }
-    //     })
-    // });
 
     //+버튼 누를때 수량
     $(".plus").on("click", function () {
@@ -283,6 +230,8 @@
         let count = $this.closest(".count").find(".stock").val();
         count++
         $this.closest(".count").find(".stock").val(count);
+
+
 
         //가격 변경
         let totalPrice = $this.closest(".count").find(".pd_price").val() * count;
@@ -321,6 +270,8 @@
                     --count
                     $this.closest(".count").find(".stock").val(count);
                     $this.hide();
+                }else{
+                    $this.closest(".itemDiv").find(".chgCnt").text('수량 : '+count);
                 }
             }
         });
@@ -392,6 +343,7 @@
                 if (count <= data) {
                     $this.closest(".count").find(".stock").val(count);
                     $this.closest(".count").find(".plus").show();
+                    $this.closest(".itemDiv").find(".chgCnt").text('수량 : '+count);
                 }
             }
         });

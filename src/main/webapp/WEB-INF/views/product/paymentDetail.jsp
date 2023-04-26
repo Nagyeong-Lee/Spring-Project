@@ -37,7 +37,7 @@
           <c:forEach var="i" items="${cart}" varStatus="status">
             <tr class="itemDiv">
               <td colspan="2"><a href="/product/detail?pd_seq=${i.get('pd_seq')}"><img
-                      src="/resources/img/products/${i.get("img")}"></a></td>
+                      src="/resources/img/products/${i.get("img")}" style="width: 100px; height: 100px;"></a></td>
               <td colspan="2">
                 <p class="pdName${status.count}">${i.get("name")}</p>
                 <p>수량 : ${i.get("count")}</p>

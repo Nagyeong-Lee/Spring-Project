@@ -242,7 +242,7 @@
         status,
         pd_seq
         from options
-        where pd_seq=#{pd_seq} and status = 'Y'
+        where pd_seq=#{pd_seq}
     </select>
 
 
@@ -251,7 +251,7 @@
         FROM (
         SELECT category,count(*)
         FROM OPTIONS
-        WHERE pd_seq=#{pd_seq} and status = 'Y'
+        WHERE pd_seq=#{pd_seq}
         GROUP BY category)
     </select>
 
@@ -271,7 +271,7 @@
             status,
             stock
         FROM OPTIONS
-        WHERE category= #{category} and pd_seq=#{pd_seq} and status = 'Y'
+        WHERE category= #{category} and pd_seq=#{pd_seq}
     </select>
 
     <insert id="insertCart" >

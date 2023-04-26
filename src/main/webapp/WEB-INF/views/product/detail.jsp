@@ -168,9 +168,10 @@
 
     });
 
-
+    var flag;
     //수량 +
     $("#plus").click(async function () {
+    flag = true; //담기 눌렀을때 재고보다 수량 많으면 false로
         let str = optionCount;
         if ($("#optionYN").val() != 0) {
             if (str == 0) {
@@ -224,6 +225,7 @@
                 alert('재고보다 많이 구매할 수 없습니다.');
                 $("#count").val(--count);
                 $("#totalStock").text(0);
+                flag=false;
             }
         }
     });
@@ -284,6 +286,7 @@
 
     $("#addItems").on("click", function () {
         let test = false;
+
         if ($("#optionYN").val() != 0) {
             if (changFlag == false) {
                 alert('옵션을 선택해주세요.');
@@ -303,11 +306,12 @@
                 return;
             }
 
-            let regex = /([A-Z]+\(\d+\))/g;
+            let regex = /([A-Za-z]+\(\d+\))/g;
             var numbers = str.match(regex);
             console.log(numbers); //
             let count = parseInt($("#count").val());
             var integerArray2 = [];
+            console.log(numbers.length);
             for (let i = 0; i < numbers.length; i++) {
                 integerArray2.push(numbers[i]);
             }
@@ -361,11 +365,6 @@
                 }
             });
         }
-        //장바구니 db 저장
-        //옵션들 -1
-        //총 수량 -1
-        //만약 수량이 0이면 N처리
-        //만약 옵션 수량이 0이면 N처리
     });
 
     $("#toCart").on("click", function () {
