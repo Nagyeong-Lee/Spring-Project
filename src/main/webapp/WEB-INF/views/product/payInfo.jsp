@@ -21,16 +21,17 @@
     <link rel="stylesheet" type="text/css" href="/resources/cart.css">
 
     <!-- jQuery -->
-    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <!-- iamport.payment.js -->
     <script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
 
 </head>
 <body>
+<input type="hidden" value="${keyword}" id="key" name="key">
 <%@ include file="/WEB-INF/views/product/navUtil.jsp" %>
 <input type="hidden" value="${id}" id="session">
 <input type="hidden" value="${cart}" id="cartInfo">
-<input type="hidden" value="${totalPrice}" id="totalPrice">
+<input type="hidden" value="${price}" id="totalPrice">
 <input type="hidden" value="${totalSum}" id="totalSum">
 <input type="hidden" value="${memberDTO.name}" id="mem_name">
 <input type="hidden" value="${memberDTO.phone}" id="mem_phone">
@@ -51,7 +52,8 @@
                     <c:forEach var="i" items="${cart}" varStatus="status">
                         <tr class="itemDiv">
                             <td colspan="2"><a href="/product/detail?pd_seq=${i.get('pd_seq')}"><img
-                                    src="/resources/img/products/${i.get("img")}" style="width: 120px; height: 100px;"></a></td>
+                                    src="/resources/img/products/${i.get("img")}" style="width: 120px; height: 100px;"></a>
+                            </td>
                             <td colspan="2">
                                 <p class="pdName${status.count}">${i.get("name")}</p>
                                 <p>수량 : ${i.get("count")}</p>
@@ -102,19 +104,21 @@
 
 <script>
 
-    $("#search").on("click",function(){
+    $("#keyword").val($("#key").val());
+
+    $("#search").on("click", function () {
         let keyword = $("#keyword").val();
-        location.href='/product/searchPd?keyword='+keyword;
+        location.href = '/product/searchPd?keyword=' + keyword;
     });
 
-        function toCart(){ //장바구니로 이동
+    function toCart() { //장바구니로 이동
         let newForm = document.createElement("form");
-        newForm.setAttribute("method","post");
-        newForm.setAttribute("action","/product/cart");
+        newForm.setAttribute("method", "post");
+        newForm.setAttribute("action", "/product/cart");
         let newInput = document.createElement("input");
-        newInput.setAttribute("type","hidden");
-        newInput.setAttribute("name","id");
-        newInput.setAttribute("value",$("#session").val());
+        newInput.setAttribute("type", "hidden");
+        newInput.setAttribute("name", "id");
+        newInput.setAttribute("value", $("#session").val());
         newForm.appendChild(newInput);
         document.body.append(newForm);
         newForm.submit();
@@ -193,30 +197,6 @@
     //결제 하기 클릭
     $("#pay").on("click", function () {
         requestPay();
-        // var msg = '결제가 완료되었습니다.';
-        // //결제 내역으로 이동
-        // let frm = document.createElement("form");
-        // frm.setAttribute("method","post");
-        // frm.setAttribute("action","/product/paymentDetails");
-        // let newInput = document.createElement("input");
-        // let newInput2 = document.createElement("input");
-        // let newInput3 = document.createElement("input");
-        // newInput.setAttribute("type","hidden");
-        // newInput.setAttribute("value",$("#session").val());
-        // newInput.setAttribute("name","id");
-        //
-        // newInput2.setAttribute("type","hidden");
-        // newInput2.setAttribute("value",$("#totalMoney").val());
-        // newInput2.setAttribute("name","price");
-        //
-        // newInput3.setAttribute("type","hidden");
-        // newInput3.setAttribute("value",$("#cartInfo").val());
-        // newInput3.setAttribute("name","carts");
-        // frm.appendChild(newInput);
-        // frm.appendChild(newInput2);
-        // frm.appendChild(newInput3);
-        // document.body.appendChild(frm);
-        // frm.submit();
     });
 
     var IMP = window.IMP;
@@ -227,11 +207,11 @@
         var name = $("#mem_name").val();
         var phone = $("#mem_phone").val();
         var address = $("#defaultAddress").text();
-        var price =  $("#totalPrice").val()
-        if($("#totalSum").val() != 1){
-           var title = $(".pdName1").text() + '외 ' + ($("#totalSum").val() - $(".pdCnt1").val());
-        }else{
-            title=$(".pdName1").text();
+        var price = $("#totalPrice").val()
+        if ($("#totalSum").val() != 1) {
+            var title = $(".pdName1").text() + '외 ' + ($("#totalSum").val() - $(".pdCnt1").val());
+        } else {
+            title = $(".pdName1").text();
         }
 
         var payInfo = {
@@ -251,17 +231,17 @@
                 var msg = '결제가 완료되었습니다.';
                 //결제 내역으로 이동
                 let frm = document.createElement("form");
-                frm.setAttribute("method","post");
-                frm.setAttribute("action","/product/paymentDetails");
+                frm.setAttribute("method", "post");
+                frm.setAttribute("action", "/product/paymentDetails");
                 let newInput = document.createElement("input");
                 let newInput2 = document.createElement("input");
-                newInput.setAttribute("type","hidden");
-                newInput.setAttribute("value",$("#session").val());
-                newInput.setAttribute("name","id");
+                newInput.setAttribute("type", "hidden");
+                newInput.setAttribute("value", $("#session").val());
+                newInput.setAttribute("name", "id");
 
-                newInput2.setAttribute("type","hidden");
-                newInput2.setAttribute("value",$("#totalMoney").val());
-                newInput2.setAttribute("name","price");
+                newInput2.setAttribute("type", "hidden");
+                newInput2.setAttribute("value", $("#totalMoney").val());
+                newInput2.setAttribute("name", "price");
                 frm.appendChild(newInput);
                 frm.appendChild(newInput2);
                 document.body.appendChild(frm);

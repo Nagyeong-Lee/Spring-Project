@@ -302,15 +302,15 @@
         where id=#{id}
     </select>
 
-    <!--쿠폰 가져오기-->
-    <select id="getCoupon" resultType="com.example.Spring_Project.dto.CouponDTO">
-        select
-            title,
-            discount
-        from coupon
-        where m_seq=#{m_seq}
-        where status = 'Y'
-    </select>
+<!--    &lt;!&ndash;쿠폰 가져오기&ndash;&gt;-->
+<!--    <select id="getCoupon" resultType="com.example.Spring_Project.dto.CouponDTO">-->
+<!--        select-->
+<!--            title,-->
+<!--            discount-->
+<!--        from coupon-->
+<!--        where m_seq=#{m_seq}-->
+<!--        where status = 'Y'-->
+<!--    </select>-->
 
     <select id="getMemInfo"  resultType="com.example.Spring_Project.dto.MemberDTO">
         select

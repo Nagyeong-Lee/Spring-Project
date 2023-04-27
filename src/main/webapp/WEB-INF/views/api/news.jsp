@@ -85,8 +85,7 @@
             count: $("#count").val(),
             keyword: keyword
         };
-        console.log(data.count);
-        console.log('키워드 : ' + data.keyword);
+
         return data;
     }
 
@@ -95,7 +94,7 @@
     });
     //카운트 변경
     $(" #count").on("change", function () {
-        console.log('카운트 변경 시 키워드 값 : ' + $(this).children().val());
+
         let result = changeOptions();
         $.ajax({
             url: '/api/repaging',
@@ -105,7 +104,6 @@
                 "keyword": $('#nowKeyWord').val()
             },
             success: function (data) {
-                console.log("list길이 : " + data.items.length);
                 $("#tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
@@ -113,8 +111,7 @@
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
                 let page = data.paging;
-                console.log('data.cpage : ' + data.currentPage);
-                console.log('data.cnt : ' + data.count);
+
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $("#tbody").append(html);
@@ -157,7 +154,6 @@
                 "keyword": $('#nowKeyWord').val()
             },
             success: function (data) {
-                console.log("list길이 : " + data.items.length);
                 $("#tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
@@ -165,14 +161,13 @@
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
                 let page = data.paging;
-                console.log('data.cpage : ' + data.currentPage);
-                console.log('data.cnt : ' + data.count);
+
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $("#tbody").append(html);
                 } else {
                     for (let i = 0; i < items.length; i++) {
-                        console.log("items : " + items);
+
 // var newHtml = createHtmlNews(items[i],cpage, cnt, data.keyword);
                         var newHtml = createHtmlNews(items[i], cpage, cnt);
                         $("#tbody").append(newHtml);

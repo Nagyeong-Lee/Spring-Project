@@ -75,7 +75,6 @@
         let data = new FormData(frm);
 
         for (var i = 0; i < file.length; i++) {
-            console.log(file[i]);
             data.append("file", file[i]);
         }
 

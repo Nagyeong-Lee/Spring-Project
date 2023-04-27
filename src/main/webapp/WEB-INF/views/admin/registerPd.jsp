@@ -22,10 +22,10 @@
         <div>상품명 : <input type="text" id="name" name="name"></div>
         <div>상품 설명 : <input type="text" id="description" name="description"></div>
         <div>가격 : <input type="number" min="1" id="price" name="price"></div>
-        <div>재고 : <input type="number" min="1" id="stock" name="stock"></div>
-<%--        <div>이미지 : <input type="file" id="img" name="img"></div>--%>
-        <img src="" style="width: 200px; height: 200px;"
-             id="pdImg">
+        <div id="cnt">재고 : <input type="number" min="1" id="stock" name="stock"></div>
+        <%--        <div>이미지 : <input type="file" id="img" name="img"></div>--%>
+        <%--        <img src="" style="width: 200px; height: 200px;"--%>
+        <%--             id="pdImg">--%>
         <input type="file" id="img" name="img"><br>
         <input type="hidden" id="img_name" name="img_name">
         카테고리
@@ -63,9 +63,11 @@
         var str = $(this).val();
         var fileName = str.split('\\').pop().toLowerCase();
         $("#img_name").val(fileName);
-        console.log($("#img_name").val());
         checkFileName(fileName);
         readURL(this);
+
+        var html = '<img src="" style="width: 200px; height: 200px;"id="pdImg">';
+        $("#cnt").after(html);
     });
 
     function checkFileName(str) {
@@ -129,14 +131,12 @@
                 return;
             }
         }
-        console.log(optionArr);
         alert("옵션 추가 완료");
         key++;
     });
 
     function remove(key) {
         let newArr = [];
-        console.log(optionArr.length)
         for (let i = 0; i < optionArr.length; i++) {
             console.log(optionArr[i]);
             console.log(optionArr[i].get('key'));
@@ -166,17 +166,20 @@
         location.href = '/admin/main';
     });
 
-
+    var tmp = 0;
     //상품 등록 버튼 클릭 시
     $("#addPdBtn").on("click", function () {
 
         let optStockSum = 0;
         console.log($(".optionBox").length);
         for (let i = 0; i < $(".optionBox").length; i++) {
-            let optionBox =$(".optionBox")[i];
+            let optionBox = $(".optionBox")[i];
             let optionStock = $(optionBox).find(".optionStock")[0];
+            let optionCategory = $(optionBox).find(".optionCategory")[0];
+            console.log("optionCategory");
+            console.log($(optionCategory).val());
             console.log($(optionStock).val());
-            optStockSum+=Number($(optionStock).val());
+            optStockSum += Number($(optionStock).val());
             console.log('옵션 재고 : ');
             console.log(optionStock);
         }
@@ -184,11 +187,11 @@
         console.log(optStockSum);
 
         let pdStock = $("#stock").val(); //상품 재고
-        //상품재고보다 옵션재고 많을때
-        if(optStockSum>Number(pdStock)){
-            alert('옵션 재고가 상품 재고보다 많을 수 없습니다.');
-            return;
-        }
+        // //상품재고보다 옵션재고 많을때
+        // if (optStockSum > Number(pdStock)) {
+        //     alert('옵션 재고가 상품 재고보다 많을 수 없습니다.');
+        //     return;
+        // }
 
         if ($("#name").val().length == 0) {
             alert('상품명을 입력하세요');
@@ -256,7 +259,7 @@
             , success: function (data) {
                 if (data === 'success') {
                     alert('상품 등록이 완료되었습니다.');
-                    location.href='/admin/registeredPd';
+                    location.href = '/admin/registeredPd';
                 }
             }
         });

@@ -112,6 +112,7 @@
     </style>
 </head>
 <body>
+<input type="hidden" value="${keyword}" id="key" name="key">
 <%@ include file="/WEB-INF/views/product/navUtil.jsp" %>
 
 <div class="product-list">
@@ -133,7 +134,7 @@
 </div>
 
 <script>
-
+    $("#keyword").val($("#key").val());
     $("#search").on("click",function(){
         let keyword = $("#keyword").val();
         location.href='/product/searchPd?keyword='+keyword;

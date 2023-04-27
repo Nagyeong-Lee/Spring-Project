@@ -28,22 +28,11 @@ public class BatchScheduler {
         batchService.updateActiveN();
     }
 
-    @Scheduled(cron = "0 31 14 * * *") //매일 22시로
+    @Scheduled(cron = "0 54 09 * * *") //매일 10시로
     public void runScheduler() throws Exception {
         apiService.scheduler(); //api data insert
     }
 
-//    @Scheduled(cron = "0/30 * * * * *")  // 뉴스 실시간 가져오는거
-//    public void getNews() throws Exception {
-//        System.out.println("0");
-//        apiService.covid();
-//        System.out.println("99");
-////        apiService.getNewsCovid();
-////        apiService.getNewsQuarantine();
-////        apiService.getNewsDistance();
-////        apiService.getNewsMask();
-////        apiService.getNewsVaccine();
-//    }
 
 }
 

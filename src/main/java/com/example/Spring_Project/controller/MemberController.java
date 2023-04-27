@@ -186,13 +186,13 @@ public class MemberController {
                     model.addAttribute("communityPath", communityPath);
 
 
-                    //쿠폰 만료 확인
+                    /*로그인 했을 때 -> 쿠폰 만료 확인*/
                     Integer m_seq = productService.getMemberSeq(id);//m_seq 가져오기
                     List<CouponDTO> couponDTOList = productService.getCoupon(m_seq);//쿠폰 리스트 가져오기
-                    for(int i = 0 ; i<couponDTOList.size(); i++){
+                    for(int i = 0 ; i<couponDTOList.size(); i++){  //status y인것만
                         List<CouponDTO> val = productService.checkCouponPr();
                        for(int k=0; k<val.size(); k++){
-                           productService.updCoupon(val.get(k).getCp_seq());
+                           productService.updCoupon(val.get(k).getCp_seq()); //status n으로
                        }
                     }
                     result = "redirect:/member/myPage";
@@ -413,7 +413,7 @@ public class MemberController {
     public List<EventDTO> registeredEvent() throws Exception {
         List<EventDTO> list = service.getEvents(); //등록된 이벤트 가져오기
         for (int i = 0; i < list.size(); i++) {
-            System.out.println(list.get(i).getTitle());
+
         }
 //        for (Integer i = 0; i<list.size(); i++){
 //            if(list.get(i).getEvent_seq()){
@@ -438,4 +438,6 @@ public class MemberController {
     public String cart() throws Exception {
         return "/member/cart";
     }
+
+
 }

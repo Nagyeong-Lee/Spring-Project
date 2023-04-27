@@ -232,7 +232,7 @@ public class AdminController {
                 optList.put("optionDTOList", optionDTOList);
             }
         }
-        System.out.println("map : " + optList);
+
         model.addAttribute("optList", optList);
         return "/admin/registeredPd";
     }
@@ -254,7 +254,6 @@ public class AdminController {
             map.put("optionDTOList", optionDTOList);
         }
         model.addAttribute("map",map);
-        System.out.println("수정클릭 시 map : "+map);
         return "/admin/updProduct";
     }
 }

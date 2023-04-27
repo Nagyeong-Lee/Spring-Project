@@ -6,14 +6,14 @@
 
     <select id="getProducts" resultType="com.example.Spring_Project.dto.ProductDTO">
         select
-        pd_seq,
-        name,
-        description,
-        price,
-        stock,
-        status,
-        img,
-        category
+            pd_seq,
+            name,
+            description,
+            price,
+            stock,
+            status,
+            img,
+            category
         from product
         where status = 'Y'
     </select>
@@ -29,7 +29,7 @@
         img,
         category
         from product
-        where pd_seq=#{pd_seq}
+        where pd_seq=#{pd_seq} and status = 'Y'
     </select>
 
 
@@ -44,7 +44,7 @@
         img,
         category
         FROM PRODUCT p WHERE category IN (
-        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ =1 ) order by 1
+        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ =1 and status = 'Y' ) order by 1
     </select>
 
     <select id="getWOuter" resultType="com.example.Spring_Project.dto.ProductDTO">
@@ -57,7 +57,7 @@
         status,
         img,
         category
-        FROM PRODUCT p WHERE category = 2
+        FROM PRODUCT p WHERE category = 2 and status = 'Y'
     </select>
 
     <select id="getWTop" resultType="com.example.Spring_Project.dto.ProductDTO">
@@ -70,7 +70,7 @@
         status,
         img,
         category
-        FROM PRODUCT p WHERE category = 3
+        FROM PRODUCT p WHERE category = 3 and status = 'Y'
     </select>
 
     <select id="getWPants" resultType="com.example.Spring_Project.dto.ProductDTO">
@@ -83,7 +83,7 @@
         status,
         img,
         category
-        FROM PRODUCT p WHERE category = 4
+        FROM PRODUCT p WHERE category = 4 and status = 'Y'
     </select>
 
     <select id="getWAccessories" resultType="com.example.Spring_Project.dto.ProductDTO">
@@ -96,7 +96,7 @@
         status,
         img,
         category
-        FROM PRODUCT p WHERE category = 5
+        FROM PRODUCT p WHERE category = 5 and status = 'Y'
     </select>
 
 
@@ -111,7 +111,7 @@
         img,
         category
         FROM PRODUCT p WHERE category IN (
-        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ =6) order by 1
+        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ =6 and status = 'Y') order by 1
     </select>
 
 
@@ -125,7 +125,7 @@
         status,
         img,
         category
-        FROM PRODUCT p WHERE category = 7
+        FROM PRODUCT p WHERE category = 7 and status = 'Y'
     </select>
 
     <select id="getMTop" resultType="com.example.Spring_Project.dto.ProductDTO">
@@ -138,7 +138,7 @@
         status,
         img,
         category
-        FROM PRODUCT p WHERE category = 8
+        FROM PRODUCT p WHERE category = 8 and status = 'Y'
     </select>
     <select id="getMPants" resultType="com.example.Spring_Project.dto.ProductDTO">
         SELECT
@@ -150,7 +150,7 @@
         status,
         img,
         category
-        FROM PRODUCT p WHERE category = 9
+        FROM PRODUCT p WHERE category = 9 and status = 'Y'
     </select>
     <select id="getMAccessories" resultType="com.example.Spring_Project.dto.ProductDTO">
         SELECT
@@ -162,7 +162,7 @@
         status,
         img,
         category
-        FROM PRODUCT p WHERE category = 10
+        FROM PRODUCT p WHERE category = 10 and status = 'Y'
     </select>
 
 
@@ -177,7 +177,7 @@
         img,
         category
         FROM PRODUCT p WHERE category IN (
-        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ =11) order by 1
+        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ =11 and status = 'Y') order by 1
     </select>
 
     <select id="getNewOuter" resultType="com.example.Spring_Project.dto.ProductDTO">
@@ -190,7 +190,7 @@
         status,
         img,
         category
-        FROM PRODUCT p WHERE category = 12
+        FROM PRODUCT p WHERE category = 12 and status = 'Y'
     </select>
 
     <select id="getNewTop" resultType="com.example.Spring_Project.dto.ProductDTO">
@@ -203,7 +203,7 @@
         status,
         img,
         category
-        FROM PRODUCT p WHERE category = 13
+        FROM PRODUCT p WHERE category = 13 and status = 'Y'
     </select>
 
     <select id="getNewPants" resultType="com.example.Spring_Project.dto.ProductDTO">
@@ -216,7 +216,7 @@
         status,
         img,
         category
-        FROM PRODUCT p WHERE category = 14
+        FROM PRODUCT p WHERE category = 14 and status = 'Y'
     </select>
 
     <select id="getNewAccessories" resultType="com.example.Spring_Project.dto.ProductDTO">
@@ -229,7 +229,7 @@
         status,
         img,
         category
-        FROM PRODUCT p WHERE category = 15
+        FROM PRODUCT p WHERE category = 15 and status = 'Y'
     </select>
 
 
@@ -591,8 +591,7 @@
     </update>
 
     <update id="updOptionStatus">
-        update options
-        set status = 'N'
+        delete from options
         where option_seq = #{option_seq}
     </update>
 
@@ -619,7 +618,7 @@
             category = #{category},
             name = #{option_name},
             stock =#{option_stock},
-            status = 'Y',
+            status = 'Y'
         where  option_seq = #{option_seq}
     </update>
 
@@ -635,6 +634,6 @@
             category
         from product
         where status = 'Y'
-        and name like '%'||#{keyword}||'%'
+        and LOWER(name) like '%'||#{keyword}||'%'
     </select>
 </mapper>

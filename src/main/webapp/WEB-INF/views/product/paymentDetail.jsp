@@ -21,6 +21,7 @@
   <link rel="stylesheet" type="text/css" href="/resources/cart.css">
 </head>
 <body>
+<input type="hidden" value="${keyword}" id="key" name="key">
 <%@ include file="/WEB-INF/views/product/navUtil.jsp" %>
 <div class="cart">
   <input type="hidden" id="cartLength" value="${cart.size()}">
@@ -61,13 +62,15 @@
   </table>
   <hr>
   <div style="margin-top: 50px;">총 수량 : ${totalSum}개</div>
-  <div>총 합계 : <fmt:formatNumber pattern="#,###" value="${totalPrice}" />원</div>
+  <div>총 합계 : <fmt:formatNumber pattern="#,###" value="${price}" />원</div>
   <input type="hidden" id="hiddenPay" value="<fmt:formatNumber pattern="#,###" value="${totalPrice}" />">
   <div class="cart__mainbtns">
     <button class="cart__bigorderbtn left" id="continue" style="margin-left:70px;">상품 리스트로 이동</button>
   </div>
 </div>
 <script>
+
+  $("#keyword").val($("#key").val());
 
   $("#search").on("click",function(){
     let keyword = $("#keyword").val();

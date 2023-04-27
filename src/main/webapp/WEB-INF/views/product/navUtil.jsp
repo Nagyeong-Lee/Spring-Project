@@ -12,7 +12,7 @@
 
 <input type="hidden" value="${id}" id="session">
 <span style="margin-left: 400px;">
-    <input type="text" id="keyword" name="keyword">
+    <input type="text" id="keyword" name="keyword" placeholder="상품명을 입력해주세요.">
     <button type="button" id="search">찾기</button>
 </span>
 <div style="text-align: right">

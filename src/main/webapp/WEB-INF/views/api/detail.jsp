@@ -32,7 +32,8 @@
         <div id="holidayBsHour">일요일 및 공휴일 진료시간 : ${hospitalDTO.holidayOpen} ~ ${hospitalDTO.holidayClose}</div>
     </c:if>
     <c:if test="${hospitalDTO.holidayOpen eq '-'}">
-    <div id="holidayBsHour">일요일 및 공휴일 진료시간 : -</div>
+<%--    <div id="holidayBsHour">일요일 및 공휴일 진료시간 : -</div>--%>
+    <div id="holidayBsHour"></div>
     </c:if>
 </c:if>
 <div id="map" style="width:50%;height:350px;"></div>
@@ -61,20 +62,20 @@
 </form>
 <script>
     function toList(currentPage, count, searchType, keyword, city, weekOpen, weekClose, satOpen, satClose,holidayY,holidayN, holidayOpen, holidayClose) {
-        console.log("목록으로 눌렀을때");
-        console.log(currentPage);
-        console.log(count);
-        console.log(searchType);
-        console.log(keyword);
-        console.log(city);
-        console.log(weekOpen);
-        console.log(weekClose);
-        console.log(satOpen);
-        console.log(satClose);
-        console.log(holidayOpen);
-        console.log(holidayClose);
-        console.log("holidayY : "+holidayY);
-        console.log("holidayN : "+holidayN);
+        // console.log("목록으로 눌렀을때");
+        // console.log(currentPage);
+        // console.log(count);
+        // console.log(searchType);
+        // console.log(keyword);
+        // console.log(city);
+        // console.log(weekOpen);
+        // console.log(weekClose);
+        // console.log(satOpen);
+        // console.log(satClose);
+        // console.log(holidayOpen);
+        // console.log(holidayClose);
+        // console.log("holidayY : "+holidayY);
+        // console.log("holidayN : "+holidayN);
 
         $("#currentPage").val(currentPage);
         $("#count").val(count);
@@ -89,7 +90,6 @@
 
         $("#holidayY").val(holidayY);
         $("#holidayN").val(holidayN);
-
 
         $("#holidayOpen").val(holidayOpen);
         $("#holidayClose").val(holidayClose);

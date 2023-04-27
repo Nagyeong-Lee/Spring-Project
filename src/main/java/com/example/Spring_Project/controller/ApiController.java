@@ -33,14 +33,14 @@ public class ApiController {
     @Autowired
     private PathService pathService;
 
-    @PostMapping("/data")
+    @PostMapping("/data")  //일별 감염률 현황
     public String api(Model model) throws Exception {
         InfectionDTO infectionDTO = apiService.getInfectionInfo();
         model.addAttribute("infectionDTO", infectionDTO);
         return "/api/infectionChart";
     }
 
-    @PostMapping("/dataByMonth")
+    @PostMapping("/dataByMonth") //월별 감염률 현황
     public String dataByMonth(Model model) throws Exception {
         List<InfectionByMonthDTO2> list = apiService.getInfectionByMonthInfo(); //2023년 월,감염자 수
         List<Map<String, Object>> mapList = new ArrayList<>();
@@ -58,7 +58,6 @@ public class ApiController {
     @RequestMapping("/hospital") //처음 들어갈때
     public String hospitalInfo(HttpServletRequest request, Model model, @RequestParam Map<String, Object> map) throws Exception {
 
-        System.out.println("MAP1 : " + map);
         Integer currentPage = Integer.parseInt(map.get("currentPage").toString());
         Integer count = Integer.parseInt(map.get("count").toString());
         String searchType = map.get("searchType").toString();
@@ -181,11 +180,6 @@ public class ApiController {
         reMap.put("items", list);
         reMap.put("paging", paging);
 
-        System.out.println("=====처음 끝 페이지====");
-        System.out.println("paging needNext : " + Boolean.parseBoolean(paging.get("needNext").toString()));
-        System.out.println("page totalCount : " + Integer.parseInt(paging.get("pageTotalCount").toString()));
-        System.out.println("=====처음 끝 페이지====");
-
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("count", count); //개수 선택
         model.addAttribute("searchType", searchType);
@@ -203,7 +197,6 @@ public class ApiController {
     @RequestMapping("/hospital/list") //옵션 수정할때
     public Map<String, Object> hospitalItems(HttpServletRequest request, Model model, @RequestParam Map<String, Object> map) throws Exception {
 
-        System.out.println("/hospital/list map2 : " + map);
         Map<String, Object> reMap = new HashMap<>();
 
         //option 값
@@ -277,8 +270,6 @@ public class ApiController {
         List<HospitalDTO> list = apiService.test2(paramMap);
         Map<String, Object> paging = apiService.getHospitalPageNavi2(currentPage, count, searchType, keyword, city, weekOpen,
                 weekClose, satOpen, satClose, holidayYN, holidayY, holidayN, holidayOpen, holidayClose);
-        System.out.println("변경 후 전체 글 개수");
-        System.out.println(paging.get("pageTotalCount"));
 
         reMap.put("items", list);
 
@@ -305,19 +296,6 @@ public class ApiController {
         reMap.put("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));
         reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
 
-        System.out.println("====/list");
-//        System.out.println("holidayYN : " + holidayYN);
-//        System.out.println("holidayY : " + holidayY);
-//        System.out.println("holidayN : " + holidayN);
-
-        System.out.println("=====처음 끝 페이지====");
-        System.out.println("pageTotalCount : " + Integer.parseInt(paging.get("pageTotalCount").toString()));
-        System.out.println("startNavi : " + Integer.parseInt(paging.get("startNavi").toString()));
-        System.out.println("endNavi : " + Integer.parseInt(paging.get("endNavi").toString()));
-        System.out.println("needPrev : " + Boolean.parseBoolean(paging.get("needPrev").toString()));
-        System.out.println("needNext : " + Boolean.parseBoolean(paging.get("needNext").toString()));
-        System.out.println("=====처음 끝 페이지====");
-
         return reMap;
     }
 
@@ -343,9 +321,7 @@ public class ApiController {
         holidayY = map.get("holidayY").toString();
         holidayN = map.get("holidayN").toString();
 
-        System.out.println("detail");
-        System.out.println(holidayY);
-        System.out.println(holidayN);
+
         HospitalDTO hospitalDTO = apiService.getInfo(hospital_seq); //병원 한 개 정보
         model.addAttribute("hospitalDTO", hospitalDTO);
         model.addAttribute("currentPage", currentPage);
@@ -371,9 +347,6 @@ public class ApiController {
         List<PathDTO> pathList = pathService.getNewsPathList();
         Integer start = currentPage * count - (count - 1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
-
-        System.out.println("start : "+start);
-        System.out.println("end : "+end);
 
         List<NewsDTO> newsList = apiService.getNewsList(start,end); // 전체 뉴스 가져오기
         Map<String,Object>paging=apiService.newsPaging1(currentPage,count);
@@ -404,7 +377,7 @@ public class ApiController {
         Integer end = currentPage * count; // 끝 글 번호
         String keyword="코로나";
         List<NewsDTO>list = apiService.getNewsByKeyword(start,end,keyword);
-        System.out.println("list.s\\ = " + list.size());
+
         Map<String,Object>paging=apiService.newsPaging2(currentPage,count,keyword);
         reMap.put("pageTotalCount", Integer.parseInt(paging.get("pageTotalCount").toString()));
         reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
@@ -517,7 +490,7 @@ public class ApiController {
     @RequestMapping("/repaging")
     public Map<String, Object> repaging(Integer currentPage,Integer count,@RequestParam(required = false) String keyword) throws Exception{
 
-        System.out.println("키워드 = " + keyword);
+
         if(keyword == null || keyword == "" || keyword.length() == 0){
             keyword="all";
         }

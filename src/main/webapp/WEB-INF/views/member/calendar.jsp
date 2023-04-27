@@ -37,7 +37,6 @@
                 },
                 eventClick: function (arg) {
                     window.open('/member/showEvent', '', 'width=500, height=500, left=650, top=250');
-                    console.log($("event_seq").val());
                 },
                 events: [
                     $.ajax({
@@ -47,8 +46,6 @@
                         success:
                             function (data) {
                                 for (let i = 0; i < data.length; i++) {
-                                    console.log('----');
-                                    console.log(Date.parse(data[i]['startTime']));
                                     calendar.addEvent({
                                         event_seq: data[i]['event_seq'],
                                         title: data[i]['title'],

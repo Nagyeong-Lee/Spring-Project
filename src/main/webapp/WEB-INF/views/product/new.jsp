@@ -18,9 +18,12 @@
   <link rel="stylesheet" type="text/css" href="/resources/navUtil.css">
 </head>
 <body>
+<input type="hidden" value="${keyword}" id="key" name="key">
 <%@ include file="/WEB-INF/views/product/navUtil.jsp" %>
 <%@ include file="/WEB-INF/views/product/pdListUtil.jsp"%>
 <script>
+
+  $("#keyword").val($("#key").val());
 
   $("#search").on("click",function(){
     let keyword = $("#keyword").val();

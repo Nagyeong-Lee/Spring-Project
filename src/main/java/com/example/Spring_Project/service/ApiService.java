@@ -65,7 +65,6 @@ public class ApiService {
                 jsonObject1 = (JsonObject) jsonObject.get("response");
                 jsonArray = (JsonArray) jsonObject1.get("result");
                 jsonObject2 = (JsonObject) jsonArray.get(0);
-                System.out.println(jsonObject2.get("resultCode"));
                 InfectionDTO data = new Gson().fromJson(jsonObject2, InfectionDTO.class);
                 InfectionDTO data1 = new Gson().fromJson(jsonObject1, InfectionDTO.class);
                 InfectionDTO infectionDTO = InfectionDTO.builder()
@@ -104,7 +103,7 @@ public class ApiService {
                 String cnt = infectionDTO.getCnt6();
                 String month = mmdd.substring(0, 2);
                 String year = this.getYear();//현재 년도 가져오기
-                this.insertInfectionByMonth(mmdd, cnt, month, year);
+                this.insertInfectionByMonth(mmdd, cnt, month, year); //마지막 날짜의 데이터를 월별감염률 현황에 인서트
                 Integer currVal = this.getCurrVal();
                 this.updateStatus(currVal);
             }
@@ -361,7 +360,6 @@ public class ApiService {
 
     //merge into
     public synchronized void upd(List<Map<String, Object>> news) throws Exception {
-        System.out.println("upd : " + news);
         apiMapper.upd(news);
     }
 
@@ -619,9 +617,7 @@ public class ApiService {
             needNext = false;
         }
 
-        System.out.println("startNavi : " + startNavi);
-        System.out.println("endNavi : " + endNavi);
-        System.out.println("전체 글 개수 : " + pageTotalCount);
+
 
         reMap.put("pageTotalCount", pageTotalCount);
         reMap.put("startNavi", startNavi);
@@ -669,9 +665,6 @@ public class ApiService {
             needNext = false;
         }
 
-        System.out.println("startNavi : " + startNavi);
-        System.out.println("endNavi : " + endNavi);
-        System.out.println("전체 글 개수 : " + pageTotalCount);
 
         reMap.put("pageTotalCount", pageTotalCount);
         reMap.put("startNavi", startNavi);
@@ -683,14 +676,12 @@ public class ApiService {
 
     //뉴스 커뮤니티 페이징2
     public Map<String, Object> newsPaging2(Integer currentPage, Integer count, String keyword) throws Exception {
-        System.out.println("APIService : " + keyword);
         if (keyword == null || keyword == "" || keyword.length() != 0) {
-            System.out.println("key  변경");
+//            System.out.println("key  변경");
 //            keyword="all";
         }
         Map<String, Object> reMap = new HashMap<>();
         int postTotalCount = this.countNews(keyword);
-        System.out.println("postTotalCount = " + postTotalCount);
 
         int recordCountPerPage = count; // 페이지 당 게시글 개수
         int naviCountPerPage = 10; // 내비 개수
@@ -724,9 +715,6 @@ public class ApiService {
             needNext = false;
         }
 
-        System.out.println("startNavi : " + startNavi);
-        System.out.println("endNavi : " + endNavi);
-        System.out.println("전체 글 개수 : " + pageTotalCount);
 
         reMap.put("pageTotalCount", pageTotalCount);
         reMap.put("startNavi", startNavi);

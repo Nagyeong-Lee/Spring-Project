@@ -19,6 +19,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 </head>
 <body>
+<input type="hidden" value="${keyword}" id="key" name="key">
 <%@ include file="/WEB-INF/views/product/navUtil.jsp" %>
 <input type="hidden" value="${optionDTO.size()}" id="optionYN">
 <div class="productDetail">
@@ -83,6 +84,8 @@
 </form>
 <script>
 
+    $("#keyword").val($("#key").val());
+
     $("#search").on("click",function(){
         let keyword = $("#keyword").val();
         location.href='/product/searchPd?keyword='+keyword;
@@ -110,7 +113,7 @@
             "pd_seq": $("#pd_seq").val()
         },
         success: function (data) {
-            console.log("data : " + data);
+
             if (data == 0) {
                 $("#likeBtn2").hide();
                 $("#likeBtn").show();
@@ -130,7 +133,7 @@
                 "pd_seq": $("#pd_seq").val()
             },
             success: function (data) {
-                console.log("data : " + data);
+
                 $("#likeBtn").hide();
                 $("#likeBtn2").show();
             }
@@ -146,7 +149,7 @@
                 "pd_seq": $("#pd_seq").val()
             },
             success: function (data) {
-                console.log("data : " + data);
+
                 $("#likeBtn").show();
                 $("#likeBtn2").hide();
             }
@@ -159,8 +162,7 @@
     //카테고리 개수 가져오는 함수
     $("select").change(function () {
         optionCount = $("select option:selected").text();
-        console.log(optionCount);
-        // console.log($("select option:selected").text()); //text값 가져오기
+
         //옵션 변경 시 초기화
         $("#count").val(0);
         $("#totalStock").text($("#originalTotalStock").val());
@@ -177,7 +179,6 @@
             if (str == 0) {
                 alert('옵션을 먼저 선택해주세요');
                 return;
-                // console.log('index : '+str.indexOf("--option--"))
             }
             let numbers = str.match(/\d+/g);
             // console.log(numbers); // ["40", "50"]
@@ -189,22 +190,16 @@
             for (let i = 0; i < numbers.length; i++) {
                 integerArray.push(parseInt(numbers[i]));
             }
-            // console.log(integerArray);
-            // console.log("count : " + count);
 
             //제일 작은 값 구하기
             let min = Math.min.apply(Math, integerArray);
-            // console.log(min);
 
             if (count >= 0 && count < min) {
                 count++
                 $("#count").val(count);
-                // console.log("count : " + count);
                 //총 수량 -
                 let totalStock = parseInt($("#totalStock").text());
                 totalStock--;
-                // console.log(totalStock);
-                console.log("totalStock : " + totalStock);
                 // if (totalStock >= 0) { //전체 수량 0개일때
                 //     alert('구매가 불가능한 상품입니다.');
                 // } else {
@@ -217,7 +212,6 @@
             let count = parseInt($("#count").val());
             count++;
             $("#count").val(count);
-            console.log("count : " + count);
             let totalStock = parseInt($("#totalStock").text());
             totalStock--;
             $("#totalStock").text(totalStock);
@@ -237,7 +231,6 @@
             if (str == 0) {
                 alert('수량은 1개 이상 선택 가능합니다.');
                 return;
-                // console.log('index : '+str.indexOf("--option--"))
             }
             let numbers = str.match(/\d+/g);
             // console.log(numbers); // ["40", "50"]s
@@ -247,11 +240,10 @@
             for (let i = 0; i < numbers.length; i++) {
                 integerArray.push(parseInt(numbers[i]));
             }
-            // console.log(integerArray);
 
             //제일 작은 값 구하기
             let min = Math.min.apply(Math, integerArray);
-            // console.log(min);
+
             if (count == 0) {
                 alert('수량을 1개 이상 선택해주세요.');
             } else if (count >= 0) {
@@ -261,7 +253,7 @@
                 //총 수량 +
                 let totalStock = parseInt($("#totalStock").text());
                 totalStock++;
-                console.log("- totalStock : " + totalStock);
+
                 // if (totalStock > parseInt($("#totalStock").text())) { //원래 전체 수량 보다 많을때
                 //     alert('구매가능한 수량이 아닙니다.');
                 // } else {
@@ -272,7 +264,7 @@
             let count = parseInt($("#count").val());
             count--;
             $("#count").val(count);
-            console.log("count : " + count);
+
             let totalStock = parseInt($("#totalStock").text());
             totalStock++;
             $("#totalStock").text(totalStock);
@@ -294,11 +286,10 @@
             }
 
             let str = optionCount;
-            console.log("str : " + str);
+
             if (str.indexOf("--option--") != -1) {
                 alert('옵션을 모두 선택해주세요');
                 return;
-                // console.log('index : '+str.indexOf("--option--"))
             }
 
             if ($("#count").val() == 0) { //수량 0일때
@@ -306,22 +297,18 @@
                 return;
             }
 
-            let regex = /([A-Za-z]+\(\d+\))/g;
+            let regex = /([A-Za-z0-9]+\(\d+\))/g;
             var numbers = str.match(regex);
-            console.log(numbers); //
+
             let count = parseInt($("#count").val());
             var integerArray2 = [];
-            console.log(numbers.length);
+
             for (let i = 0; i < numbers.length; i++) {
                 integerArray2.push(numbers[i]);
             }
             var cnt = $("#count").val(); //수량
             var id = $("#id").val(); //아이디
             var pd_seq = $("#pd_seq").val(); //상품 seq
-            console.log("count : " + count);
-            console.log("id : " + id);
-            console.log("pd_seq : " + pd_seq);
-            console.log(integerArray2);
 
             $.ajax({
                 url: '/product/addProduct',
@@ -333,7 +320,7 @@
                     "optionList": integerArray2.toString()
                 },
                 success: function (data) {
-                    console.log("data : " + data);
+
                     if (data == 'success') {
                         alert('상품을 장바구니에 추가했습니다.');
                         $("#frm").submit();
@@ -357,7 +344,7 @@
                     "pd_seq": pd_seq
                 },
                 success: function (data) {
-                    console.log("data : " + data);
+
                     if (data == 'success') {
                         alert('상품을 장바구니에 추가했습니다.');
                         $("#frm").submit();

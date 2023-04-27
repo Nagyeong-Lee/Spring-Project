@@ -306,7 +306,7 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
-                console.log("list길이 : " + data.items.length);
+
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
@@ -314,8 +314,7 @@
                 let cpage = data.currentPage;
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
-                console.log('data.cpage : ' + data.currentPage);
-                console.log('data.cnt : ' + data.count);
+
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $(".tbody").append(html);
@@ -365,7 +364,6 @@
             holidayN: $(".holidayN:checked").val() == '미진료' ? $(".holidayN:checked").val() : ''
         };
 
-        console.log(data);
         return data;
     }
 
@@ -467,7 +465,7 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
-                console.log("list길이 : " + data.items.length);
+
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
@@ -475,8 +473,7 @@
                 let cpage = data.currentPage;
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
-                console.log('data.cpage : ' + data.currentPage);
-                console.log('data.cnt : ' + data.count);
+
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $(".tbody").append(html);
@@ -531,7 +528,7 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
-                console.log("list길이 : " + data.items.length);
+
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
@@ -539,8 +536,7 @@
                 let cpage = data.currentPage;
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
-                console.log('data.cpage : ' + data.currentPage);
-                console.log('data.cnt : ' + data.count);
+
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $(".tbody").append(html);
@@ -595,7 +591,6 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
-                console.log("list길이 : " + data.items.length);
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
@@ -603,8 +598,7 @@
                 let cpage = data.currentPage;
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
-                console.log('data.cpage : ' + data.currentPage);
-                console.log('data.cnt : ' + data.count);
+
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $(".tbody").append(html);
@@ -637,7 +631,7 @@
     });
 
     $(".weekOpen").on("change", function () {
-        console.log("시작시간 변경할때");
+
         let result = changeOption();
         $.ajax({
             url: '/api/hospital/list',
@@ -659,7 +653,7 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
-                console.log("list길이 : " + data.items.length);
+
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
@@ -667,8 +661,7 @@
                 let cpage = data.currentPage;
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
-                console.log('data.cpage : ' + data.currentPage);
-                console.log('data.cnt : ' + data.count);
+
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $(".tbody").append(html);
@@ -722,7 +715,7 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
-                console.log("list길이 : " + data.items.length);
+
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
@@ -730,8 +723,7 @@
                 let cpage = data.currentPage;
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
-                console.log('data.cpage : ' + data.currentPage);
-                console.log('data.cnt : ' + data.count);
+
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $(".tbody").append(html);
@@ -785,7 +777,6 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
-                console.log("list길이 : " + data.items.length);
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
@@ -793,8 +784,7 @@
                 let cpage = data.currentPage;
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
-                console.log('data.cpage : ' + data.currentPage);
-                console.log('data.cnt : ' + data.count);
+
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $(".tbody").append(html);
@@ -848,7 +838,7 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
-                console.log("list길이 : " + data.items.length);
+
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
@@ -856,8 +846,7 @@
                 let cpage = data.currentPage;
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
-                console.log('data.cpage : ' + data.currentPage);
-                console.log('data.cnt : ' + data.count);
+
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $(".tbody").append(html);
@@ -892,15 +881,13 @@
     $(".holidayY").on("change", function () {
         let holY = $('.holidayY').is(':checked');
         let holN = $('.holidayN').is(':checked');
-        console.log("holY : " + holY);
-        console.log("holN : " + holN);
 
         if (!holY && !holN) {
             alert('진료 여부를 선택하세요');
             $('.holidayY').prop('checked', true);
             return false;
         }
-        console.log('change');
+
         let result = changeOption();
         $.ajax({
             url: '/api/hospital/list',
@@ -922,7 +909,7 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
-                console.log("list길이 : " + data.items.length);
+
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
@@ -930,8 +917,7 @@
                 let cpage = data.currentPage;
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
-                console.log('data.cpage : ' + data.currentPage);
-                console.log('data.cnt : ' + data.count);
+
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $(".tbody").append(html);
@@ -967,8 +953,7 @@
     $(".holidayN").on("change", function () {
         let holY = $('.holidayY').is(':checked');
         let holN = $('.holidayN').is(':checked');
-        console.log("holY : " + holY);
-        console.log("holN : " + holN);
+
         if (!holY && !holN) {
             alert('진료 여부를 선택하세요');
             $('.holidayN').prop('checked', true);

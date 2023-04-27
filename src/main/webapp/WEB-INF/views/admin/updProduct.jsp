@@ -146,6 +146,14 @@
         console.log(optionCategory);
         console.log(optionName);
         console.log(optionStock);
+
+        let map = new Map();
+        map.set("key", key);
+        map.set("category", optionCategory);
+        map.set("name", optionName);
+        map.set("stock", optionStock);
+        updOpt.push(map);
+        alert('옵션 수정 완료');
     }
 
     $(document).on("click", ".delBtn", function () {
@@ -214,7 +222,6 @@
         alert("옵션 추가 완료");
         console.log(optionArr);
         key--;
-
     });
 
     //초기화 클릭 시
@@ -233,22 +240,26 @@
         let optStockSum = 0;
         console.log($(".optionBox").length);
         for (let i = 0; i < $(".optionBox").length; i++) {
-            let optionBox =$(".optionBox")[i];
+            let optionBox = $(".optionBox")[i];
             let optionStock = $(optionBox).find(".optionStock")[0];
+            let optionCategory = $(optionBox).find(".optionCategory")[0];
+            console.log("optionCategory");
+            console.log($(optionCategory).val());
             console.log($(optionStock).val());
-            optStockSum+=Number($(optionStock).val());
+            optStockSum += Number($(optionStock).val());
             console.log('옵션 재고 : ');
             console.log(optionStock);
+
         }
         console.log("optStockSum");
         console.log(optStockSum);
 
         let pdStock = $("#stock").val(); //상품 재고
         //상품재고보다 옵션재고 많을때
-        if(optStockSum>Number(pdStock)){
-            alert('옵션 재고가 상품 재고보다 많을 수 없습니다.');
-            return;
-        }
+        // if(optStockSum>Number(pdStock)){
+        //     alert('옵션 재고가 상품 재고보다 많을 수 없습니다.');
+        //     return;
+        // }
         if ($("#name").val().length == 0) {
             alert('상품명을 입력하세요');
             return;
