@@ -189,11 +189,11 @@ public class MemberController {
                     /*로그인 했을 때 -> 쿠폰 만료 확인*/
                     Integer m_seq = productService.getMemberSeq(id);//m_seq 가져오기
                     List<CouponDTO> couponDTOList = productService.getCoupon(m_seq);//쿠폰 리스트 가져오기
-                    for(int i = 0 ; i<couponDTOList.size(); i++){  //status y인것만
+                    for (int i = 0; i < couponDTOList.size(); i++) {  //status y인것만
                         List<CouponDTO> val = productService.checkCouponPr();
-                       for(int k=0; k<val.size(); k++){
-                           productService.updCoupon(val.get(k).getCp_seq()); //status n으로
-                       }
+                        for (int k = 0; k < val.size(); k++) {
+                            productService.updCoupon(val.get(k).getCp_seq()); //status n으로
+                        }
                     }
                     result = "redirect:/member/myPage";
                 } else {
@@ -223,6 +223,23 @@ public class MemberController {
     public String toUpdateForm(Model model, @RequestParam String id) throws Exception {
         MemberDTO memberDTO = service.memberInfo(id);//회원 정보 가져오기
         model.addAttribute("memberDTO", memberDTO);
+        String communityPath = pathService.getCommunityPath();
+        String deletePath = pathService.getDeletePath();
+        String updateFormPath = pathService.getUpdateFormPath();
+        String logoutPath = pathService.getDaily();
+        String daily = pathService.getMonthly();
+        String monthly = pathService.getLogoutPath();
+        String hospitalPath = pathService.getHospitalPath();
+
+        List<PathDTO> pathList = pathService.getPathList();
+        model.addAttribute("updateFormPath", updateFormPath);
+        model.addAttribute("deletePath", deletePath);
+        model.addAttribute("logoutPath", logoutPath);
+        model.addAttribute("communityPath", communityPath);
+        model.addAttribute("hospitalPath", hospitalPath);
+        model.addAttribute("daily", daily);
+        model.addAttribute("monthly", monthly);
+        model.addAttribute("pathList", pathList);
         return "/member/updateForm";
     }
 
@@ -309,7 +326,7 @@ public class MemberController {
         String monthly = pathService.getLogoutPath();
         String hospitalPath = pathService.getHospitalPath();
 
-        List<PathDTO> list = pathService.getPathList();
+        List<PathDTO> pathList = pathService.getPathList();
         model.addAttribute("updateFormPath", updateFormPath);
         model.addAttribute("deletePath", deletePath);
         model.addAttribute("logoutPath", logoutPath);
@@ -317,7 +334,7 @@ public class MemberController {
         model.addAttribute("hospitalPath", hospitalPath);
         model.addAttribute("daily", daily);
         model.addAttribute("monthly", monthly);
-        model.addAttribute("list", list);
+        model.addAttribute("pathList", pathList);
         return "/member/myPage";
     }
 

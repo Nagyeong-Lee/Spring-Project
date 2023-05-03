@@ -8,17 +8,39 @@
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+            crossorigin="anonymous"></script>
     <style>
         img {
             width: 200px;
             height: 200px;
         }
+
+        #footer{
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40; /* 배경색상 */
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            padding: 15px; /* 위아래/좌우 패딩 */
+        }
+
     </style>
+
+    <link rel="stylesheet" type="text/css" href="/resources/asset/css/util.css">
+
 </head>
 <body>
+<input type="hidden" value="${id}" id="session">
+<%@ include file="/WEB-INF/views/product/communityNavUtil.jsp" %>
+
 <c:if test="${not empty memberDTO}">
-    <div class="updateInfoBox">
+    <div class="updateInfoBox" style="margin-top: 50px;">
         <form action="/member/update" method="post" id="frm" enctype="multipart/form-data">
             <input type="hidden" id="m_seq"  name="m_seq" value="${memberDTO.m_seq}">
             <div>아이디
@@ -42,7 +64,7 @@
             </div>
 
             <input type="text" id="postcode" name="postcode" placeholder="우편번호" value="${memberDTO.postcode}">
-            <input type="button" onclick="sample4_execDaumPostcode()" value="우편번호 찾기"><br>
+            <input type="button" onclick="sample4_execDaumPostcode()" value="우편번호 찾기" class="btn btn-primary"><br>
             <input type="text" id="roadAddress" name="roadAddress" placeholder="도로명주소" value="${memberDTO.roadAddress}"><br>
             <input type="text" id="jibunAddress" name="jibunAddress" placeholder="지번주소" value="${memberDTO.jibunAddress}"><br>
             <input type="text" id="detailAddress" name="detailAddress" placeholder="상세주소" value="${memberDTO.detailAddress}">
@@ -52,18 +74,27 @@
                 <input type="file" id="file" name="file"><br>
             </div>
             <div>
-                <button type="button" id="updateBtn">수정하기</button>
+                <button type="button" id="updateBtn" class="btn btn-primary">수정하기</button>
                 <a href="/member/myPage">
-                    <button type="button">취소</button>
+                    <button type="button" class="btn btn-primary">취소</button>
                 </a>
             </div>
         </form>
     </div>
 </c:if>
 
+<button  type="button" id="delete" class="btn btn-primary">탈퇴하기</button><!-- Footer-->
 
+<footer class="py-5 bg-dark" id="footer" >
+    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+</footer>
+
+<script src="/resources/asset/js/util.js"></script>
 <script>
 
+    $("#delete").click(function(){
+        location.href='/member/delete?id='+$("#session").val();
+    })
     //pw 일치 여부
     // let pwOk = false;
 

@@ -15,6 +15,12 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
     <style>
         * {
             padding: 0;
@@ -105,53 +111,78 @@
             clear: both;
         }
 
-        .img{
+        .img {
             width: 200px;
             heigth: 200px;
+        }
+
+        footer{
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40; /* 배경색상 */
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            padding: 15px; /* 위아래/좌우 패딩 */
         }
     </style>
 </head>
 <body>
 <input type="hidden" value="${keyword}" id="key" name="key">
-<%@ include file="/WEB-INF/views/product/navUtil.jsp" %>
-
-<div class="product-list">
-        <c:choose>
-            <c:when test="${!empty product}">
-                <c:forEach var="i" items="${product}" >
-                        <div class="product">
-                            <img src="/resources/img/products/${i.img}" width="225" class="img" >
-                            <div class="product-name">
-                                <a href="/product/detail?pd_seq=${i.pd_seq}">${i.name}</a>
-                            </div>
-                            <div class="product-price">
-                                <fmt:formatNumber value="${i.price}" pattern="#,###"/>원
-                            </div>
-                       </div>
-                </c:forEach>
-            </c:when>
-        </c:choose>
-</div>
+<input type="hidden" value="${id}" id="id" name="id">
+<%@ include file="/WEB-INF/views/product/pdListUtil.jsp"%>
+<!-- Bootstrap core JS-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Core theme JS-->
+<script src="/resources/asset/js/scripts.js"></script>
+</body>
 
 <script>
-    $("#keyword").val($("#key").val());
-    $("#search").on("click",function(){
-        let keyword = $("#keyword").val();
-        location.href='/product/searchPd?keyword='+keyword;
-    });
-
-    function toCart(){
+    $("#cart").click(function(){
         let newForm = document.createElement("form");
         newForm.setAttribute("method","post");
         newForm.setAttribute("action","/product/cart");
         let newInput = document.createElement("input");
         newInput.setAttribute("type","hidden");
         newInput.setAttribute("name","id");
-        newInput.setAttribute("value",$("#session").val());
+        newInput.setAttribute("value",$("#id").val());
         newForm.appendChild(newInput);
         document.body.append(newForm);
         newForm.submit();
-    }
+    })
+    $("#keyword").val($("#key").val());
+    $("#search").on("click", function () {
+        let keyword = $("#keyword").val();
+        location.href = '/product/searchPd?keyword=' + keyword;
+    });
+
+    // function toCart() {
+    //     let newForm = document.createElement("form");
+    //     newForm.setAttribute("method", "post");
+    //     newForm.setAttribute("action", "/product/cart");
+    //     let newInput = document.createElement("input");
+    //     newInput.setAttribute("type", "hidden");
+    //     newInput.setAttribute("name", "id");
+    //     newInput.setAttribute("value", $("#session").val());
+    //     newForm.appendChild(newInput);
+    //     document.body.append(newForm);
+    //     newForm.submit();
+    // }
+
+
+    $("#cart").click(function(){
+        let newForm = document.createElement("form");
+        newForm.setAttribute("method","post");
+        newForm.setAttribute("action","/product/cart");
+        let newInput = document.createElement("input");
+        newInput.setAttribute("type","hidden");
+        newInput.setAttribute("name","id");
+        newInput.setAttribute("value",$("#id").val());
+        newForm.appendChild(newInput);
+        document.body.append(newForm);
+        newForm.submit();
+    })
 </script>
 </body>
 </html>

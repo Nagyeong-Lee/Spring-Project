@@ -156,11 +156,10 @@ public class MemberService {
     public List<CouponDTO>getCoupon(Integer m_seq) throws Exception{
         return mapper.getCoupon(m_seq);
     }
-
-
     public MemberDTO getMemInfo(String id) throws Exception{
         return mapper.getMemInfo(id);
     }
+
 
 
 }

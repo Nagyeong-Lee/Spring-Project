@@ -36,8 +36,8 @@ public class ProductController {
 
     @RequestMapping("/list") //전체 상품 리스트
     public String productList(Model model) throws Exception {
-        List<ProductDTO> product = productService.getProducts();
-        model.addAttribute("product", product);
+        List<ProductDTO> productDTOList = productService.getProducts();
+        model.addAttribute("productDTOList", productDTOList);
         return "/product/productList";
     }
 
@@ -341,8 +341,14 @@ public class ProductController {
         return "success";
     }
 
-    @RequestMapping("/payInfo")
-    public String toPayInfo(Model model, String data, Integer price) throws Exception { //data : id
+    @RequestMapping("/payInfo") //결제하기
+    public String toPayInfo(Model model, String data, Integer price, String buyPdSeq) throws Exception { //data : id
+        System.out.println("buyPdSeq = " + buyPdSeq);
+        String[] arr = buyPdSeq.split(",");
+        List<Integer> buyList = new ArrayList<>();
+        for (int i = 0; i < arr.length; i++) {
+            buyList.add(Integer.parseInt(arr[i]));
+        }
         List<Map<String, Object>> optionList = new ArrayList<>();
         JsonParser jsonParser = new JsonParser();
         JsonArray jsonArray = new JsonArray();
@@ -355,36 +361,40 @@ public class ProductController {
 
         /*중복 제거*/
 
-        for (Integer i = 0; i < cartInfo.size(); i++) {
-            list = productService.getOptionCategory(cartInfo.get(i).getCart_seq());
-            Map<String, Object> item = new HashMap<>();
-            item.put("id", cartInfo.get(i).getId());
-            item.put("count", cartInfo.get(i).getCount());
-            item.put("cart_seq", cartInfo.get(i).getCart_seq());
-            item.put("status", cartInfo.get(i).getStatus());
-            item.put("pd_seq", cartInfo.get(i).getPd_seq());
-            item.put("name", cartInfo.get(i).getName());
-            item.put("description", cartInfo.get(i).getDescription());
-            item.put("price", cartInfo.get(i).getPrice());
-            item.put("stock", cartInfo.get(i).getStock());
-            item.put("img", cartInfo.get(i).getImg());
-            item.put("category", cartInfo.get(i).getCategory());
-            item.put("totalPrice", cartInfo.get(i).getPrice() * cartInfo.get(i).getCount());
-
+        for (Integer i = 0; i < buyList.size(); i++) {
+            //count,pd_seq,options
+            Integer pd_seq = productService.getPdSeq(buyList.get(i));
+            ProductDTO productDTO = productService.getPdInfo(pd_seq);
+            list = productService.getOptionCategory(buyList.get(i));
             //돌면서 상품 개수, 상품 가격 가져오고 더하기
-            Integer pdCount = cartInfo.get(i).getCount();
-            Integer pdProduct_seq = cartInfo.get(i).getPd_seq();
-            Integer pdPrice = productService.getPdPrice(pdProduct_seq);
+            Integer count = productService.getPdCount(buyList.get(i));
+            Integer pd_price = productService.getPdPrice(pd_seq);
 
-            totalPrice += pdPrice * pdCount;
-            totalSum += pdCount;
+            System.out.println("count = " + count);
+            System.out.println("pd_seq = " + pd_seq);
+            System.out.println("pd_price = " + pd_price);
+            totalPrice += count * pd_price;
+            totalSum += count;
 
-            if (cartInfo.get(i).getOptions() != null) {
-                Object object = jsonParser.parse(cartInfo.get(i).getOptions());
+            Map<String, Object> item = new HashMap<>();
+            item.put("id", data);
+            item.put("count", count);
+            item.put("cart_seq", buyList.get(i));
+            item.put("pd_seq", pd_seq);
+            item.put("name", productDTO.getName());
+            item.put("description", productDTO.getDescription());
+            item.put("price", productDTO.getImg());
+            item.put("stock", productDTO.getStock());
+            item.put("img", productDTO.getImg());
+            item.put("category", productDTO.getCategory());
+
+            if (productService.getOption(buyList.get(i)) != null) {
+                Object object = jsonParser.parse(productService.getOption(buyList.get(i)));
                 jsonObject = (JsonObject) object;
                 jsonArray = (JsonArray) jsonObject.get("name");
                 List<Map<String, Object>> optionMap = new ArrayList<>();
                 for (Integer k = 0; k < list.size(); k++) {
+                    System.out.println("list.size() = " + list.size());
                     Map<String, Object> map = new HashMap<>();
                     String category = list.get(k);
                     String option = String.valueOf(jsonArray.get(k)).replace("\"", "");
@@ -398,7 +408,6 @@ public class ProductController {
             }
         }
 
-
         Map<String, Object> deliAddress = new HashMap<>();
         String name = productService.getName(data);//이름
         String phone = productService.getPhone(data);//폰
@@ -410,13 +419,33 @@ public class ProductController {
 
         MemberDTO memberDTO = memberService.getMemInfo(data);
 
+
+//        if (productService.getId(data) != 0) {
+//            productService.updateBuyPd(data,totalSum,totalPrice);
+//            //update
+//        } else {
+//            //insert
+//            productService.insertBuyPd(data,totalSum,totalPrice);
+//        }
+
         model.addAttribute("cart", cart);
-        model.addAttribute("totalPrice", totalPrice);
-        model.addAttribute("totalSum", totalSum);
         model.addAttribute("deliAddress", deliAddress);
         model.addAttribute("price", price); //실제 총 합계
         model.addAttribute("memberDTO", memberDTO); //회원 정보
+        model.addAttribute("totalPrice", totalPrice);
+        model.addAttribute("totalSum", totalSum);
         return "/product/payInfo";
+    }
+
+    @ResponseBody
+    @RequestMapping("/getTotal")
+    public Map<String, Object> getTotal(String id) throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        Integer price = productService.getPrice(id);
+        Integer total_sum = productService.getSum(id);
+        map.put("price", price);
+        map.put("total_sum", total_sum);
+        return map;
     }
 
     @ResponseBody
@@ -559,7 +588,6 @@ public class ProductController {
                 }
             }
         }
-
 
 
         //장바구니 비우기
@@ -774,8 +802,8 @@ public class ProductController {
     //상품 검색
     @RequestMapping("/searchPd")
     public String searchPd(String keyword, Model model) throws Exception {
-        List<ProductDTO> product = productService.getProductsByKeyword(keyword);
-        model.addAttribute("product", product);
+        List<ProductDTO> productDTOList = productService.getProductsByKeyword(keyword);
+        model.addAttribute("productDTOList", productDTOList);
         model.addAttribute("keyword", keyword);
         return "/product/productList";
     }

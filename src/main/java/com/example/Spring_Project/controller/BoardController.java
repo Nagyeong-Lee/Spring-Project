@@ -2,10 +2,12 @@ package com.example.Spring_Project.controller;
 
 import com.example.Spring_Project.dto.BoardDTO;
 import com.example.Spring_Project.dto.FileDTO;
+import com.example.Spring_Project.dto.PathDTO;
 import com.example.Spring_Project.dto.ReplyDTO;
 import com.example.Spring_Project.service.BoardService;
 import com.example.Spring_Project.service.CommentService;
 import com.example.Spring_Project.service.FileService;
+import com.example.Spring_Project.service.PathService;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,8 @@ public class BoardController {
 
     @Autowired
     private CommentService commentService;
+    @Autowired
+    private PathService pathService;
 
     @Autowired
     private FileService fileService;
@@ -71,6 +75,25 @@ public class BoardController {
         model.addAttribute("currPage",currPage);
         model.addAttribute("count",count);
         model.addAttribute("postNum",postNum);
+
+        String communityPath = pathService.getCommunityPath();
+        String deletePath = pathService.getDeletePath();
+        String updateFormPath = pathService.getUpdateFormPath();
+        String logoutPath = pathService.getDaily();
+        String daily = pathService.getMonthly();
+        String monthly = pathService.getLogoutPath();
+        String hospitalPath = pathService.getHospitalPath();
+
+        List<PathDTO> pathList = pathService.getPathList();
+        model.addAttribute("updateFormPath", updateFormPath);
+        model.addAttribute("deletePath", deletePath);
+        model.addAttribute("logoutPath", logoutPath);
+        model.addAttribute("communityPath", communityPath);
+        model.addAttribute("hospitalPath", hospitalPath);
+        model.addAttribute("daily", daily);
+        model.addAttribute("monthly", monthly);
+        model.addAttribute("pathList", pathList);
+
         return "/board/main";
     }
 
@@ -79,6 +102,24 @@ public class BoardController {
         model.addAttribute("b_seq", b_seq);
         model.addAttribute("count", count);
         model.addAttribute("currentPage", currentPage);
+
+        String communityPath = pathService.getCommunityPath();
+        String deletePath = pathService.getDeletePath();
+        String updateFormPath = pathService.getUpdateFormPath();
+        String logoutPath = pathService.getDaily();
+        String daily = pathService.getMonthly();
+        String monthly = pathService.getLogoutPath();
+        String hospitalPath = pathService.getHospitalPath();
+
+        List<PathDTO> pathList = pathService.getPathList();
+        model.addAttribute("updateFormPath", updateFormPath);
+        model.addAttribute("deletePath", deletePath);
+        model.addAttribute("logoutPath", logoutPath);
+        model.addAttribute("communityPath", communityPath);
+        model.addAttribute("hospitalPath", hospitalPath);
+        model.addAttribute("daily", daily);
+        model.addAttribute("monthly", monthly);
+        model.addAttribute("pathList", pathList);
         return "/board/writeForm";
     }
 
@@ -135,6 +176,25 @@ public class BoardController {
         BoardDTO boardDTO = service.getBoardDetail(b_seq);   //게시글 상세 정보 가져오기
         List<ReplyDTO> commentList = commentService.getComment(b_seq);
         List<FileDTO> list = fileService.getFile(b_seq);
+
+        String communityPath = pathService.getCommunityPath();
+        String deletePath = pathService.getDeletePath();
+        String updateFormPath = pathService.getUpdateFormPath();
+        String logoutPath = pathService.getDaily();
+        String daily = pathService.getMonthly();
+        String monthly = pathService.getLogoutPath();
+        String hospitalPath = pathService.getHospitalPath();
+
+        List<PathDTO> pathList = pathService.getPathList();
+        model.addAttribute("updateFormPath", updateFormPath);
+        model.addAttribute("deletePath", deletePath);
+        model.addAttribute("logoutPath", logoutPath);
+        model.addAttribute("communityPath", communityPath);
+        model.addAttribute("hospitalPath", hospitalPath);
+        model.addAttribute("daily", daily);
+        model.addAttribute("monthly", monthly);
+        model.addAttribute("pathList", pathList);
+
 
         model.addAttribute("boardDTO", boardDTO);
         model.addAttribute("commentList", commentList); //댓글 가져오기

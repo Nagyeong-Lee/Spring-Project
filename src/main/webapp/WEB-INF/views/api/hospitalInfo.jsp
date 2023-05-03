@@ -14,10 +14,30 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="/resources/asset/css/util.css">
+
+
+    <style>
+        #footer{
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40; /* 배경색상 */
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            padding: 15px; /* 위아래/좌우 패딩 */
+        }
+    </style>
 </head>
 <body>
-
-<select name="city" id="city">
+<%@ include file="/WEB-INF/views/product/communityNavUtil.jsp" %>
+<select name="city" id="city" style="margin-top: 50px;">
     <option value="ALL" <c:out value="${cityOption eq 'ALL'  ? 'selected' :''}"/>>전체지역</option>
     <c:forEach var="i" items="${city}">
         <option value="${i}" <c:out value="${city ne 'ALL' and cityOption eq i ? 'selected' :''}"/> >${i}</option>
@@ -97,20 +117,20 @@
     <input type="hidden" name="keyword" id="key">
 </form>
 
-<table style="border: 1px solid black">
+<table style="border: 1px solid black" class="table">
     <thead>
-    <th>지역명</th>
-    <th>병원명</th>
-    <th>평일</th>
-    <th>토요일</th>
-    <th>일요일/공휴일</th>
-    <th>전화번호</th>
+    <th scope="col">지역명</th>
+    <th scope="col">병원명</th>
+    <th scope="col">평일</th>
+    <th scope="col">토요일</th>
+    <th scope="col">일요일/공휴일</th>
+    <th scope="col">전화번호</th>
     </thead>
     <tbody class="tbody">
     <c:choose>
         <c:when test="${not empty test}">
             <c:forEach var="i" items="${test}">
-                <tr>
+                <tr scope="row">
                     <td>${i.city}</td>
                     <td>
                         <a href="javascript:void(0);"
@@ -132,7 +152,7 @@
     </tbody>
 </table>
 
-<div class="pagingDiv">
+<div class="pagingDiv" style="text-align: center">
     <c:choose>
         <c:when test="${needPrev eq true}">
             <c:if test="${searchType eq null and keyword eq null}">
@@ -190,21 +210,25 @@
     </c:choose>
 </div>
 <%--${paging}<br>--%>
-<select name="searchType" id="searchType">
-    <option value="hospital_name"<c:out value="${searchType eq 'hospital_name' ? 'selected' : ''}"/>>병원명</option>
-    <option value="phone"<c:out value="${searchType eq 'phone' ? 'selected' : ''}"/>>전화번호</option>
-    <option value="postcode"<c:out value="${searchType eq 'postcode' ? 'selected' : ''}"/>>우편번호</option>
-    <option value="roadAddress"<c:out value="${searchType eq 'roadAddress' ? 'selected' : ''}"/>>도로명 주소</option>
-</select>
-<input type="text" name="keyword" id="keyword" value="${keyword}">
-<button type="button" id="searchBtn">검색</button>
-<select name="count" id="count">
-    <option value="10"<c:out value="${count eq '10' ? 'selected' : ''}"/>>10개씩 보기</option>
-    <option value="30"<c:out value="${count eq '30' ? 'selected' : ''}"/>>30개씩 보기</option>
-    <option value="50"<c:out value="${count eq '50' ? 'selected' : ''}"/>>50개씩 보기</option>
-</select>
-<button type="button" id="reset">리셋</button>
-<a href="/member/myPage"><button type="button">마이페이지로</button></a>
+<div class="btn" style="margin-left: 750px;">
+    <select name="searchType" id="searchType">
+        <option value="hospital_name"<c:out value="${searchType eq 'hospital_name' ? 'selected' : ''}"/>>병원명</option>
+        <option value="phone"<c:out value="${searchType eq 'phone' ? 'selected' : ''}"/>>전화번호</option>
+        <option value="postcode"<c:out value="${searchType eq 'postcode' ? 'selected' : ''}"/>>우편번호</option>
+        <option value="roadAddress"<c:out value="${searchType eq 'roadAddress' ? 'selected' : ''}"/>>도로명 주소</option>
+    </select>
+    <input type="text" name="keyword" id="keyword" value="${keyword}">
+    <button type="button" id="searchBtn" class="btn btn-primary">검색</button>
+    <select name="count" id="count">
+        <option value="10"<c:out value="${count eq '10' ? 'selected' : ''}"/>>10개씩 보기</option>
+        <option value="30"<c:out value="${count eq '30' ? 'selected' : ''}"/>>30개씩 보기</option>
+        <option value="50"<c:out value="${count eq '50' ? 'selected' : ''}"/>>50개씩 보기</option>
+    </select>
+    <button type="button" id="reset" class="btn btn-primary">리셋</button>
+    <a href="/member/myPage">
+        <button type="button" class="btn btn-primary">마이페이지로</button>
+    </a>
+</div>
 
 <form id="frm" name="frm" method="post" action="/api/detail">
     <input type="hidden" name="hospital_seq" id="hospital_seq1"/>
@@ -257,8 +281,14 @@
     <input type="hidden" name="holidayOpen" id="holidayOpen3"/>
     <input type="hidden" name="holidayClose" id="holidayClose3"/>
 </form>
-<script>
 
+<!-- Footer-->
+<footer class="py-5 bg-dark" id="footer" >
+    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+</footer>
+
+<script src="/resources/asset/js/util.js"></script>
+<script>
     //리셋
     $("#reset").on("click", function () {
         location.reload();

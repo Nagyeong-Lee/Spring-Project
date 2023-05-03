@@ -84,4 +84,5 @@ public interface MemberMapper {
     List<CouponDTO>getCoupon(@Param("m_seq") Integer m_seq);
     MemberDTO getMemInfo(@Param("id") String id);
 
+
 }

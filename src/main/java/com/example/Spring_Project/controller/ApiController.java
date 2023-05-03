@@ -37,6 +37,24 @@ public class ApiController {
     public String api(Model model) throws Exception {
         InfectionDTO infectionDTO = apiService.getInfectionInfo();
         model.addAttribute("infectionDTO", infectionDTO);
+        String communityPath = pathService.getCommunityPath();
+        String deletePath = pathService.getDeletePath();
+        String updateFormPath = pathService.getUpdateFormPath();
+        String logoutPath = pathService.getDaily();
+        String daily = pathService.getMonthly();
+        String monthly = pathService.getLogoutPath();
+        String hospitalPath = pathService.getHospitalPath();
+
+        List<PathDTO> pathList = pathService.getPathList();
+        model.addAttribute("updateFormPath", updateFormPath);
+        model.addAttribute("deletePath", deletePath);
+        model.addAttribute("logoutPath", logoutPath);
+        model.addAttribute("communityPath", communityPath);
+        model.addAttribute("hospitalPath", hospitalPath);
+        model.addAttribute("daily", daily);
+        model.addAttribute("monthly", monthly);
+        model.addAttribute("pathList", pathList);
+
         return "/api/infectionChart";
     }
 
@@ -51,6 +69,24 @@ public class ApiController {
             map.put("sum", list.get(i).getSum());
             mapList.add(map);
         }
+        String communityPath = pathService.getCommunityPath();
+        String deletePath = pathService.getDeletePath();
+        String updateFormPath = pathService.getUpdateFormPath();
+        String logoutPath = pathService.getDaily();
+        String daily = pathService.getMonthly();
+        String monthly = pathService.getLogoutPath();
+        String hospitalPath = pathService.getHospitalPath();
+
+        List<PathDTO> pathList = pathService.getPathList();
+        model.addAttribute("updateFormPath", updateFormPath);
+        model.addAttribute("deletePath", deletePath);
+        model.addAttribute("logoutPath", logoutPath);
+        model.addAttribute("communityPath", communityPath);
+        model.addAttribute("hospitalPath", hospitalPath);
+        model.addAttribute("daily", daily);
+        model.addAttribute("monthly", monthly);
+        model.addAttribute("pathList", pathList);
+
         model.addAttribute("mapList", mapList);
         return "/api/infectionChartByMonth";
     }
@@ -190,6 +226,25 @@ public class ApiController {
         model.addAttribute("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));
         model.addAttribute("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
         model.addAttribute("pageTotalCount", Integer.parseInt(paging.get("pageTotalCount").toString()));
+
+        String communityPath = pathService.getCommunityPath();
+        String deletePath = pathService.getDeletePath();
+        String updateFormPath = pathService.getUpdateFormPath();
+        String logoutPath = pathService.getDaily();
+        String daily = pathService.getMonthly();
+        String monthly = pathService.getLogoutPath();
+        String hospitalPath = pathService.getHospitalPath();
+
+        List<PathDTO> pathList = pathService.getPathList();
+        model.addAttribute("updateFormPath", updateFormPath);
+        model.addAttribute("deletePath", deletePath);
+        model.addAttribute("logoutPath", logoutPath);
+        model.addAttribute("communityPath", communityPath);
+        model.addAttribute("hospitalPath", hospitalPath);
+        model.addAttribute("daily", daily);
+        model.addAttribute("monthly", monthly);
+        model.addAttribute("pathList", pathList);
+
         return "/api/hospitalInfo";
     }
 
@@ -344,14 +399,14 @@ public class ApiController {
     @RequestMapping("/searchNews")
     public String searchNews(Model model,Integer currentPage,Integer count,String keyword) throws Exception {
         List<CodeInfoDTO> list = apiService.getCode_info();
-        List<PathDTO> pathList = pathService.getNewsPathList();
+//        List<PathDTO> pathList = pathService.getNewsPathList();
         Integer start = currentPage * count - (count - 1); //시작 글 번호
         Integer end = currentPage * count; // 끝 글 번호
 
         List<NewsDTO> newsList = apiService.getNewsList(start,end); // 전체 뉴스 가져오기
         Map<String,Object>paging=apiService.newsPaging1(currentPage,count);
         model.addAttribute("list", list);
-        model.addAttribute("pathList", pathList);
+//        model.addAttribute("pathList", pathList);
         model.addAttribute("newsList", newsList);
 
         model.addAttribute("currentPage", currentPage);
@@ -364,6 +419,26 @@ public class ApiController {
         model.addAttribute("paging",paging);
         model.addAttribute("count",count);
         model.addAttribute("keyword",keyword);
+
+        String communityPath = pathService.getCommunityPath();
+        String deletePath = pathService.getDeletePath();
+        String updateFormPath = pathService.getUpdateFormPath();
+        String logoutPath = pathService.getDaily();
+        String daily = pathService.getMonthly();
+        String monthly = pathService.getLogoutPath();
+        String hospitalPath = pathService.getHospitalPath();
+
+        List<PathDTO> pathList = pathService.getPathList();
+        model.addAttribute("updateFormPath", updateFormPath);
+        model.addAttribute("deletePath", deletePath);
+        model.addAttribute("logoutPath", logoutPath);
+        model.addAttribute("communityPath", communityPath);
+        model.addAttribute("hospitalPath", hospitalPath);
+        model.addAttribute("daily", daily);
+        model.addAttribute("monthly", monthly);
+        model.addAttribute("pathList", pathList);
+
+
         return "/api/news";
 
     }

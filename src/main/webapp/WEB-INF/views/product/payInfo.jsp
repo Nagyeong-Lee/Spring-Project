@@ -14,12 +14,17 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
-    <link rel="stylesheet" type="text/css" href="/resources/navUtil.css">
+<%--    <link rel="stylesheet" type="text/css" href="/resources/navUtil.css">--%>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/resources/cart.css">
-
+    <link rel="stylesheet" type="text/css" href="/resources/cart.css">
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
     <!-- jQuery -->
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <!-- iamport.payment.js -->
@@ -28,14 +33,15 @@
 </head>
 <body>
 <input type="hidden" value="${keyword}" id="key" name="key">
-<%@ include file="/WEB-INF/views/product/navUtil.jsp" %>
+<%--<%@ include file="/WEB-INF/views/product/navUtil.jsp" %>--%>
 <input type="hidden" value="${id}" id="session">
 <input type="hidden" value="${cart}" id="cartInfo">
-<input type="hidden" value="${price}" id="totalPrice">
+<input type="hidden" value="${totalPrice}" id="totalPrice">
 <input type="hidden" value="${totalSum}" id="totalSum">
 <input type="hidden" value="${memberDTO.name}" id="mem_name">
 <input type="hidden" value="${memberDTO.phone}" id="mem_phone">
 <input type="hidden" value="${memberDTO.email}" id="mem_email">
+<%@ include file="/WEB-INF/views/product/shopUtil.jsp" %>
 <div class="cart">
     <input type="hidden" id="cartLength" value="${cart.size()}">
     <table class="cart__list">
@@ -96,12 +102,14 @@
     <div class="cart__mainbtns">
         <button class="cart__bigorderbtn left" id="continue">쇼핑 계속하기</button>
         <button class="cart__bigorderbtn right" id="pay" type="button">
-            <fmt:formatNumber pattern="#,###" value="${price}"/>원 결제하기
+            <fmt:formatNumber pattern="#,###" value="${totalPrice}"/>원 결제하기
         </button>
         <input type="hidden" value="${price}" id="totalMoney" name="price">
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/resources/asset/js/scripts.js"></script>
 <script>
 
     $("#keyword").val($("#key").val());
@@ -111,19 +119,32 @@
         location.href = '/product/searchPd?keyword=' + keyword;
     });
 
-    function toCart() { //장바구니로 이동
+    // function toCart() { //장바구니로 이동
+    //     let newForm = document.createElement("form");
+    //     newForm.setAttribute("method", "post");
+    //     newForm.setAttribute("action", "/product/cart");
+    //     let newInput = document.createElement("input");
+    //     newInput.setAttribute("type", "hidden");
+    //     newInput.setAttribute("name", "id");
+    //     newInput.setAttribute("value", $("#session").val());
+    //     newForm.appendChild(newInput);
+    //     document.body.append(newForm);
+    //     newForm.submit();
+    // }
+
+
+    $("#cart").click(function(){
         let newForm = document.createElement("form");
-        newForm.setAttribute("method", "post");
-        newForm.setAttribute("action", "/product/cart");
+        newForm.setAttribute("method","post");
+        newForm.setAttribute("action","/product/cart");
         let newInput = document.createElement("input");
-        newInput.setAttribute("type", "hidden");
-        newInput.setAttribute("name", "id");
-        newInput.setAttribute("value", $("#session").val());
+        newInput.setAttribute("type","hidden");
+        newInput.setAttribute("name","id");
+        newInput.setAttribute("value",$("#id").val());
         newForm.appendChild(newInput);
         document.body.append(newForm);
         newForm.submit();
-    }
-
+    })
 
     $("#continue").on("click", function () {
         location.href = "/product/list";
@@ -194,6 +215,8 @@
     });
 
 
+    var pd_sum;
+    var pd_price;
     //결제 하기 클릭
     $("#pay").on("click", function () {
         requestPay();
@@ -203,11 +226,26 @@
     IMP.init("imp62163330");
 
     function requestPay() {
+
+        // $.ajax({
+        //     url:'/product/getTotal',
+        //     type:'post',
+        //     data:{
+        //         "id": $("#session").val()
+        //     },
+        //     async:false,
+        //     success:function(data){
+        //         pd_price = data.price;
+        //         pd_sum = data.total_sum;
+        //     }
+        // })
+
         var email = $("#mem_email").val();
         var name = $("#mem_name").val();
         var phone = $("#mem_phone").val();
         var address = $("#defaultAddress").text();
-        var price = $("#totalPrice").val()
+        var price = $("#totalPrice").val();
+        console.log("price : " + price);
         if ($("#totalSum").val() != 1) {
             var title = $(".pdName1").text() + '외 ' + ($("#totalSum").val() - $(".pdCnt1").val());
         } else {

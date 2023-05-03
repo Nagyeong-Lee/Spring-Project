@@ -8,9 +8,14 @@
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+            crossorigin="anonymous"></script>
 </head>
 <body>
-<div class="signUpBox">
+<div class="signUpBox" style="text-align: center; margin-top: 150px;">
     <form action="/member/signUp" method="post" id="frm" name="signUp_form" enctype="multipart/form-data">
 
         <div>아이디
@@ -33,7 +38,7 @@
         <div>
             이메일<input type="text" id="email" name="email">
             <span id="checkEmail"></span>
-            <input type="button" id="authenticBtn" name="authenticBtn" value="인증하기">
+            <input type="button" id="authenticBtn" name="authenticBtn" value="인증하기" class="btn btn-light">
         </div>
         <div class="emailDupleCheck"></div>
         <div>
@@ -46,7 +51,7 @@
         </div>
 
         <input type="text" id="postcode" name="postcode" placeholder="우편번호">
-        <input type="button" onclick="sample4_execDaumPostcode()" value="우편번호 찾기"><br>
+        <input type="button" onclick="sample4_execDaumPostcode()" value="우편번호 찾기" class="btn btn-light"><br>
         <input type="text" id="roadAddress" name="roadAddress" placeholder="도로명주소"><br>
         <input type="text" id="jibunAddress" name="jibunAddress" placeholder="지번주소"><br>
         <input type="text" id="detailAddress" name="detailAddress" placeholder="상세주소">
@@ -57,10 +62,10 @@
         </div>
         <div>
 
-            <button type="button" id="btn">회원가입</button>
+            <button type="button" id="btn" class="btn btn-light">회원가입</button>
 
             <a href="/">
-                <button type="button">취소</button>
+                <button type="button" class="btn btn-light">취소</button>
             </a>
         </div>
     </form>

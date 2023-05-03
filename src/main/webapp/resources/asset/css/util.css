@@ -1,0 +1,14 @@
+* {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.flex-nav {
+    display: flex;
+    justify-content: space-between;
+}
+
+.flex-nav > div {
+    display: flex;
+    justify-content: space-between;
+}

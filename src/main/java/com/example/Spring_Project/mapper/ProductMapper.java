@@ -88,4 +88,12 @@ public interface ProductMapper {
     void insertNewOptions(Map<String,Object>insertParam);
     void updOptions(Map<String, Object> updParam);
     List<ProductDTO> getProductsByKeyword(@Param("keyword") String keyword);
+    List<CartDTO> cartInfo(@Param("cart_seq") Integer cart_seq);
+    Integer getPdCount(@Param("cart_seq") Integer cart_seq);
+    String getOption(@Param("cart_seq")  Integer cart_seq);
+    Integer getId(@Param("id")  String id);
+    void insertBuyPd(@Param("id")  String id,@Param("sum") Integer sum,@Param("price")  Integer price);
+    void updateBuyPd(@Param("id")  String id,@Param("sum") Integer sum,@Param("price")  Integer price);
+    Integer getSum(@Param("id")  String id);
+    Integer getPrice(@Param("id")  String id);
 }

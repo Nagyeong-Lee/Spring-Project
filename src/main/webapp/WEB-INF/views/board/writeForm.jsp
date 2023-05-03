@@ -9,26 +9,45 @@
     </script>
 
     <!-- include libraries(jQuery, bootstrap) -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<%--    <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">--%>
+<%--    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>--%>
+<%--    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>--%>
 
     <!-- include summernote css/js -->
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+            crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" type="text/css" href="/resources/asset/css/util.css">
 
     <style>
         * {
             box-sizing: border-box;
         }
+
+        #footer{
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40; /* 배경색상 */
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            padding: 15px; /* 위아래/좌우 패딩 */
+        }
     </style>
 
 </head>
 <body>
+<%@ include file="/WEB-INF/views/product/communityNavUtil.jsp" %>
 <input type="file" id="file" name="file" multiple="multiple" style="display: none;">
 <input type="hidden" id="count" name="count" value="${count}">
 <input type="hidden" id="currPage" name="currPage" value="${currentPage}">
-<form action="/board/insert" method="post" enctype="multipart/form-data" id="frm">
+<form action="/board/insert" method="post" enctype="multipart/form-data" id="frm" style="margin-top: 70px;">
     <div class="title">
         제목 <input type="text" id="title" name="title">
     </div>
@@ -38,12 +57,17 @@
     <textarea id="content" name="content" class="summernote"></textarea>
 
     <div class="fileDiv"></div>
-    <button type="button" id="fileBtn" onclick="$('#file').click();">첨부파일</button>
-    <button type="button" id="writeBtn">글작성</button>
-    <button type="button" id="toMain">목록으로</button>
+    <button type="button" id="fileBtn" onclick="$('#file').click();" class="btn btn-dark">첨부파일</button>
+    <button type="button" id="writeBtn" class="btn btn-dark">글작성</button>
+    <button type="button" id="toMain" class="btn btn-dark">목록으로</button>
     <input type="hidden" value="${id}" id="writer" name="writer">
 </form>
 
+<!-- Footer-->
+<footer class="py-5 bg-dark" id="footer" >
+    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+</footer>
+<script src="/resources/asset/js/util.js"></script>
 <script>
     $("#toMain").on("click", function () {  //게시글 메인 페이지로 이동
         let currentPage = $("#currPage").val();

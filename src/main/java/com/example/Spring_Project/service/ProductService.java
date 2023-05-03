@@ -2,10 +2,7 @@ package com.example.Spring_Project.service;
 
 import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.mapper.ProductMapper;
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.relational.core.sql.In;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -262,15 +259,15 @@ public class ProductService {
         return productMapper.getOptByGroup(pd_seq);
     }
 
-    public void deletePd(Integer pd_seq) throws Exception{
+    public void deletePd(Integer pd_seq) throws Exception {
         productMapper.deletePd(pd_seq);
     }
 
-    public ProductDTO getPdInfo(Integer pd_seq) throws Exception{
+    public ProductDTO getPdInfo(Integer pd_seq) throws Exception {
         return productMapper.getPdInfo(pd_seq);
     }
 
-    public CategoryDTO getPdCategory(Integer category) throws Exception{
+    public CategoryDTO getPdCategory(Integer category) throws Exception {
         return productMapper.getPdCategory(category);
     }
 
@@ -278,23 +275,23 @@ public class ProductService {
         return productMapper.getPdSubCategory(category);
     }
 
-    public void updPdImg(Integer pd_seq,String sysname)throws Exception{
-        productMapper.updPdImg(pd_seq,sysname);
+    public void updPdImg(Integer pd_seq, String sysname) throws Exception {
+        productMapper.updPdImg(pd_seq, sysname);
     }
 
-    public void updProduct(Map<String,Object>param) throws Exception{
+    public void updProduct(Map<String, Object> param) throws Exception {
         productMapper.updProduct(param);
     }
 
-    public void updOptionStatus(Integer option_seq) throws Exception{
+    public void updOptionStatus(Integer option_seq) throws Exception {
         productMapper.updOptionStatus(option_seq);
     }
 
-    public Integer getNextOptSeq() throws Exception{
+    public Integer getNextOptSeq() throws Exception {
         return productMapper.getNextOptSeq();
     }
 
-    public void insertNewOptions(Map<String,Object>insertParam) throws Exception{
+    public void insertNewOptions(Map<String, Object> insertParam) throws Exception {
         productMapper.insertNewOptions(insertParam);
     }
 
@@ -302,7 +299,40 @@ public class ProductService {
         productMapper.updOptions(updParam);
     }
 
-    public List<ProductDTO> getProductsByKeyword(String keyword) throws Exception{
+    public List<ProductDTO> getProductsByKeyword(String keyword) throws Exception {
         return productMapper.getProductsByKeyword(keyword);
     }
+
+    public List<CartDTO> cartInfo(Integer cart_seq) throws Exception {
+        return productMapper.cartInfo(cart_seq);
+    }
+
+    public Integer getPdCount(Integer cart_seq) throws Exception {
+        return productMapper.getPdCount(cart_seq);
+    }
+
+    public String getOption(Integer cart_seq) throws Exception {
+        return productMapper.getOption(cart_seq);
+    }
+
+    public Integer getId(String id) throws Exception {
+        return productMapper.getId(id);
+    }
+
+    public void insertBuyPd(String id, Integer sum, Integer price) throws Exception {
+        productMapper.insertBuyPd(id, sum, price);
+    }
+
+    public void updateBuyPd(String id, Integer sum, Integer price) throws Exception {
+        productMapper.updateBuyPd(id, sum, price);
+    }
+
+    public Integer getSum(String id) throws Exception {
+       return productMapper.getSum(id);
+    }
+
+    public Integer getPrice(String id) throws Exception {
+       return productMapper.getPrice(id);
+    }
+
 }

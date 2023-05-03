@@ -13,13 +13,26 @@
     </script>
 
     <!-- include libraries(jQuery, bootstrap) -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<%--    <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">--%>
+<%--    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>--%>
+<%--    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>--%>
 
     <!-- include summernote css/js -->
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+
+<%--    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">--%>
+<%--    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>--%>
+<%--    <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>--%>
+    <!-- Bootstrap icons-->
+<%--    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>--%>
+    <!-- Core theme CSS (includes Bootstrap)-->
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+            crossorigin="anonymous"></script>
 
     <style>
         .container {
@@ -73,14 +86,30 @@
         #file {
             visibility: hidden;
         }
-    </style>
 
+        #footer{
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40; /* 배경색상 */
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            padding: 15px; /* 위아래/좌우 패딩 */
+        }
+
+        a{
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="/resources/asset/css/util.css">
 </head>
 <body>
-
+<%@ include file="/WEB-INF/views/product/communityNavUtil.jsp" %>
 <input type="file" id="file" name="file" multiple="multiple" class="file" style="display: none">
 <%--작성자==로그인 아이디 일때 삭제.수정 보여주기--%>
-<form action="/board/update" id="frm" method="post" enctype="multipart/form-data">
+<form action="/board/update" id="frm" method="post" enctype="multipart/form-data" style="margin-top: 50px;">
     <input type="hidden" value="${count}" id="count" name="count">
     <input type="hidden" value="${currPage}" id="currpage" name="currpage">
     <div class="container">
@@ -108,8 +137,8 @@
             <c:when test="${not empty file}">
                 <c:forEach var="i" items="${file}">
                     <button type="button" onclick="fileDown(${i.f_seq})" class="down"
-                            id="fileName${i.f_seq}">${i.oriname}</button>
-                    <button type="button" onclick="deleteFile(${i.f_seq})" class="deleteFile" id="${i.f_seq}">x</button>
+                            id="fileName${i.f_seq}" class="btn btn-primary">${i.oriname}</button>
+                    <button type="button" onclick="deleteFile(${i.f_seq})" class="deleteFile" id="${i.f_seq}" class="btn btn-primary">x</button>
                     <input type="hidden" value="${i.oriname}" id="${i.f_seq}" class="oriname" disabled>
                     <br>
                 </c:forEach>
@@ -132,11 +161,11 @@
                                 =============삭제된 댓글입니다.=============
                             </c:if>
                             <c:if test="${i.status eq 'Y' }">
-                                <button type="button" class="cmt" onclick="cmtOpen('${i.cmt_seq}')">대댓글 달기</button>
+                                <button type="button" class="btn btn-dark" class="cmt" onclick="cmtOpen('${i.cmt_seq}')">대댓글 달기</button>
                                 <%-- 댓글 작성자 != 로그인 아이디--%>
                                 <c:if test="${i.writer eq id}">
-                                    <button type="button" onclick="cmtDel('${i.cmt_seq}')">댓글 삭제</button>
-                                    <button type="button" onclick="cmtUpd('${i.cmt_seq}')">댓글 수정</button>
+                                    <button type="button" onclick="cmtDel('${i.cmt_seq}')" class="btn btn-dark">댓글 삭제</button>
+                                    <button type="button" onclick="cmtUpd('${i.cmt_seq}')" class="btn btn-dark">댓글 수정</button>
                                 </c:if>
                             </c:if>
                             <input type="hidden" value="${i.cmt_seq}" class="p_cmt"><br>
@@ -158,27 +187,28 @@
         <input type="hidden" id="cmtWriter" value="${id}">
         <div id="b_comments" name="b_comments">
             <textarea class="comment" id="comment" class="comment"></textarea>
-            <button type="button" id="replyBtn">댓글달기</button>
+            <button type="button" id="replyBtn" class="btn btn-dark">댓글달기</button>
         </div>
         <br>
         <%--새로운 파일--%>
         <div class="fileDiv"></div>
         <div class="btns">
-            <c:if test="${boardDTO.writer ne id}">
-                <button type="button"><a href="/board/list?currentPage=${currPage}&count=${count}">목록으로</a></button>
+            <c:if test="${boardDTO.writer ne id}" >
+                <button type="button" class="btn btn-dark"><a href="/board/list?currentPage=${currPage}&count=${count}" style="text-decoration: none;">목록으로</a></button>
             </c:if>
             <c:if test="${boardDTO.writer eq id}">
-                <button type="button"><a href="/board/list?currentPage=${currPage}&count=${count}">목록으로</a></button>
-                <button type="button"><a
+                <button type="button" class="btn btn-dark"><a href="/board/list?currentPage=${currPage}&count=${count}">목록으로</a></button>
+                <button type="button" class="btn btn-dark"><a
                         href="/board/delete?b_seq=${boardDTO.b_seq}&currentPage=${currPage}&count=${count}">삭제하기</a>
                 </button>
-                <button id="updBtn" type="button">게시글 수정하기</button>
-                <button type="button" onclick="$('#file').click();" id="attach">첨부파일</button>
+                <button id="updBtn" type="button" class="btn btn-dark">게시글 수정하기</button>
+                <button type="button" class="btn btn-dark" onclick="$('#file').click();" id="attach">첨부파일</button>
             </c:if>
         </div>
     </div>
 </form>
 
+<script src="/resources/asset/js/util.js"></script>
 <script>
 
     $("#attach").hide();
@@ -316,9 +346,9 @@
                 comment.text(content);   //댓글 작성
                 $("#comment").val('');   //댓글 작성칸 초기화
 
-                let str = '<button type="button" class="cmt" onclick="cmtOpen(\'' + data + '\')">대댓글 달기</button> ';
-                str += '<button type="button" onclick="cmtDel(\'' + data + '\')">댓글 삭제</button> ';
-                str += '<button type="button" onclick="cmtUpd(\'' + data + '\')">댓글 수정</button>';
+                let str = '<button type="button" class="cmt" onclick="cmtOpen(\'' + data + '\')" class="btn btn-dark">대댓글 달기</button> ';
+                str += '<button type="button" onclick="cmtDel(\'' + data + '\')" class="btn btn-dark">댓글 삭제</button> ';
+                str += '<button type="button" onclick="cmtUpd(\'' + data + '\')" class="btn btn-dark">댓글 수정</button>';
                 comment.append(str);
                 let info = $("<div></div>");
                 let infoText = writer + " " + $("#write_date").val();
