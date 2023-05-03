@@ -346,6 +346,7 @@ public class ProductController {
         System.out.println("buyPdSeq = " + buyPdSeq);
         String[] arr = buyPdSeq.split(",");
         List<Integer> buyList = new ArrayList<>();
+        // 구매할 cart_seq
         for (int i = 0; i < arr.length; i++) {
             buyList.add(Integer.parseInt(arr[i]));
         }
@@ -408,6 +409,7 @@ public class ProductController {
             }
         }
 
+        //배송 주소 관련
         Map<String, Object> deliAddress = new HashMap<>();
         String name = productService.getName(data);//이름
         String phone = productService.getPhone(data);//폰
@@ -419,7 +421,6 @@ public class ProductController {
 
         MemberDTO memberDTO = memberService.getMemInfo(data);
 
-
 //        if (productService.getId(data) != 0) {
 //            productService.updateBuyPd(data,totalSum,totalPrice);
 //            //update
@@ -430,10 +431,10 @@ public class ProductController {
 
         model.addAttribute("cart", cart);
         model.addAttribute("deliAddress", deliAddress);
-        model.addAttribute("price", price); //실제 총 합계
+        model.addAttribute("price", price);
         model.addAttribute("memberDTO", memberDTO); //회원 정보
-        model.addAttribute("totalPrice", totalPrice);
-        model.addAttribute("totalSum", totalSum);
+        model.addAttribute("totalPrice", totalPrice); // 최종 금액
+        model.addAttribute("totalSum", totalSum); // 최종 수량
         return "/product/payInfo";
     }
 
@@ -494,7 +495,7 @@ public class ProductController {
         JsonArray jsonArray = new JsonArray();
         JsonObject jsonObject = new JsonObject();
         List<String> list = new ArrayList<>();
-        List<CartDTO> cartInfo = productService.getCartInfo(id);
+        List<CartDTO> cartInfo = productService.getCart(id);  //결제 후 결제 내역에서 결제한것만 보여주기
         List<Map<String, Object>> cart = new ArrayList<>();
         Integer totalPrice = 0;  //상품 총 합계
         Integer totalSum = 0;  //상품 총 개수
@@ -588,7 +589,6 @@ public class ProductController {
                 }
             }
         }
-
 
         //장바구니 비우기
         productService.updCartStatus(id);
@@ -807,5 +807,20 @@ public class ProductController {
         model.addAttribute("keyword", keyword);
         return "/product/productList";
     }
+
+    @ResponseBody
+    @PostMapping("/cart/updFlag")  //cart flag n으로 변경
+    public String updFlag(@RequestParam Integer cart_seq) throws Exception{
+        productService.updCartFlag(cart_seq);
+        return "success";
+    }
+
+    @ResponseBody
+    @PostMapping("/cart/updFlagToY")  //cart flag n으로 변경
+    public String updFlagToY(@RequestParam Integer cart_seq) throws Exception{
+        productService.updFlagToY(cart_seq);
+        return "success";
+    }
+
 
 }

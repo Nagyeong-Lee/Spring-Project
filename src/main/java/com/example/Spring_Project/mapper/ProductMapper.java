@@ -96,4 +96,8 @@ public interface ProductMapper {
     void updateBuyPd(@Param("id")  String id,@Param("sum") Integer sum,@Param("price")  Integer price);
     Integer getSum(@Param("id")  String id);
     Integer getPrice(@Param("id")  String id);
+
+    void updCartFlag(@Param("cart_seq") Integer cart_seq);
+    void updFlagToY(@Param("cart_seq") Integer cart_seq);
+    List<CartDTO> getCart(@Param("id") String id);
 }

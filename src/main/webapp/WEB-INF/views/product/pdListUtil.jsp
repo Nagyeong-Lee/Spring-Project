@@ -21,27 +21,27 @@
                         <li>
                             <hr class="dropdown-divider"/>
                         </li>
-                        <li><a class="dropdown-item" href="/product/women">여성</a></li>
-                        <li><a class="dropdown-item" href="/product/women/outer">여성-아우터</a></li>
-                        <li><a class="dropdown-item" href="/product/women/top">여성-상의</a></li>
-                        <li><a class="dropdown-item" href="/product/women/pants">여성-하의</a></li>
-                        <li><a class="dropdown-item" href="/product/women/accessories">여성-악세사리</a></li>
-                        <li><a class="dropdown-item" href="/product/men">남성</a></li>
-                        <li><a class="dropdown-item" href="/product/men/outer">남성-아우터</a></li>
-                        <li><a class="dropdown-item" href="/product/men/top">남성-상의</a></li>
-                        <li><a class="dropdown-item" href="/product/men/pants">남성-하의</a></li>
-                        <li><a class="dropdown-item" href="/product/men/accessories">남성-악세사리</a></li>
-                        <li><a class="dropdown-item" href="/product/new">신상품</a></li>
-                        <li><a class="dropdown-item" href="/product/new/outer">신상품-아우터</a></li>
-                        <li><a class="dropdown-item" href="/product/new/top">신상품-상의</a></li>
-                        <li><a class="dropdown-item" href="/product/new/pants">신상품-하의</a></li>
-                        <li><a class="dropdown-item" href="/product/new/accessories">신상품-악세사리</a></li>
+                        <li><a class="dropdown-item" href="/product/women" style="font-weight: bold">여성</a></li>
+                        <li><a class="dropdown-item" href="/product/women/outer">ㄴ아우터</a></li>
+                        <li><a class="dropdown-item" href="/product/women/top">ㄴ상의</a></li>
+                        <li><a class="dropdown-item" href="/product/women/pants">ㄴ하의</a></li>
+                        <li><a class="dropdown-item" href="/product/women/accessories">ㄴ악세사리</a></li>
+                        <li><a class="dropdown-item" href="/product/men" style="font-weight: bold">남성</a></li>
+                        <li><a class="dropdown-item" href="/product/men/outer">ㄴ아우터</a></li>
+                        <li><a class="dropdown-item" href="/product/men/top">ㄴ상의</a></li>
+                        <li><a class="dropdown-item" href="/product/men/pants">ㄴ하의</a></li>
+                        <li><a class="dropdown-item" href="/product/men/accessories">ㄴ악세사리</a></li>
+                        <li><a class="dropdown-item" href="/product/new" style="font-weight: bold">신상품</a></li>
+                        <li><a class="dropdown-item" href="/product/new/outer">ㄴ아우터</a></li>
+                        <li><a class="dropdown-item" href="/product/new/top">ㄴ상의</a></li>
+                        <li><a class="dropdown-item" href="/product/new/pants">ㄴ하의</a></li>
+                        <li><a class="dropdown-item" href="/product/new/accessories">ㄴ악세사리</a></li>
                     </ul>
                 </li>
             </ul>
             <span style="margin-left: 400px;">
                 <input type="text" id="keyword" name="keyword" placeholder="상품명을 입력해주세요.">
-                <button type="button" id="search" class="btn btn-dark">찾기</button>
+                <button type="button" id="search" class="btn btn-dark">검색</button>
             </span>
             <button class="btn btn-outline-dark" type="button" id="cart" style="margin-left: 10px;" >
                 <i class="bi-cart-fill me-1"></i>
@@ -60,12 +60,9 @@
     </div>
 </nav>
 
-<!-- Header-->
 <header class="bg-dark py-5">
     <div class="container px-4 px-lg-5 my-5">
         <div class="text-center text-white">
-            <%--            <h1 class="display-4 fw-bolder">Shop in style</h1>--%>
-            <%--            <p class="lead fw-normal text-white-50 mb-0">With this shop hompeage template</p>--%>
         </div>
     </div>
 </header>
@@ -104,22 +101,3 @@
 <footer class="py-5 bg-dark" id="ft">
     <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
 </footer>
-
-
-<%--<div class="product-list">--%>
-<%--    <c:choose>--%>
-<%--        <c:when test="${!empty productDTOList}">--%>
-<%--            <c:forEach var="i" items="${productDTOList}">--%>
-<%--                <div class="product">--%>
-<%--                    <img src="/resources/img/products/${i.img}" width="225" class="img">--%>
-<%--                    <div class="product-name">--%>
-<%--                        <a href="/product/detail?pd_seq=${i.pd_seq}">${i.name}</a>--%>
-<%--                    </div>--%>
-<%--                    <div class="product-price">--%>
-<%--                        <fmt:formatNumber value="${i.price}" type="number"/>원<br>--%>
-<%--                    </div>--%>
-<%--                </div>--%>
-<%--            </c:forEach>--%>
-<%--        </c:when>--%>
-<%--    </c:choose>--%>
-<%--</div>--%>

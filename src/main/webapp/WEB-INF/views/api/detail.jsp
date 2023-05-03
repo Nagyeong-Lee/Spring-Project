@@ -67,21 +67,6 @@
 </form>
 <script>
     function toList(currentPage, count, searchType, keyword, city, weekOpen, weekClose, satOpen, satClose,holidayY,holidayN, holidayOpen, holidayClose) {
-        // console.log("목록으로 눌렀을때");
-        // console.log(currentPage);
-        // console.log(count);
-        // console.log(searchType);
-        // console.log(keyword);
-        // console.log(city);
-        // console.log(weekOpen);
-        // console.log(weekClose);
-        // console.log(satOpen);
-        // console.log(satClose);
-        // console.log(holidayOpen);
-        // console.log(holidayClose);
-        // console.log("holidayY : "+holidayY);
-        // console.log("holidayN : "+holidayN);
-
         $("#currentPage").val(currentPage);
         $("#count").val(count);
         $("#searchType").val(searchType);
@@ -101,21 +86,6 @@
         $("#frm").submit();
     }
 
-    // function toList(currentPage,count,searchType,keyword){
-    //   $("#currentPage").val(currentPage);
-    //   $("#count").val(count);
-    //   $("#searchType").val(searchType);
-    //   $("#keyword").val(keyword);
-    //
-    //   $("#city2").val(city);
-    //   $("#weekOpen").val(weekOpen);
-    //   $("#weekClose").val(weekClose);
-    //   $("#satOpen").val(satOpen);
-    //   $("#satClose").val(satClose);
-    //   $("#holidayOpen").val(holidayOpen);
-    //   $("#holidayClose").val(holidayClose);
-    //   $("#frm").submit();
-    // }
     var mapContainer = document.getElementById('map'), // 지도를 표시할 div
         mapOption = {
             center: new kakao.maps.LatLng(${hospitalDTO.latitude}, ${hospitalDTO.longitude}), // 지도의 중심좌표

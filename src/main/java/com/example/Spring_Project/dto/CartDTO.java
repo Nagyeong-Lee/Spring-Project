@@ -26,5 +26,6 @@ public class CartDTO {
     private Integer stock;
     private String img;
     private String category;
+    private String flag;
 
 }

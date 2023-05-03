@@ -283,6 +283,7 @@
         #{pd_seq},
         #{optionList}
         ,'Y'
+        ,'Y'
         )
     </insert>
 
@@ -294,6 +295,7 @@
         #{count},
         #{pd_seq},
         null
+        ,'Y'
         ,'Y'
         )
     </insert>
@@ -358,6 +360,33 @@
         p.CATEGORY
         from cart c JOIN product p ON c.pd_seq = p.PD_SEQ
         where c.id=#{id} and c.status = 'Y'
+    </select>
+
+    <select id="getCart" resultType="com.example.Spring_Project.dto.CartDTO">
+        <!--        select-->
+        <!--            cart_seq,-->
+        <!--            id,-->
+        <!--            count,-->
+        <!--            pd_seq,-->
+        <!--            options,-->
+        <!--            status-->
+        <!--        from cart-->
+        <!--        where id=#{id}-->
+        <!--        and status = 'Y'-->
+        select
+        c.cart_seq,
+        c.id,c.count,
+        c.OPTIONS,
+        c.status,
+        c.PD_SEQ,
+        p.NAME,
+        p.DESCRIPTION,
+        p.PRICE,
+        p.STOCK,
+        p.IMG,
+        p.CATEGORY
+        from cart c JOIN product p ON c.pd_seq = p.PD_SEQ
+        where c.id=#{id} and c.status = 'Y' and c.flag = 'Y'
     </select>
 
     <select id="getOptionCategory" resultType="String">
@@ -700,4 +729,11 @@
         select total_price from buyPd where id = #{id}
     </select>
 
+    <update id="updCartFlag">
+        update cart set flag = 'N' where cart_seq = #{cart_seq}
+    </update>
+
+    <update id="updFlagToY">
+        update cart set flag = 'Y' where cart_seq = #{cart_seq}
+    </update>
 </mapper>

@@ -23,13 +23,6 @@
             </ul>
             &nbsp&nbsp&nbsp&nbsp
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <span id="btn4" style="color: white">정보 수정</span>
-                </li>
-                &nbsp
-            </ul>
-            &nbsp&nbsp&nbsp&nbsp
-            <ul class="navbar-nav mr-auto">
                 <c:forEach var="i" items="${pathList}" varStatus="status" begin="2" end="4">
                     <li class="nav-item active">
                         <a href="javascript:api${status.count}()" style="text-decoration: none; color: white">
@@ -47,7 +40,7 @@
             </li>
         </ul>
         &nbsp&nbsp&nbsp
-        <div style="margin-right: -750px;">
+        <div style="margin-right: -800px;">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
                     <a href="${pathList.get(6).path}" style="color: white; text-decoration: none">커머스</a>
@@ -55,13 +48,15 @@
                 &nbsp
             </ul>
             &nbsp&nbsp&nbsp&nbsp
-<%--            <ul class="navbar-nav mr-auto">--%>
-<%--                <li class="nav-item active">--%>
-<%--                    <span style="color: white" id="toCart">${pathList.get(7).name}</span>--%>
-<%--                </li>--%>
-<%--                &nbsp--%>
-<%--            </ul>--%>
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <span id="btn4" style="color: white">정보 수정</span>
+                </li>
+                &nbsp
+            </ul>
+            &nbsp&nbsp&nbsp&nbsp
         </div>
+
         <div>
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">

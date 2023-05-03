@@ -26,7 +26,7 @@
     <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
 
     <style>
-        #footer{
+        #footer {
             position: fixed;
             left: 0;
             bottom: 0;
@@ -67,14 +67,15 @@
                     <c:forEach var="i" items="${cart}">
                         <tr class="itemDiv">
                             <td>
-                                <input type="checkbox" name="buyPdSeq" value="${i.get('cart_seq')}" class="buyPdSeq">
+                                <input type="checkbox" name="buyPdSeq" value="${i.get('cart_seq')}" class="buyPdSeq"
+                                       checked="checked">
                             </td>
                             <td colspan="2"><a href="/product/detail?pd_seq=${i.get('pd_seq')}"><img
                                     src="/resources/img/products/${i.get("img")}" style="width: 120px; height: 100px;"></a>
                             </td>
                             <td colspan="2" style="text-align: center">
                                 <p>${i.get("name")}</p>
-                                <p class="chgCnt" >수량 : ${i.get("count")}</p>
+                                <p class="chgCnt">수량 : ${i.get("count")}</p>
                                 <c:choose>
                                     <c:when test="${!empty i.get('option')}">
                                         <c:forEach var="k" items="${i.get('option')}">
@@ -100,12 +101,13 @@
                                 </div>
                             </td>
                             <input type="hidden" value="${i.get('price')}" class="productPrice">
-                            <td colspan="2" style="text-align: center" style="text-align: center"><span class="price"><fmt:formatNumber pattern="#,###"
-                                                                                  value="${i.get('totalPrice')}"/>원</span>
+                            <td colspan="2" style="text-align: center" style="text-align: center"><span
+                                    class="price"><fmt:formatNumber pattern="#,###"
+                                                                    value="${i.get('totalPrice')}"/>원</span>
                                 <input type="hidden" class="thisPrice" value="${i.get('totalPrice')}">
                             </td>
-                            <td  style="text-align: center">
-                                <input type="checkbox" name="delete" value="${i.get('cart_seq')}" >
+                            <td style="text-align: center">
+                                <input type="checkbox" name="delete" value="${i.get('cart_seq')}">
                             </td>
                         </tr>
                     </c:forEach>
@@ -150,7 +152,7 @@
 </div>
 
 <!-- Footer-->
-<footer class="py-5 bg-dark" id="footer" >
+<footer class="py-5 bg-dark" id="footer">
     <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
 </footer>
 
@@ -163,6 +165,10 @@
     $("#keyword").val($("#key").val());
     $("#search").on("click", function () {
         let keyword = $("#keyword").val();
+        if (keyword.length == 0) {
+            alert('상품을 입력하세요.');
+            return;
+        }
         location.href = '/product/searchPd?keyword=' + keyword;
     });
 
@@ -249,27 +255,43 @@
 
     //+버튼 누를때 수량
     $(".plus").on("click", function () {
-        $("#discount  option:eq(0)").prop("selected", true);
-        $("#discount option:not(select)").show();
-        let total_price = $("#hiddenTotalPreviousTotalPrice").val();
-        let $this = $(this);
+        var $this = $(this);
+        let flag = $(this).closest(".itemDiv").find(".buyPdSeq").is(':checked');
         let cart_seq = $this.closest(".count").find(".cartSeq").val();
-        let count = $this.closest(".count").find(".stock").val();
-        count++
-        $this.closest(".count").find(".stock").val(count);
-        //가격 변경
-        let totalPrice = $this.closest(".count").find(".pd_price").val() * count;
-        var price = $this.closest(".itemDiv").find(".price").text(totalPrice.toLocaleString() + '원');
-        let productPrice = $this.closest(".itemDiv").find(".productPrice").val();
-        //총 수량 변경
-        let changedSum = parseInt($("#hiddenTotalSum").val()) + 1;
-        $("#sum").text('총 수량 : ' + changedSum + '개');
-        $("#hiddenTotalSum").val(changedSum); //변경된 수량 저장
-        let changedTotalPrice = parseInt(total_price) + parseInt(productPrice);
-        //총 합계 변경해주기
-        $("#hiddenTotalPreviousTotalPrice").val(changedTotalPrice);
-        $("#total").text('총 합계 : ' + changedTotalPrice.toLocaleString() + '원');
-        $("#hiddenTotalPrice").val(changedTotalPrice); //변경된 상품 가격
+        if (flag == true) {
+            let checkedPrice = $(this).closest(".itemDiv").find(".productPrice").val();
+            console.log(': ' + $(this).val() + " : " + checkedPrice);
+            let sum = parseInt($("#hiddenTotalPrice").val()) + parseInt(checkedPrice);
+            let cnt = parseInt($("#hiddenTotalSum").val()) + 1;
+            $("#total").text('총 합계 : ' + sum.toLocaleString() + '원');
+            $("#hiddenTotalPrice").val(sum); //변경된 상품 가격
+            console.log('hiddenTotalPrice  : ' + $("#hiddenTotalPrice").val());
+            // 총 수량 변경
+            $("#hiddenTotalSum").val(cnt);
+            //$("#sum").text('총 수량 : ' + cnt + '개');
+            console.log('hiddenTotalSum  : ' + $("#hiddenTotalSum").val());
+            $("#discount  option:eq(0)").prop("selected", true);
+
+            $("#discount option:not(select)").show();
+            var total_price = $("#hiddenTotalPreviousTotalPrice").val();
+            var count = $this.closest(".count").find(".stock").val();
+            count++
+            $this.closest(".count").find(".stock").val(count);
+            updateCnt();
+            //가격 변경
+            var totalPrice = $this.closest(".count").find(".pd_price").val() * count;
+            var price = $this.closest(".itemDiv").find(".price").text(totalPrice.toLocaleString() + '원');
+            var productPrice = $this.closest(".itemDiv").find(".productPrice").val();
+            // //총 수량 변경
+            // var changedSum = parseInt($("#hiddenTotalSum").val());
+            // $("#sum").text('총 수량 : ' + changedSum + '개');
+            // $("#hiddenTotalSum").val(changedSum); //변경된 수량 저장
+            // var changedTotalPrice = parseInt(total_price) + parseInt(productPrice);
+            // //총 합계 변경해주기
+            // $("#hiddenTotalPreviousTotalPrice").val(changedTotalPrice);
+            // $("#total").text('총 합계 : ' + changedTotalPrice.toLocaleString() + '원');
+            // $("#hiddenTotalPrice").val(changedTotalPrice); //변경된 상품 가격
+        }
         $.ajax({
             url: '/product/count',
             type: 'post',
@@ -300,67 +322,113 @@
             }
         });
     })
+
+    function updateCnt(){
+        let countTotal = 0;
+        $(".buyPdSeq:checked").each(function(){
+            countTotal += parseInt($(this).parent().parent().find(".stock").val());
+        });
+        $("#sum").text(countTotal);
+    }
+    var preSum = 0;
     //-버튼 누를때
     $(".minus").on("click", function () {
-        $("#discount  option:eq(0)").prop("selected", true);
-        $("#discount option:not(select)").show();
-        let total_price = $("#hiddenTotalPreviousTotalPrice").val();
-        // console.log("원래 상품 가격 : " + total_price);
-        let $this = $(this);
-        let count = $(this).closest(".count").find(".stock").val();
+        var $this = $(this);
+        let flag = $(this).closest(".itemDiv").find(".buyPdSeq").is(':checked');
         let cart_seq = $this.closest(".count").find(".cartSeq").val();
-        count--
-        $(this).closest(".count").find(".stock").val(count);
-        if (count < 1) {
-            alert('수량을 1개 이상 선택해주세요.');
-            $(this).closest(".count").find(".stock").val(1);
+        var count = $(this).closest(".count").find(".stock").val();
+        console.log('count : '+count);
+
+        if (count == 1) {
             count = 1;
+            alert('수량을 1개 이상 선택해주세요.');
+            // console.log(preSum);
+            // $("#sum").text('총 수량 : ' + preSum + '개');
+            // $("#total").text('총 합계 : ' + $("#hiddenTotalPreviousTotalPrice").val().toLocaleString() + '원');
+            // //가격 변경
+            // var totalPrice = $this.closest(".count").find(".pd_price").val() * count;
+            // var price = $this.closest(".itemDiv").find(".price").text(totalPrice.toLocaleString() + '원');
+            // var productPrice = $this.closest(".itemDiv").find(".productPrice").val();
+            // $(this).closest(".count").find(".stock").val(1);
+            // $this.closest(".itemDiv").find(".price").text(productPrice.toLocaleString() + '원');
+            // $(this).closest(".itemDiv").find(".chgCnt").text('수량 : ' + count);
         } else {
+            // else {
+            //     //가격 변경
+            //     let totalPrice = $this.closest(".count").find(".pd_price").val() * count;
+            //     var price = $this.closest(".itemDiv").find(".price").text(totalPrice.toLocaleString() + '원');
+            //     let productPrice = $this.closest(".itemDiv").find(".productPrice").val();
+            //     let changedTotalPrice = parseInt(total_price) - parseInt(productPrice);
+            //     console.log("해당 상품 한개 가격 : " + productPrice);
+            //     console.log("changedTotalPrice : " + changedTotalPrice);
+            //     //총 합계 변경해주기
+            //     $("#total").text('총 합계 : ' + changedTotalPrice.toLocaleString() + '원');
+            //     $("#hiddenTotalPrice").val(changedTotalPrice); //변경된 상품 가격
+            //     //총 수량 변경
+            //     let changedSum = $("#hiddenTotalSum").val() - 1;
+            //     $("#sum").text('총 수량 : ' + changedSum + '개');
+            //     $("#hiddenTotalSum").val(changedSum); //변경된 수량 저장
+            //     $("#hiddenTotalPreviousTotalPrice").val(changedTotalPrice);
+            //     console.log("===========");
+            //     console.log("changedTotalPrice : " + changedTotalPrice);
+            // }
+
+            $(this).closest(".itemDiv").find(".chgCnt").text('수량 : ' + count);
+
+            let checkedPrice = $(this).closest(".itemDiv").find(".productPrice").val();
+            let sum = parseInt($("#hiddenTotalPrice").val()) - parseInt(checkedPrice);
+            let cnt = parseInt($("#hiddenTotalSum").val()) - 1;
+
+            $("#total").text('총 합계 : ' + sum.toLocaleString() + '원');
+            $("#hiddenTotalPrice").val(sum); //변경된 상품 가격
+            // 총 수량 변경
+            $("#hiddenTotalSum").val(cnt);
+            //$("#sum").text('총 수량 : ' + cnt + '개');
+
+
+            $("#discount  option:eq(0)").prop("selected", true);
+            $("#discount option:not(select)").show();
+
+            var total_price = $("#hiddenTotalPreviousTotalPrice").val();
+            console.log('히든토탈이전 : ' + total_price);
+            var count = $this.closest(".count").find(".stock").val();
+            count--
+            $this.closest(".count").find(".stock").val(count);
+            updateCnt();
             //가격 변경
-            let totalPrice = $this.closest(".count").find(".pd_price").val() * count;
+            var totalPrice = $this.closest(".count").find(".pd_price").val() * count;
             var price = $this.closest(".itemDiv").find(".price").text(totalPrice.toLocaleString() + '원');
-            let productPrice = $this.closest(".itemDiv").find(".productPrice").val();
-            let changedTotalPrice = parseInt(total_price) - parseInt(productPrice);
-            console.log("해당 상품 한개 가격 : " + productPrice);
-            console.log("changedTotalPrice : " + changedTotalPrice);
-            //총 합계 변경해주기
-            $("#total").text('총 합계 : ' + changedTotalPrice.toLocaleString() + '원');
-            $("#hiddenTotalPrice").val(changedTotalPrice); //변경된 상품 가격
-            //총 수량 변경
-            let changedSum = $("#hiddenTotalSum").val() - 1;
-            $("#sum").text('총 수량 : ' + changedSum + '개');
-            $("#hiddenTotalSum").val(changedSum); //변경된 수량 저장
-            $("#hiddenTotalPreviousTotalPrice").val(changedTotalPrice);
-            console.log("===========");
-            console.log("changedTotalPrice : " + changedTotalPrice);
-        }
-        $.ajax({
-            url: '/product/count',
-            type: 'post',
-            data: {
-                "cart_seq": cart_seq
-            },
-            success: function (data) {
-                //구매 가능한 개수 가져옴
-                console.log("count : " + count);
-                if (count <= data) {
-                    $this.closest(".count").find(".stock").val(count);
-                    $this.closest(".count").find(".plus").show();
-                    $this.closest(".itemDiv").find(".chgCnt").text('수량 : ' + count);
+            var productPrice = $this.closest(".itemDiv").find(".productPrice").val();
+            preSum = parseInt($("#hiddenTotalSum").val());
+
+            $.ajax({
+                url: '/product/count',
+                type: 'post',
+                data: {
+                    "cart_seq": cart_seq
+                },
+                success: function (data) {
+                    //구매 가능한 개수 가져옴
+                    console.log("count : " + count);
+                    if (count <= data) {
+                        $this.closest(".count").find(".stock").val(count);
+                        $this.closest(".count").find(".plus").show();
+                        $this.closest(".itemDiv").find(".chgCnt").text('수량 : ' + count);
+                    }
                 }
-            }
-        });
-        //수량 update
-        $.ajax({
-            url: '/product/updCount',
-            type: 'post',
-            data: {
-                "count": count,
-                "cart_seq": cart_seq
-            },
-            success: function (data) {
-            }
-        });
+            });
+            //수량 update
+            $.ajax({
+                url: '/product/updCount',
+                type: 'post',
+                data: {
+                    "count": count,
+                    "cart_seq": cart_seq
+                },
+                success: function (data) {
+                }
+            });
+        }
     });
     //쿠폰 선택할때 -> ajax로 가격 변경된거 가져옴
     $("#discount").on("change", function () {
@@ -433,6 +501,73 @@
             document.body.append(newForm);
             newForm.submit();
         }
+    });
+
+
+    //구매 체크박스
+    $(".buyPdSeq").on("change", function () {
+        var t_sum = 0;
+        var t_count = 0;
+        var pdPrice = 0;
+        if ($(".buyPdSeq:checked").length == 0) {
+            t_sum = 0;
+            t_count = 0;
+            pdPrice = 0;
+            // 총 합계 변경해주기
+            $("#total").text('총 합계 : ' + 0 + '원');
+            // $("#hiddenTotalPrice").val(changedTotalPrice); //변경된 상품 가격
+            // 총 수량 변경
+            // let changedSum = $("#hiddenTotalSum").val() - 1;
+            $("#sum").text('총 수량 : ' + 0 + '개');
+        }
+        let flag = $(this).is(':checked');
+        if (flag == false) {  //cart - flag n으로 변경
+            let cart_seq = $(this).val();
+            $.ajax({
+                url: '/product/cart/updFlag',
+                type: 'post',
+                async: false,
+                data: {
+                    "cart_seq": cart_seq
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+            })
+        } else {  //cart - flag Y로 변경
+            let cart_seq = $(this).val();
+            $.ajax({
+                url: '/product/cart/updFlagToY',
+                type: 'post',
+                async: false,
+                data: {
+                    "cart_seq": cart_seq
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+            })
+        }
+        $(".buyPdSeq:checked").each(function () {
+            let checkedPrice = $(this).closest(".itemDiv").find(".productPrice").val();
+            console.log('선택된 것들 : ' + $(this).val() + " : " + checkedPrice);
+            let count = $(this).closest(".itemDiv").find(".stock").val();
+            //체크된 상품 합계
+            pdPrice = checkedPrice * count;
+            t_sum += pdPrice;
+            t_count += parseInt(count);
+            console.log('pdPrice   : ' + pdPrice);
+            console.log('t_sum  : ' + t_sum);
+            console.log('t_count  : ' + t_count);
+            // 총 합계 변경해주기
+            $("#total").text('총 합계 : ' + t_sum.toLocaleString() + '원');
+            $("#hiddenTotalPrice").val(t_sum); //변경된 상품 가격
+            console.log('변경된 상품 가격  : ' + $("#hiddenTotalPrice").val());
+            // 총 수량 변경
+            $("#hiddenTotalSum").val(t_count);
+            $("#sum").text('총 수량 : ' + t_count + '개');
+            console.log('변경된 총 수량  : ' + $("#hiddenTotalSum").val());
+        });
     });
 </script>
 </body>

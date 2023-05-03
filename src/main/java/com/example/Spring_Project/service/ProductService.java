@@ -335,4 +335,15 @@ public class ProductService {
        return productMapper.getPrice(id);
     }
 
+    public void updCartFlag(Integer cart_seq) throws Exception{
+        productMapper.updCartFlag(cart_seq);
+    }
+
+    public void updFlagToY(Integer cart_seq) throws Exception{
+        productMapper.updFlagToY(cart_seq);
+    }
+
+    public List<CartDTO> getCart(String id) throws Exception {
+        return productMapper.getCart(id);
+    }
 }
