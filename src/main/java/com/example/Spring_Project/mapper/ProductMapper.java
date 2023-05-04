@@ -115,7 +115,7 @@ public interface ProductMapper {
     void insertPayProduct(Map<String,Object>parameter);
     void insertPayPd(@Param("pd_seq") Integer pd_seq, @Param("pay_seq")Integer pay_seq);
     Integer getDefaultAdr();
-    List<PayInfoDTO> getHistoryByDate(@Param("id") String id);
+    List<PayInfoDTO> getHistory(@Param("id") String id);
 
 
 }

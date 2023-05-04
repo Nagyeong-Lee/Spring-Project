@@ -522,7 +522,7 @@ public class ProductController {
         for (Integer i = 0; i < cartInfo.size(); i++) {
 
             System.out.println("cartInfo.get(i).getPd_seq() = " + cartInfo.get(i).getPd_seq());
-            //결제 상품 테이블 인서트
+
             Map<String, Object> item = new HashMap<>();
             item.put("id", cartInfo.get(i).getId());
             item.put("count", cartInfo.get(i).getCount());
@@ -951,8 +951,9 @@ public class ProductController {
     }
 
     @RequestMapping("/history")  //구매내역 최신순부터 아래는 페이징처리
-    public String history(String id) throws Exception{
-        List<PayInfoDTO> payInfoDTOS = productService.getHistoryByDate(id);  //날짜별로 구매내역 개수
+    public String history(String id,Model model) throws Exception{
+        List<PayInfoDTO> payInfoDTOS = productService.getHistory(id);
+        model.addAttribute("payInfoDTOS",payInfoDTOS);
         return "/product/history";
     }
 }

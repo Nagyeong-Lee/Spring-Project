@@ -401,7 +401,7 @@ public class ProductService {
         return productMapper.getDefaultAdr();
     }
 
-    public List<PayInfoDTO> getHistoryByDate(String id) throws Exception{
-        return productMapper.getHistoryByDate(id);
+    public List<PayInfoDTO> getHistory(String id) throws Exception{
+        return productMapper.getHistory(id);
     }
 }

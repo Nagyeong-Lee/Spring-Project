@@ -865,12 +865,17 @@
         where status = 'Y'
     </select>
 
-    <select id="getHistoryByDate" resultType="com.example.Spring_Project.dto.PayInfoDTO">
-<!--        select-->
-<!--        to_char(payDate, 'YYYY-MM-DD'),-->
-<!--        count(*)-->
-<!--        from payInfo-->
-<!--        group by to_char(payDate, 'YYYY-MM-DD')-->
+    <select id="getHistory" resultType="com.example.Spring_Project.dto.PayInfoDTO">
+        select
+        id,
+        price,
+        deli_seq,
+        successYN,
+        to_char(payDate,'YYYY-MM-DD')
+        status,
+        payMethod
+        from payInfo
+        order by payDate DESC
     </select>
 
 
