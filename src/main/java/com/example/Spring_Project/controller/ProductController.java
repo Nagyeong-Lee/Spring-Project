@@ -410,15 +410,15 @@ public class ProductController {
         }
 
         //배송 주소 관련
-        Map<String, Object> deliAddress = new HashMap<>();
-        String name = productService.getName(data);//이름
-        String phone = productService.getPhone(data);//폰
-        phone = phone.substring(0, 3) + "-" + phone.substring(3, 7) + "-" + phone.substring(7, 11);
-        String defaultAddress = productService.getDefaultAddress(data);
-        deliAddress.put("name", name);
-        deliAddress.put("phone", phone);
-        deliAddress.put("defaultAddress", defaultAddress);
-
+//        Map<String, Object> deliAddress = new HashMap<>();
+//        String name = productService.getName(data);//이름
+//        String phone = productService.getPhone(data);//폰
+//        phone = phone.substring(0, 3) + "-" + phone.substring(3, 7) + "-" + phone.substring(7, 11);
+//        String defaultAddress = productService.getDefaultAddress(data);
+//        deliAddress.put("name", name);
+//        deliAddress.put("phone", phone);
+//        deliAddress.put("defaultAddress", defaultAddress);
+//
         MemberDTO memberDTO = memberService.getMemInfo(data);
 
 //        if (productService.getId(data) != 0) {
@@ -429,8 +429,15 @@ public class ProductController {
 //            productService.insertBuyPd(data,totalSum,totalPrice);
 //        }
 
+
+        //배송지 불러오기 (별칭으로)
+        List<DeliDTO> deliDTOList = productService.getDeliveryInfo(data);
+        List<DeliDTO> deliveryInfo = productService.deliveryInfo(data);
+        System.out.println("deliDTOList = " + deliDTOList);
         model.addAttribute("cart", cart);
-        model.addAttribute("deliAddress", deliAddress);
+        model.addAttribute("deliDTOList", deliDTOList);
+        model.addAttribute("deliveryInfo", deliveryInfo);
+//        model.addAttribute("deliAddress", deliAddress);
         model.addAttribute("price", price);
         model.addAttribute("memberDTO", memberDTO); //회원 정보
         model.addAttribute("totalPrice", totalPrice); // 최종 금액
@@ -483,13 +490,24 @@ public class ProductController {
     }
 
     @RequestMapping("/paymentDetails")
-    public String paymentDetails(Model model, String id, Integer price, String carts) throws Exception {
+    public String paymentDetails(Model model, String id, Integer price, String carts, Integer seq) throws Exception {
+
+        //기본 배송지 수정
+        productService.updDeliStatus(seq);
+        productService.updStatus(seq);
+
+        DeliDTO defaultAddr = productService.getDefaultAddr();
+
 
         //결제 테이블에 인서트
         Map<String, Object> param = new HashMap<>();
         param.put("id", id);
         param.put("price", price);
+        param.put("deliSeq", defaultAddr.getSeq());
         payService.insertPayInfo(param);
+        Integer pay_seq = productService.currPaySeq();//현재 pay_seq
+
+        PayInfoDTO payInfoDTO = payService.getPayInfo(pay_seq);//결제 정보 가져오기
 
         JsonParser jsonParser = new JsonParser();
         JsonArray jsonArray = new JsonArray();
@@ -502,6 +520,9 @@ public class ProductController {
 
         /*중복 제거*/
         for (Integer i = 0; i < cartInfo.size(); i++) {
+
+            System.out.println("cartInfo.get(i).getPd_seq() = " + cartInfo.get(i).getPd_seq());
+            //결제 상품 테이블 인서트
             Map<String, Object> item = new HashMap<>();
             item.put("id", cartInfo.get(i).getId());
             item.put("count", cartInfo.get(i).getCount());
@@ -525,6 +546,11 @@ public class ProductController {
             totalSum += pdCount;
 
             if (cartInfo.get(i).getOptions() != null) {
+                Map<String,Object> parameter = new HashMap<>();
+                parameter.put("pd_seq",cartInfo.get(i).getPd_seq());
+                parameter.put("option",cartInfo.get(i).getOptions());
+                parameter.put("payPd_seq",pay_seq);
+                productService.insertPayProduct(parameter);//결제한 상품
                 Object object = jsonParser.parse(cartInfo.get(i).getOptions());
                 jsonObject = (JsonObject) object;
                 jsonArray = (JsonArray) jsonObject.get("name");
@@ -541,6 +567,7 @@ public class ProductController {
                 cart.add(item);
             } else if (cartInfo.get(i).getOptions() == null) {
                 cart.add(item);
+                productService.insertPayPd(cartInfo.get(i).getPd_seq(),pay_seq);//결제한 상품
             }
         }
 
@@ -596,6 +623,8 @@ public class ProductController {
         model.addAttribute("totalPrice", totalPrice);
         model.addAttribute("price", price);
         model.addAttribute("totalSum", totalSum);
+        model.addAttribute("defaultAddr", defaultAddr);
+        model.addAttribute("payInfoDTO", payInfoDTO);
         return "/product/paymentDetail";
     }
 
@@ -810,17 +839,120 @@ public class ProductController {
 
     @ResponseBody
     @PostMapping("/cart/updFlag")  //cart flag n으로 변경
-    public String updFlag(@RequestParam Integer cart_seq) throws Exception{
+    public String updFlag(@RequestParam Integer cart_seq) throws Exception {
         productService.updCartFlag(cart_seq);
         return "success";
     }
 
     @ResponseBody
     @PostMapping("/cart/updFlagToY")  //cart flag n으로 변경
-    public String updFlagToY(@RequestParam Integer cart_seq) throws Exception{
+    public String updFlagToY(@RequestParam Integer cart_seq) throws Exception {
         productService.updFlagToY(cart_seq);
         return "success";
     }
 
+    @RequestMapping("/addDeli") //배송지 추가
+    public String addDeli(String id) throws Exception {
+        System.out.println("id = " + id);
+        return "/product/popup";
+        //회원 배송지 정보 가져오기
+    }
 
+    @RequestMapping("/updDeliInfo") //배송지 수정
+    public String updDeliInfo(Model model, Integer seq) throws Exception {
+        System.out.println("seq " + seq);
+        DeliDTO deliDTO = productService.getSeqDeli(seq);
+        model.addAttribute("deliDTO", deliDTO);
+        return "/product/updPopup";
+        //회원 배송지 정보 가져오기
+    }
+
+    @ResponseBody
+    @PostMapping("/addDelivery")
+    public String addDeli(@RequestParam Map<String, Object> map) throws Exception {
+
+        System.out.println("map = " + map);
+        String name = map.get("name").toString();
+        String phone = map.get("phone").toString();
+        String address = map.get("address").toString();
+        String nickname = map.get("nickname").toString();
+        String def = map.get("def").toString();
+        String id = map.get("id").toString();
+        String flag = "N";
+        if (def.equals("true")) {
+            flag = "Y";
+        }
+        System.out.println("flag = " + flag);
+        Map<String, Object> param = new HashMap<>();
+        param.put("name", name);
+        param.put("phone", phone);
+        param.put("address", address);
+        param.put("nickname", nickname);
+        param.put("flag", flag);
+        param.put("id", id);
+        productService.insertDeli(param);  //배송지 추가
+        Integer currval = productService.getCurrval();//seq.currval
+        if (flag.equals("Y")) { //flag Y일때 나머지 n으로 변경
+            productService.updDeliStatus(currval);
+        }
+        return "success";
+        //배달 정보에 insert
+    }
+
+
+    @ResponseBody
+    @PostMapping("/getSeqDeli")
+    public DeliDTO getSeqDeli(Integer seq) throws Exception {
+        DeliDTO deliDTO = productService.getSeqDeli(seq);
+        return deliDTO;
+    }
+
+    @ResponseBody
+    @PostMapping("/updDelivery")
+    public String updDelivery(@RequestParam Map<String, Object> map) throws Exception {
+        System.out.println("map = " + map);
+        String name = map.get("name").toString();
+        String phone = map.get("phone").toString();
+        String address = map.get("address").toString();
+        String nickname = map.get("nickname").toString();
+        String def = map.get("def").toString();
+        String id = map.get("id").toString();
+        Integer seq = Integer.parseInt(map.get("seq").toString());
+        String flag = "N";
+        if (def.equals("true")) {
+            flag = "Y";
+        }
+        System.out.println("flag = " + flag);
+        Map<String, Object> param = new HashMap<>();
+        param.put("name", name);
+        param.put("phone", phone);
+        param.put("address", address);
+        param.put("nickname", nickname);
+        param.put("flag", flag);
+        param.put("id", id);
+        param.put("seq", seq);
+        productService.updDeli(param);  //배송지 수정
+        productService.updDeliStatus(seq); //나머지 status n
+        return "success";
+    }
+
+    @ResponseBody
+    @PostMapping("/getDefaultAdr")  //기본 배송지 seq가져오기
+    public Integer getDefaultAdr() throws Exception{
+        Integer seq = productService.getDefaultAdr();
+        return seq;
+    }
+
+    @ResponseBody
+    @PostMapping("/deleteDeli")  //배송지 삭제
+    public String deleteDeli(Integer seq) throws Exception{
+        productService.deleteDeli(seq);
+        return "success";
+    }
+
+    @RequestMapping("/history")  //구매내역 최신순부터 아래는 페이징처리
+    public String history(String id) throws Exception{
+        List<PayInfoDTO> payInfoDTOS = productService.getHistoryByDate(id);  //날짜별로 구매내역 개수
+        return "/product/history";
+    }
 }

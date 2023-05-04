@@ -736,4 +736,142 @@
     <update id="updFlagToY">
         update cart set flag = 'Y' where cart_seq = #{cart_seq}
     </update>
+
+
+    <select id="getDeliveryInfo" resultType="com.example.Spring_Project.dto.DeliDTO">
+        select
+            seq,
+            id,
+            name,
+            phone,
+            address,
+            nickname,
+            status
+        from deliInfo
+        where id = #{id} and flag = 'Y'
+        order by status desc
+
+    </select>
+
+    <select id="deliveryInfo" resultType="com.example.Spring_Project.dto.DeliDTO">
+        select
+          id,
+          name,
+          phone,
+          address,
+          nickname,
+          status
+        from deliInfo
+        where id = #{id}
+        order by status desc
+    </select>
+
+    <insert id="insertDeli">
+        insert into deliInfo
+        values(
+        seq.nextval,
+        #{id},
+        #{name},
+        #{phone},
+        #{address},
+        #{nickname},
+        #{flag},
+        'Y'
+        )
+    </insert>
+
+    <select id="getSeqDeli" resultType="com.example.Spring_Project.dto.DeliDTO">
+        select
+        seq,
+        id,
+        name,
+        phone,
+        address,
+        nickname,
+        status
+        from deliInfo
+        where seq = #{seq}
+        order by status desc
+    </select>
+
+    <select id="getCurrval" resultType="Integer">
+        select seq.currval from dual
+    </select>
+
+    <update id="updDeliStatus">
+        UPDATE deliInfo SET status = 'N' WHERE seq NOT in(#{seq})
+    </update>
+
+    <update id="updDeli">
+        UPDATE deliInfo SET
+        name = #{name},
+        phone = #{phone},
+        address = #{address},
+        nickname = #{nickname},
+        status = #{flag}
+        where seq = #{seq}
+    </update>
+
+    <update id="deleteDeli">
+        update deliInfo set flag = 'N' where seq = #{seq}
+    </update>
+
+
+    <update id="updStatus">
+        update deliInfo set status = 'Y' where seq = #{seq}
+    </update>
+
+    <select id="getDefaultAddr" resultType="com.example.Spring_Project.dto.DeliDTO">
+        select
+            seq,
+            id,
+            name,
+            phone,
+            address,
+            nickname,
+            status
+        from deliInfo
+        where status = 'Y'
+    </select>
+
+    <select id="currPaySeq" resultType="Integer">
+        select
+         pay_seq.currval
+        from dual
+    </select>
+
+    <insert id="insertPayProduct">
+        insert into payProduct
+        values(
+        payPd_seq.nextval,
+        #{payPd_seq},
+        #{pd_seq},
+        #{option}
+        )
+    </insert>
+
+    <insert id="insertPayPd">
+        insert into payProduct(payPd_seq,pay_seq,pd_seq)
+        values(
+        payPd_seq.nextval,
+        #{pay_seq},
+        #{pd_seq}
+        )
+    </insert>
+
+    <select id="getDefaultAdr" resultType="Integer">
+        select seq
+        from deliInfo
+        where status = 'Y'
+    </select>
+
+    <select id="getHistoryByDate" resultType="com.example.Spring_Project.dto.PayInfoDTO">
+<!--        select-->
+<!--        to_char(payDate, 'YYYY-MM-DD'),-->
+<!--        count(*)-->
+<!--        from payInfo-->
+<!--        group by to_char(payDate, 'YYYY-MM-DD')-->
+    </select>
+
+
 </mapper>

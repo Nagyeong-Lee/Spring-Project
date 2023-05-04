@@ -8,11 +8,26 @@
         insert into
         payInfo
         values(
-        payInfo_seq.nextval,
+        pay_seq.nextval,
         #{id},
         #{price},
-        sysdate
+        #{deliSeq},
+        'Y',
+        sysdate,
+        'Y',
+        '카카오페이'
         )
     </insert>
+
+    <select id="getPayInfo" resultType="com.example.Spring_Project.dto.PayInfoDTO">
+        select
+         id,
+         price,
+         deli_seq,
+         payDate,
+         payMethod
+        from payInfo
+        where pay_seq = #{pay_seq}
+    </select>
 
 </mapper>

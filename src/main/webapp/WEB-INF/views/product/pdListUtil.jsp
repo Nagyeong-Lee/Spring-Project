@@ -39,21 +39,24 @@
                     </ul>
                 </li>
             </ul>
-            <span style="margin-left: 400px;">
+            <span style="margin-left: 200px;">
                 <input type="text" id="keyword" name="keyword" placeholder="상품명을 입력해주세요.">
                 <button type="button" id="search" class="btn btn-dark">검색</button>
             </span>
-            <button class="btn btn-outline-dark" type="button" id="cart" style="margin-left: 10px;" >
+            <button class="btn btn-outline-dark" type="button" id="cart" style="margin-left: 10px; width: 110px;" >
                 <i class="bi-cart-fill me-1"></i>
                 Cart
             </button>
-            <a href="/member/toUpdateForm?id=${id}"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px;" id="mypage">
+            <a href="/product/history?id=${id}"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="history">
+                구매 내역
+            </button></a>
+            <a href="/member/toUpdateForm?id=${id}"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="mypage">
                 내 정보
             </button></a>
-            <a href="/member/logout?id=${id}"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px;" id="logout">
+            <a href="/member/logout?id=${id}"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="logout">
                 로그아웃
             </button></a>
-            <a href="/board/list?currentPage=1&count=10"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px;">
+            <a href="/board/list?currentPage=1&count=10"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;">
                 커뮤니티로
             </button></a>
         </div>

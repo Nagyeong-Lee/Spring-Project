@@ -11,9 +11,13 @@ import lombok.Setter;
 @AllArgsConstructor
 public class DeliDTO {
 
-    private Integer deli_seq;
+    private Integer seq;
     private String id;
-    private String defaultAddress;
-    private String additionalAddress1;
-    private String additionalAddress2;
+    private String name;
+    private String phone;
+    private String address;
+    private String nickname;
+    private String status; //기본 배송지인지
+    private String flag; //삭제 여부
+
 }

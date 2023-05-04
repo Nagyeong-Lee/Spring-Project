@@ -12,8 +12,14 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PayInfoDTO {
-    private Integer payInfo_seq;
+
+    private Integer pay_seq;
     private String id;
     private Integer price;
-    private Timestamp pay_time;
+    private Integer deli_seq;
+    private String successYN;
+    private Timestamp payDate;
+    private String status;
+    private String payMethod;
+
 }

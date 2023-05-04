@@ -67,13 +67,25 @@
     </form>
   </table>
   <hr>
+
+  <div class="deliInfo" style="margin-top: 30px;">
+    <h4>배송지 정보</h4>
+    <p id="select_name">이름 : ${defaultAddr.name}</p>
+    <p id="select_address">주소 : ${defaultAddr.address}</p>
+    <p id="select_phone">전화번호 : ${defaultAddr.phone}</p>
+  </div>
+
   <div style="margin-top: 50px;">총 수량 : ${totalSum}개</div>
   <div>총 합계 : <fmt:formatNumber pattern="#,###" value="${price}" />원</div>
   <input type="hidden" id="hiddenPay" value="<fmt:formatNumber pattern="#,###" value="${totalPrice}" />">
+  <div>결제 방법 : ${payInfoDTO.payMethod}</div>
+
   <div class="cart__mainbtns">
     <button class="cart__bigorderbtn left" id="continue" style="margin-left:70px;">상품 리스트로 이동</button>
   </div>
+
 </div>
+
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>

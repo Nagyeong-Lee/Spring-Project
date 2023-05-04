@@ -100,4 +100,22 @@ public interface ProductMapper {
     void updCartFlag(@Param("cart_seq") Integer cart_seq);
     void updFlagToY(@Param("cart_seq") Integer cart_seq);
     List<CartDTO> getCart(@Param("id") String id);
+    List<DeliDTO> getDeliveryInfo(@Param("id") String id);
+    List<DeliDTO> deliveryInfo(@Param("id") String id);
+    void insertDeli(Map<String,Object>param);
+    DeliDTO getSeqDeli(@Param("seq") Integer seq);
+    Integer getCurrval();
+    void updDeliStatus(@Param("seq") Integer seq);
+    void updDeli(Map<String,Object>param);
+    void deleteDeli(@Param("seq") Integer seq);
+    void chgDefaultAddr(@Param("seq") Integer seq);
+    void updStatus(@Param("seq") Integer seq);
+    DeliDTO getDefaultAddr();
+    Integer currPaySeq();
+    void insertPayProduct(Map<String,Object>parameter);
+    void insertPayPd(@Param("pd_seq") Integer pd_seq, @Param("pay_seq")Integer pay_seq);
+    Integer getDefaultAdr();
+    List<PayInfoDTO> getHistoryByDate(@Param("id") String id);
+
+
 }

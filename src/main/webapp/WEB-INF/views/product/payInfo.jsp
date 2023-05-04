@@ -14,7 +14,7 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
-<%--    <link rel="stylesheet" type="text/css" href="/resources/navUtil.css">--%>
+    <%--    <link rel="stylesheet" type="text/css" href="/resources/navUtil.css">--%>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -86,18 +86,32 @@
 
 
     <h3>배송지 선택</h3>
-    <input type="radio" name="address" checked value="default">기본 배송지
-    <input type="radio" name="address" value="additional1">추가 배송지1
-    <input type="radio" name="address" value="additional2">기본 배송지2
+    <button type="button" id="addBtn">배송지 추가</button>
+    <br>
+    <c:choose>
+        <c:when test="${!empty deliDTOList}">
+            <c:forEach var="i" items="${deliDTOList}">
+                <input type="radio" class="select_add_radio" name="address" value="${i.seq}" <c:out
+                        value="${i.status eq 'Y' ? 'checked' : ''}"/>>
+                <c:choose>
+                    <c:when test="${i.status eq 'Y'}">기본 배송지</c:when>
+                    <c:otherwise>${i.nickname}</c:otherwise>
+                </c:choose>
 
-    <div class="deliveryInfo">
-        <div>이름 : ${deliAddress.get("name")}</div>
-        <div id="phone"> 전화번호 : ${deliAddress.get("phone")}</div>
-        <div id="addr">기본주소 : <span id="defaultAddress"
-                                    contenteditable="false">${deliAddress.get("defaultAddress")}</span>
+            </c:forEach>
+            <c:forEach var="i" items="${deliDTOList}">
+                <c:if test="${i.status eq 'Y'}">
+                    <div class="deliInfo">
+                        <p id="select_name">이름 : ${i.name}</p>
+                        <p id="select_address">주소 : ${i.address}</p>
+                        <p id="select_phone">전화번호 : ${i.phone}</p>
+                    </div>
+                </c:if>
+            </c:forEach>
             <button type="button" id="updateBtn">배송지 수정</button>
-        </div>
-    </div>
+            <button type="button" id="delBtn">배송지 삭제</button>
+        </c:when>
+    </c:choose>
 
     <div class="cart__mainbtns">
         <button class="cart__bigorderbtn left" id="continue">쇼핑 계속하기</button>
@@ -116,21 +130,21 @@
 
     $("#search").on("click", function () {
         let keyword = $("#keyword").val();
-        if(keyword.length == 0 ){
+        if (keyword.length == 0) {
             alert('상품을 입력하세요.');
             return;
         }
         location.href = '/product/searchPd?keyword=' + keyword;
     });
 
-    $("#cart").click(function(){
+    $("#cart").click(function () {
         let newForm = document.createElement("form");
-        newForm.setAttribute("method","post");
-        newForm.setAttribute("action","/product/cart");
+        newForm.setAttribute("method", "post");
+        newForm.setAttribute("action", "/product/cart");
         let newInput = document.createElement("input");
-        newInput.setAttribute("type","hidden");
-        newInput.setAttribute("name","id");
-        newInput.setAttribute("value",$("#id").val());
+        newInput.setAttribute("type", "hidden");
+        newInput.setAttribute("name", "id");
+        newInput.setAttribute("value", $("#id").val());
         newForm.appendChild(newInput);
         document.body.append(newForm);
         newForm.submit();
@@ -140,76 +154,108 @@
         location.href = "/product/list";
     });
 
-    //배송지 수정 클릭 시
-    // $("#updateBtn").on("click", function () {
-    $(document).on("click", "#updateBtn", function () {
-        $("#defaultAddress").attr("contentEditable", true);
-        $("#updateBtn").hide();
-        var button = '<button type="button" id="cplUpdate">수정 완료</button>';
-        $("#defaultAddress").after(button);
-    });
+    //배송지 추가 클릭 시
+    $("#addBtn").click(function () {
+        let id = $("#session").val();
+        window.open('/product/addDeli?id=${id}', '', 'width=500, height=500, left=800, top=250');
+    })
 
-    //수정 완료 클릭 시
-    $(document).on("click", "#cplUpdate", function () {
-        $("#defaultAddress").attr("contentEditable", false);
-        $("#updateBtn").show();
-        $("#cplUpdate").hide();
-    });
+    //배송지 수정 클릭 시
+    $("#updateBtn").click(function () {
+         let seq = $("input[name=address]:checked").val();
+         popup(seq);
+    })
+
+    function popup(seq) {
+        window.open('/product/updDeliInfo?seq='+seq, '', 'width=500, height=500, left=650, top=250');
+    }
+
+    //배송지 삭제 클릭 시
+    $("#delBtn").click(function(){
+        let seq = $("input[name=address]:checked").val();
+        console.log(seq);
+        let defaultSeq = 0;
+        //기본 배송지 seq 가져오기
+        $.ajax({
+            url:'/product/getDefaultAdr',
+            type:'post',
+            async:false,
+            success:function(data){
+                defaultSeq = data;
+                console.log(data);
+                if(seq == data){
+                    alert('기본 배송지를 삭제할 수 없습니다.');
+                    return false;
+                }
+            }
+        })
+
+        if(seq != defaultSeq){
+            $.ajax({
+                url : '/product/deleteDeli',
+                type:'post',
+                async:false,
+                data : {
+                    "seq":seq
+                },
+                success:function(data){
+                    location.reload();
+                    console.log(data);
+                }
+            })
+        }
+    })
 
     //라디오 버튼 바뀔때
     $("input[type=radio]").on("change", function () {
-        let checkedVal = $('input[name="address"]:checked').val();
-        if (checkedVal == 'additional1') {  //추가 배송지1
-            $("#addr").remove();
-            $.ajax({
-                url: '/product/getAdditionalAddr',
-                data: {
-                    "id": $("#session").val()
-                },
-                success: function (data) {
-                    let addr = data;
-                    var html = '<div id="addr">기본주소 : ' + '<span id="defaultAddress" contenteditable="false">' + data + '</span>' +
-                        '<button type="button" id="updateBtn">배송지 수정</button></div>';
-                    $("#phone").after(html);
-                }
-            });
-        } else if (checkedVal == 'additional2') { //추가 배송지2
-            $("#addr").remove();
-            $.ajax({
-                url: '/product/getAdditionalAddr2',
-                data: {
-                    "id": $("#session").val()
-                },
-                success: function (data) {
-                    let addr = data;
-                    var html = '<div id="addr">기본주소 : ' + '<span id="defaultAddress" contenteditable="false">' + data + '</span>' +
-                        '<button type="button" id="updateBtn">배송지 수정</button></div>';
-                    $("#phone").after(html);
-                }
-            });
-        } else {  //기본 배송지
-            $("#addr").remove();
-            $.ajax({
-                url: '/product/getDefaultAddr',
-                data: {
-                    "id": $("#session").val()
-                },
-                success: function (data) {
-                    let addr = data;
-                    var html = '<div id="addr">기본주소 : ' + '<span id="defaultAddress" contenteditable="false">' + data + '</span>' +
-                        '<button type="button" id="updateBtn">배송지 수정</button></div>';
-                    $("#phone").after(html);
-                }
-            });
-        }
-    });
+        let seq = $(this).val();
+        console.log(seq);
+        $.ajax({
+            url: '/product/getSeqDeli', //해당 seq 배달정보
+            type: 'post',
+            data: {
+                "seq": seq
+            },
+            success: function (data) {
+                console.log(data);
+                $("#select_name").text('이름 : ' + data.name);
+                $("#select_address").text('주소 : ' + data.address);
+                $("#select_phone").text('전화번호 : ' + data.phone);
+            }
+        })
+    })
 
 
     var pd_sum;
     var pd_price;
     //결제 하기 클릭
     $("#pay").on("click", function () {
-        requestPay();
+        // requestPay();
+
+            //결제 내역으로 이동
+            let frm = document.createElement("form");
+            frm.setAttribute("method", "post");
+            frm.setAttribute("action", "/product/paymentDetails");
+            let newInput = document.createElement("input");
+            let newInput2 = document.createElement("input");
+            let newInput3 = document.createElement("input");
+            newInput.setAttribute("type", "hidden");
+            newInput.setAttribute("value", $("#session").val());
+            newInput.setAttribute("name", "id");
+
+            newInput2.setAttribute("type", "hidden");
+            newInput2.setAttribute("value", $("#totalMoney").val());
+            newInput2.setAttribute("name", "price");
+
+            newInput3.setAttribute("type", "hidden");
+            newInput3.setAttribute("value", $("input[name=address]:checked").val());
+            newInput3.setAttribute("name", "seq");
+            frm.appendChild(newInput);
+            frm.appendChild(newInput2);
+            frm.appendChild(newInput3);
+            document.body.appendChild(frm);
+            frm.submit();
+
     });
 
     var IMP = window.IMP;
@@ -229,7 +275,6 @@
         //         pd_sum = data.total_sum;
         //     }
         // })
-
         var email = $("#mem_email").val();
         var name = $("#mem_name").val();
         var phone = $("#mem_phone").val();
@@ -255,29 +300,35 @@
         };
 
         IMP.request_pay(payInfo, function (rsp) {
-            if (rsp.success) {
-                var msg = '결제가 완료되었습니다.';
-                //결제 내역으로 이동
-                let frm = document.createElement("form");
-                frm.setAttribute("method", "post");
-                frm.setAttribute("action", "/product/paymentDetails");
-                let newInput = document.createElement("input");
-                let newInput2 = document.createElement("input");
-                newInput.setAttribute("type", "hidden");
-                newInput.setAttribute("value", $("#session").val());
-                newInput.setAttribute("name", "id");
-
-                newInput2.setAttribute("type", "hidden");
-                newInput2.setAttribute("value", $("#totalMoney").val());
-                newInput2.setAttribute("name", "price");
-                frm.appendChild(newInput);
-                frm.appendChild(newInput2);
-                document.body.appendChild(frm);
-                frm.submit();
-            } else {
-                var msg = '결제에 실패했습니다.';
-            }
-            alert(msg);
+            // if (rsp.success) {
+            //     var msg = '결제가 완료되었습니다.';
+            //     //결제 내역으로 이동
+            //     let frm = document.createElement("form");
+            //     frm.setAttribute("method", "post");
+            //     frm.setAttribute("action", "/product/paymentDetails");
+            //     let newInput = document.createElement("input");
+            //     let newInput2 = document.createElement("input");
+            //     let newInput3 = document.createElement("input");
+            //     newInput.setAttribute("type", "hidden");
+            //     newInput.setAttribute("value", $("#session").val());
+            //     newInput.setAttribute("name", "id");
+            //
+            //     newInput2.setAttribute("type", "hidden");
+            //     newInput2.setAttribute("value", $("#totalMoney").val());
+            //     newInput2.setAttribute("name", "price");
+            //
+            //     newInput3.setAttribute("type", "hidden");
+            //     newInput3.setAttribute("value", $("input[name=address]:checked").val());
+            //     newInput3.setAttribute("name", "seq");
+            //     frm.appendChild(newInput);
+            //     frm.appendChild(newInput2);
+            //     frm.appendChild(newInput3);
+            //     document.body.appendChild(frm);
+            //     frm.submit();
+            // } else {
+            //     var msg = '결제에 실패했습니다.';
+            // }
+            // alert(msg);
         });
     }
 </script>

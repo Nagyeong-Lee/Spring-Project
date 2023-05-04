@@ -5,6 +5,7 @@ import com.example.Spring_Project.mapper.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.print.DocFlavor;
 import java.util.List;
 import java.util.Map;
 
@@ -345,5 +346,62 @@ public class ProductService {
 
     public List<CartDTO> getCart(String id) throws Exception {
         return productMapper.getCart(id);
+    }
+
+    public List<DeliDTO> getDeliveryInfo(String id) throws Exception{
+        return productMapper.getDeliveryInfo(id);
+    }
+
+    public List<DeliDTO> deliveryInfo(String id) throws Exception{
+        return productMapper.deliveryInfo(id);
+    }
+    public void insertDeli(Map<String,Object>param) throws Exception{
+         productMapper.insertDeli(param);
+    }
+
+    public DeliDTO getSeqDeli(Integer seq) throws Exception{
+        return productMapper.getSeqDeli(seq);
+    }
+
+    public Integer getCurrval() throws Exception{
+        return productMapper.getCurrval();
+    }
+
+    public void updDeliStatus(Integer seq) throws Exception{
+        productMapper.updDeliStatus(seq);
+    }
+
+    public void updDeli(Map<String,Object>param) throws Exception{
+        productMapper.updDeli(param);
+    }
+
+    public void deleteDeli(Integer seq) throws Exception{
+        productMapper.deleteDeli(seq);
+    }
+     public void updStatus(Integer seq) throws Exception{
+        productMapper.updStatus(seq);
+    }
+
+    public DeliDTO getDefaultAddr() throws Exception{
+        return productMapper.getDefaultAddr();
+    }
+
+    public Integer currPaySeq() throws Exception{
+        return productMapper.currPaySeq();
+    }
+
+    public void insertPayProduct(Map<String,Object>parameter) throws Exception{
+         productMapper.insertPayProduct(parameter);
+    }
+    public void insertPayPd(Integer pd_seq,Integer pay_seq) throws Exception{
+         productMapper.insertPayPd(pd_seq,pay_seq);
+    }
+
+    public Integer getDefaultAdr() throws Exception{
+        return productMapper.getDefaultAdr();
+    }
+
+    public List<PayInfoDTO> getHistoryByDate(String id) throws Exception{
+        return productMapper.getHistoryByDate(id);
     }
 }
