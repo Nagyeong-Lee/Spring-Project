@@ -47,7 +47,7 @@
                 <i class="bi-cart-fill me-1"></i>
                 Cart
             </button>
-            <a href="/product/history?id=${id}"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="history">
+            <a href="/product/history?id=${id}&cpage=1"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="history">
                 구매 내역
             </button></a>
             <a href="/member/toUpdateForm?id=${id}"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="mypage">

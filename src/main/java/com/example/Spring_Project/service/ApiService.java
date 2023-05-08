@@ -664,8 +664,6 @@ public class ApiService {
         if (endNavi == pageTotalCount) {
             needNext = false;
         }
-
-
         reMap.put("pageTotalCount", pageTotalCount);
         reMap.put("startNavi", startNavi);
         reMap.put("endNavi", endNavi);

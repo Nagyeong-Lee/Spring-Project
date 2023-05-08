@@ -115,7 +115,9 @@ public interface ProductMapper {
     void insertPayProduct(Map<String,Object>parameter);
     void insertPayPd(@Param("pd_seq") Integer pd_seq, @Param("pay_seq")Integer pay_seq);
     Integer getDefaultAdr();
-    List<PayInfoDTO> getHistory(@Param("id") String id);
-
+    List<Map<String,Object>> getHistory(@Param("id") String id,@Param("start") Integer start,@Param("end")Integer end);
+    DeliDTO getDeliInfoBySeq(@Param("deli_seq") Integer deli_seq);
+    String getOptCategory(@Param("pd_seq") Integer pd_seq, @Param("optName") String optName);
+    Integer countPost();
 
 }

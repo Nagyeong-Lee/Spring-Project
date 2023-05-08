@@ -239,6 +239,7 @@
             let newInput = document.createElement("input");
             let newInput2 = document.createElement("input");
             let newInput3 = document.createElement("input");
+            let newInput4 = document.createElement("input");
             newInput.setAttribute("type", "hidden");
             newInput.setAttribute("value", $("#session").val());
             newInput.setAttribute("name", "id");
@@ -250,9 +251,14 @@
             newInput3.setAttribute("type", "hidden");
             newInput3.setAttribute("value", $("input[name=address]:checked").val());
             newInput3.setAttribute("name", "seq");
+
+            newInput4.setAttribute("type", "hidden");
+            newInput4.setAttribute("value", $("#totalSum").val());
+            newInput4.setAttribute("name", "pdTotalSum");
             frm.appendChild(newInput);
             frm.appendChild(newInput2);
             frm.appendChild(newInput3);
+            frm.appendChild(newInput4);
             document.body.appendChild(frm);
             frm.submit();
 

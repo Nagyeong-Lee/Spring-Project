@@ -21,5 +21,6 @@ public class PayInfoDTO {
     private Timestamp payDate;
     private String status;
     private String payMethod;
+    private Integer count;
 
 }

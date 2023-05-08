@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.print.DocFlavor;
+import java.rmi.MarshalledObject;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -329,18 +331,18 @@ public class ProductService {
     }
 
     public Integer getSum(String id) throws Exception {
-       return productMapper.getSum(id);
+        return productMapper.getSum(id);
     }
 
     public Integer getPrice(String id) throws Exception {
-       return productMapper.getPrice(id);
+        return productMapper.getPrice(id);
     }
 
-    public void updCartFlag(Integer cart_seq) throws Exception{
+    public void updCartFlag(Integer cart_seq) throws Exception {
         productMapper.updCartFlag(cart_seq);
     }
 
-    public void updFlagToY(Integer cart_seq) throws Exception{
+    public void updFlagToY(Integer cart_seq) throws Exception {
         productMapper.updFlagToY(cart_seq);
     }
 
@@ -348,60 +350,124 @@ public class ProductService {
         return productMapper.getCart(id);
     }
 
-    public List<DeliDTO> getDeliveryInfo(String id) throws Exception{
+    public List<DeliDTO> getDeliveryInfo(String id) throws Exception {
         return productMapper.getDeliveryInfo(id);
     }
 
-    public List<DeliDTO> deliveryInfo(String id) throws Exception{
+    public List<DeliDTO> deliveryInfo(String id) throws Exception {
         return productMapper.deliveryInfo(id);
     }
-    public void insertDeli(Map<String,Object>param) throws Exception{
-         productMapper.insertDeli(param);
+
+    public void insertDeli(Map<String, Object> param) throws Exception {
+        productMapper.insertDeli(param);
     }
 
-    public DeliDTO getSeqDeli(Integer seq) throws Exception{
+    public DeliDTO getSeqDeli(Integer seq) throws Exception {
         return productMapper.getSeqDeli(seq);
     }
 
-    public Integer getCurrval() throws Exception{
+    public Integer getCurrval() throws Exception {
         return productMapper.getCurrval();
     }
 
-    public void updDeliStatus(Integer seq) throws Exception{
+    public void updDeliStatus(Integer seq) throws Exception {
         productMapper.updDeliStatus(seq);
     }
 
-    public void updDeli(Map<String,Object>param) throws Exception{
+    public void updDeli(Map<String, Object> param) throws Exception {
         productMapper.updDeli(param);
     }
 
-    public void deleteDeli(Integer seq) throws Exception{
+    public void deleteDeli(Integer seq) throws Exception {
         productMapper.deleteDeli(seq);
     }
-     public void updStatus(Integer seq) throws Exception{
+
+    public void updStatus(Integer seq) throws Exception {
         productMapper.updStatus(seq);
     }
 
-    public DeliDTO getDefaultAddr() throws Exception{
+    public DeliDTO getDefaultAddr() throws Exception {
         return productMapper.getDefaultAddr();
     }
 
-    public Integer currPaySeq() throws Exception{
+    public Integer currPaySeq() throws Exception {
         return productMapper.currPaySeq();
     }
 
-    public void insertPayProduct(Map<String,Object>parameter) throws Exception{
-         productMapper.insertPayProduct(parameter);
-    }
-    public void insertPayPd(Integer pd_seq,Integer pay_seq) throws Exception{
-         productMapper.insertPayPd(pd_seq,pay_seq);
+    public void insertPayProduct(Map<String, Object> parameter) throws Exception {
+        productMapper.insertPayProduct(parameter);
     }
 
-    public Integer getDefaultAdr() throws Exception{
+    public void insertPayPd(Integer pd_seq, Integer pay_seq) throws Exception {
+        productMapper.insertPayPd(pd_seq, pay_seq);
+    }
+
+    public Integer getDefaultAdr() throws Exception {
         return productMapper.getDefaultAdr();
     }
 
-    public List<PayInfoDTO> getHistory(String id) throws Exception{
-        return productMapper.getHistory(id);
+
+    public List<Map<String, Object>> getHistory(String id, Integer start, Integer end) throws Exception {
+        return productMapper.getHistory(id, start, end);
     }
+
+    public DeliDTO getDeliInfoBySeq(Integer deli_seq) throws Exception {
+        return productMapper.getDeliInfoBySeq(deli_seq);
+    }
+
+    public String getOptCategory(Integer pd_seq, String optName) throws Exception {
+        return productMapper.getOptCategory(pd_seq, optName);
+    }
+
+    public Integer countPost() throws Exception {  //글 개수
+        return productMapper.countPost();
+    }
+
+    //페이징
+    public Map<String, Object> paging(Integer cpage) throws Exception {
+        //현재 페이지
+        System.out.println("cpage = " + cpage);
+        Integer postCount = countPost(); //글 개수
+        Integer postPerPage = 10; //페이지 당 글 개수
+        Integer naviPerPage = 10; //페이지 당 내비 수
+        Integer totalPageCount = 0; //전체 페이지 수
+        Map<String, Object> map = new HashMap<>();
+        if (postCount % naviPerPage > 0) {
+            totalPageCount = postCount / naviPerPage + 1;
+        } else {
+            totalPageCount = postCount / naviPerPage;
+        }
+
+        if (cpage > totalPageCount) {
+            cpage = totalPageCount;
+        }
+
+        int startNavi = (cpage - 1) / naviPerPage * naviPerPage + 1;  //페이지 start
+        int endNavi = startNavi + naviPerPage - 1; //페이지 end
+
+        if (endNavi > totalPageCount) {
+            endNavi = totalPageCount;
+        }
+
+        System.out.println("startNavi = " + startNavi);
+        System.out.println("endNavi = " + endNavi);
+        boolean needPrev = true;
+        boolean needNext = true;
+
+        if (startNavi == 1) {
+            needPrev = false;
+        }
+        if (endNavi == totalPageCount) {
+            needNext = false;
+        }
+
+        map.put("startNavi", startNavi);
+        map.put("endNavi", endNavi);
+        map.put("needPrev", needPrev);
+        map.put("needNext", needNext);
+        map.put("totalPageCount", totalPageCount);
+        map.put("cpage", cpage);
+        return map;
+    }
+
 }

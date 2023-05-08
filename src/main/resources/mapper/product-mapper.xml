@@ -865,18 +865,59 @@
         where status = 'Y'
     </select>
 
-    <select id="getHistory" resultType="com.example.Spring_Project.dto.PayInfoDTO">
-        select
-        id,
-        price,
+    <select id="getHistory" resultType="java.util.Map">
+
+<!--        SELECT-->
+<!--            pd_seq,-->
+<!--            payPd_seq,-->
+<!--            deli_seq,-->
+<!--            price,-->
+<!--            to_char(PAYDATE,'YYYY-MM-DD') AS PAYDATE ,-->
+<!--            PAYMETHOD,-->
+<!--            OPTIONS,-->
+<!--            count-->
+<!--        FROM payInfo p JOIN PAYPRODUCT pp-->
+<!--        ON p.PAY_SEQ  = pp.pay_seq-->
+<!--        WHERE p.id = #{id}-->
+<!--        ORDER BY PAYDATE desc-->
+
+        SELECT  pd_seq,payPd_seq,deli_seq,price,PAYDATE,PAYMETHOD,OPTIONS,COUNT
+        from( SELECT ROWNUM rn, a.* FROM(SELECT
+        pd_seq,
+        payPd_seq,
         deli_seq,
-        successYN,
-        to_char(payDate,'YYYY-MM-DD')
-        status,
-        payMethod
-        from payInfo
-        order by payDate DESC
+        price,
+        to_char(PAYDATE,'YYYY-MM-DD') AS PAYDATE ,
+        PAYMETHOD,
+        OPTIONS,
+        count
+        FROM payInfo p JOIN PAYPRODUCT pp
+        ON p.PAY_SEQ  = pp.pay_seq
+        WHERE p.id = #{id}
+        ORDER BY PAYDATE DESC) a)
+        where rn between #{start} and #{end}
+
     </select>
 
+    <select id="getDeliInfoBySeq" resultType="com.example.Spring_Project.dto.DeliDTO">
+        select
+         name,
+         phone,
+         address
+        from deliInfo
+        where seq = #{deli_seq}
+    </select>
 
+    <select id="getOptCategory" resultType="String">
+        SELECT
+            category
+        FROM OPTIONS
+        WHERE pd_seq = #{pd_seq} AND name = #{optName}
+    </select>
+
+    <select id="countPost" resultType="Integer">
+        select
+         count(*)
+        from PAYPRODUCT
+    </select>
 </mapper>

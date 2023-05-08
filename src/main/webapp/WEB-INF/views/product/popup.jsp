@@ -13,40 +13,47 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
+    <style>
+        .popup{
+            margin-top: 100px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
 <input type="hidden" value="${id}" id="id" name="id">
-<form action="/product/addDeli" method="post" id="frm">
-    <div>이름 <input type="text" name="name" id="name"></div>
-    <div>번호 <input type="text" name="phone" id="phone"></div>
-    <div>주소 <input type="text" name="address" id="address"></div>
-    <div>별칭 <input type="text" name="nickname" id="nickname"></div>
-    <div>기본 여부 <input type="checkbox" name="default" id="default"></div>
-    <div>
-        <button type="button" id="sbn">저장</button>
-        <button type="button" id="close">취소</button>
-    </div>
-</form>
-
+<div class="popup">
+    <form action="/product/addDeli" method="post" id="frm">
+        <div>이름 <input type="text" name="name" id="name"></div>
+        <div>번호 <input type="text" name="phone" id="phone"></div>
+        <div>주소 <input type="text" name="address" id="address"></div>
+        <div>별칭 <input type="text" name="nickname" id="nickname"></div>
+        <div>기본 여부 <input type="checkbox" name="default" id="default"></div>
+        <div>
+            <button type="button" id="sbn">저장</button>
+            <button type="button" id="close">취소</button>
+        </div>
+    </form>
+</div>
 <script>
     // $("#frm").onsubmit(function () {
     //     window.close();
     // });
     //저장 클릭 시
-    $("#sbn").on("click",function(){
+    $("#sbn").on("click", function () {
 
         let regexName = /^[가-힣]{2,5}$/;
         let regexPhone = /^010\d{4}\d{4}$/;
 
         let name = $("#name").val();
         let phone = $("#phone").val();
-        let address =$("#address").val();
-        let nickname =$("#nickname").val();
+        let address = $("#address").val();
+        let nickname = $("#nickname").val();
         let flag = $("#default").is(':checked');  //기본 주소 체크 여부
         let id = $("#id").val();
-        if(flag == true){
+        if (flag == true) {
             $("#default").val(1);
-        }else{
+        } else {
             $("#default").val(0);
         }
         if (name == '') {
@@ -81,18 +88,18 @@
         }
 
         $.ajax({
-            url:'/product/addDelivery',
-            type:'post',
-            data:{
-                "name":name,
-                "phone":phone,
-                "address":address,
-                "nickname":nickname,
-                "def":flag,
-                "id":id
+            url: '/product/addDelivery',
+            type: 'post',
+            data: {
+                "name": name,
+                "phone": phone,
+                "address": address,
+                "nickname": nickname,
+                "def": flag,
+                "id": id
             },
-            success:function(data){
-                if(data == 'success'){
+            success: function (data) {
+                if (data == 'success') {
                     window.close();
                     opener.parent.location.reload();
                 }
@@ -101,7 +108,7 @@
 
     })
 
-    $("#close").click(function(){
+    $("#close").click(function () {
         window.close();
     })
 </script>

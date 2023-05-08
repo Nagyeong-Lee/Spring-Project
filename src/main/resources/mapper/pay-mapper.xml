@@ -15,7 +15,8 @@
         'Y',
         sysdate,
         'Y',
-        '카카오페이'
+        '카카오페이',
+        #{pdTotalSum}
         )
     </insert>
 
