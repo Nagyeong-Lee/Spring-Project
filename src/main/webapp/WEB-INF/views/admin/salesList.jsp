@@ -42,20 +42,32 @@
     <script>
         $(function () {
             /*택배사 선택 클릭 시*/
-            $(".selectDeli").click(function(){
+            $(".selectDeli").click(function () {
                 var list = [];
-                let key='Zw11zx4vY7bsy0IdlOp98Q';
+                let key = 'Zw11zx4vY7bsy0IdlOp98Q';
                 $.ajax({
-                    type:"GET",
-                    dataType : "json",
-                    url:"http://info.sweettracker.co.kr/api/v1/companylist?t_key="+key,
-                    success:function(data){
+                    type: "GET",
+                    dataType: "json",
+                    url: "http://info.sweettracker.co.kr/api/v1/companylist?t_key=" + key,
+                    async:false,
+                    success: function (data) {
                         let size = data.Company.length;
-                        for(let i = 0 ; i<size; i++){
+                        for (let i = 0; i < size; i++) {
                             let map = new Map();
-                            map.set("code",data.Company[i].Code);
-                            map.set("name",data.Company[i].Name);
+                            map.set("code", data.Company[i].Code);
+                            map.set("name", data.Company[i].Name);
                             list.push(map);
+                            //db에 저장
+                            $.ajax({
+                                url:'/product/insertDeliInfo',
+                                type:'POST',
+                                data:{
+                                    "list":list.toString()
+                                },
+                                success:function(data){
+                                    console.log(data);
+                                }
+                            })
                         }
                         window.open('/admin/chgDeliStatus', '', 'width=500, height=500, left=800, top=250');
                     }

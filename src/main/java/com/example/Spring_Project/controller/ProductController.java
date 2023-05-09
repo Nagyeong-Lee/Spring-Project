@@ -551,7 +551,7 @@ public class ProductController {
             totalPrice += pdPrice * pdCount;
             totalSum += pdCount;
 
-            Map<String,Object> salesParam = new HashMap<>();
+            Map<String, Object> salesParam = new HashMap<>();
             Integer productPrice = cartInfo.get(i).getStock() * cartInfo.get(i).getPrice(); //상품 가격 * 상품 개수
             if (cartInfo.get(i).getOptions() != null) { //옵션 있을때
                 salesParam.put("option", cartInfo.get(i).getOptions());
@@ -581,11 +581,11 @@ public class ProductController {
             }
 
             //판매 테이블에 인서트할 map (상품당 insert)
-            salesParam.put("id",id); //id
-            salesParam.put("pd_seq",cartInfo.get(i).getPd_seq()); //pd_seq
+            salesParam.put("id", id); //id
+            salesParam.put("pd_seq", cartInfo.get(i).getPd_seq()); //pd_seq
             salesParam.put("stock", cartInfo.get(i).getStock()); //stock
-            salesParam.put("productPrice",productPrice);//price
-            salesParam.put("salesDate",timestamp); //판매 시간
+            salesParam.put("productPrice", productPrice);//price
+            salesParam.put("salesDate", timestamp); //판매 시간
             productService.insertSales(salesParam);
         }
 
@@ -980,7 +980,7 @@ public class ProductController {
         List<Map<String, Object>> historyList = new ArrayList<>();
         List<Map<String, Object>> payInfoDTOS = productService.getHistory(id, start, end);
         //옵션 정보 가져오기
-        historyList =  productService.pdOptionInfo(payInfoDTOS);
+        historyList = productService.pdOptionInfo(payInfoDTOS);
         model.addAttribute("historyList", historyList);
         model.addAttribute("paging", paging);
         return "/product/history";
@@ -1004,9 +1004,17 @@ public class ProductController {
         reMap.put("cpage", Integer.parseInt(paging.get("cpage").toString()));
 
         //옵션 정보 가져오기
-        historyList =  productService.pdOptionInfo(payInfoDTOS);
-        reMap.put("historyList",historyList);
+        historyList = productService.pdOptionInfo(payInfoDTOS);
+        reMap.put("historyList", historyList);
         return reMap;
+    }
+
+    @ResponseBody
+    @PostMapping("/insertDeliInfo")  //택배사 db 저장
+    public String insertDeliInfo(@RequestParam String list) throws Exception {
+        System.out.println("list = " + list);
+        //택배사 db저장
+        return "success";
     }
 
 }
