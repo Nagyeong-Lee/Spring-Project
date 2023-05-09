@@ -328,7 +328,7 @@
         select
         stock
         from product
-        where pd_seq=#{pd_seq}
+        where pd_seq=#{pd_seq} and status = 'Y'
     </select>
 
     <update id="updatePdStatus">
@@ -565,7 +565,7 @@
 
     <select id="getOptByGroup" resultType="com.example.Spring_Project.dto.OptionDTO">
         SELECT CATEGORY,name,stock,option_seq FROM OPTIONS WHERE pd_seq = #{pd_seq} and status = 'Y' GROUP BY
-        CATEGORY,name,stock,option_seq ORDER BY 4
+        CATEGORY,name,stock,option_seq ORDER BY 1
     </select>
 
     <update id="deletePd">
@@ -717,7 +717,7 @@
     </insert>
 
     <update id="updateBuyPd">
-       update buyPd set total_sum = #{sum}, total_price = #{price}
+        update buyPd set total_sum = #{sum}, total_price = #{price}
         where id = #{id}
     </update>
 
@@ -740,13 +740,13 @@
 
     <select id="getDeliveryInfo" resultType="com.example.Spring_Project.dto.DeliDTO">
         select
-            seq,
-            id,
-            name,
-            phone,
-            address,
-            nickname,
-            status
+        seq,
+        id,
+        name,
+        phone,
+        address,
+        nickname,
+        status
         from deliInfo
         where id = #{id} and flag = 'Y'
         order by status desc
@@ -755,12 +755,12 @@
 
     <select id="deliveryInfo" resultType="com.example.Spring_Project.dto.DeliDTO">
         select
-          id,
-          name,
-          phone,
-          address,
-          nickname,
-          status
+        id,
+        name,
+        phone,
+        address,
+        nickname,
+        status
         from deliInfo
         where id = #{id}
         order by status desc
@@ -823,20 +823,20 @@
 
     <select id="getDefaultAddr" resultType="com.example.Spring_Project.dto.DeliDTO">
         select
-            seq,
-            id,
-            name,
-            phone,
-            address,
-            nickname,
-            status
+        seq,
+        id,
+        name,
+        phone,
+        address,
+        nickname,
+        status
         from deliInfo
         where status = 'Y'
     </select>
 
     <select id="currPaySeq" resultType="Integer">
         select
-         pay_seq.currval
+        pay_seq.currval
         from dual
     </select>
 
@@ -867,57 +867,93 @@
 
     <select id="getHistory" resultType="java.util.Map">
 
-<!--        SELECT-->
-<!--            pd_seq,-->
-<!--            payPd_seq,-->
-<!--            deli_seq,-->
-<!--            price,-->
-<!--            to_char(PAYDATE,'YYYY-MM-DD') AS PAYDATE ,-->
-<!--            PAYMETHOD,-->
-<!--            OPTIONS,-->
-<!--            count-->
-<!--        FROM payInfo p JOIN PAYPRODUCT pp-->
-<!--        ON p.PAY_SEQ  = pp.pay_seq-->
-<!--        WHERE p.id = #{id}-->
-<!--        ORDER BY PAYDATE desc-->
-
-        SELECT  pd_seq,payPd_seq,deli_seq,price,PAYDATE,PAYMETHOD,OPTIONS,COUNT
+        SELECT pd_seq,payPd_seq,deli_seq,price,TO_CHAR(PAYDATE,'YYYY-MM-DD HH:MI') AS PAYDATE,PAYMETHOD,OPTIONS,COUNT
         from( SELECT ROWNUM rn, a.* FROM(SELECT
         pd_seq,
         payPd_seq,
         deli_seq,
         price,
-        to_char(PAYDATE,'YYYY-MM-DD') AS PAYDATE ,
+        PAYDATE,
         PAYMETHOD,
         OPTIONS,
         count
         FROM payInfo p JOIN PAYPRODUCT pp
-        ON p.PAY_SEQ  = pp.pay_seq
+        ON p.PAY_SEQ = pp.pay_seq
         WHERE p.id = #{id}
         ORDER BY PAYDATE DESC) a)
         where rn between #{start} and #{end}
+
+        <!--        SELECT  pd_seq,payPd_seq,deli_seq,price,PAYDATE,PAYMETHOD,OPTIONS,COUNT-->
+        <!--        from( SELECT ROWNUM rn, a.* FROM(SELECT-->
+        <!--        pd_seq,-->
+        <!--        payPd_seq,-->
+        <!--        deli_seq,-->
+        <!--        price,-->
+        <!--&lt;!&ndash;        to_char(PAYDATE,'YYYY-MM-DD hh:mm:ss') AS PAYDATE ,&ndash;&gt;-->
+        <!--        PAYDATE,-->
+        <!--        PAYMETHOD,-->
+        <!--        OPTIONS,-->
+        <!--        count-->
+        <!--        FROM payInfo p JOIN PAYPRODUCT pp-->
+        <!--        ON p.PAY_SEQ  = pp.pay_seq-->
+        <!--        WHERE p.id = #{id}-->
+        <!--        ORDER BY PAYDATE DESC) a)-->
+        <!--        where rn between #{start} and #{end}-->
 
     </select>
 
     <select id="getDeliInfoBySeq" resultType="com.example.Spring_Project.dto.DeliDTO">
         select
-         name,
-         phone,
-         address
+        name,
+        phone,
+        address
         from deliInfo
         where seq = #{deli_seq}
     </select>
 
     <select id="getOptCategory" resultType="String">
         SELECT
-            category
+        category
         FROM OPTIONS
         WHERE pd_seq = #{pd_seq} AND name = #{optName}
     </select>
 
     <select id="countPost" resultType="Integer">
         select
-         count(*)
+        count(*)
         from PAYPRODUCT
+    </select>
+
+    <select id="getPayDate" resultType="java.sql.Timestamp">
+        select
+        payDate
+        from payInfo
+        where pay_seq = #{pay_seq}
+    </select>
+
+    <insert id="insertSales">
+        insert into sales
+        values(
+        sales_seq.nextval,
+        #{id},
+        #{pd_seq},
+        #{stock},
+        #{productPrice},
+        #{option, jdbcType=VARCHAR},
+        #{salesDate},
+        'N'
+        )
+    </insert>
+
+    <select id="getSalesList" resultType="com.example.Spring_Project.dto.SalesDTO">
+        select
+        id,
+        pd_seq,
+        stock,
+        price,
+        pdOption,
+        salesDate,
+        deliYN
+        from sales
     </select>
 </mapper>

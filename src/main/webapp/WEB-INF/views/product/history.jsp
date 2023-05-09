@@ -164,7 +164,6 @@
 
         $("#tbody").children().remove();
         for (let i = 0; i < historyList.length; i++) {
-            console.log(historyList[i].productDTO.img);
             var newHtml = createHtml(historyList[i], startNavi);
             $("#tbody").append(newHtml);
         }
@@ -193,10 +192,9 @@
         console.log(cpage);
         var newTable = '';
         var temp = '';
-        // newTable = '<tr><td><a href=' + '/product/detail?pd_seq=' + item.productDTO.pd_seq + '><img src=' + '/resources/img/products/' + item.productDTO.img + '></a></td>';
         newTable = '<tr><td><a href="/product/detail?pd_seq=' + item.productDTO.pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width:120px; height: 100px;"></a></td>';
         newHtml = newTable;
-        if (item.option.length === 0) { //옵션 없을때
+        if (item.option == null) { //옵션 없을때
             newTable += '<td><p>' + item.productDTO.name + '  ' + item.count + '개' + '</p></td>';
         } else { //옵션 있을때
             temp += '<td><p>' + item.productDTO.name + '  ' + item.count + '개' + '</p>';
@@ -220,13 +218,20 @@
 
     function createNewPage1(k) {
         var html = '';
-        html += '<a href="javascript:void(0);" onclick="paging(' + k + ')" style="font-weight: bold"> ' + k + ' </a>';
+        html += '<a href="javascript:void(0);" onclick="paging(' + k + ')"> ' + k + ' </a>';
         return html;
     }
 
     function createNewPage2(k) {
         var html = '';
-        html += '<a href="javascript:void(0);" onclick="paging(' + k + ')"> ' + k + ' </a>';
+        html += '<a href="javascript:void(0);" onclick="paging(' + k + ')" style="font-weight: bold;"> ' + k + ' </a>';
+        return html;
+    }
+
+    function createNext(endNavi,totalPageCount){
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (endNavi + 1) + ');">' + ">" + '</a>';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (totalPageCount) + ');">' + "맨끝" + '</a>';
         return html;
     }
 

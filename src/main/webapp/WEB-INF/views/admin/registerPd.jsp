@@ -14,10 +14,25 @@
     <!--jQuery-->
     <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+    <script src="https://malsup.github.io/jquery.form.js"></script>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
+    <style>
+        .registerFrm{
+            text-align: center;
+            margin-top: 50px;
+        }
+        .registerFrm *{
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-<div>
-    <h3>상품 등록</h3>
+<%@ include file="/WEB-INF/views/admin/adminNavUtil.jsp" %>
+<div class="registerFrm">
     <form action="/product/addPd" method="post" enctype="multipart/form-data" id="frm">
         <div>상품명 : <input type="text" id="name" name="name"></div>
         <div>상품 설명 : <input type="text" id="description" name="description"></div>
@@ -44,16 +59,18 @@
                 <option value="악세사리">악세사리</option>
             </select>
         </div>
-        <div class="btn">
-            <button type="button" id="addOption">옵션 추가</button>
+        <div class="optBtn">
+            <button type="button" id="addOption" class="btn btn-light">옵션 추가</button>
         </div>
 
-        <button type="button" id="addPdBtn">상품 등록</button>
-        <button type="button" id="reset">초기화</button>
-        <button type="button" id="toList">관리자 메인페지로</button>
+        <button type="button" id="addPdBtn" class="btn btn-light">상품 등록</button>
+        <button type="button" id="reset" class="btn btn-light">초기화</button>
+<%--        <button type="button" id="toList">관리자 메인페지로</button>--%>
     </form>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/resources/asset/js/scripts.js"></script>
 <script>
     let key = 0;
 
@@ -96,8 +113,8 @@
 
     //옵션 추가 클릭 시
     $("#addOption").on("click", function () {
-        let optionBox = '<div class="optionBox">카테고리 : <input type="text" class="optionCategory" ><br>이름 : <input type="text" class="optionName"><br>재고: <input type="number" min="1" class="optionStock"><button type="button" class="delBtn" onclick="remove(' + key + ')">삭제</button><button type="button" class="addOptionBtn">추가하기</button></div><br>';
-        $(".btn").after(optionBox);
+        let optionBox = '<div class="optionBox" style="text-align: center;">카테고리 : <input type="text" class="optionCategory" ><br>이름 : <input type="text" class="optionName"><br>재고: <input type="number" min="1" class="optionStock"><br><button type="button" class="delBtn btn btn-light" onclick="remove(' + key + ')">삭제</button><button type="button" class="addOptionBtn btn btn-light">추가하기</button></div><br>';
+        $(".optBtn").after(optionBox);
     });
 
     var optionArr = [];
@@ -162,9 +179,9 @@
     });
 
     //관리자 메인으로
-    $("#toList").click(function () {
-        location.href = '/admin/main';
-    });
+    // $("#toList").click(function () {
+    //     location.href = '/admin/main';
+    // });
 
     var tmp = 0;
     //상품 등록 버튼 클릭 시

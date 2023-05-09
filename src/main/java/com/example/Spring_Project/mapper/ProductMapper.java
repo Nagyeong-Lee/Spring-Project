@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
+
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -119,5 +121,8 @@ public interface ProductMapper {
     DeliDTO getDeliInfoBySeq(@Param("deli_seq") Integer deli_seq);
     String getOptCategory(@Param("pd_seq") Integer pd_seq, @Param("optName") String optName);
     Integer countPost();
+    Timestamp getPayDate(@Param("pay_seq") Integer pay_seq);
+    void insertSales(Map<String,Object>salesParam);
+    List<SalesDTO> getSalesList();
 
 }

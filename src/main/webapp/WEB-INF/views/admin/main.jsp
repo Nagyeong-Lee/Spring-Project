@@ -15,37 +15,21 @@
     <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
     <script src="https://malsup.github.io/jquery.form.js"></script>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
 </head>
 <body>
-<a href="/admin/mngMember">
-    <button type="button">회원관리</button>
-</a><br>
-<a href="/admin/chart">
-    <button type="button">월별 회원가입 차트</button>
-    <br>
-</a>
-<a href="/admin/list?currentPage=1&count=10&postNum=&searchType=&keyword="><button type="button">로그 확인</button></a>
-<br>
-<button type="button" id="logout"><input type="hidden" id="toLogOut" value="${logoutPath}">로그아웃</button>
-<input type="hidden" id="session" name="session" value="${id}">
-<br>
-<button type="button" id="register">상품 등록</button>
-<button type="button" id="registeredPd">등록한 상품 조회</button>
+<%@ include file="/WEB-INF/views/admin/adminNavUtil.jsp" %>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/resources/asset/js/scripts.js"></script>
 <script>
     let path=$("#toLogOut").val();
     let session=$("#session").val();
     $("#logout").on("click",function(){
         location.href=path+session;
-    });
-
-    //상품 등록
-    $("#register").click(function(){
-       location.href='/admin/registerPd';
-    });
-
-    //등록한 상품 조회
-    $("#registeredPd").click(function(){
-       location.href='/admin/registeredPd';
     });
 </script>
 </body>

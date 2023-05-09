@@ -2,7 +2,9 @@ package com.example.Spring_Project.controller;
 
 import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.service.*;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
@@ -222,19 +224,24 @@ public class AdminController {
     //등록한 상품 조회
     @RequestMapping("/registeredPd")
     public String registeredPd(Model model) throws Exception {
-        Map<String, Object> optList = new HashMap<>();
         List<ProductDTO> list = productService.getProducts(); //상품정보
-        optList.put("list", list);
-        for (int i = 0; i < list.size(); i++) {
-            Integer isOptExist = productService.isOptExist(list.get(i).getPd_seq()); //상품의 옵션이 있는지 확인
+        List<OptionDTO> optionDTOList = null;
+        List<Map<String, Object>> registeredPd = new ArrayList<>();
+        Map<String, Object> tmp = null;
+        for (ProductDTO productDTO : list) {
+            tmp = new HashMap<>();
+            Integer isOptExist = productService.isOptExist(productDTO.getPd_seq()); //상품의 옵션이 있는지 확인
             if (isOptExist != 0) { //상품의 옵션이 있을 경우
-                List<OptionDTO> optionDTOList = productService.getOptByGroup(list.get(i).getPd_seq());
-                optList.put("optionDTOList", optionDTOList);
+                optionDTOList = productService.getOptByGroup(productDTO.getPd_seq());
+                tmp.put("optionDTOList", optionDTOList);
             }
+            System.out.println("isOptExist = " + isOptExist);
+            tmp.put("productDTO", productDTO);
+            registeredPd.add(tmp);
         }
-
-        model.addAttribute("optList", optList);
+        model.addAttribute("registeredPd", registeredPd);
         return "/admin/registeredPd";
+
     }
 
     @RequestMapping("/updProduct")
@@ -245,16 +252,69 @@ public class AdminController {
 
         CategoryDTO pdSubCategory = productService.getPdCategory(productDTO.getCategory());//상품 상위 카테고리 (상의/하의)
         CategoryDTO pdMainCategory = productService.getPdSubCategory(pdSubCategory.getParent_category_seq());//상품 하위 카테고리 (남성/여성)
-        map.put("pdSubCategory",pdSubCategory.getName());
-        map.put("pdMainCategory",pdMainCategory.getName());
+        map.put("pdSubCategory", pdSubCategory.getName());
+        map.put("pdMainCategory", pdMainCategory.getName());
 
         Integer isOptExist = productService.isOptExist(pd_seq); //상품의 옵션이 있는지 확인
         if (isOptExist != 0) { //상품의 옵션이 있을 경우
             List<OptionDTO> optionDTOList = productService.getOptByGroup(pd_seq);
             map.put("optionDTOList", optionDTOList);
         }
-        model.addAttribute("map",map);
+        model.addAttribute("map", map);
         return "/admin/updProduct";
+    }
+
+    @RequestMapping("/salesList") //판매 정보 조회
+    public String salesList(Model model) throws Exception {
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = new JsonObject();
+        JsonArray jsonArray = new JsonArray();
+
+        List<SalesDTO> salesDTOS = productService.getSalesList();//판매 테이블에서 가져오기
+        System.out.println("salesDTOS = " + salesDTOS);
+        List<Map<String, Object>> paramList = new ArrayList<>();
+        List<Map<String, Object>> optionMapList = null;
+        for (SalesDTO salesDTO : salesDTOS) {
+            Map<String, Object> param = new HashMap<>();
+            if (salesDTO.getPdOption() != null) { //옵션 있을때 size : s
+                param.put("option", salesDTO.getPdOption());
+                    Object object = jsonParser.parse(salesDTO.getPdOption());
+                    jsonObject = (JsonObject) object;
+                    jsonArray = (JsonArray) jsonObject.get("name");
+                    optionMapList = new ArrayList<>();
+                    Map<String, Object> optionMap = null;
+
+                    for (int i = 0; i < jsonArray.size(); i++) {
+                        optionMap = new HashMap<>();
+                        //size = s
+                        String optName = jsonArray.get(i).toString().replace("\"", "");
+                        String optCategory = productService.getOptCategory(salesDTO.getPd_seq(), optName); //옵션 카테고리 이름 가져오기 (size)
+                        System.out.println("optName = " + optName);
+                        System.out.println("optCategory = " + optCategory);
+                        optionMap.put(optCategory, optName);
+                        optionMapList.add(optionMap);
+                    }
+
+                }
+            param.put("id", salesDTO.getId());
+            param.put("stock", salesDTO.getStock());
+            param.put("price", salesDTO.getPrice());
+            param.put("salesDate", salesDTO.getSalesDate());
+            param.put("deliYN", salesDTO.getDeliYN());
+            ProductDTO productDTO = productService.getPdInfo(salesDTO.getPd_seq());//상품 관련 정보
+            param.put("productDTO", productDTO);
+            Integer pdStock = productService.getPdStock(salesDTO.getPd_seq());//판매하고 남은 상품 개수
+            param.put("pdStock",pdStock);
+            param.put("optionMapList",optionMapList);
+            paramList.add(param);
+            }
+        model.addAttribute("paramList", paramList);
+        return "/admin/salesList";
+    }
+
+    @RequestMapping("/chgDeliStatus")
+    public String chgDeliStatus() throws Exception{
+        return "/admin/deliPopup";
     }
 }
 

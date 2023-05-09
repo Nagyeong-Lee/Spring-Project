@@ -2,11 +2,16 @@ package com.example.Spring_Project.service;
 
 import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.mapper.ProductMapper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.print.DocFlavor;
 import java.rmi.MarshalledObject;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -470,4 +475,70 @@ public class ProductService {
         return map;
     }
 
+    //구매한 상품,옵션 정보 가져오기
+    public List<Map<String, Object>> pdOptionInfo(List<Map<String, Object>> payInfoDTOS) throws Exception {
+        List<Map<String, Object>> historyList = new ArrayList<>();
+
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = new JsonObject();
+        JsonArray jsonArray = new JsonArray();
+
+        for (Map<String, Object> payInfoDTO : payInfoDTOS) {
+            Map<String, Object> map = new HashMap<>();
+            ProductDTO productDTO = this.getPdInfo(Integer.parseInt(payInfoDTO.get("PD_SEQ").toString())); //상품 정보
+            Integer price = Integer.parseInt(payInfoDTO.get("PRICE").toString());  //결제 금액
+            String payMethod = payInfoDTO.get("PAYMETHOD").toString();  //결제 방법
+            String payDate = payInfoDTO.get("PAYDATE").toString(); //결제 일자
+            DeliDTO deliDTO = this.getDeliInfoBySeq(Integer.parseInt(payInfoDTO.get("DELI_SEQ").toString())); //배송지
+            Integer count = Integer.parseInt(payInfoDTO.get("COUNT").toString());
+            map.put("productDTO", productDTO);
+            map.put("price", price);
+            map.put("payMethod", payMethod);
+            map.put("payDate", payDate);
+            String phone = deliDTO.getPhone();
+            String parsedPhone = phone.substring(0, 3) + "-" + phone.substring(3, 7) + "-" + phone.substring(7, 11);
+            deliDTO.setPhone(parsedPhone);
+            map.put("deliDTO", deliDTO);
+            map.put("count", count);
+            System.out.println("payInfoDTO = " + payInfoDTO.containsKey("OPTIONS"));
+            if (payInfoDTO.containsKey("OPTIONS")) { //옵션 있을때
+                Object object = jsonParser.parse(payInfoDTO.get("OPTIONS").toString());
+                jsonObject = (JsonObject) object;
+                jsonArray = (JsonArray) jsonObject.get("name");
+                List<Map<String, Object>> optionMapList = new ArrayList<>();
+                Map<String, Object> optionMap = null;
+                System.out.println("jsonArray = " + jsonArray);
+                System.out.println("jsonArray = " + jsonArray.size());
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    optionMap = new HashMap<>();
+                    //size = s
+                    String optName = jsonArray.get(i).toString().replace("\"", "");
+                    String optCategory = this.getOptCategory(productDTO.getPd_seq(), optName); //옵션 카테고리 이름 가져오기 (size)
+                    System.out.println("optName = " + optName);
+                    System.out.println("optCategory = " + optCategory);
+                    optionMap.put(optCategory, optName);
+                    optionMapList.add(optionMap);
+                }
+                System.out.println("optionMap = " + optionMap);
+                System.out.println("optionMapList = " + optionMapList);
+                map.put("option", optionMapList);
+            }
+            historyList.add(map);
+        }
+        return historyList;
+    }
+
+    //결제 테이블 인서트 시 결제 일자
+    public Timestamp getPayDate(Integer pay_seq) throws Exception{
+        return productMapper.getPayDate(pay_seq);
+    }
+
+    //결제 테이블 insert
+    public void insertSales(Map<String,Object>salesParam) throws Exception{
+        productMapper.insertSales(salesParam);
+    }
+
+    public List<SalesDTO> getSalesList() throws Exception{
+        return productMapper.getSalesList();
+    }
 }

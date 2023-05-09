@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.sql.Timestamp;
 import java.util.*;
 
 @Controller
@@ -490,6 +492,7 @@ public class ProductController {
     }
 
     @RequestMapping("/paymentDetails")
+    @Transactional
     public String paymentDetails(Model model, String id, Integer price, String carts, Integer seq, Integer pdTotalSum) throws Exception {
 
         //기본 배송지 수정
@@ -506,6 +509,7 @@ public class ProductController {
         param.put("pdTotalSum", pdTotalSum);
         payService.insertPayInfo(param);
         Integer pay_seq = productService.currPaySeq();//현재 pay_seq
+        Timestamp timestamp = productService.getPayDate(pay_seq);
 
         PayInfoDTO payInfoDTO = payService.getPayInfo(pay_seq);//결제 정보 가져오기
 
@@ -518,10 +522,12 @@ public class ProductController {
         Integer totalPrice = 0;  //상품 총 합계
         Integer totalSum = 0;  //상품 총 개수
 
-        /*중복 제거*/
         for (Integer i = 0; i < cartInfo.size(); i++) {
 
             System.out.println("cartInfo.get(i).getPd_seq() = " + cartInfo.get(i).getPd_seq());
+            System.out.println("cartInfo.get(i).getCount() = " + cartInfo.get(i).getCount());
+            System.out.println("cartInfo.get(i).getName() = " + cartInfo.get(i).getName());
+            System.out.println("cartInfo.get(i).getPrice    () = " + cartInfo.get(i).getPrice());
 
             Map<String, Object> item = new HashMap<>();
             item.put("id", cartInfo.get(i).getId());
@@ -545,12 +551,16 @@ public class ProductController {
             totalPrice += pdPrice * pdCount;
             totalSum += pdCount;
 
-            if (cartInfo.get(i).getOptions() != null) {
+            Map<String,Object> salesParam = new HashMap<>();
+            Integer productPrice = cartInfo.get(i).getStock() * cartInfo.get(i).getPrice(); //상품 가격 * 상품 개수
+            if (cartInfo.get(i).getOptions() != null) { //옵션 있을때
+                salesParam.put("option", cartInfo.get(i).getOptions());
                 Map<String, Object> parameter = new HashMap<>();
                 parameter.put("pd_seq", cartInfo.get(i).getPd_seq());
                 parameter.put("option", cartInfo.get(i).getOptions());
                 parameter.put("payPd_seq", pay_seq);
                 productService.insertPayProduct(parameter);//결제한 상품
+
                 Object object = jsonParser.parse(cartInfo.get(i).getOptions());
                 jsonObject = (JsonObject) object;
                 jsonArray = (JsonArray) jsonObject.get("name");
@@ -569,6 +579,14 @@ public class ProductController {
                 cart.add(item);
                 productService.insertPayPd(cartInfo.get(i).getPd_seq(), pay_seq);//결제한 상품
             }
+
+            //판매 테이블에 인서트할 map (상품당 insert)
+            salesParam.put("id",id); //id
+            salesParam.put("pd_seq",cartInfo.get(i).getPd_seq()); //pd_seq
+            salesParam.put("stock", cartInfo.get(i).getStock()); //stock
+            salesParam.put("productPrice",productPrice);//price
+            salesParam.put("salesDate",timestamp); //판매 시간
+            productService.insertSales(salesParam);
         }
 
         //상품 수량, 옵션 수량 변경
@@ -616,6 +634,7 @@ public class ProductController {
                 }
             }
         }
+
 
         //장바구니 비우기
         productService.updCartStatus(id);
@@ -954,62 +973,14 @@ public class ProductController {
     public String history(String id, Model model, Integer cpage) throws Exception {
         if (cpage == null) cpage = 1;
         Map<String, Object> paging = productService.paging(cpage);
-        System.out.println("paging = " + paging);
         Integer naviPerPage = 10;
         Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
         Integer end = cpage * naviPerPage; // 끝 글 번호
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = new JsonObject();
-        JsonArray jsonArray = new JsonArray();
-        List<Map<String, Object>> historyList = new ArrayList<>();
-//        List<Map<String, Object>> payInfoDTOS = productService.getHistory(id);
-        List<Map<String, Object>> payInfoDTOS = productService.getHistory(id, start, end);
 
-        //상품명 이미지 수량 (옵션 있으면 옵션도)
-        int size = payInfoDTOS.size();
-        for (Map<String, Object> payInfoDTO : payInfoDTOS) {
-            Map<String, Object> map = new HashMap<>();
-            ProductDTO productDTO = productService.getPdInfo(Integer.parseInt(payInfoDTO.get("PD_SEQ").toString())); //상품 정보
-            Integer price = Integer.parseInt(payInfoDTO.get("PRICE").toString());  //결제 금액
-            String payMethod = payInfoDTO.get("PAYMETHOD").toString();  //결제 방법
-            String payDate = payInfoDTO.get("PAYDATE").toString(); //결제 일자
-            DeliDTO deliDTO = productService.getDeliInfoBySeq(Integer.parseInt(payInfoDTO.get("DELI_SEQ").toString())); //배송지
-            Integer count = Integer.parseInt(payInfoDTO.get("COUNT").toString());
-            map.put("productDTO", productDTO);
-            map.put("price", price);
-            map.put("payMethod", payMethod);
-            map.put("payDate", payDate);
-            String phone = deliDTO.getPhone();
-            String parsedPhone = phone.substring(0, 3) + "-" + phone.substring(3, 7) + "-" + phone.substring(7, 11);
-            deliDTO.setPhone(parsedPhone);
-            map.put("deliDTO", deliDTO);
-            map.put("count", count);
-            System.out.println("payInfoDTO = " + payInfoDTO.containsKey("OPTIONS"));
-            if (payInfoDTO.containsKey("OPTIONS")) { //옵션 있을때
-                Object object = jsonParser.parse(payInfoDTO.get("OPTIONS").toString());
-                jsonObject = (JsonObject) object;
-                jsonArray = (JsonArray) jsonObject.get("name");
-                List<Map<String, Object>> optionMapList = new ArrayList<>();
-                Map<String, Object> optionMap = null;
-                System.out.println("jsonArray = " + jsonArray);
-                System.out.println("jsonArray = " + jsonArray.size());
-                for (int i = 0; i < jsonArray.size(); i++) {
-                    optionMap = new HashMap<>();
-                    //size = s
-                    String optName = jsonArray.get(i).toString().replace("\"", "");
-                    String optCategory = productService.getOptCategory(productDTO.getPd_seq(), optName); //옵션 카테고리 이름 가져오기 (size)
-                    System.out.println("optName = " + optName);
-                    System.out.println("optCategory = " + optCategory);
-                    optionMap.put(optCategory, optName);
-                    optionMapList.add(optionMap);
-                }
-                System.out.println("optionMap = " + optionMap);
-                System.out.println("optionMapList = " + optionMapList);
-                map.put("option", optionMapList);
-            }
-            historyList.add(map);
-        }
-        System.out.println("historyList = " + historyList);
+        List<Map<String, Object>> historyList = new ArrayList<>();
+        List<Map<String, Object>> payInfoDTOS = productService.getHistory(id, start, end);
+        //옵션 정보 가져오기
+        historyList =  productService.pdOptionInfo(payInfoDTOS);
         model.addAttribute("historyList", historyList);
         model.addAttribute("paging", paging);
         return "/product/history";
@@ -1018,12 +989,7 @@ public class ProductController {
     @ResponseBody
     @PostMapping("/rePaging")
     public Map<String, Object> rePaging(Integer cpage, String id) throws Exception {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = new JsonObject();
-        JsonArray jsonArray = new JsonArray();
-
         List<Map<String, Object>> historyList = new ArrayList<>();
-
         Integer naviPerPage = 10;
         Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
         Integer end = cpage * naviPerPage; // 끝 글 번호
@@ -1036,52 +1002,11 @@ public class ProductController {
         reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
         reMap.put("paging", paging);
         reMap.put("cpage", Integer.parseInt(paging.get("cpage").toString()));
-        //옵션
-        int size = payInfoDTOS.size();
-        for (Map<String, Object> payInfoDTO : payInfoDTOS) {
-            Map<String, Object> map = new HashMap<>();
-            ProductDTO productDTO = productService.getPdInfo(Integer.parseInt(payInfoDTO.get("PD_SEQ").toString())); //상품 정보
-            Integer price = Integer.parseInt(payInfoDTO.get("PRICE").toString());  //결제 금액
-            String payMethod = payInfoDTO.get("PAYMETHOD").toString();  //결제 방법
-            String payDate = payInfoDTO.get("PAYDATE").toString(); //결제 일자
-            DeliDTO deliDTO = productService.getDeliInfoBySeq(Integer.parseInt(payInfoDTO.get("DELI_SEQ").toString())); //배송지
-            Integer count = Integer.parseInt(payInfoDTO.get("COUNT").toString());
-            map.put("productDTO", productDTO);
-            map.put("price", price);
-            map.put("payMethod", payMethod);
-            map.put("payDate", payDate);
-            String phone = deliDTO.getPhone();
-            String parsedPhone = phone.substring(0, 3) + "-" + phone.substring(3, 7) + "-" + phone.substring(7, 11);
-            deliDTO.setPhone(parsedPhone);
-            map.put("deliDTO", deliDTO);
-            map.put("count", count);
-            System.out.println("payInfoDTO = " + payInfoDTO.containsKey("OPTIONS"));
-            if (payInfoDTO.containsKey("OPTIONS")) { //옵션 있을때
-                Object object = jsonParser.parse(payInfoDTO.get("OPTIONS").toString());
-                jsonObject = (JsonObject) object;
-                jsonArray = (JsonArray) jsonObject.get("name");
-                List<Map<String, Object>> optionMapList = new ArrayList<>();
-                Map<String, Object> optionMap = null;
-                System.out.println("jsonArray = " + jsonArray);
-                System.out.println("jsonArray = " + jsonArray.size());
-                for (int i = 0; i < jsonArray.size(); i++) {
-                    optionMap = new HashMap<>();
-                    //size = s
-                    String optName = jsonArray.get(i).toString().replace("\"", "");
-                    String optCategory = productService.getOptCategory(productDTO.getPd_seq(), optName); //옵션 카테고리 이름 가져오기 (size)
-                    System.out.println("optName = " + optName);
-                    System.out.println("optCategory = " + optCategory);
-                    optionMap.put(optCategory, optName);
-                    optionMapList.add(optionMap);
-                }
-                System.out.println("optionMap = " + optionMap);
-                System.out.println("optionMapList = " + optionMapList);
-                map.put("option", optionMapList);
-            }
-            historyList.add(map);
-        }
+
+        //옵션 정보 가져오기
+        historyList =  productService.pdOptionInfo(payInfoDTOS);
         reMap.put("historyList",historyList);
-        System.out.println("reMap = " + reMap);
         return reMap;
     }
+
 }
