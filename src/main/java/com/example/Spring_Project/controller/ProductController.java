@@ -518,6 +518,8 @@ public class ProductController {
         param.put("price", price);
         param.put("deliSeq", defaultAddr.getSeq());
         param.put("pdTotalSum", pdTotalSum);
+        System.out.println("\"tq\" = " + "tq");
+        System.out.println("param = " + param);
         payService.insertPayInfo(param);
         Integer pay_seq = productService.currPaySeq();//현재 pay_seq
         Timestamp timestamp = productService.getPayDate(pay_seq);
@@ -592,10 +594,14 @@ public class ProductController {
             }
 
             //판매 테이블에 인서트할 map (상품당 insert)
+            
+            PayInfoDTO payInfoDTO1 = productService.getPayInfo(pay_seq);
+            System.out.println("payInfoDTO1 = " + payInfoDTO1.getCount());
+            System.out.println("getPrice = " + payInfoDTO1.getPrice());
             salesParam.put("id", id); //id
             salesParam.put("pd_seq", cartInfo.get(i).getPd_seq()); //pd_seq
-            salesParam.put("stock", cartInfo.get(i).getStock()); //stock
-            salesParam.put("productPrice", productPrice);//price
+            salesParam.put("stock", payInfoDTO1.getCount()); //stock
+            salesParam.put("productPrice",payInfoDTO1.getPrice());//price
             salesParam.put("salesDate", timestamp); //판매 시간
             productService.insertSales(salesParam);
         }
@@ -1109,7 +1115,7 @@ public class ProductController {
     }
 
     @ResponseBody
-    @PostMapping("/chgDeliveryStatus")
+    @PostMapping("/chgDeliveryStatus")  //payProduct deliYN, code 변경
     public String chgDeliveryStatus(String courier,Integer sales_seq) throws Exception{
         System.out.println("courier = " + courier);
         //flag변경

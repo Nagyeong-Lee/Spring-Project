@@ -129,5 +129,6 @@ public interface ProductMapper {
     void insert(@Param("code") Integer code, @Param("name") String name);
     Integer getCourierCode(@Param("name") String name);
     void deliveryStatus(@Param("code") Integer code,@Param("sales_seq") Integer sales_seq);
+    PayInfoDTO getPayInfo(@Param("pay_seq") Integer pay_seq);
 
 }

@@ -870,16 +870,20 @@
         payPd_seq.nextval,
         #{payPd_seq},
         #{pd_seq},
-        #{option}
+        #{option},
+        'N',
+        null
         )
     </insert>
 
     <insert id="insertPayPd">
-        insert into payProduct(payPd_seq,pay_seq,pd_seq)
+        insert into payProduct(payPd_seq,pay_seq,pd_seq,deliYN,code)
         values(
         payPd_seq.nextval,
         #{pay_seq},
-        #{pd_seq}
+        #{pd_seq},
+        'N',
+        null
         )
     </insert>
 
@@ -970,9 +974,7 @@
         #{stock},
         #{productPrice},
         #{option, jdbcType=VARCHAR},
-        #{salesDate},
-        'N',
-        null
+        #{salesDate}
         )
     </insert>
 
@@ -983,8 +985,7 @@
         stock,
         price,
         pdOption,
-        to_char(salesDate,'YYYY-MM-DD hh:mm:ss') AS salesDate,
-        deliYN
+        to_char(salesDate,'YYYY-MM-DD hh:mm:ss') AS salesDate
         from( SELECT ROWNUM rn, a.* FROM(select
         sales_seq,
         id,
@@ -992,8 +993,7 @@
         stock,
         price,
         pdOption,
-        salesDate,
-        deliYN
+        salesDate
         from sales
         ORDER BY salesDate DESC) a)
         where rn between #{start} and #{end}
@@ -1028,4 +1028,8 @@
         update sales set deliYN = 'Y', courierCode = #{code}
         where sales_seq = #{sales_seq}
     </update>
+
+    <select id="getPayInfo" resultType="com.example.Spring_Project.dto.PayInfoDTO">
+        select * from payInfo where pay_seq = #{pay_seq}
+    </select>
 </mapper>

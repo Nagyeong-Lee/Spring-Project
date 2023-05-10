@@ -8,4 +8,6 @@ public class PayProductDTO {
     private Integer pay_seq; //결제 테이블 seq
     private Integer pd_seq;
     private String options;
+    private String deliYN;
+    private Integer code;
 }

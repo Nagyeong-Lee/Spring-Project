@@ -315,7 +315,7 @@ public class AdminController {
             param.put("stock", salesDTO.getStock());
             param.put("price", salesDTO.getPrice());
             param.put("salesDate", salesDTO.getSalesDate());
-            param.put("deliYN", salesDTO.getDeliYN());
+//            param.put("deliYN", salesDTO.getDeliYN());
             param.put("sales_seq", salesDTO.getSales_seq());
             ProductDTO productDTO = productService.getPdInfo(salesDTO.getPd_seq());//상품 관련 정보
             param.put("productDTO", productDTO);

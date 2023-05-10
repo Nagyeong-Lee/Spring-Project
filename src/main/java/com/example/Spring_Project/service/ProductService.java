@@ -559,4 +559,8 @@ public class ProductService {
     public void deliveryStatus(Integer code,Integer sales_seq)throws Exception{
         productMapper.deliveryStatus(code,sales_seq);
     }
+
+    public PayInfoDTO getPayInfo(Integer pay_seq) throws Exception{
+        return productMapper.getPayInfo(pay_seq);
+    }
 }

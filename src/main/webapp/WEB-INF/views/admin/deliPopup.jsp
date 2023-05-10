@@ -67,7 +67,8 @@
           <option value="${i.name}">${i.name}</option>
         </c:forEach>
       </select>
-    </c:if>
+    </c:if><br>
+    송장번호 : <input type="text" name="postNum" id="postNum">
     <div>
       <button type="button" id="sbn">변경</button> <%--배송중으로 변경--%>
       <button type="button" id="close">취소</button>
