@@ -21,7 +21,7 @@
 </div>
 <ul class="menu">
     <li>
-        <a href="/product/list">전체 상품</a>
+        <a href="/product/list?cpage=1">전체 상품</a>
     </li>
     <li>
         <a href="/product/women">여성</a>

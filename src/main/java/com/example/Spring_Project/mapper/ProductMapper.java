@@ -13,7 +13,7 @@ import java.util.Map;
 @Mapper
 @Repository
 public interface ProductMapper {
-    List<ProductDTO> getProducts();
+    List<ProductDTO> getProducts(@Param("start") Integer start,@Param("end") Integer end);
     ProductDTO getProductDetail(@Param("pd_seq") Integer pd_seq);
 
     List<ProductDTO> getWProduct(); //여자 카테고리만
@@ -121,8 +121,13 @@ public interface ProductMapper {
     DeliDTO getDeliInfoBySeq(@Param("deli_seq") Integer deli_seq);
     String getOptCategory(@Param("pd_seq") Integer pd_seq, @Param("optName") String optName);
     Integer countPost();
+    Integer salesPdCount();
     Timestamp getPayDate(@Param("pay_seq") Integer pay_seq);
     void insertSales(Map<String,Object>salesParam);
-    List<SalesDTO> getSalesList();
+    List<SalesDTO> getSalesList(@Param("start") Integer start, @Param("end") Integer end);
+    List<CourierDTO> getCourierInfo();
+    void insert(@Param("code") Integer code, @Param("name") String name);
+    Integer getCourierCode(@Param("name") String name);
+    void deliveryStatus(@Param("code") Integer code,@Param("sales_seq") Integer sales_seq);
 
 }

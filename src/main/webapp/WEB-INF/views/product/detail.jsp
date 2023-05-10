@@ -371,7 +371,7 @@
         $("#frm").submit();
     });
     $("#back").on("click", function () {
-        location.href = "/product/list";
+        location.href = "/product/list?cpage=1";
     });
 </script>
 </body>

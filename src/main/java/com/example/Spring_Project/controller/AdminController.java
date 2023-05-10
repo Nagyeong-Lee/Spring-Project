@@ -223,8 +223,15 @@ public class AdminController {
 
     //등록한 상품 조회
     @RequestMapping("/registeredPd")
-    public String registeredPd(Model model) throws Exception {
-        List<ProductDTO> list = productService.getProducts(); //상품정보
+    public String registeredPd(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Map<String, Object> paging = productService.paging(cpage);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+
+//        List<ProductDTO> list = productService.getProducts(); //상품정보
+        List<ProductDTO> list = productService.getProducts(start, end); //상품정보
         List<OptionDTO> optionDTOList = null;
         List<Map<String, Object>> registeredPd = new ArrayList<>();
         Map<String, Object> tmp = null;
@@ -240,6 +247,7 @@ public class AdminController {
             registeredPd.add(tmp);
         }
         model.addAttribute("registeredPd", registeredPd);
+        model.addAttribute("paging", paging);
         return "/admin/registeredPd";
 
     }
@@ -265,55 +273,69 @@ public class AdminController {
     }
 
     @RequestMapping("/salesList") //판매 정보 조회
-    public String salesList(Model model) throws Exception {
+    public String salesList(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Map<String, Object> paging = productService.paging(cpage);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+
         JsonParser jsonParser = new JsonParser();
         JsonObject jsonObject = new JsonObject();
         JsonArray jsonArray = new JsonArray();
 
-        List<SalesDTO> salesDTOS = productService.getSalesList();//판매 테이블에서 가져오기
+        List<SalesDTO> salesDTOS = productService.getSalesList(start, end);//판매 테이블에서 가져오기
         System.out.println("salesDTOS = " + salesDTOS);
         List<Map<String, Object>> paramList = new ArrayList<>();
-        List<Map<String, Object>> optionMapList = null;
         for (SalesDTO salesDTO : salesDTOS) {
             Map<String, Object> param = new HashMap<>();
+            System.out.println(salesDTO.getPdOption());
             if (salesDTO.getPdOption() != null) { //옵션 있을때 size : s
+                List<Map<String, Object>> optionMapList = null;
                 param.put("option", salesDTO.getPdOption());
-                    Object object = jsonParser.parse(salesDTO.getPdOption());
-                    jsonObject = (JsonObject) object;
-                    jsonArray = (JsonArray) jsonObject.get("name");
-                    optionMapList = new ArrayList<>();
-                    Map<String, Object> optionMap = null;
+                Object object = jsonParser.parse(salesDTO.getPdOption());
+                jsonObject = (JsonObject) object;
+                jsonArray = (JsonArray) jsonObject.get("name");
+                optionMapList = new ArrayList<>();
+                Map<String, Object> optionMap = null;
 
-                    for (int i = 0; i < jsonArray.size(); i++) {
-                        optionMap = new HashMap<>();
-                        //size = s
-                        String optName = jsonArray.get(i).toString().replace("\"", "");
-                        String optCategory = productService.getOptCategory(salesDTO.getPd_seq(), optName); //옵션 카테고리 이름 가져오기 (size)
-                        System.out.println("optName = " + optName);
-                        System.out.println("optCategory = " + optCategory);
-                        optionMap.put(optCategory, optName);
-                        optionMapList.add(optionMap);
-                    }
-
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    optionMap = new HashMap<>();
+                    //size = s
+                    String optName = jsonArray.get(i).toString().replace("\"", "");
+                    String optCategory = productService.getOptCategory(salesDTO.getPd_seq(), optName); //옵션 카테고리 이름 가져오기 (size)
+                    System.out.println("optName = " + optName);
+                    System.out.println("optCategory = " + optCategory);
+                    optionMap.put(optCategory, optName);
+                    optionMapList.add(optionMap);
                 }
+            if (optionMapList.size() != 0) param.put("optionMapList", optionMapList);
+            }
             param.put("id", salesDTO.getId());
             param.put("stock", salesDTO.getStock());
             param.put("price", salesDTO.getPrice());
             param.put("salesDate", salesDTO.getSalesDate());
             param.put("deliYN", salesDTO.getDeliYN());
+            param.put("sales_seq", salesDTO.getSales_seq());
             ProductDTO productDTO = productService.getPdInfo(salesDTO.getPd_seq());//상품 관련 정보
             param.put("productDTO", productDTO);
             Integer pdStock = productService.getPdStock(salesDTO.getPd_seq());//판매하고 남은 상품 개수
-            param.put("pdStock",pdStock);
-            param.put("optionMapList",optionMapList);
+            param.put("pdStock", pdStock);
+//            param.put("optionMapList",optionMapList);
             paramList.add(param);
-            }
+        }
         model.addAttribute("paramList", paramList);
+        model.addAttribute("paging", paging);
         return "/admin/salesList";
     }
 
     @RequestMapping("/chgDeliStatus")
-    public String chgDeliStatus() throws Exception{
+    public String chgDeliStatus(Model model, @RequestParam Integer sales_seq) throws Exception {
+        System.out.println("sales_seq = " + sales_seq);
+        //택배사 정보 가져오기
+        List<CourierDTO> courierDTOS = productService.getCourierInfo();
+        model.addAttribute("courierDTOS", courierDTOS);
+        model.addAttribute("sales_seq", sales_seq);
         return "/admin/deliPopup";
     }
 }

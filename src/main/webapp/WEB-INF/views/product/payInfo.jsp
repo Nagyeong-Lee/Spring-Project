@@ -149,7 +149,7 @@
     })
 
     $("#continue").on("click", function () {
-        location.href = "/product/list";
+        location.href = "/product/list?cpage=1";
     });
 
     //배송지 추가 클릭 시

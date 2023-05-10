@@ -14,4 +14,5 @@ public class SalesDTO {
     private String pdOption;
     private Timestamp salesDate;
     private String DeliYN; //배송 여부
+    private Integer courierCode;
 }

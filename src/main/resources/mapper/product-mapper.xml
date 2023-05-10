@@ -5,7 +5,30 @@
 <mapper namespace="com.example.Spring_Project.mapper.ProductMapper">
 
     <select id="getProducts" resultType="com.example.Spring_Project.dto.ProductDTO">
-        select
+<!--        select-->
+<!--        pd_seq,-->
+<!--        name,-->
+<!--        description,-->
+<!--        price,-->
+<!--        stock,-->
+<!--        status,-->
+<!--        img,-->
+<!--        category-->
+<!--        from product-->
+<!--        where status = 'Y'-->
+
+        SELECT pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM (
+        SELECT ROWNUM rn, a.*
+        FROM
+        (select
         pd_seq,
         name,
         description,
@@ -15,7 +38,8 @@
         img,
         category
         from product
-        where status = 'Y'
+        where status = 'Y' ORDER BY 1) a)
+        WHERE rn BETWEEN #{start} AND #{end}
     </select>
 
     <select id="getProductDetail" resultType="com.example.Spring_Project.dto.ProductDTO">
@@ -924,6 +948,12 @@
         from PAYPRODUCT
     </select>
 
+    <select id="salesPdCount" resultType="Integer">
+        select
+        count(*)
+        from sales
+    </select>
+
     <select id="getPayDate" resultType="java.sql.Timestamp">
         select
         payDate
@@ -941,12 +971,22 @@
         #{productPrice},
         #{option, jdbcType=VARCHAR},
         #{salesDate},
-        'N'
+        'N',
+        null
         )
     </insert>
 
     <select id="getSalesList" resultType="com.example.Spring_Project.dto.SalesDTO">
-        select
+        SELECT sales_seq,
+        id,
+        pd_seq,
+        stock,
+        price,
+        pdOption,
+        to_char(salesDate,'YYYY-MM-DD hh:mm:ss') AS salesDate,
+        deliYN
+        from( SELECT ROWNUM rn, a.* FROM(select
+        sales_seq,
         id,
         pd_seq,
         stock,
@@ -955,5 +995,37 @@
         salesDate,
         deliYN
         from sales
+        ORDER BY salesDate DESC) a)
+        where rn between #{start} and #{end}
     </select>
+
+    <select id="getCourierInfo" resultType="com.example.Spring_Project.dto.CourierDTO">
+        select
+         name,
+         code,
+         orders
+        from courier
+    </select>
+
+    <insert id="insert">
+        insert into courier
+        values(
+        courier_seq.nextval,
+        #{name},
+        #{code},
+        #{code}
+        )
+    </insert>
+
+    <select id="getCourierCode" resultType="Integer">
+        select
+         code
+        from courier
+        where name = #{name}
+    </select>
+
+    <update id="deliveryStatus">
+        update sales set deliYN = 'Y', courierCode = #{code}
+        where sales_seq = #{sales_seq}
+    </update>
 </mapper>

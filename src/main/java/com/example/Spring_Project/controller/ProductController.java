@@ -1,12 +1,15 @@
 package com.example.Spring_Project.controller;
 
+import aj.org.objectweb.asm.TypeReference;
 import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.service.MemberService;
 import com.example.Spring_Project.service.PayService;
 import com.example.Spring_Project.service.ProductService;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+import org.apache.logging.log4j.util.PerformanceSensitive;
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.lang.reflect.Type;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -37,9 +41,16 @@ public class ProductController {
     private PayService payService;
 
     @RequestMapping("/list") //전체 상품 리스트
-    public String productList(Model model) throws Exception {
-        List<ProductDTO> productDTOList = productService.getProducts();
+    public String productList(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Map<String, Object> paging = productService.paging(cpage);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+
+        List<ProductDTO> productDTOList = productService.getProducts(start, end);
         model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("paging", paging);
         return "/product/productList";
     }
 
@@ -1010,11 +1021,100 @@ public class ProductController {
     }
 
     @ResponseBody
+    @PostMapping("/rePagingPdList")
+    public Map<String, Object> rePagingPdList(Integer cpage, String id) throws Exception {
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+        Map<String, Object> reMap = new HashMap<>();
+        List<ProductDTO> productDTOList = productService.getProducts(start, end);
+        Map<String, Object> paging = productService.paging(cpage);
+        reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
+        reMap.put("endNavi", Integer.parseInt(paging.get("endNavi").toString()));
+        reMap.put("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));
+        reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
+        reMap.put("paging", paging);
+        reMap.put("cpage", Integer.parseInt(paging.get("cpage").toString()));
+        reMap.put("productDTOList", productDTOList);
+        return reMap;
+    }
+
+    @ResponseBody
+    @PostMapping("/rePagingSalesList")
+    public List<Object> rePagingSalesList(Integer cpage, String id) throws Exception {
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = new JsonObject();
+        JsonArray jsonArray = new JsonArray();
+
+        List<Object> historyList = new ArrayList<>();
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+        List<SalesDTO> salesDTOS = productService.getSalesList(start, end);//판매 테이블에서 가져오기
+        Map<String, Object> paging = productService.paging(cpage);
+        for (SalesDTO salesDTO : salesDTOS) {
+            Map<String, Object> reMap = new HashMap<>();
+            reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
+            reMap.put("endNavi", Integer.parseInt(paging.get("endNavi").toString()));
+            reMap.put("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));
+            reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
+            reMap.put("paging", paging);
+            reMap.put("cpage", Integer.parseInt(paging.get("cpage").toString()));
+            reMap.put("salesDTOS", salesDTO);
+            System.out.println("salesDTO.getPd_seq() = " + salesDTO.getPd_seq());
+            ProductDTO productDTO = productService.getPdInfo(salesDTO.getPd_seq());
+            reMap.put("productDTO", productDTO);
+
+            if (salesDTO.getPdOption() != null) { //옵션 있을때 size : s
+                List<Map<String, Object>> optionMapList = null;
+                reMap.put("option", salesDTO.getPdOption());
+                Object object = jsonParser.parse(salesDTO.getPdOption());
+                jsonObject = (JsonObject) object;
+                jsonArray = (JsonArray) jsonObject.get("name");
+                optionMapList = new ArrayList<>();
+                Map<String, Object> optionMap = null;
+
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    optionMap = new HashMap<>();
+                    //size = s
+                    String optName = jsonArray.get(i).toString().replace("\"", "");
+                    String optCategory = productService.getOptCategory(salesDTO.getPd_seq(), optName); //옵션 카테고리 이름 가져오기 (size)
+                    System.out.println("optName = " + optName);
+                    System.out.println("optCategory = " + optCategory);
+                    optionMap.put(optCategory, optName);
+                    optionMapList.add(optionMap);
+                }
+                if (optionMapList.size() != 0) reMap.put("optionMapList", optionMapList);
+            }
+            historyList.add(reMap);
+        }
+        return historyList;
+    }
+
+
+    @ResponseBody
     @PostMapping("/insertDeliInfo")  //택배사 db 저장
-    public String insertDeliInfo(@RequestParam String list) throws Exception {
-        System.out.println("list = " + list);
-        //택배사 db저장
+    public String insertDeliInfo(@RequestBody List<List<Object>>list) throws Exception {
+        System.out.println("data = " + list);
+        for(int i = 0 ; i<list.size(); i++){
+            for(int k = 0 ; k<list.get(i).size(); k++){
+                Integer code = Integer.parseInt((String) list.get(i).get(0));
+                String name = (String) list.get(i).get(1);
+                System.out.println(code+":"+name);
+                productService.insert(code,name);
+            }
+
+        }
         return "success";
     }
 
+    @ResponseBody
+    @PostMapping("/chgDeliveryStatus")
+    public String chgDeliveryStatus(String courier,Integer sales_seq) throws Exception{
+        System.out.println("courier = " + courier);
+        //flag변경
+        Integer code = productService.getCourierCode(courier); //택배코드
+        productService.deliveryStatus(code,sales_seq);  //sales table -> code, deliYN 변경
+        return "success";
+    }
 }

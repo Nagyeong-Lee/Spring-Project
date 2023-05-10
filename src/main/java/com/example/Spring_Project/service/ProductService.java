@@ -23,8 +23,8 @@ public class ProductService {
     private ProductMapper productMapper;
 
 
-    public List<ProductDTO> getProducts() throws Exception { //상품 리스트 가져오기
-        return productMapper.getProducts();
+    public List<ProductDTO> getProducts(Integer start,Integer end) throws Exception { //상품 리스트 가져오기
+        return productMapper.getProducts(start,end);
     }
 
     public ProductDTO getProductDetail(Integer pd_seq) throws Exception { //상품 상세 정보
@@ -428,11 +428,15 @@ public class ProductService {
         return productMapper.countPost();
     }
 
+    public Integer salesPdCount() throws Exception {  //글 개수
+        return productMapper.salesPdCount();
+    }
+
     //페이징
     public Map<String, Object> paging(Integer cpage) throws Exception {
         //현재 페이지
         System.out.println("cpage = " + cpage);
-        Integer postCount = countPost(); //글 개수
+        Integer postCount = salesPdCount(); //판매 상품수
         Integer postPerPage = 10; //페이지 당 글 개수
         Integer naviPerPage = 10; //페이지 당 내비 수
         Integer totalPageCount = 0; //전체 페이지 수
@@ -538,7 +542,21 @@ public class ProductService {
         productMapper.insertSales(salesParam);
     }
 
-    public List<SalesDTO> getSalesList() throws Exception{
-        return productMapper.getSalesList();
+    public List<SalesDTO> getSalesList(Integer start,Integer end) throws Exception{
+        return productMapper.getSalesList(start,end);
+    }
+
+    public List<CourierDTO> getCourierInfo() throws Exception{
+        return productMapper.getCourierInfo();
+    }
+
+    public void insert(Integer code,String name)throws Exception {
+        productMapper.insert(code, name);
+    }
+    public Integer getCourierCode(String name) throws Exception{
+        return productMapper.getCourierCode(name);
+    }
+    public void deliveryStatus(Integer code,Integer sales_seq)throws Exception{
+        productMapper.deliveryStatus(code,sales_seq);
     }
 }

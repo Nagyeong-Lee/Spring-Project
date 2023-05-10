@@ -15,10 +15,10 @@
      <a href="/admin/registerPd"><button class="btn btn-outline-dark" type="button" id="cart" style="margin-left: 10px; width: 150px;">
         상품 등록
       </button></a>
-      <a href="/admin/registeredPd"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 150px;" id="history">
+      <a href="/admin/registeredPd?cpag=1"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 150px;" id="history">
         등록 상품 조회
       </button></a>
-      <a href="/admin/salesList"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 150px;">
+      <a href="/admin/salesList?cpage=1"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 150px;">
         판매 정보 조회
       </button></a>
       <a href="/member/logout?id=${id}"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="logout">

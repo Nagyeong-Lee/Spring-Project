@@ -192,7 +192,7 @@
         $("#discount").remove();
     }
     $("#continue").on("click", function () {
-        location.href = "/product/list";
+        location.href = "/product/list?cpage=1";
     });
 
     //구매 클릭 시

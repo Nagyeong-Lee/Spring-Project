@@ -132,6 +132,26 @@
 <input type="hidden" value="${keyword}" id="key" name="key">
 <input type="hidden" value="${id}" id="id" name="id">
 <%@ include file="/WEB-INF/views/product/pdListUtil.jsp"%>
+
+<div class="pagingDiv" style="text-align: center;">
+    <c:if test="${paging.needPrev eq true}">
+        <a href="javascript:void(0); onclick=paging(${paging.startNavi-1}});"><</a>
+        <a href="javascript:void(0); onclick=paging(1);">맨 처음</a>
+    </c:if>
+    <c:forEach var="i" begin="${paging.startNavi}" end="${paging.endNavi}" varStatus="var">
+        <c:if test="${paging.cpage eq i}">
+            <a href="javascript:void(0); onclick=paging(${i});" style="font-weight: bold;">${i}</a>
+        </c:if>
+        <c:if test="${paging.cpage ne i}">
+            <a href="javascript:void(0); onclick=paging(${i});">${i}</a>
+        </c:if>
+    </c:forEach>
+    <c:if test="${paging.needNext eq true}">
+        <a href="javascript:void(0); onclick=paging(${paging.endNavi+1});">></a>
+        <a href="javascript:void(0); onclick=paging(${paging.totalPageCount});">맨끝</a>
+    </c:if>
+</div>
+
 <!-- Bootstrap core JS-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Core theme JS-->
@@ -139,6 +159,96 @@
 </body>
 
 <script>
+
+    //페이징 다시 그려줌
+    function paging(startNavi) {
+        $.ajax({
+            url: '/product/rePagingPdList',
+            type: 'post',
+            data: {
+                "cpage": startNavi,
+                "id": $("#id").val()
+            },
+            success: function (data) {
+                $(".pagingDiv").children().remove();
+                createPaging(data);
+            }
+        })
+    }
+
+    function createPaging(data) {
+        console.log(data);
+        let startNavi = data.startNavi;
+        let endNavi = data.endNavi;
+        let needPrev = data.needPrev;
+        let needNext = data.needNext;
+        let productDTOList = data.productDTOList;
+        $("#row").children().remove();
+        for (let i = 0; i < productDTOList.length; i++) {
+            console.log(productDTOList[i]);
+            console.log(startNavi);
+            var newHtml = createHtml(productDTOList[i], startNavi);
+            $("#row").append(newHtml);
+        }
+
+        if (needPrev) {
+            var html = createPrev(startNavi);
+            $(".pagingDiv").append(html);
+        }
+        for (let k = startNavi; k <= endNavi; k++) {
+            if (startNavi == k) {
+                var html = createNewPage1(k);
+                $(".pagingDiv").append(html);
+            } else {
+                var html = createNewPage2(k);
+                $(".pagingDiv").append(html);
+            }
+        }
+        if (needNext) {
+            var html = createNext(endNavi, totalPageCount);
+            $(".pagingDiv").append(html);
+        }
+    }
+
+    function createHtml(item, cpage) {
+        let pdName = item.name;
+        let pd_seq = item.pd_seq;
+        var HTML = '<div class="col mb-5"><div class="card h-100">';
+        HTML+='<img class="card-img-top img" src="/resources/img/products/'+item.img+'" style="width: 225px;">';
+        HTML+='<div class="card-body p-4"><div class="text-center"><h5 class="fw-bolder">';
+        HTML+='<a href="/product/detail?pd_seq='+pd_seq+'">'+pdName+'</a></h5>';
+        HTML+=item.price.toLocaleString()+'원';
+        HTML+='</div></div></div></div>';
+        console.log(HTML);
+        return HTML;
+    }
+
+    function createPrev(startNavi) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (startNavi - 1) + ');">' + "<" + '</a>';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (1) + ');">' + "맨 처음" + '</a>';
+        return html;
+    }
+
+    function createNewPage1(k) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + k + ')"> ' + k + ' </a>';
+        return html;
+    }
+
+    function createNewPage2(k) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + k + ')" style="font-weight: bold;"> ' + k + ' </a>';
+        return html;
+    }
+
+    function createNext(endNavi,totalPageCount){
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (endNavi + 1) + ');">' + ">" + '</a>';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (totalPageCount) + ');">' + "맨끝" + '</a>';
+        return html;
+    }
+
     $("#cart").click(function(){
         let newForm = document.createElement("form");
         newForm.setAttribute("method","post");

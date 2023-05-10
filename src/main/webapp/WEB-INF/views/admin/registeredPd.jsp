@@ -72,9 +72,138 @@
     </table>
 </div>
 
+<div class="pagingDiv" style="text-align: center;">
+    <c:if test="${paging.needPrev eq true}">
+        <a href="javascript:void(0); onclick=paging(${paging.startNavi-1}});"><</a>
+        <a href="javascript:void(0); onclick=paging(1);">맨 처음</a>
+    </c:if>
+    <c:forEach var="i" begin="${paging.startNavi}" end="${paging.endNavi}" varStatus="var">
+        <c:if test="${paging.cpage eq i}">
+            <a href="javascript:void(0); onclick=paging(${i});" style="font-weight: bold;">${i}</a>
+        </c:if>
+        <c:if test="${paging.cpage ne i}">
+            <a href="javascript:void(0); onclick=paging(${i});">${i}</a>
+        </c:if>
+    </c:forEach>
+    <c:if test="${paging.needNext eq true}">
+        <a href="javascript:void(0); onclick=paging(${paging.endNavi+1});">></a>
+        <a href="javascript:void(0); onclick=paging(${paging.totalPageCount});">맨끝</a>
+    </c:if>
+</div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/resources/asset/js/scripts.js"></script>
 <script>
+
+    //페이징 다시 그려줌
+    function paging(startNavi) {
+        $.ajax({
+            url: '/product/rePaging',
+            type: 'post',
+            data: {
+                "cpage": startNavi,
+                "id": $("#id").val()
+            },
+            success: function (data) {
+                console.log(data);
+                $(".pagingDiv").children().remove();
+                createPaging(data);
+            }
+        })
+    }
+
+    function createPaging(data) {
+        let startNavi = data.startNavi;
+        let endNavi = data.endNavi;
+        let needPrev = data.needPrev;
+        let needNext = data.needNext;
+        let paging = data.paging;
+        let historyList = data.historyList;
+        let cpage = data.cpage;
+
+        console.log("startNavi : " + startNavi);
+        console.log("endNavi : " + endNavi);
+        console.log("needPrev : " + needPrev);
+        console.log("needNext : " + needNext);
+        console.log("paging : " + paging);
+        console.log("historyList " + historyList);
+
+        $("#tbody").children().remove();
+        for (let i = 0; i < historyList.length; i++) {
+            var newHtml = createHtml(historyList[i], startNavi);
+            $("#tbody").append(newHtml);
+        }
+
+        if (needPrev) {
+            var html = createPrev(startNavi);
+            $(".pagingDiv").append(html);
+        }
+        for (let k = startNavi; k <= endNavi; k++) {
+            if (startNavi == k) {
+                var html = createNewPage1(k);
+                $(".pagingDiv").append(html);
+            } else {
+                var html = createNewPage2(k);
+                $(".pagingDiv").append(html);
+            }
+        }
+        if (needNext) {
+            var html = createNext(endNavi, totalPageCount);
+            $(".pagingDiv").append(html);
+        }
+    }
+
+    function createHtml(item, cpage) {
+        console.log(item.productDTO.pd_seq);
+        console.log(cpage);
+        var newTable = '';
+        var temp = '';
+        newTable = '<tr><td><a href="/product/detail?pd_seq=' + item.productDTO.pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width:120px; height: 100px;"></a></td>';
+        newHtml = newTable;
+        if (item.option == null) { //옵션 없을때
+            newTable += '<td><p>' + item.productDTO.name + '  ' + item.count + '개' + '</p></td>';
+        } else { //옵션 있을때
+            temp += '<td><p>' + item.productDTO.name + '  ' + item.count + '개' + '</p>';
+            for (let i = 0; i < item.option.length; i++) {
+                temp += '<p>' + Object.keys(item.option[i])[0] + ' : ' + item.option[i][Object.keys(item.option[i])[0]] + '</p>';
+            }
+            temp += '</td>';
+            newTable = newTable + temp;
+        }
+        newTable += '<td><p>받는 사람 : ' + item.deliDTO.name + '</p><p>전화번호 : ' + item.deliDTO.phone + '</p><p>주소 : ' + item.deliDTO.address + '</p></td>';
+        newTable += '<td><p>결제 일자 : ' + item.payDate + '</p><p>결제 방법 : ' + item.payMethod + '</p><p>결제 금액 : ' + item.price.toLocaleString() + '원</p></td></tr>';
+        return newTable;
+    }
+
+    function createPrev(startNavi) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (startNavi - 1) + ');">' + "<" + '</a>';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (1) + ');">' + "맨 처음" + '</a>';
+        return html;
+    }
+
+    function createNewPage1(k) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + k + ')"> ' + k + ' </a>';
+        return html;
+    }
+
+    function createNewPage2(k) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + k + ')" style="font-weight: bold;"> ' + k + ' </a>';
+        return html;
+    }
+
+    function createNext(endNavi,totalPageCount){
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (endNavi + 1) + ');">' + ">" + '</a>';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (totalPageCount) + ');">' + "맨끝" + '</a>';
+        return html;
+    }
+
+
+
     //관리자 메인으로
     $("#toList").click(function () {
         location.href = '/admin/main';
