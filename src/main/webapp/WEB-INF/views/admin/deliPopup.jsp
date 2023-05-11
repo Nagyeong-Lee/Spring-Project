@@ -37,21 +37,34 @@
       //변경 클릭시
       $("#sbn").on("click",function(){
         let name = $("select option:checked").val();
-        $.ajax({
-          url:'/product/chgDeliveryStatus',
-          type:'post',
-          data:{
-            "courier":name,
-            "sales_seq":$("#sales_seq").val()
-          },
-          success:function(data){
-            console.log(data);
-            if(data == 'success'){
-              window.close();
-              opener.parent.location.reload();
+        let invoiceNum = $("#invoiceNum").val();
+        const regex = /^\d{13}$/
+        if(invoiceNum.length === 0) {
+          alert('송장번호를 입력해주세요.');
+          return false;
+        }
+        if(regex.test(invoiceNum) === false){
+          alert('송장번호 형식이 아닙니다.');
+          return false;
+        }
+        else{
+          $.ajax({
+            url:'/product/chgDeliveryStatus',
+            type:'post',
+            data:{
+              "courier":name,
+              "sales_seq":$("#sales_seq").val(),
+              "invoiceNum":invoiceNum
+            },
+            success:function(data){
+              console.log(data);
+              if(data === 'success'){
+                window.close();
+                opener.parent.location.reload();
+              }
             }
-          }
-        })
+          })
+        }
       });
     })
   </script>
@@ -68,7 +81,7 @@
         </c:forEach>
       </select>
     </c:if><br>
-    송장번호 : <input type="text" name="postNum" id="postNum">
+    송장번호 : <input type="text" name="invoiceNum" id="invoiceNum" maxlength="13">
     <div>
       <button type="button" id="sbn">변경</button> <%--배송중으로 변경--%>
       <button type="button" id="close">취소</button>

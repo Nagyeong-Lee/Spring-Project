@@ -311,6 +311,7 @@ public class AdminController {
                 }
             if (optionMapList.size() != 0) param.put("optionMapList", optionMapList);
             }
+            PayProductDTO payProductDTO = productService.getDeliYN(salesDTO.getSales_seq()); // deliYN, CODE 가져오기
             param.put("id", salesDTO.getId());
             param.put("stock", salesDTO.getStock());
             param.put("price", salesDTO.getPrice());
@@ -321,6 +322,8 @@ public class AdminController {
             param.put("productDTO", productDTO);
             Integer pdStock = productService.getPdStock(salesDTO.getPd_seq());//판매하고 남은 상품 개수
             param.put("pdStock", pdStock);
+            param.put("deliYN", payProductDTO.getDeliYN());
+            param.put("code", payProductDTO.getCode());
 //            param.put("optionMapList",optionMapList);
             paramList.add(param);
         }

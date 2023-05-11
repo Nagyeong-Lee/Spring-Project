@@ -76,8 +76,11 @@
                                     <button class="selectCourier btn btn-light">택배사 입력</button>
                                 </td>
                             </c:when>
-                            <c:otherwise>
+                            <c:when test="${i.deliYN == 'M'}"> <%--배송중일때--%>
                                 <td style="text-align: center;">배송중</td>
+                            </c:when>
+                            <c:otherwise> <%--배송 완료--%>
+                                <td style="text-align: center;">배송 완료</td>
                             </c:otherwise>
                         </c:choose>
                     </tr>
@@ -85,7 +88,7 @@
             </c:when>
             <c:otherwise>
                 <tr>
-                    <td colspan="5">구매 내역이 없습니다.</td>
+                    <td colspan="5" style="text-align: center;">구매 내역이 없습니다.</td>
                 </tr>
             </c:otherwise>
         </c:choose>
@@ -146,7 +149,7 @@
     //     });
 
     /*택배사 입력 클릭 시*/
-    $(".selectCourier").click(function(){
+    $(".selectCourier").click(function () {
         let sales_seq = $(this).parent().parent().find(".sales_seq").val();
         window.open('/admin/chgDeliStatus?sales_seq=' + sales_seq, '', 'width=500, height=500, left=800, top=250');
     });
@@ -200,7 +203,7 @@
         var HTML = '<tr><td><a href="/product/detail?pd_seq=' + pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width:120px; height: 100px;"></a></td>';
         if (item.optionMapList == null) { //옵션 없을때
             HTML += '<td style="text-align: center;"><p>' + item.productDTO.name + item.productDTO.stock + '개</p>';
-        } else if(item.optionMapList != null){ //옵션 있을때
+        } else if (item.optionMapList != null) { //옵션 있을때
             temp += '<td style="text-align: center;"><p>' + item.productDTO.name + ' ' + item.productDTO.stock + '개</p>';
             for (let i = 0; i < item.optionMapList.length; i++) {
                 temp += '<p>' + Object.keys(item.optionMapList[i])[0] + ' : ' + item.optionMapList[i][Object.keys(item.optionMapList[i])[0]] + '</p>';
@@ -209,10 +212,12 @@
             HTML = HTML + temp;
         }
         HTML += '<td style="text-align: center;">' + item.productDTO.stock + '개</td>';
-        if(item.salesDTOS.deliYN == 'Y'){
-            HTML+='<td style="text-align: center;">배송중</td>';
-        }else if(item.salesDTOS.deliYN == 'N'){
-            HTML+='<td style="text-align: center;"><button class="selectCourier btn btn-light">택배사 입력</button></td>';
+        if (item.deliYN == 'M') {
+            HTML += '<td style="text-align: center;">배송중</td>';
+        } else if (item.deliYN == 'N') {
+            HTML += '<td style="text-align: center;"><button class="selectCourier btn btn-light">택배사 입력</button></td>';
+        }else{
+            HTML += '<td style="text-align: center;">배송 완료</td>';
         }
         return HTML;
     }

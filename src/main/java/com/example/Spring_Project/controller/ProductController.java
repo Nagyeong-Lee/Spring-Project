@@ -43,7 +43,7 @@ public class ProductController {
     @RequestMapping("/list") //전체 상품 리스트
     public String productList(Model model, Integer cpage) throws Exception {
         if (cpage == null) cpage = 1;
-        Map<String, Object> paging = productService.paging(cpage);
+        Map<String, Object> paging = productService.pagingPdList(cpage);
         Integer naviPerPage = 10;
         Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
         Integer end = cpage * naviPerPage; // 끝 글 번호
@@ -594,7 +594,7 @@ public class ProductController {
             }
 
             //판매 테이블에 인서트할 map (상품당 insert)
-            
+            Integer currPayPdSeq = productService.getCurrPayPdSeq();//현재 payPd_seq 가져오기
             PayInfoDTO payInfoDTO1 = productService.getPayInfo(pay_seq);
             System.out.println("payInfoDTO1 = " + payInfoDTO1.getCount());
             System.out.println("getPrice = " + payInfoDTO1.getPrice());
@@ -603,6 +603,7 @@ public class ProductController {
             salesParam.put("stock", payInfoDTO1.getCount()); //stock
             salesParam.put("productPrice",payInfoDTO1.getPrice());//price
             salesParam.put("salesDate", timestamp); //판매 시간
+            salesParam.put("payPdSeq", currPayPdSeq); //payPd_seq
             productService.insertSales(salesParam);
         }
 
@@ -1034,7 +1035,7 @@ public class ProductController {
         Integer end = cpage * naviPerPage; // 끝 글 번호
         Map<String, Object> reMap = new HashMap<>();
         List<ProductDTO> productDTOList = productService.getProducts(start, end);
-        Map<String, Object> paging = productService.paging(cpage);
+        Map<String, Object> paging = productService.pagingPdList(cpage);
         reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
         reMap.put("endNavi", Integer.parseInt(paging.get("endNavi").toString()));
         reMap.put("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));
@@ -1059,6 +1060,7 @@ public class ProductController {
         List<SalesDTO> salesDTOS = productService.getSalesList(start, end);//판매 테이블에서 가져오기
         Map<String, Object> paging = productService.paging(cpage);
         for (SalesDTO salesDTO : salesDTOS) {
+            PayProductDTO payProductDTO = productService.getDeliYN(salesDTO.getSales_seq()); // deliYN, CODE 가져오기
             Map<String, Object> reMap = new HashMap<>();
             reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
             reMap.put("endNavi", Integer.parseInt(paging.get("endNavi").toString()));
@@ -1066,6 +1068,8 @@ public class ProductController {
             reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
             reMap.put("paging", paging);
             reMap.put("cpage", Integer.parseInt(paging.get("cpage").toString()));
+            reMap.put("deliYN", payProductDTO.getDeliYN());
+            reMap.put("code", payProductDTO.getCode());
             reMap.put("salesDTOS", salesDTO);
             System.out.println("salesDTO.getPd_seq() = " + salesDTO.getPd_seq());
             ProductDTO productDTO = productService.getPdInfo(salesDTO.getPd_seq());
@@ -1116,11 +1120,12 @@ public class ProductController {
 
     @ResponseBody
     @PostMapping("/chgDeliveryStatus")  //payProduct deliYN, code 변경
-    public String chgDeliveryStatus(String courier,Integer sales_seq) throws Exception{
-        System.out.println("courier = " + courier);
-        //flag변경
-        Integer code = productService.getCourierCode(courier); //택배코드
-        productService.deliveryStatus(code,sales_seq);  //sales table -> code, deliYN 변경
+    public String chgDeliveryStatus(@RequestParam Map<String,Object> data) throws Exception{
+        System.out.println("DATA = " + data);
+        //배송 상태 변경 (배송중으로)
+        Integer sales_seq = Integer.parseInt(data.get("sales_seq").toString()); //sales_seq
+        Integer courierCode = productService.getCourierCode(data.get("courier").toString()); //택배사 이름
+        productService.updDeliveryStatus(sales_seq,courierCode); //sales table -> payPdSeq
         return "success";
     }
 }

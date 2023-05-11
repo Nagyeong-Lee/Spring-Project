@@ -974,7 +974,8 @@
         #{stock},
         #{productPrice},
         #{option, jdbcType=VARCHAR},
-        #{salesDate}
+        #{salesDate},
+        #{payPdSeq}
         )
     </insert>
 
@@ -1031,5 +1032,26 @@
 
     <select id="getPayInfo" resultType="com.example.Spring_Project.dto.PayInfoDTO">
         select * from payInfo where pay_seq = #{pay_seq}
+    </select>
+
+    <select id="getCurrPayPdSeq" resultType="Integer">
+        select payPd_seq.currval
+        from dual
+    </select>
+
+    <select id="productCnt" resultType="Integer">
+        select count(*) from product
+    </select>
+
+    <select id="getDeliYN" resultType="com.example.Spring_Project.dto.PayProductDTO">
+        SELECT deliYN,code FROM payProduct WHERE payPd_seq = (
+        SELECT payPd_seq FROM sales WHERE sales_seq = #{salesSeq})
+    </select>
+
+    <select id="updDeliveryStatus" resultType="Integer">
+        UPDATE
+            (SELECT deliYN,code FROM PAYPRODUCT p WHERE PAYPD_SEQ  =
+                ( SELECT payPd_seq FROM sales WHERE sales_seq = #{sales_seq}))
+        SET deliYN = 'M',code = #{code}
     </select>
 </mapper>

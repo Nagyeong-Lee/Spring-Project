@@ -432,6 +432,57 @@ public class ProductService {
         return productMapper.salesPdCount();
     }
 
+    public Integer productCnt() throws Exception {  //상품 총 개수
+        return productMapper.productCnt();
+    }
+
+    //페이징
+    public Map<String, Object> pagingPdList(Integer cpage) throws Exception {
+        //현재 페이지
+        System.out.println("cpage = " + cpage);
+        Integer postCount = productCnt(); //전체 상품수
+        Integer postPerPage = 10; //페이지 당 글 개수
+        Integer naviPerPage = 10; //페이지 당 내비 수
+        Integer totalPageCount = 0; //전체 페이지 수
+        Map<String, Object> map = new HashMap<>();
+        if (postCount % naviPerPage > 0) {
+            totalPageCount = postCount / naviPerPage + 1;
+        } else {
+            totalPageCount = postCount / naviPerPage;
+        }
+
+        if (cpage > totalPageCount) {
+            cpage = totalPageCount;
+        }
+
+        int startNavi = (cpage - 1) / naviPerPage * naviPerPage + 1;  //페이지 start
+        int endNavi = startNavi + naviPerPage - 1; //페이지 end
+
+        if (endNavi > totalPageCount) {
+            endNavi = totalPageCount;
+        }
+
+        System.out.println("startNavi = " + startNavi);
+        System.out.println("endNavi = " + endNavi);
+        boolean needPrev = true;
+        boolean needNext = true;
+
+        if (startNavi == 1) {
+            needPrev = false;
+        }
+        if (endNavi == totalPageCount) {
+            needNext = false;
+        }
+
+        map.put("startNavi", startNavi);
+        map.put("endNavi", endNavi);
+        map.put("needPrev", needPrev);
+        map.put("needNext", needNext);
+        map.put("totalPageCount", totalPageCount);
+        map.put("cpage", cpage);
+        return map;
+    }
+
     //페이징
     public Map<String, Object> paging(Integer cpage) throws Exception {
         //현재 페이지
@@ -562,5 +613,17 @@ public class ProductService {
 
     public PayInfoDTO getPayInfo(Integer pay_seq) throws Exception{
         return productMapper.getPayInfo(pay_seq);
+    }
+
+    public Integer getCurrPayPdSeq() throws Exception{
+        return productMapper.getCurrPayPdSeq();
+    }
+
+    public PayProductDTO getDeliYN(Integer salesSeq) throws Exception{
+        return productMapper.getDeliYN(salesSeq);
+    }
+
+    public void updDeliveryStatus(Integer sales_seq,Integer courierCode) throws Exception{
+        productMapper.updDeliveryStatus(sales_seq,courierCode);
     }
 }
