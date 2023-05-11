@@ -1,26 +1,19 @@
 package com.example.Spring_Project.controller;
 
-import aj.org.objectweb.asm.TypeReference;
 import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.service.MemberService;
 import com.example.Spring_Project.service.PayService;
 import com.example.Spring_Project.service.ProductService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
-import org.apache.logging.log4j.util.PerformanceSensitive;
-import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
-import java.lang.reflect.Type;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -45,8 +38,9 @@ public class ProductController {
         if (cpage == null) cpage = 1;
         Map<String, Object> paging = productService.pagingPdList(cpage);
         Integer naviPerPage = 10;
-        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
-        Integer end = cpage * naviPerPage; // 끝 글 번호
+        Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage); //시작 글번호,끝 글번호 계산
+        Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
+        Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
 
         List<ProductDTO> productDTOList = productService.getProducts(start, end);
         model.addAttribute("productDTOList", productDTOList);
@@ -60,20 +54,11 @@ public class ProductController {
         ProductDTO productDTO = productService.getProductDetail(pd_seq); //상품 상세 정보
         List<OptionDTO> optionDTO = productService.getOptions(pd_seq); //상품 옵션 정보
         List<String> category = productService.getCategory(pd_seq);//옵션 카테고리
-
-        Map<String, List<OptionListDTO>> optionList = new HashMap();
-
-        if (optionDTO != null || optionDTO.size() != 0) {
-            for (Integer i = 0; i < category.size(); i++) {
-                String cg = category.get(i);
-                List<OptionListDTO> getOptionByGroup = productService.getOptionByGroup(category.get(i), pd_seq);  //카테고리별 optionList
-                optionList.put(cg, getOptionByGroup);
-            }
-            model.addAttribute("productDTO", productDTO);
-            model.addAttribute("optionDTO", optionDTO);
-            model.addAttribute("category", category);
-            model.addAttribute("optionList", optionList);
-        }
+        Map<String, List<OptionListDTO>> optionList = productService.pdDetail(optionDTO, category, pd_seq);
+        model.addAttribute("productDTO", productDTO);
+        model.addAttribute("optionDTO", optionDTO);
+        model.addAttribute("category", category);
+        model.addAttribute("optionList", optionList);
         return "/product/detail";
     }
 
@@ -189,44 +174,16 @@ public class ProductController {
     @ResponseBody
     @PostMapping("/addProduct")
     public String addProduct(@RequestParam Map<String, Object> map) throws Exception {
-//        "count":cnt,
-//        "id":id,
-//        "pd_seq":pd_seq,
-//        "optionList":integerArray2
-
         Integer count = Integer.parseInt(map.get("count").toString());
         String id = map.get("id").toString();
         Integer pd_seq = Integer.parseInt(map.get("pd_seq").toString());
 
-        if (map.get("optionList") != null) {
-
-            String[] test = map.get("optionList").toString().split(",");
-            System.out.println("test = " + test);
-
-            for (Integer i = 0; i < test.length; i++) {
-                test[i] = map.get("optionList").toString().split(",")[i];
-                System.out.println("test[i] = " + test[i]);
-            }
-
-            List<String> list = new ArrayList<>();
-            System.out.println("list = " + list);
-            Map<String, List<String>> optionList = new HashMap<>();
-
-            for (Integer i = 0; i < test.length; i++) {
-                Map<String, Object> options = new HashMap<>();
-                String option_name = test[i].substring(0, test[i].indexOf("("));
-
-                list.add(option_name);
-                optionList.put("name", list);
-            }
-            System.out.println("optionList = " + optionList);
-            //장바구니 insert 옵션 있을때
-            productService.insertCart(id, count, pd_seq, optionList.toString());
-        } else if (map.get("optionList") == null) {
-            //옵션 없을때
+        if (map.get("optionList") != null) { //옵션 있을때
+            Map<String,List<String>> optionList = productService.getOptionList(map);
+            productService.insertCart(id, count, pd_seq, optionList.toString());  //옵션 있을때 장바구니 insert
+        } else if (map.get("optionList") == null) { //옵션 없을때
             productService.insertCartWtOption(id, count, pd_seq);
         }
-
         return "success";
     }
 
@@ -312,29 +269,8 @@ public class ProductController {
     @RequestMapping("/count")
     public Integer getCount(Integer cart_seq) throws Exception {
         Map<String, Object> cartOption = productService.getCartOption(cart_seq);
-        int stock = 0;
-        if (cartOption.size() != 1) {
-            //pd_seq
-            Integer pd_seq = Integer.parseInt(cartOption.get("PD_SEQ").toString());
-            //옵션
-            JsonParser jsonParser = new JsonParser();
-            JsonObject jsonObject = (JsonObject) jsonParser.parse((String) cartOption.get("OPTIONS"));
-
-            JsonArray jsonArray = (JsonArray) jsonObject.get("name");
-
-            int[] list = new int[jsonArray.size()];
-
-            for (int i = 0; i < jsonArray.size(); i++) {
-                int index = jsonArray.get(i).toString().indexOf("\"");
-                String option = jsonArray.get(i).toString().substring(index + 1, jsonArray.get(i).toString().length() - 1);
-                stock = productService.getOptionCount(pd_seq, option);
-                list[i] = stock;
-            }
-            stock = Arrays.stream(list).min().getAsInt();
-        } else if (cartOption.size() == 1) {
-            Integer pd_seq = productService.getPdSeq(cart_seq);// pd_seq 가져오기
-            stock = productService.getPdStock(pd_seq);
-        }
+        int stock = productService.count(cartOption,cart_seq);
+        System.out.println("stock tq= " + stock);
         return stock;
     }
 
@@ -422,27 +358,7 @@ public class ProductController {
             }
         }
 
-        //배송 주소 관련
-//        Map<String, Object> deliAddress = new HashMap<>();
-//        String name = productService.getName(data);//이름
-//        String phone = productService.getPhone(data);//폰
-//        phone = phone.substring(0, 3) + "-" + phone.substring(3, 7) + "-" + phone.substring(7, 11);
-//        String defaultAddress = productService.getDefaultAddress(data);
-//        deliAddress.put("name", name);
-//        deliAddress.put("phone", phone);
-//        deliAddress.put("defaultAddress", defaultAddress);
-//
         MemberDTO memberDTO = memberService.getMemInfo(data);
-
-//        if (productService.getId(data) != 0) {
-//            productService.updateBuyPd(data,totalSum,totalPrice);
-//            //update
-//        } else {
-//            //insert
-//            productService.insertBuyPd(data,totalSum,totalPrice);
-//        }
-
-
         //배송지 불러오기 (별칭으로)
         List<DeliDTO> deliDTOList = productService.getDeliveryInfo(data);
         List<DeliDTO> deliveryInfo = productService.deliveryInfo(data);
@@ -458,6 +374,7 @@ public class ProductController {
         return "/product/payInfo";
     }
 
+
     @ResponseBody
     @RequestMapping("/getTotal")
     public Map<String, Object> getTotal(String id) throws Exception {
@@ -469,36 +386,11 @@ public class ProductController {
         return map;
     }
 
-    @ResponseBody
-    @RequestMapping("/getAdditionalAddr")
-    public String getAdditionalAddr(String id) throws Exception {
-        String additionalAddress1 = productService.getAdditionalAddress1(id);
-        return additionalAddress1;
-    }
-
-    @ResponseBody
-    @RequestMapping("/getAdditionalAddr2")
-    public String getAdditionalAddr2(String id) throws Exception {
-        String additionalAddress2 = productService.getAdditionalAddress2(id);
-        return additionalAddress2;
-    }
-
-    @ResponseBody
-    @RequestMapping("/getDefaultAddr")
-    public String getDefaultAddr(String id) throws Exception {
-        String defaultAddress = productService.getDefaultAddress(id);
-        return defaultAddress;
-    }
-
     //선택삭제 테스트
     @ResponseBody
     @RequestMapping("/cart/delCart")
-    public String deleteItem(@RequestParam(value = "deleteCartSeq[]") List<Integer> deleteCartSeq) throws
-            Exception {
-
-        for (Integer i : deleteCartSeq) {
-            productService.deleteItem(i);
-        }
+    public String deleteItem(@RequestParam(value = "deleteCartSeq[]") List<Integer> deleteCartSeq) throws Exception {
+        productService.deleteCart(deleteCartSeq);
         return "success";
     }
 
@@ -518,8 +410,6 @@ public class ProductController {
         param.put("price", price);
         param.put("deliSeq", defaultAddr.getSeq());
         param.put("pdTotalSum", pdTotalSum);
-        System.out.println("\"tq\" = " + "tq");
-        System.out.println("param = " + param);
         payService.insertPayInfo(param);
         Integer pay_seq = productService.currPaySeq();//현재 pay_seq
         Timestamp timestamp = productService.getPayDate(pay_seq);
@@ -536,12 +426,6 @@ public class ProductController {
         Integer totalSum = 0;  //상품 총 개수
 
         for (Integer i = 0; i < cartInfo.size(); i++) {
-
-            System.out.println("cartInfo.get(i).getPd_seq() = " + cartInfo.get(i).getPd_seq());
-            System.out.println("cartInfo.get(i).getCount() = " + cartInfo.get(i).getCount());
-            System.out.println("cartInfo.get(i).getName() = " + cartInfo.get(i).getName());
-            System.out.println("cartInfo.get(i).getPrice    () = " + cartInfo.get(i).getPrice());
-
             Map<String, Object> item = new HashMap<>();
             item.put("id", cartInfo.get(i).getId());
             item.put("count", cartInfo.get(i).getCount());
@@ -596,12 +480,10 @@ public class ProductController {
             //판매 테이블에 인서트할 map (상품당 insert)
             Integer currPayPdSeq = productService.getCurrPayPdSeq();//현재 payPd_seq 가져오기
             PayInfoDTO payInfoDTO1 = productService.getPayInfo(pay_seq);
-            System.out.println("payInfoDTO1 = " + payInfoDTO1.getCount());
-            System.out.println("getPrice = " + payInfoDTO1.getPrice());
             salesParam.put("id", id); //id
             salesParam.put("pd_seq", cartInfo.get(i).getPd_seq()); //pd_seq
             salesParam.put("stock", payInfoDTO1.getCount()); //stock
-            salesParam.put("productPrice",payInfoDTO1.getPrice());//price
+            salesParam.put("productPrice", payInfoDTO1.getPrice());//price
             salesParam.put("salesDate", timestamp); //판매 시간
             salesParam.put("payPdSeq", currPayPdSeq); //payPd_seq
             productService.insertSales(salesParam);
@@ -653,7 +535,6 @@ public class ProductController {
             }
         }
 
-
         //장바구니 비우기
         productService.updCartStatus(id);
         model.addAttribute("cart", cart);
@@ -668,7 +549,6 @@ public class ProductController {
     @ResponseBody
     @RequestMapping("/likeYN") //좋아요 눌렀는지 여부
     public Integer likeYN(String id, Integer pd_seq) throws Exception {
-
         Integer yn = productService.likeYN(id, pd_seq);
         return yn;
     }
@@ -890,14 +770,12 @@ public class ProductController {
 
     @RequestMapping("/addDeli") //배송지 추가
     public String addDeli(String id) throws Exception {
-        System.out.println("id = " + id);
         return "/product/popup";
         //회원 배송지 정보 가져오기
     }
 
     @RequestMapping("/updDeliInfo") //배송지 수정
     public String updDeliInfo(Model model, Integer seq) throws Exception {
-        System.out.println("seq " + seq);
         DeliDTO deliDTO = productService.getSeqDeli(seq);
         model.addAttribute("deliDTO", deliDTO);
         return "/product/updPopup";
@@ -916,10 +794,7 @@ public class ProductController {
         String def = map.get("def").toString();
         String id = map.get("id").toString();
         String flag = "N";
-        if (def.equals("true")) {
-            flag = "Y";
-        }
-        System.out.println("flag = " + flag);
+        if (def.equals("true")) flag = "Y";
         Map<String, Object> param = new HashMap<>();
         param.put("name", name);
         param.put("phone", phone);
@@ -929,9 +804,7 @@ public class ProductController {
         param.put("id", id);
         productService.insertDeli(param);  //배송지 추가
         Integer currval = productService.getCurrval();//seq.currval
-        if (flag.equals("Y")) { //flag Y일때 나머지 n으로 변경
-            productService.updDeliStatus(currval);
-        }
+        if (flag.equals("Y")) productService.updDeliStatus(currval);  //flag Y일때 나머지 n으로 변경
         return "success";
         //배달 정보에 insert
     }
@@ -947,7 +820,6 @@ public class ProductController {
     @ResponseBody
     @PostMapping("/updDelivery")
     public String updDelivery(@RequestParam Map<String, Object> map) throws Exception {
-        System.out.println("map = " + map);
         String name = map.get("name").toString();
         String phone = map.get("phone").toString();
         String address = map.get("address").toString();
@@ -956,10 +828,7 @@ public class ProductController {
         String id = map.get("id").toString();
         Integer seq = Integer.parseInt(map.get("seq").toString());
         String flag = "N";
-        if (def.equals("true")) {
-            flag = "Y";
-        }
-        System.out.println("flag = " + flag);
+        if (def.equals("true")) flag = "Y";
         Map<String, Object> param = new HashMap<>();
         param.put("name", name);
         param.put("phone", phone);
@@ -992,8 +861,9 @@ public class ProductController {
         if (cpage == null) cpage = 1;
         Map<String, Object> paging = productService.paging(cpage);
         Integer naviPerPage = 10;
-        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
-        Integer end = cpage * naviPerPage; // 끝 글 번호
+        Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage);
+        Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
+        Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
 
         List<Map<String, Object>> historyList = new ArrayList<>();
         List<Map<String, Object>> payInfoDTOS = productService.getHistory(id, start, end);
@@ -1009,8 +879,10 @@ public class ProductController {
     public Map<String, Object> rePaging(Integer cpage, String id) throws Exception {
         List<Map<String, Object>> historyList = new ArrayList<>();
         Integer naviPerPage = 10;
-        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
-        Integer end = cpage * naviPerPage; // 끝 글 번호
+        Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage);
+        Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
+        Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
+
         Map<String, Object> reMap = new HashMap<>();
         List<Map<String, Object>> payInfoDTOS = productService.getHistory(id, start, end);
         Map<String, Object> paging = productService.paging(cpage);
@@ -1031,8 +903,10 @@ public class ProductController {
     @PostMapping("/rePagingPdList")
     public Map<String, Object> rePagingPdList(Integer cpage, String id) throws Exception {
         Integer naviPerPage = 10;
-        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
-        Integer end = cpage * naviPerPage; // 끝 글 번호
+        Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage);
+        Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
+        Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
+
         Map<String, Object> reMap = new HashMap<>();
         List<ProductDTO> productDTOList = productService.getProducts(start, end);
         Map<String, Object> paging = productService.pagingPdList(cpage);
@@ -1055,8 +929,10 @@ public class ProductController {
 
         List<Object> historyList = new ArrayList<>();
         Integer naviPerPage = 10;
-        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
-        Integer end = cpage * naviPerPage; // 끝 글 번호
+        Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage);
+        Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
+        Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
+
         List<SalesDTO> salesDTOS = productService.getSalesList(start, end);//판매 테이블에서 가져오기
         Map<String, Object> paging = productService.paging(cpage);
         for (SalesDTO salesDTO : salesDTOS) {
@@ -1102,30 +978,25 @@ public class ProductController {
     }
 
 
-    @ResponseBody
-    @PostMapping("/insertDeliInfo")  //택배사 db 저장
-    public String insertDeliInfo(@RequestBody List<List<Object>>list) throws Exception {
-        System.out.println("data = " + list);
-        for(int i = 0 ; i<list.size(); i++){
-            for(int k = 0 ; k<list.get(i).size(); k++){
-                Integer code = Integer.parseInt((String) list.get(i).get(0));
-                String name = (String) list.get(i).get(1);
-                System.out.println(code+":"+name);
-                productService.insert(code,name);
-            }
-
-        }
-        return "success";
-    }
+//    @ResponseBody
+//    @PostMapping("/insertDeliInfo")  //택배사 db 저장
+//    public String insertDeliInfo(@RequestBody List<List<Object>> list) throws Exception {
+//        for (int i = 0; i < list.size(); i++) {
+//            for (int k = 0; k < list.get(i).size(); k++) {
+//                Integer code = Integer.parseInt((String) list.get(i).get(0));
+//                String name = (String) list.get(i).get(1);
+//                productService.insert(code, name);
+//            }
+//        }
+//        return "success";
+//    }
 
     @ResponseBody
-    @PostMapping("/chgDeliveryStatus")  //payProduct deliYN, code 변경
-    public String chgDeliveryStatus(@RequestParam Map<String,Object> data) throws Exception{
-        System.out.println("DATA = " + data);
-        //배송 상태 변경 (배송중으로)
+    @PostMapping("/chgDeliveryStatus")  //payProduct deliYN, code 변경  (배송 상태 변경 - 배송중으로)
+    public String chgDeliveryStatus(@RequestParam Map<String, Object> data) throws Exception {
         Integer sales_seq = Integer.parseInt(data.get("sales_seq").toString()); //sales_seq
         Integer courierCode = productService.getCourierCode(data.get("courier").toString()); //택배사 이름
-        productService.updDeliveryStatus(sales_seq,courierCode); //sales table -> payPdSeq
+        productService.updDeliveryStatus(sales_seq, courierCode); //sales table -> payPdSeq
         return "success";
     }
 }

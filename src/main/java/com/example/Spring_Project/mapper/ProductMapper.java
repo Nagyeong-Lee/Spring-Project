@@ -134,4 +134,5 @@ public interface ProductMapper {
     Integer productCnt();
     PayProductDTO getDeliYN(@Param("salesSeq") Integer salesSeq);
     void updDeliveryStatus(@Param("sales_seq") Integer sales_seq, @Param("code") Integer courierCode);
+    PayProductDTO getPayProductInfo(@Param("pay_seq") Integer pay_seq, @Param("pd_seq") Integer pd_seq);
 }

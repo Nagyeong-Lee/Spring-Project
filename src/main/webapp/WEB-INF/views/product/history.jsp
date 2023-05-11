@@ -37,15 +37,15 @@
             padding: 15px; /* 위아래/좌우 패딩 */
         }
 
-        /*.pagingDiv {*/
-        /*    position: fixed;*/
-        /*    left: 0;*/
-        /*    bottom: 400px;*/
-        /*    width: 100%;*/
-        /*    color: white; !* 글자색상 *!*/
-        /*    text-align: center; !* 가운데 정렬 *!*/
-        /*    padding: 15px; !* 위아래/좌우 패딩 *!*/
-        /*}*/
+        .pagingDiv {
+            position: fixed;
+            left: 0;
+            bottom: 400px;
+            width: 100%;
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            padding: 15px; /* 위아래/좌우 패딩 */
+        }
     </style>
 </head>
 <body>
@@ -58,6 +58,7 @@
         <th>상품 정보</th>
         <th>배송지</th>
         <th>결제 정보</th>
+        <th>배송 상태</th>
         </thead>
         <tbody id="tbody">
         <c:choose>
@@ -69,6 +70,8 @@
                         </td>
                         <td>
                             <p>${i.productDTO.name} ${i.count}개</p>
+                            <input type="hidden" value="${i.payPd_seq}" name="payPd_seq" class="payPd_seq">
+                            <input type="hidden" value="${i.productDTO.pd_seq}" name="pd_seq" class="pd_seq">
                                 <%--옵션 있을때--%>
                             <c:if test="${!empty i.option}">
                                 <c:forEach var="k" items="${i.option}">
@@ -88,6 +91,22 @@
                             <p>결제 방법 : ${i.payMethod}</p>
                             <p>결제 금액 : <fmt:formatNumber pattern="#,###" value="${i.price}"/>원</p>
                         </td>
+                        <c:choose>
+                            <c:when test="${i.deliYN == 'N'}"> <%--배송 안했을때--%>
+                                <td style="text-align: center;">배송전</td>
+                            </c:when>
+                            <c:when test="${i.deliYN == 'M'}"> <%--배송중일때--%>
+                                <td style="text-align: center;">배송중</td>
+                            </c:when>
+                            <c:otherwise> <%--배송 완료--%>
+                                <td style="text-align: center;">
+                                    배송 완료
+                                    <button type="button" class="reviewBtn btn btn-light" style="font-size: 13px;">리뷰
+                                        작성하기
+                                    </button>
+                                </td>
+                            </c:otherwise>
+                        </c:choose>
                     </tr>
                 </c:forEach>
             </c:when>
@@ -195,7 +214,7 @@
         newTable = '<tr><td><a href="/product/detail?pd_seq=' + item.productDTO.pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width:120px; height: 100px;"></a></td>';
         newHtml = newTable;
         if (item.option == null) { //옵션 없을때
-            newTable += '<td><p>' + item.productDTO.name + '  ' + item.count + '개' + '</p></td>';
+            newTable += '<td style="text-align: center"><p>' + item.productDTO.name + '  ' + item.count + '개' + '</p></td>';
         } else { //옵션 있을때
             temp += '<td><p>' + item.productDTO.name + '  ' + item.count + '개' + '</p>';
             for (let i = 0; i < item.option.length; i++) {
@@ -204,8 +223,15 @@
             temp += '</td>';
             newTable = newTable + temp;
         }
-        newTable += '<td><p>받는 사람 : ' + item.deliDTO.name + '</p><p>전화번호 : ' + item.deliDTO.phone + '</p><p>주소 : ' + item.deliDTO.address + '</p></td>';
-        newTable += '<td><p>결제 일자 : ' + item.payDate + '</p><p>결제 방법 : ' + item.payMethod + '</p><p>결제 금액 : ' + item.price.toLocaleString() + '원</p></td></tr>';
+        newTable += '<td style="text-align: center"><p>받는 사람 : ' + item.deliDTO.name + '</p><p>전화번호 : ' + item.deliDTO.phone + '</p><p>주소 : ' + item.deliDTO.address + '</p></td>';
+        newTable += '<td style="text-align: center"><p>결제 일자 : ' + item.payDate + '</p><p>결제 방법 : ' + item.payMethod + '</p><p>결제 금액 : ' + item.price.toLocaleString() + '원</p></td>';
+        if (item.deliYN == 'N') {
+            newTable += '<td style="text-align: center;">배송전</td></tr>';
+        } else if (item.deliYN == 'M') {
+            newTable += '<td style="text-align: center;">배송중</td></tr>';
+        } else {
+            newTable += '<td style="text-align: center;">배송 완료<button type="button" class="reviewBtn btn btn-light" style="font-size: 13px;">리뷰 작성하기</button></td></tr>';
+        }
         return newTable;
     }
 
@@ -228,7 +254,7 @@
         return html;
     }
 
-    function createNext(endNavi,totalPageCount){
+    function createNext(endNavi, totalPageCount) {
         var html = '';
         html += '<a href="javascript:void(0);" onclick="paging(' + (endNavi + 1) + ');">' + ">" + '</a>';
         html += '<a href="javascript:void(0);" onclick="paging(' + (totalPageCount) + ');">' + "맨끝" + '</a>';
@@ -254,6 +280,31 @@
         document.body.append(newForm);
         newForm.submit();
     })
+
+    //리뷰 작성하기 클릭 시
+    $(".reviewBtn").click(function () {
+        let pd_seq = $(this).parent().parent().find(".pd_seq").val();
+        let payPd_seq = $(this).parent().parent().find(".payPd_seq").val();
+
+        let newForm = document.createElement("form");
+        newForm.setAttribute("method", "post");
+        newForm.setAttribute("action", "/pdReview/toWriteForm");
+
+        let input = document.createElement("input");
+        input.setAttribute("type", "hidden");
+        input.setAttribute("name", "pd_seq");
+        input.setAttribute("value", pd_seq);
+
+        let input2 = document.createElement("input");
+        input2.setAttribute("type", "hidden");
+        input2.setAttribute("name", "payPd_seq");
+        input2.setAttribute("value", payPd_seq);
+
+        newForm.appendChild(input);
+        newForm.appendChild(input2);
+        document.body.append(newForm);
+        newForm.submit();
+    });
 </script>
 </body>
 </html>

@@ -102,6 +102,11 @@
 <button type="button" id="back" style="margin-left: 1120px;" class="btn btn-dark">상품 목록으로</button>
 <button type="button" id="toCart" class="btn btn-dark">장바구니로</button>
 
+<%--리뷰 영역--%>
+<div class="reviewDiv">
+
+</div>
+
 <form id="frm" method="post" action="/product/cart">
     <input type="hidden" name="id" value="${id}" id="sessionId">
 </form>

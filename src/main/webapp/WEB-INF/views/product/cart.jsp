@@ -59,7 +59,7 @@
                         <td colspan="2">수량</td>
                         <td colspan="2">상품금액</td>
                         <td colspan="2">
-                            <button type="button" class="delBtn" onclick="deleteCart()">삭제</button>
+                            <button type="button" class="delBtn btn btn-light" onclick="deleteCart()">삭제</button>
                         </td>
                     </tr>
                     </thead>

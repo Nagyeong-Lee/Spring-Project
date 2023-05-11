@@ -895,7 +895,7 @@
 
     <select id="getHistory" resultType="java.util.Map">
 
-        SELECT pd_seq,payPd_seq,deli_seq,price,TO_CHAR(PAYDATE,'YYYY-MM-DD HH:MI') AS PAYDATE,PAYMETHOD,OPTIONS,COUNT
+        SELECT pd_seq,payPd_seq,deli_seq,price,TO_CHAR(PAYDATE,'YYYY-MM-DD HH:MI') AS PAYDATE,PAYMETHOD,OPTIONS,COUNT,pay_seq
         from( SELECT ROWNUM rn, a.* FROM(SELECT
         pd_seq,
         payPd_seq,
@@ -904,29 +904,32 @@
         PAYDATE,
         PAYMETHOD,
         OPTIONS,
-        count
+        count,
+        code,p.pay_seq
         FROM payInfo p JOIN PAYPRODUCT pp
         ON p.PAY_SEQ = pp.pay_seq
         WHERE p.id = #{id}
         ORDER BY PAYDATE DESC) a)
         where rn between #{start} and #{end}
 
-        <!--        SELECT  pd_seq,payPd_seq,deli_seq,price,PAYDATE,PAYMETHOD,OPTIONS,COUNT-->
-        <!--        from( SELECT ROWNUM rn, a.* FROM(SELECT-->
-        <!--        pd_seq,-->
-        <!--        payPd_seq,-->
-        <!--        deli_seq,-->
-        <!--        price,-->
-        <!--&lt;!&ndash;        to_char(PAYDATE,'YYYY-MM-DD hh:mm:ss') AS PAYDATE ,&ndash;&gt;-->
-        <!--        PAYDATE,-->
-        <!--        PAYMETHOD,-->
-        <!--        OPTIONS,-->
-        <!--        count-->
-        <!--        FROM payInfo p JOIN PAYPRODUCT pp-->
-        <!--        ON p.PAY_SEQ  = pp.pay_seq-->
-        <!--        WHERE p.id = #{id}-->
-        <!--        ORDER BY PAYDATE DESC) a)-->
-        <!--        where rn between #{start} and #{end}-->
+
+<!--        SELECT pd_seq,payPd_seq,deli_seq,price,TO_CHAR(PAYDATE,'YYYY-MM-DD HH:MI') AS PAYDATE,PAYMETHOD,OPTIONS,COUNT, deliYN,code-->
+<!--        from( SELECT ROWNUM rn, a.* FROM(SELECT-->
+<!--        pd_seq,-->
+<!--        payPd_seq,-->
+<!--        deli_seq,-->
+<!--        price,-->
+<!--        PAYDATE,-->
+<!--        PAYMETHOD,-->
+<!--        OPTIONS,-->
+<!--        count,-->
+<!--        deliYN,-->
+<!--        code-->
+<!--        FROM payInfo p JOIN PAYPRODUCT pp-->
+<!--        ON p.PAY_SEQ = pp.pay_seq-->
+<!--        WHERE p.id = #{id}-->
+<!--        ORDER BY PAYDATE DESC) a)-->
+<!--        where rn between #{start} and #{end}-->
 
     </select>
 
@@ -1053,5 +1056,9 @@
             (SELECT deliYN,code FROM PAYPRODUCT p WHERE PAYPD_SEQ  =
                 ( SELECT payPd_seq FROM sales WHERE sales_seq = #{sales_seq}))
         SET deliYN = 'M',code = #{code}
+    </select>
+
+    <select id="getPayProductInfo" resultType="com.example.Spring_Project.dto.PayProductDTO">
+        SELECT DELIYN , CODE FROM PAYPRODUCT p WHERE pay_seq = #{pay_seq} AND PD_SEQ = #{pd_seq}
     </select>
 </mapper>

@@ -120,12 +120,6 @@ public class AdminController {
 
         boolean result = adminService.excelUpload(multipartFile);
 
-//        ModelAndView view = new ModelAndView();
-//
-//        view.setViewName("/admin/main");
-//
-//        return view;
-
         if (result == true) {
             return "success";
         } else {
@@ -230,7 +224,6 @@ public class AdminController {
         Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
         Integer end = cpage * naviPerPage; // 끝 글 번호
 
-//        List<ProductDTO> list = productService.getProducts(); //상품정보
         List<ProductDTO> list = productService.getProducts(start, end); //상품정보
         List<OptionDTO> optionDTOList = null;
         List<Map<String, Object>> registeredPd = new ArrayList<>();

@@ -8,13 +8,8 @@ import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.print.DocFlavor;
-import java.rmi.MarshalledObject;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ProductService {
@@ -23,8 +18,8 @@ public class ProductService {
     private ProductMapper productMapper;
 
 
-    public List<ProductDTO> getProducts(Integer start,Integer end) throws Exception { //상품 리스트 가져오기
-        return productMapper.getProducts(start,end);
+    public List<ProductDTO> getProducts(Integer start, Integer end) throws Exception { //상품 리스트 가져오기
+        return productMapper.getProducts(start, end);
     }
 
     public ProductDTO getProductDetail(Integer pd_seq) throws Exception { //상품 상세 정보
@@ -107,9 +102,14 @@ public class ProductService {
         return productMapper.getOptionByGroup(category, pd_seq);
     }
 
-//    public void insertCart(Map<String, Object> map) throws Exception {
-//        productMapper.insertCart(map);
-//    }
+    public Map<String, Object> pagingStartEnd(Integer cpage, Integer naviPerPage) throws Exception {
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+        Map<String, Object> map = new HashMap<>();
+        map.put("start", start);
+        map.put("end", end);
+        return map;
+    }
 
     public void insertCart(String id, Integer count, Integer pd_seq, String optionList) throws Exception {
         productMapper.insertCart(id, count, pd_seq, optionList);
@@ -153,6 +153,12 @@ public class ProductService {
 
     public void deleteItem(Integer cart_seq) throws Exception {  //장바구니에서 아이템 삭제
         productMapper.deleteItem(cart_seq);
+    }
+
+    public void deleteCart(List<Integer> deleteCartSeq) throws Exception {
+        for (Integer i : deleteCartSeq) {
+            deleteItem(i);
+        }
     }
 
     public Map<String, Object> getCartOption(Integer cart_seq) throws Exception {  // 상품 하나당 옵션 가져오기
@@ -436,6 +442,10 @@ public class ProductService {
         return productMapper.productCnt();
     }
 
+    public PayProductDTO getPayProductInfo(Integer pay_seq, Integer pd_seq) throws Exception {
+        return productMapper.getPayProductInfo(pay_seq, pd_seq);
+    }
+
     //페이징
     public Map<String, Object> pagingPdList(Integer cpage) throws Exception {
         //현재 페이지
@@ -546,10 +556,16 @@ public class ProductService {
             String payDate = payInfoDTO.get("PAYDATE").toString(); //결제 일자
             DeliDTO deliDTO = this.getDeliInfoBySeq(Integer.parseInt(payInfoDTO.get("DELI_SEQ").toString())); //배송지
             Integer count = Integer.parseInt(payInfoDTO.get("COUNT").toString());
+            Integer pay_seq = Integer.parseInt(payInfoDTO.get("PAY_SEQ").toString());
+            Integer pd_seq = Integer.parseInt(payInfoDTO.get("PD_SEQ").toString());
+            PayProductDTO payProductDTO1 = this.getPayProductInfo(pay_seq, pd_seq);
             map.put("productDTO", productDTO);
             map.put("price", price);
             map.put("payMethod", payMethod);
             map.put("payDate", payDate);
+            map.put("deliYN", payProductDTO1.getDeliYN());
+            map.put("code", payProductDTO1.getCode());
+            map.put("payPd_seq", payInfoDTO.get("PAYPD_SEQ"));
             String phone = deliDTO.getPhone();
             String parsedPhone = phone.substring(0, 3) + "-" + phone.substring(3, 7) + "-" + phone.substring(7, 11);
             deliDTO.setPhone(parsedPhone);
@@ -584,46 +600,109 @@ public class ProductService {
     }
 
     //결제 테이블 인서트 시 결제 일자
-    public Timestamp getPayDate(Integer pay_seq) throws Exception{
+    public Timestamp getPayDate(Integer pay_seq) throws Exception {
         return productMapper.getPayDate(pay_seq);
     }
 
     //결제 테이블 insert
-    public void insertSales(Map<String,Object>salesParam) throws Exception{
+    public void insertSales(Map<String, Object> salesParam) throws Exception {
         productMapper.insertSales(salesParam);
     }
 
-    public List<SalesDTO> getSalesList(Integer start,Integer end) throws Exception{
-        return productMapper.getSalesList(start,end);
+    public List<SalesDTO> getSalesList(Integer start, Integer end) throws Exception {
+        return productMapper.getSalesList(start, end);
     }
 
-    public List<CourierDTO> getCourierInfo() throws Exception{
+    public List<CourierDTO> getCourierInfo() throws Exception {
         return productMapper.getCourierInfo();
     }
 
-    public void insert(Integer code,String name)throws Exception {
+    public void insert(Integer code, String name) throws Exception {
         productMapper.insert(code, name);
     }
-    public Integer getCourierCode(String name) throws Exception{
+
+    public Integer getCourierCode(String name) throws Exception {
         return productMapper.getCourierCode(name);
     }
-    public void deliveryStatus(Integer code,Integer sales_seq)throws Exception{
-        productMapper.deliveryStatus(code,sales_seq);
+
+    public void deliveryStatus(Integer code, Integer sales_seq) throws Exception {
+        productMapper.deliveryStatus(code, sales_seq);
     }
 
-    public PayInfoDTO getPayInfo(Integer pay_seq) throws Exception{
+    public PayInfoDTO getPayInfo(Integer pay_seq) throws Exception {
         return productMapper.getPayInfo(pay_seq);
     }
 
-    public Integer getCurrPayPdSeq() throws Exception{
+    public Integer getCurrPayPdSeq() throws Exception {
         return productMapper.getCurrPayPdSeq();
     }
 
-    public PayProductDTO getDeliYN(Integer salesSeq) throws Exception{
+    public PayProductDTO getDeliYN(Integer salesSeq) throws Exception {
         return productMapper.getDeliYN(salesSeq);
     }
 
-    public void updDeliveryStatus(Integer sales_seq,Integer courierCode) throws Exception{
-        productMapper.updDeliveryStatus(sales_seq,courierCode);
+    public void updDeliveryStatus(Integer sales_seq, Integer courierCode) throws Exception {
+        productMapper.updDeliveryStatus(sales_seq, courierCode);
     }
+
+    //상품 디테일
+    public Map<String, List<OptionListDTO>> pdDetail(List<OptionDTO> optionDTO, List<String> category, Integer pd_seq) throws Exception {
+        Map<String, List<OptionListDTO>> optionList = new HashMap();
+        Integer size = optionDTO.size();
+        if (optionDTO != null || size != 0) {
+            for (Integer i = 0; i < category.size(); i++) {
+                String cg = category.get(i);
+                List<OptionListDTO> getOptionByGroup = this.getOptionByGroup(category.get(i), pd_seq);  //카테고리별 optionList
+                optionList.put(cg, getOptionByGroup);
+            }
+        }
+        return optionList;
+    }
+
+    //옵션 있을때 장바구니에 상품 추가
+    public Map<String, List<String>> getOptionList(Map<String, Object> map) throws Exception {
+        String[] test = map.get("optionList").toString().split(",");
+        for (Integer i = 0; i < test.length; i++) {
+            test[i] = map.get("optionList").toString().split(",")[i];
+        }
+        List<String> list = new ArrayList<>();
+        Map<String, List<String>> optionList = new HashMap<>();
+        for (Integer i = 0; i < test.length; i++) {
+            Map<String, Object> options = new HashMap<>();
+            String option_name = test[i].substring(0, test[i].indexOf("("));
+            list.add(option_name);
+            optionList.put("name", list);
+        }
+        return optionList;
+    }
+
+
+    //pd 재고 count
+    public Integer count(Map<String, Object> cartOption, Integer cart_seq) throws Exception {
+        int stock = 0;
+        if (cartOption.size() != 1) {
+            //pd_seq
+            Integer pd_seq = Integer.parseInt(cartOption.get("PD_SEQ").toString());
+            //옵션
+            JsonParser jsonParser = new JsonParser();
+            JsonObject jsonObject = (JsonObject) jsonParser.parse((String) cartOption.get("OPTIONS"));
+
+            JsonArray jsonArray = (JsonArray) jsonObject.get("name");
+
+            int[] list = new int[jsonArray.size()];
+
+            for (int i = 0; i < jsonArray.size(); i++) {
+                int index = jsonArray.get(i).toString().indexOf("\"");
+                String option = jsonArray.get(i).toString().substring(index + 1, jsonArray.get(i).toString().length() - 1);
+                stock = this.getOptionCount(pd_seq, option);
+                list[i] = stock;
+            }
+            stock = Arrays.stream(list).min().getAsInt();
+        } else if (cartOption.size() == 1) {
+            Integer pd_seq = this.getPdSeq(cart_seq);// pd_seq 가져오기
+            stock = this.getPdStock(pd_seq);
+        }
+        return stock;
+    }
+
 }

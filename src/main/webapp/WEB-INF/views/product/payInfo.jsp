@@ -84,7 +84,7 @@
 
 
     <h3>배송지 선택</h3>
-    <button type="button" id="addBtn">배송지 추가</button>
+    <button type="button" id="addBtn" class="btn btn-light">배송지 추가</button>
     <br>
     <c:choose>
         <c:when test="${!empty deliDTOList}">
@@ -106,8 +106,8 @@
                     </div>
                 </c:if>
             </c:forEach>
-            <button type="button" id="updateBtn">배송지 수정</button>
-            <button type="button" id="delBtn">배송지 삭제</button>
+            <button type="button" id="updateBtn" class="btn btn-light">배송지 수정</button>
+            <button type="button" id="delBtn"  class="btn btn-light">배송지 삭제</button>
         </c:when>
     </c:choose>
 
