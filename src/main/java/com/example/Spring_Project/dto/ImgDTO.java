@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class ImgDTO {
     private Integer img_seq;
+    private Integer review_seq;
     private String oriname;
     private String sysname;
     private String savePath;

@@ -17,6 +17,9 @@ public class ProductService {
     @Autowired
     private ProductMapper productMapper;
 
+    @Autowired
+    private PdReviewService pdReviewService;
+
 
     public List<ProductDTO> getProducts(Integer start, Integer end) throws Exception { //상품 리스트 가져오기
         return productMapper.getProducts(start, end);
@@ -559,7 +562,13 @@ public class ProductService {
             Integer pay_seq = Integer.parseInt(payInfoDTO.get("PAY_SEQ").toString());
             Integer pd_seq = Integer.parseInt(payInfoDTO.get("PD_SEQ").toString());
             PayProductDTO payProductDTO1 = this.getPayProductInfo(pay_seq, pd_seq);
+
+            ReviewDTO reviewDTO = pdReviewService.reviewInfo(Integer.parseInt(payInfoDTO.get("PAYPD_SEQ").toString()));//리뷰 상태
+            if(reviewDTO != null){
+                map.put("reviewDTO", reviewDTO);
+            }
             map.put("productDTO", productDTO);
+            System.out.println("reviewDTO = " + reviewDTO);
             map.put("price", price);
             map.put("payMethod", payMethod);
             map.put("payDate", payDate);

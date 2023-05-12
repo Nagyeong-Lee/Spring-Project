@@ -101,9 +101,19 @@
                             <c:otherwise> <%--배송 완료--%>
                                 <td style="text-align: center;">
                                     배송 완료
-                                    <button type="button" class="reviewBtn btn btn-light" style="font-size: 13px;">리뷰
-                                        작성하기
-                                    </button>
+                                    <c:choose>
+                                        <c:when test="${i.reviewDTO.status == 'Y'}">
+                                            <button type="button" class="updReviewBtn btn btn-light"
+                                                    style="font-size: 13px;">
+                                                <input type="hidden" value="${i.reviewDTO.review_seq}">리뷰 수정하기
+                                            </button>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <button type="button" class="reviewBtn btn btn-light"
+                                                    style="font-size: 13px;">리뷰 작성하기
+                                            </button>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </td>
                             </c:otherwise>
                         </c:choose>
@@ -214,13 +224,14 @@
         newTable = '<tr><td><a href="/product/detail?pd_seq=' + item.productDTO.pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width:120px; height: 100px;"></a></td>';
         newHtml = newTable;
         if (item.option == null) { //옵션 없을때
-            newTable += '<td style="text-align: center"><p>' + item.productDTO.name + '  ' + item.count + '개' + '</p></td>';
+            newTable += '<td style="text-align: center"><p>' + item.productDTO.name + '  ' + item.count + '개' + '</p>';
+            newTable +='<input type="hidden" value="'+item.payPd_seq+'" name="payPd_seq" class="payPd_seq"><input type="hidden" value="'+item.productDTO.pd_seq+'" name="pd_seq" class="pd_seq"></td>';
         } else { //옵션 있을때
             temp += '<td><p>' + item.productDTO.name + '  ' + item.count + '개' + '</p>';
             for (let i = 0; i < item.option.length; i++) {
                 temp += '<p>' + Object.keys(item.option[i])[0] + ' : ' + item.option[i][Object.keys(item.option[i])[0]] + '</p>';
             }
-            temp += '</td>';
+            temp +='<input type="hidden" value="'+item.payPd_seq+'" name="payPd_seq" class="payPd_seq"><input type="hidden" value="'+item.productDTO.pd_seq+'" name="pd_seq" class="pd_seq"></td>';
             newTable = newTable + temp;
         }
         newTable += '<td style="text-align: center"><p>받는 사람 : ' + item.deliDTO.name + '</p><p>전화번호 : ' + item.deliDTO.phone + '</p><p>주소 : ' + item.deliDTO.address + '</p></td>';
@@ -230,7 +241,13 @@
         } else if (item.deliYN == 'M') {
             newTable += '<td style="text-align: center;">배송중</td></tr>';
         } else {
-            newTable += '<td style="text-align: center;">배송 완료<button type="button" class="reviewBtn btn btn-light" style="font-size: 13px;">리뷰 작성하기</button></td></tr>';
+            // newTable += '<td style="text-align: center;">배송 완료<button type="button" class="reviewBtn btn btn-light" style="font-size: 13px;">리뷰 작성하기</button></td></tr>';
+            newTable += '<td style="text-align: center;">배송 완료';
+            if (item.reviewDTO.status == 'Y') {
+                newTable += '<button type="button" class="updReviewBtn btn btn-light" style="font-size: 13px;"><input type="hidden" value="'+item.reviewDTO.review_seq+'">리뷰 수정하기</button></td>';
+            } else {
+                newTable += '<button type="button" class="reviewBtn btn btn-light" style="font-size: 13px;">리뷰 작성하기</button></td>';
+            }
         }
         return newTable;
     }
@@ -302,6 +319,26 @@
 
         newForm.appendChild(input);
         newForm.appendChild(input2);
+        document.body.append(newForm);
+        newForm.submit();
+    });
+
+    //리뷰 수정하기 클릭 시
+    $(document).on("click",".updReviewBtn ",function(){
+        // let pd_seq = $(this).parent().parent().find(".pd_seq").val();
+        // let payPd_seq = $(this).parent().parent().find(".payPd_seq").val();
+        let review_seq = $(this).children().val();
+
+        let newForm = document.createElement("form");
+        newForm.setAttribute("method","post");
+        newForm.setAttribute("action","/pdReview/updReview");
+
+        let input1= document.createElement("input");
+        input1.setAttribute("type","hidden");
+        input1.setAttribute("name","review_seq");
+        input1.setAttribute("value",review_seq);
+
+        newForm.appendChild(input1);
         document.body.append(newForm);
         newForm.submit();
     });

@@ -3,6 +3,7 @@ package com.example.Spring_Project.controller;
 import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.service.MemberService;
 import com.example.Spring_Project.service.PayService;
+import com.example.Spring_Project.service.PdReviewService;
 import com.example.Spring_Project.service.ProductService;
 import com.google.gson.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ public class ProductController {
     @Autowired
     private PayService payService;
 
+    @Autowired
+    private PdReviewService pdReviewService;
+
     @RequestMapping("/list") //전체 상품 리스트
     public String productList(Model model, Integer cpage) throws Exception {
         if (cpage == null) cpage = 1;
@@ -55,6 +59,10 @@ public class ProductController {
         List<OptionDTO> optionDTO = productService.getOptions(pd_seq); //상품 옵션 정보
         List<String> category = productService.getCategory(pd_seq);//옵션 카테고리
         Map<String, List<OptionListDTO>> optionList = productService.pdDetail(optionDTO, category, pd_seq);
+
+        //따로 따로 뿌려주기
+        //리뷰를 가져옴
+        //img table에서 review_seq있으면 뿌려줌
         model.addAttribute("productDTO", productDTO);
         model.addAttribute("optionDTO", optionDTO);
         model.addAttribute("category", category);
@@ -865,6 +873,7 @@ public class ProductController {
         Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
         Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
 
+        //리뷰 상태 가져오기
         List<Map<String, Object>> historyList = new ArrayList<>();
         List<Map<String, Object>> payInfoDTOS = productService.getHistory(id, start, end);
         //옵션 정보 가져오기

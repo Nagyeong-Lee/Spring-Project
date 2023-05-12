@@ -37,6 +37,10 @@
             width: 300px;
             height: 300px;
         }
+        .reviewDiv{
+            margin-top: 50px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -95,16 +99,12 @@
 
 <hr>
 
-<%--<div class="price">--%>
-
-<%--</div>--%>
-
 <button type="button" id="back" style="margin-left: 1120px;" class="btn btn-dark">상품 목록으로</button>
 <button type="button" id="toCart" class="btn btn-dark">장바구니로</button>
 
 <%--리뷰 영역--%>
 <div class="reviewDiv">
-
+    reviewDiv
 </div>
 
 <form id="frm" method="post" action="/product/cart">

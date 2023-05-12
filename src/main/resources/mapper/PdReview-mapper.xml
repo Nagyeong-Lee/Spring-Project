@@ -3,4 +3,115 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.Spring_Project.mapper.PdReviewMapper">
+    <insert id="reviewInsert"  parameterType="java.util.HashMap">
+        insert into review values(
+            review_seq.nextval,
+            #{loginID},
+            #{payPd_seq},
+            #{pd_seq},
+            sysdate,
+            'Y',
+            #{star},
+            #{content}
+        )
+    </insert>
+
+<!--    <insert id="insertReviewImg" parameterType="java.util.List">-->
+<!--        insert all-->
+<!--        <foreach collection="list" item="item" separator="," >-->
+<!--            into img values(-->
+<!--            img_seq.nextval,-->
+<!--            #{item.review_seq},-->
+<!--            #{item.oriname},-->
+<!--            #{item.sysname},-->
+<!--            #{item.imgSavePath},-->
+<!--            'Y'-->
+<!--        )-->
+<!--        </foreach>-->
+<!--        select * from dual-->
+<!--    </insert>-->
+<!--    <insert id="insertReviewImg" parameterType="java.util.List">-->
+<!--        insert all-->
+<!--        <foreach collection="list" item="i" separator=",">-->
+<!--            into-->
+<!--            img-->
+<!--            values-->
+<!--            (img_seq.nextval,-->
+<!--            #{i.review_seq},-->
+<!--            #{i.oriname},-->
+<!--            #{i.sysname},-->
+<!--            #{i.imgSavePath},-->
+<!--            'Y'-->
+<!--            )-->
+<!--        </foreach>-->
+<!--        SELECT * FROM DUAL-->
+<!--    </insert>-->
+
+    <insert id="insertReviewImg" parameterType="java.util.List">
+        INSERT
+        INTO img
+        SELECT img_seq.NEXTVAL, A.*
+        FROM
+        (
+        <foreach collection="list" item="item" separator="UNION ALL">
+            SELECT #{item.review_seq},#{item.oriname},#{item.sysname},#{item.imgSavePath},'Y'
+            FROM DUAL
+        </foreach>
+        ) A
+    </insert>
+
+
+    <select id="reviewInfo" resultType="com.example.Spring_Project.dto.ReviewDTO">
+        SELECT
+          review_seq,
+          payPd_seq,
+          id,
+          pd_seq,
+          status,
+          star,
+          content
+        from review
+        where payPd_seq = #{payPd_seq} and status = 'Y'
+    </select>
+
+    <select id="reviewDetail" resultType="com.example.Spring_Project.dto.ReviewDTO">
+        SELECT
+            review_seq,
+            payPd_seq,
+            id,
+            pd_seq,
+            status,
+            star,
+            content
+        from review
+        where review_seq = #{review_seq} and status = 'Y'
+    </select>
+
+    <select id="getReviewImg" resultType="com.example.Spring_Project.dto.ImgDTO">
+        select
+         img_seq,
+         review_seq,
+         oriname,
+         sysname
+        from img
+        where review_seq = #{review_seq} and status = 'Y'
+    </select>
+
+    <update id="updReviewDetail">
+        update
+         review
+        set writeDate = sysdate,
+        star = #{star},
+        content = #{content}
+        where review_seq = #{review_seq}
+    </update>
+
+    <update id="deleteImg" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" separator=";" open="DECLARE BEGIN" close="; END;">
+                update
+                    img
+                    set status = 'N'
+                where  img_seq = #{item}
+        </foreach>
+    </update>
 </mapper>

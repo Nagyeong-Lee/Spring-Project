@@ -1,9 +1,16 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: weaver-gram-0020
+  Date: 2023-05-12
+  Time: 오후 2:13
+  To change this template use File | Settings | File Templates.
+--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
-    <title>리뷰 작성</title>
+    <title>리뷰 수정</title>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
@@ -54,6 +61,14 @@
         let k = 0;
         let imgArr = [];
         let fileArr = []; //보낼 파일 배열
+        let deleteSeq = [];
+
+        function deleteFile(i) {
+            console.log(i);
+            $("#"+i).parent().remove(); //imgDiv 삭제
+            $("#" + i).remove();  //x 버튼 삭제
+            deleteSeq.push(i);  //status=n으로 변경
+        }
 
         function delFile(i) {  //x버튼 클릭 시 삭제
             $("#k").remove();
@@ -125,6 +140,37 @@
                 form.submit();
             })
 
+            //삭제 클릭
+            $("#delBtn").click(function () {
+                let review_seq = $("#review_seq").val();
+                let id = $("#id").val();
+                $.ajax({
+                    url: '/pdReview/deleteReview',
+                    type: 'post',
+                    data: {
+                        "review_seq": review_seq
+                        // "id":id
+                    },
+                    success: function (data) {
+                        if (data === 'success') {
+                            let form = document.createElement("form");
+                            form.setAttribute("method", "post");
+                            form.setAttribute("action", "/product/history");
+
+                            let input = document.createElement("input");
+                            input.setAttribute("type", "hidden");
+                            input.setAttribute("name", "id");
+                            input.setAttribute("value", id);
+
+                            form.appendChild(input);
+                            document.body.append(form);
+                            form.submit();
+                        }
+                    }
+                })
+
+            })
+
             //파일 변경
             $("#file").on("change", function () {
                 let inputFile = $('input[name="file"]');
@@ -140,10 +186,11 @@
             });
 
 
-            //리뷰 작성
-            $("#writeBtn").click(function () {
+            //리뷰 수정
+            $("#updBtn").click(function () {
                 let fileArrLength = fileArr.length;
-                if($("#content").val().length === 0){
+
+                if ($("#content").val().length === 0) {
                     alert('리뷰를 작성해주세요');
                     return;
                 }
@@ -160,10 +207,10 @@
                     data.append("file", fileArr[i]);
                 }
 
-                alert('리뷰 작성 완료');
+                data.append("deleteSeq", deleteSeq);
 
                 $.ajax({
-                    url: "/pdReview/insertReview"
+                    url: "/pdReview/updReviewDetail"
                     , type: "POST"
                     , enctype: 'multipart/form-data'
                     , data: data
@@ -173,20 +220,12 @@
                     , isModal: true
                     , isModalEnd: true
                     , success: function (data) {
-                        let id = $("#id").val();
-                        let form = document.createElement("form");
-                        form.setAttribute("method", "post");
-                        form.setAttribute("action", "/product/history");
-
-                        let input = document.createElement("input");
-                        input.setAttribute("type", "hidden");
-                        input.setAttribute("name", "id");
-                        input.setAttribute("value", id);
-
-                        form.appendChild(input);
-                        document.body.append(form);
-                        form.submit();
+                        if(data === 'success'){
+                            alert('리뷰 수정 완료');
+                            location.reload();
+                        }
                     }, error: function (e) {
+
                     }
                 });
             })
@@ -200,29 +239,45 @@
 <%@ include file="/WEB-INF/views/product/shopUtil.jsp" %>
 <h5>리뷰 작성</h5>
 <form action="/pdReview/insertReview" method="post" id="frm">
-    <div class="star">
-        별점 선택
-        <select name="star">
-            <c:forEach var="i" begin="1"  end="5">
-                <option value="${i}">${i}</option>
-            </c:forEach>
-        </select>
-    </div>
-    <input type="hidden" name="payPd_seq" id="payPd_seq" value="${payPd_seq}">
-    <input type="hidden" name="pd_seq" id="pd_seq" value="${pd_seq}">
-    <input type="hidden" name="loginID" id="loginID" value="${id}">
-    <textarea id="content" name="content" class="summernote"></textarea>
+<input type="hidden" id="review_seq" name="review_seq" value="${reviewDTO.review_seq}">
+    <c:choose>
+        <c:when test="${!empty reviewDTO}">
+            <div class="star">
+                별점 선택
+                <select name="star">
+                    <c:forEach var="i" begin="1" end="5">
+                        <option value="${i}"<c:out value="${reviewDTO.star == i ? 'selected' : ''}"/>>${i}</option>
+                    </c:forEach>
+                </select>
+            </div>
+            <input type="hidden" name="payPd_seq" id="payPd_seq" value="${reviewDTO.payPd_seq}">
+            <input type="hidden" name="pd_seq" id="pd_seq" value="${reviewDTO.pd_seq}">
+            <input type="hidden" name="loginID" id="loginID" value="${id}">
+            <textarea id="content" name="content" class="summernote">${reviewDTO.content}</textarea>
 
-    <div class="files">
-        <button type="button" onclick="$('#file').click();">첨부파일</button>
-    </div>
+            <div class="imgArea">
+                <c:if test="${!empty imgDTOList}">
+                    <c:forEach var="i" items="${imgDTOList}">
+                        <div class="img" style="width:100px; height: 200px; text-align: left;">
+                            <img src="/resources/img/products/pdReview/${i.sysname}" style="width: 100px; height: 100px;"><button type="button" onclick="deleteFile(${i.img_seq})" class="deleteFile" id="${i.img_seq}" >x</button>
+                        </div>
+                    </c:forEach>
+                </c:if>
+            </div>
 
-    <div class="fileDiv"></div>
+            <div class="files">
+                <button type="button" onclick="$('#file').click();">첨부파일</button>
+            </div>
 
-    <div class="cart__mainbtns btns">
-        <button class="btn btn-light"  type="button" id="writeBtn">리뷰 작성</button>
-        <button class="btn btn-light"  type="button" id="cancleBtn">취소</button>
-    </div>
+            <div class="fileDiv"></div>
+
+            <div class="cart__mainbtns btns">
+                <button class="btn btn-light" type="button" id="updBtn">리뷰 수정</button>
+                <button class="btn btn-light" type="button" id="delBtn">삭제</button>
+                <button class="btn btn-light" type="button" id="cancleBtn">취소</button>
+            </div>
+        </c:when>
+    </c:choose>
 </form>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
