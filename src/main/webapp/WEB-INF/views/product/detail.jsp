@@ -35,8 +35,9 @@
             padding: 15px; /* 위아래/좌우 패딩 */
             transform: translatY(-100%);
         }
-        #wrapper{
-            height : auto;
+
+        #wrapper {
+            height: auto;
             min-height: 550px;
         }
 
@@ -50,9 +51,13 @@
             text-align: center;
         }
 
-        .reviewDiv {
+        .reviewDiv, .QnADiv {
             margin-top: 50px;
             text-align: center;
+        }
+
+        h4 {
+            font-weight: bold;
         }
 
         .reviewImg {
@@ -139,25 +144,25 @@
         <div> 리뷰수 ${reviewCnt}개</div>
         </c:if>
     </div>
-<%--    <div class="dashBoardImgs">--%>
-<%--        <c:if test="${!empty dashBoardImgs}">--%>
-<%--            <c:forEach var="i" items="${dashBoardImgs}">--%>
-<%--                <img src="/resources/img/products/pdReview/${i}" class="reviewImg">--%>
-<%--            </c:forEach>--%>
-<%--        </c:if>--%>
-<%--    </div>--%>
-        <div class="dashBoardImgs">
-            <c:if test="${!empty dashBoardImgs}">
-                <c:forEach var="i" items="${dashBoardImgs}" varStatus="status">
-                    <c:if test="${status.count <= 10}">
-                        <img src="/resources/img/products/pdReview/${i}" class="reviewImg">
-                    </c:if>
-                    <c:if test="${status.index > 10}">
-                       &nbsp&nbsp ...
-                    </c:if>
-                </c:forEach>
-            </c:if>
-        </div>
+    <%--    <div class="dashBoardImgs">--%>
+    <%--        <c:if test="${!empty dashBoardImgs}">--%>
+    <%--            <c:forEach var="i" items="${dashBoardImgs}">--%>
+    <%--                <img src="/resources/img/products/pdReview/${i}" class="reviewImg">--%>
+    <%--            </c:forEach>--%>
+    <%--        </c:if>--%>
+    <%--    </div>--%>
+    <div class="dashBoardImgs">
+        <c:if test="${!empty dashBoardImgs}">
+            <c:forEach var="i" items="${dashBoardImgs}" varStatus="status">
+                <c:if test="${status.count <= 10}">
+                    <img src="/resources/img/products/pdReview/${i}" class="reviewImg">
+                </c:if>
+                <c:if test="${status.index > 10}">
+                    &nbsp&nbsp ...
+                </c:if>
+            </c:forEach>
+        </c:if>
+    </div>
 </div>
 
 <%--리뷰 영역--%>
@@ -167,7 +172,7 @@
         <c:when test="${!empty reviewInfoList}">
             <c:forEach var="i" items="${reviewInfoList}">
                 ${i.reviewInPdDetail.ID}
-                <c:forEach var="star" begin="1" end="5" >
+                <c:forEach var="star" begin="1" end="5">
                     <c:set var="starColor" value="#ddd"/>
                     <c:if test="${star le i.reviewInPdDetail.STAR}">
                         <c:set var="starColor" value="rgba(250, 208, 0, 0.99)"/>
@@ -181,7 +186,7 @@
                 <c:if test="${i.optionMapList != null}">
                     <c:forEach var="k" items="${i.optionMapList}">
                         <c:forEach var="j" items="${k}">
-                            ${j.key}:${j.value}&nbsp
+                            ${j.key} : ${j.value}&nbsp
                         </c:forEach>
                     </c:forEach>
                     ${i.reviewInPdDetail.STOCK}개
@@ -199,6 +204,16 @@
             리뷰가 없습니다.
         </c:otherwise>
     </c:choose>
+</div>
+
+<div class="QnADiv">
+    <h4>Q&A</h4>
+    <form action="/QnA" method="post" id="qnaFrm" name="qnaFrm">
+        <input type="hidden" value="${id}" id="loginID" name="loginI">
+        <input type="hidden" value="${productDTO.pd_seq}" id="pdSeq" name="pdSeq">
+        <button class="btn btn-light writeQnABtn" onclick="popup()">상품Q&A 작성하기</button>
+        <button class="btn btn-light myQnA">나의Q&A 조회</button>
+    </form>
 </div>
 
 <form id="frm" method="post" action="/product/cart">
@@ -472,6 +487,16 @@
     $("#back").on("click", function () {
         location.href = "/product/list?cpage=1";
     });
+
+    //QnA 작성 클릭 id,pd_seq
+    function popup() {
+        var option = 'width=500, height=500, left=800, top=250';
+        window.open("/QnA", "qnaFrm", option);
+        var myForm = document.qnaFrm;
+        myForm.method = "post";
+        myForm.target = "qnaFrm";
+        myForm.submit();
+    }
 </script>
 </body>
 </html>
