@@ -3,6 +3,7 @@ package com.example.Spring_Project.mapper;
 import com.example.Spring_Project.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
@@ -135,4 +136,7 @@ public interface ProductMapper {
     PayProductDTO getDeliYN(@Param("salesSeq") Integer salesSeq);
     void updDeliveryStatus(@Param("sales_seq") Integer sales_seq, @Param("code") Integer courierCode);
     PayProductDTO getPayProductInfo(@Param("pay_seq") Integer pay_seq, @Param("pd_seq") Integer pd_seq);
+
+    @Select("select count(*) from payInfo where id = #{id}")
+    Integer historyCnt(@Param("id") String id);
 }

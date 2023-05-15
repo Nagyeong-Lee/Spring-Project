@@ -174,6 +174,9 @@ public class MemberController {
                     }
 
                     session.setAttribute("id", id);
+                    //가짜
+//                    session.setAttribute("id", "test");
+//                    session.setAttribute("id", "test200");
                     session.setAttribute("admin", false);
                     model.addAttribute("admin", session.getAttribute("admin"));
                     String communityPath = pathService.getCommunityPath();

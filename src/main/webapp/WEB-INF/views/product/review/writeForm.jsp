@@ -28,16 +28,6 @@
     <link rel="stylesheet" type="text/css" href="/resources/asset/css/util.css">
 
     <style>
-        #footer {
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: #343a40; /* 배경색상 */
-            color: white; /* 글자색상 */
-            text-align: center; /* 가운데 정렬 */
-            padding: 15px; /* 위아래/좌우 패딩 */
-        }
 
         .pagingDiv {
             position: fixed;
@@ -50,7 +40,6 @@
         }
     </style>
     <script>
-
         let k = 0;
         let imgArr = [];
         let fileArr = []; //보낼 파일 배열
@@ -129,8 +118,11 @@
             $("#file").on("change", function () {
                 let inputFile = $('input[name="file"]');
                 let files = inputFile[0].files;
+                console.log(files)
+                console.log(files.length)
                 for (let i = 0; i < files.length; i++) {
                     imgArr.push(files[i]);
+                    console.log(imgArr)
                     let str = '<div id=' + k + '>' + files[i].name + '<button type="button" onclick="delFile(' + k + ')">x</button>' + '</div>';
                     k++
                     $(".fileDiv").append(str);

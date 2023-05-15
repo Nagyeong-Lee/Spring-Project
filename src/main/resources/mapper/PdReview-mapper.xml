@@ -114,4 +114,85 @@
                 where  img_seq = #{item}
         </foreach>
     </update>
+
+    <select id="getReviewByPd_seq" resultType="com.example.Spring_Project.dto.ReviewDTO">
+        select
+            review_seq,
+            id,
+            payPd_seq,
+            writeDate,
+            star,
+            content
+        from review
+        where status = 'Y' and pd_seq = #{pd_seq}
+    </select>
+
+    <select id="reviewInPdDetail" resultType="map">
+        SELECT
+            id,
+            name,
+            price,
+            img,
+            pdOption,
+            a.stock AS stock,
+            to_char(writeDate,'YYYY-MM-DD HH:MI') AS writeDate,
+            star,
+            content
+            FROM PRODUCT p JOIN
+                (SELECT
+                    r.id,
+                    r.pd_seq,
+                    writeDate,
+                    star,
+                    content,
+                    pdOption,
+                    stock
+                FROM review r JOIN sales s
+                ON r.payPd_seq = s.payPd_seq
+                WHERE r.payPd_seq = #{payPd_seq}) a
+                on a.pd_seq = p.pd_seq WHERE a.pd_seq = #{pd_seq}
+
+
+<!--        SELECT-->
+<!--        id,-->
+<!--        name,-->
+<!--        price,-->
+<!--        img,-->
+<!--        pdOption,-->
+<!--        a.stock,-->
+<!--        to_char(writeDate,'YYYY-MM-DD HH:MI') AS writeDate,-->
+<!--        star,-->
+<!--        content-->
+<!--        FROM PRODUCT p JOIN-->
+<!--        (SELECT-->
+<!--        r.id,-->
+<!--        r.pd_seq,-->
+<!--        writeDate,-->
+<!--        star,-->
+<!--        content,-->
+<!--        pdOption,-->
+<!--        stock-->
+<!--        FROM review r JOIN sales s-->
+<!--        ON r.payPd_seq = s.payPd_seq ) a-->
+<!--        on a.pd_seq = p.pd_seq WHERE a.pd_seq = #{pd_seq}-->
+    </select>
+
+    <select id="reviewImgsByPd_seq" resultType="String">
+        SELECT
+            sysname
+        FROM img
+        WHERE review_seq IN
+        (
+            SELECT
+                review_seq
+            FROM review
+            WHERE pd_seq = #{pd_seq})
+    </select>
+
+    <select id="optionCategory" resultType="String">
+        SELECT
+        category
+        FROM OPTIONS
+        WHERE pd_seq = #{pd_seq} AND name = #{optName}
+    </select>
 </mapper>

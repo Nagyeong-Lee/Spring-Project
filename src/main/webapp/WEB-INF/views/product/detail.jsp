@@ -14,7 +14,8 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
-<%--    <link rel="stylesheet" type="text/css" href="/resources/navUtil.css">--%>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.css" rel="stylesheet">
+    <%--    <link rel="stylesheet" type="text/css" href="/resources/navUtil.css">--%>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
@@ -23,8 +24,8 @@
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
     <style>
-        #footer{
-            position: fixed;
+        #footer {
+            position: relative;
             left: 0;
             bottom: 0;
             width: 100%;
@@ -32,14 +33,35 @@
             color: white; /* 글자색상 */
             text-align: center; /* 가운데 정렬 */
             padding: 15px; /* 위아래/좌우 패딩 */
+            transform: translatY(-100%);
         }
-        img{
+        #wrapper{
+            height : auto;
+            min-height: 550px;
+        }
+
+        img {
             width: 300px;
             height: 300px;
         }
-        .reviewDiv{
+
+        .dashBoard {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .reviewDiv {
             margin-top: 50px;
             text-align: center;
+        }
+
+        .reviewImg {
+            width: 80px;
+            height: 80px;
+        }
+
+        .reviewImg:hover {
+            transform: scale(1.5, 1.5); /* 가로2배 새로 1.5배 로 커짐 */
         }
     </style>
 </head>
@@ -65,28 +87,28 @@
 
 <c:choose>
     <c:when test="${!empty optionList}">
-        <div   style="margin-left: 1150px;">
-        <c:forEach var="i" items="${optionList}" varStatus="status">
-            <select name="${i.key}">
-                <option value="option" class="option">--option--</option>
-                <c:forEach var="k" items="${i.value}">
-                    <c:choose>
-                        <c:when test="${k.status eq 'N'}"> <%--품절일때--%>
-                            <option value="${k.name}" disabled="disabled">${k.name}(${k.stock})</option>
-                        </c:when>
-                        <c:otherwise>
-                            <option value="${k.name}">${k.name}(${k.stock})</option>
-                            <%--                ${i.value.get(0).name}--%>
-                        </c:otherwise>
-                    </c:choose>
-                </c:forEach>
-            </select>
-        </c:forEach>
+        <div style="margin-left: 1150px;">
+            <c:forEach var="i" items="${optionList}" varStatus="status">
+                <select name="${i.key}">
+                    <option value="option" class="option">--option--</option>
+                    <c:forEach var="k" items="${i.value}">
+                        <c:choose>
+                            <c:when test="${k.status eq 'N'}"> <%--품절일때--%>
+                                <option value="${k.name}" disabled="disabled">${k.name}(${k.stock})</option>
+                            </c:when>
+                            <c:otherwise>
+                                <option value="${k.name}">${k.name}(${k.stock})</option>
+                                <%--                ${i.value.get(0).name}--%>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:forEach>
+                </select>
+            </c:forEach>
         </div>
     </c:when>
 </c:choose>
 
-<div class="count"  style="margin-left: 1150px;">
+<div class="count" style="margin-left: 1180px;">
     <input type="text" style="width: 40px;" value="0" id="count" readonly>
     <button style="width: 30px;" id="plus" class="btn btn-light">+</button>
     <button style="width: 30px;" id="minus" class="btn btn-light">-</button>
@@ -94,17 +116,89 @@
 </div>
 
 <%--좋아요--%>
-<button type="button" id="likeBtn"  style="margin-left: 1200px;"><i class="far fa-thumbs-up" id="like"></i></button>
-<button type="button" id="likeBtn2" style="margin-left: 1200px;"><i class="fas fa-thumbs-up" id="like2"></i></button>
+<button type="button" id="likeBtn" style="margin-left: 1250px;"><i class="far fa-thumbs-up" id="like"></i></button>
+<button type="button" id="likeBtn2" style="margin-left: 1250px;"><i class="fas fa-thumbs-up" id="like2"></i></button>
 
 <hr>
 
-<button type="button" id="back" style="margin-left: 1120px;" class="btn btn-dark">상품 목록으로</button>
+<button type="button" id="back" style="margin-left: 1150px;" class="btn btn-dark">상품 목록으로</button>
 <button type="button" id="toCart" class="btn btn-dark">장바구니로</button>
 
+<div class="dashBoard" style="text-align: center;">
+    <c:if test="${!empty reviewInfoList}">
+    <div>별점 평균 &nbsp
+        <c:forEach var="star" begin="1" end="5">
+            <c:set var="starColor" value="#ddd"/>
+            <c:if test="${star le starAvg}">
+                <c:set var="starColor" value="rgba(250, 208, 0, 0.99)"/>
+            </c:if>
+            <label for="1-star" id="star_${star}" class="startext">
+                <i class="fa-solid fa-star" style="position:relative;color:${starColor};"></i>
+            </label>
+        </c:forEach>
+        <div> 리뷰수 ${reviewCnt}개</div>
+        </c:if>
+    </div>
+<%--    <div class="dashBoardImgs">--%>
+<%--        <c:if test="${!empty dashBoardImgs}">--%>
+<%--            <c:forEach var="i" items="${dashBoardImgs}">--%>
+<%--                <img src="/resources/img/products/pdReview/${i}" class="reviewImg">--%>
+<%--            </c:forEach>--%>
+<%--        </c:if>--%>
+<%--    </div>--%>
+        <div class="dashBoardImgs">
+            <c:if test="${!empty dashBoardImgs}">
+                <c:forEach var="i" items="${dashBoardImgs}" varStatus="status">
+                    <c:if test="${status.count <= 10}">
+                        <img src="/resources/img/products/pdReview/${i}" class="reviewImg">
+                    </c:if>
+                    <c:if test="${status.index > 10}">
+                       &nbsp&nbsp ...
+                    </c:if>
+                </c:forEach>
+            </c:if>
+        </div>
+</div>
+
 <%--리뷰 영역--%>
-<div class="reviewDiv">
-    reviewDiv
+<div class="reviewDiv" id="wrapper">
+    <h4>리뷰</h4>
+    <c:choose>
+        <c:when test="${!empty reviewInfoList}">
+            <c:forEach var="i" items="${reviewInfoList}">
+                ${i.reviewInPdDetail.ID}
+                <c:forEach var="star" begin="1" end="5" >
+                    <c:set var="starColor" value="#ddd"/>
+                    <c:if test="${star le i.reviewInPdDetail.STAR}">
+                        <c:set var="starColor" value="rgba(250, 208, 0, 0.99)"/>
+                    </c:if>
+                    <label for="1-star" id="star_${star}" class="startext">
+                        <i class="fa-solid fa-star" style="position:relative;color:${starColor};"></i>
+                    </label>
+                </c:forEach>
+                <br>
+                ${i.reviewInPdDetail.WRITEDATE}<br>
+                <c:if test="${i.optionMapList != null}">
+                    <c:forEach var="k" items="${i.optionMapList}">
+                        <c:forEach var="j" items="${k}">
+                            ${j.key}:${j.value}&nbsp
+                        </c:forEach>
+                    </c:forEach>
+                    ${i.reviewInPdDetail.STOCK}개
+                </c:if><br>
+                <c:if test="${i.imgSysname != null}">
+                    <c:forEach var="k" items="${i.imgSysname}">
+                        <img src="/resources/img/products/pdReview/${k}" class="reviewImg">
+                    </c:forEach>
+                </c:if>
+                ${i.reviewInPdDetail.CONTENT}
+                <hr>
+            </c:forEach>
+        </c:when>
+        <c:otherwise>
+            리뷰가 없습니다.
+        </c:otherwise>
+    </c:choose>
 </div>
 
 <form id="frm" method="post" action="/product/cart">
@@ -112,7 +206,7 @@
 </form>
 
 <!-- Footer-->
-<footer class="py-5 bg-dark" id="footer" >
+<footer class="py-5 bg-dark" id="footer">
     <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
 </footer>
 
@@ -123,9 +217,9 @@
 <script src="/resources/asset/js/scripts.js"></script>
 <script>
     $("#keyword").val($("#key").val());
-    $("#search").on("click",function(){
+    $("#search").on("click", function () {
         let keyword = $("#keyword").val();
-        location.href='/product/searchPd?keyword='+keyword;
+        location.href = '/product/searchPd?keyword=' + keyword;
     });
     // function toCart(){
     //     let newForm = document.createElement("form");
@@ -141,14 +235,14 @@
     // }
 
 
-    $("#cart").click(function(){
+    $("#cart").click(function () {
         let newForm = document.createElement("form");
-        newForm.setAttribute("method","post");
-        newForm.setAttribute("action","/product/cart");
+        newForm.setAttribute("method", "post");
+        newForm.setAttribute("action", "/product/cart");
         let newInput = document.createElement("input");
-        newInput.setAttribute("type","hidden");
-        newInput.setAttribute("name","id");
-        newInput.setAttribute("value",$("#id").val());
+        newInput.setAttribute("type", "hidden");
+        newInput.setAttribute("name", "id");
+        newInput.setAttribute("value", $("#id").val());
         newForm.appendChild(newInput);
         document.body.append(newForm);
         newForm.submit();
@@ -166,7 +260,7 @@
             if (data == 0) {
                 $("#likeBtn2").hide();
                 $("#likeBtn").show();
-            }else{
+            } else {
                 $("#likeBtn2").show();
                 $("#likeBtn").hide();
             }
@@ -255,7 +349,7 @@
                 alert('재고보다 많이 구매할 수 없습니다.');
                 $("#count").val(--count);
                 $("#totalStock").text(0);
-                flag=false;
+                flag = false;
             }
         }
     });

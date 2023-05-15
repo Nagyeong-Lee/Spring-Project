@@ -27,7 +27,7 @@
 
     <style>
         #footer {
-            position: fixed;
+            /*position: fixed;*/
             left: 0;
             bottom: 0;
             width: 100%;
@@ -35,12 +35,14 @@
             color: white; /* 글자색상 */
             text-align: center; /* 가운데 정렬 */
             padding: 15px; /* 위아래/좌우 패딩 */
+            position: relative;
+            /*transform: translatY(-100%);*/
         }
 
         .pagingDiv {
             position: fixed;
             left: 0;
-            bottom: 400px;
+            bottom: 100px;
             width: 100%;
             color: white; /* 글자색상 */
             text-align: center; /* 가운데 정렬 */
@@ -130,7 +132,7 @@
     </table>
 </div>
 
-<div class="pagingDiv" style="text-align: center;">
+<div class="pagingDiv" style="text-align: center; ">
     <c:if test="${paging.needPrev eq true}">
         <a href="javascript:void(0); onclick=paging(${paging.startNavi-1}});"><</a>
         <a href="javascript:void(0); onclick=paging(1);">맨 처음</a>
@@ -169,8 +171,8 @@
             },
             success: function (data) {
                 console.log(data);
-                $(".pagingDiv").children().remove();
-                createPaging(data);
+                // $(".pagingDiv").children().remove();
+                // createPaging(data);
             }
         })
     }
@@ -243,10 +245,12 @@
         } else {
             // newTable += '<td style="text-align: center;">배송 완료<button type="button" class="reviewBtn btn btn-light" style="font-size: 13px;">리뷰 작성하기</button></td></tr>';
             newTable += '<td style="text-align: center;">배송 완료';
-            if (item.reviewDTO.status == 'Y') {
-                newTable += '<button type="button" class="updReviewBtn btn btn-light" style="font-size: 13px;"><input type="hidden" value="'+item.reviewDTO.review_seq+'">리뷰 수정하기</button></td>';
-            } else {
-                newTable += '<button type="button" class="reviewBtn btn btn-light" style="font-size: 13px;">리뷰 작성하기</button></td>';
+            if(item.reviewDTO != null){
+                if (item.reviewDTO.status == 'Y') {
+                    newTable += '<button type="button" class="updReviewBtn btn btn-light" style="font-size: 13px;"><input type="hidden" value="'+item.reviewDTO.review_seq+'">리뷰 수정하기</button></td>';
+                } else {
+                    newTable += '<button type="button" class="reviewBtn btn btn-light" style="font-size: 13px;">리뷰 작성하기</button></td>';
+                }
             }
         }
         return newTable;

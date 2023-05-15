@@ -19,7 +19,7 @@
             height: 200px;
         }
 
-        #footer{
+        #footer {
             position: fixed;
             left: 0;
             bottom: 0;
@@ -28,6 +28,7 @@
             color: white; /* 글자색상 */
             text-align: center; /* 가운데 정렬 */
             padding: 15px; /* 위아래/좌우 패딩 */
+            /*transform: translatY(-100%);*/
         }
 
     </style>

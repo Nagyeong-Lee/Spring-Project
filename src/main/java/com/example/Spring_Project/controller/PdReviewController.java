@@ -62,7 +62,6 @@ public class PdReviewController {
     @ResponseBody
     @PostMapping("/deleteReview")  //리뷰 삭제
     public String deleteReview(@RequestParam Integer review_seq) throws Exception{
-        System.out.println("review_seq = " + review_seq);
         pdReviewService.deleteReview(review_seq);
         return "success";
     }
@@ -70,9 +69,6 @@ public class PdReviewController {
     @ResponseBody
     @PostMapping("/updReviewDetail")
     public String updReviewDetail(@RequestParam Map<String,Object>param, @RequestParam(value = "file", required = false) List<MultipartFile>file,@RequestParam(value = "deleteSeq",required = false) List<Integer>deleteSeq,HttpServletRequest request) throws Exception{
-        System.out.println("param = " + param);
-        System.out.println("file = " + file);
-        System.out.println("deleteSeq = " + deleteSeq);
         Integer review_seq = Integer.parseInt(param.get("review_seq").toString());
         pdReviewService.updReviewDetail(param); //리뷰 디테일 수정
         if(file != null && file.size()!=0)pdReviewService.imgInsert(file,request,review_seq);  //파일 추가

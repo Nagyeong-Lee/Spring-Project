@@ -36,7 +36,7 @@
 
     <style>
         #footer {
-            position: fixed;
+            /*position: fixed;*/
             left: 0;
             bottom: 0;
             width: 100%;
@@ -44,6 +44,8 @@
             color: white; /* 글자색상 */
             text-align: center; /* 가운데 정렬 */
             padding: 15px; /* 위아래/좌우 패딩 */
+            position: relative;
+            /*transform: translatY(-100%);*/
         }
 
         .pagingDiv {
@@ -63,14 +65,14 @@
         let fileArr = []; //보낼 파일 배열
         let deleteSeq = [];
 
-        function deleteFile(i) {
+        function deleteFile(i) {  //사진+x
             console.log(i);
             $("#"+i).parent().remove(); //imgDiv 삭제
             $("#" + i).remove();  //x 버튼 삭제
             deleteSeq.push(i);  //status=n으로 변경
         }
 
-        function delFile(i) {  //x버튼 클릭 시 삭제
+        function delFile(i) {  //x버튼 클릭 시 삭제  파일명+x
             $("#k").remove();
             let splice = imgArr.splice(i, 1);
             console.log("imgArr : " + imgArr);
@@ -188,6 +190,7 @@
 
             //리뷰 수정
             $("#updBtn").click(function () {
+                let id = $("#id").val();
                 let fileArrLength = fileArr.length;
 
                 if ($("#content").val().length === 0) {
@@ -221,8 +224,9 @@
                     , isModalEnd: true
                     , success: function (data) {
                         if(data === 'success'){
-                            alert('리뷰 수정 완료');
-                            location.reload();
+
+                          alert('리뷰 수정 완료');
+                            location.href='/product/history?id='+id+'&cpage=1';
                         }
                     }, error: function (e) {
 

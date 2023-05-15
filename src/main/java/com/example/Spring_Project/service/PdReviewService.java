@@ -3,6 +3,9 @@ package com.example.Spring_Project.service;
 import com.example.Spring_Project.dto.ImgDTO;
 import com.example.Spring_Project.dto.ReviewDTO;
 import com.example.Spring_Project.mapper.PdReviewMapper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +20,7 @@ public class PdReviewService {
     @Autowired
     private PdReviewMapper pdReviewMapper;
 
+
     //review insert
     public void reviewInsert(Map<String, Object> param) throws Exception {
         pdReviewMapper.reviewInsert(param);
@@ -27,12 +31,11 @@ public class PdReviewService {
         return pdReviewMapper.currRevSeq();
     }
 
-    public void imgInsert(List<MultipartFile> file, HttpServletRequest request,Integer review_seq) throws Exception{
+    public void imgInsert(List<MultipartFile> file, HttpServletRequest request, Integer review_seq) throws Exception {
 
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         if (file != null) {  //파일 인서트
             String path = "/resources/img/products/pdReview";
-//            String realPath=session.getServletContext().getRealPath("/resources/img/pdReview");
             String realPath = request.getServletContext().getRealPath(path); //webapp 폴더
             File filePath = new File(realPath);
 
@@ -58,7 +61,7 @@ public class PdReviewService {
         }
     }
 
-   //img insert
+    //img insert
     public void insertReviewImg(List<Map<String, Object>> param) throws Exception {
         pdReviewMapper.insertReviewImg(param);
     }
@@ -94,12 +97,92 @@ public class PdReviewService {
     }
 
     //review detail 수정
-    public void updReviewDetail(Map<String,Object>param) throws Exception{
+    public void updReviewDetail(Map<String, Object> param) throws Exception {
         pdReviewMapper.updReviewDetail(param);
     }
 
     //이미지 삭제
-    public void deleteImg(List<Integer>deleteSeq) throws Exception{
+    public void deleteImg(List<Integer> deleteSeq) throws Exception {
         pdReviewMapper.deleteImg(deleteSeq);
     }
+
+    //상품 별점평균
+    public Double starAvg(Integer pd_seq) throws Exception {
+        return pdReviewMapper.starAvg(pd_seq);
+    }
+
+    //상품 리뷰 개수
+    public Integer reviewCnt(Integer pd_seq) throws Exception {
+        return pdReviewMapper.reviewCnt(pd_seq);
+    }
+
+    //상품 리뷰들 가져오기
+    public List<ReviewDTO> getReviewByPd_seq(Integer pd_seq) throws Exception {
+        return pdReviewMapper.getReviewByPd_seq(pd_seq);
+    }
+
+    //리뷰에 이미지 있는지
+    public Integer isImgExist(Integer review_seq) throws Exception {
+        return pdReviewMapper.isImgExist(review_seq);
+    }
+
+    public Map<String, Object> reviewInPdDetail(Integer pd_seq, Integer payPd_seq) throws Exception {
+        return pdReviewMapper.reviewInPdDetail(pd_seq, payPd_seq);
+    }
+
+    public List<String> reviewImgsByPd_seq(Integer pd_seq) throws Exception {
+        return pdReviewMapper.reviewImgsByPd_seq(pd_seq);
+    }
+
+    public List<Map<String, Object>> reviewInfoList(List<ReviewDTO> reviewDTO,Integer pd_seq) throws Exception {
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = new JsonObject();
+        JsonArray jsonArray = new JsonArray();
+        List<Map<String,Object>> reviewInfoList = new ArrayList<>();
+        List<Map<String, Object>> optionMapList = null;
+        for (ReviewDTO dto : reviewDTO) {
+            Map<String, Object> map = new HashMap<>();
+            Integer review_seq = dto.getReview_seq();
+            Integer isImgExist = isImgExist(review_seq);
+            Map<String, Object> reviewInPdDetail = reviewInPdDetail(pd_seq, dto.getPayPd_seq()); //join해서 detailReview에 필요한 데이터
+            if (reviewInPdDetail.get("PDOPTION") != null) {
+                Object object = jsonParser.parse(reviewInPdDetail.get("PDOPTION").toString());
+                jsonObject = (JsonObject) object;
+                jsonArray = (JsonArray) jsonObject.get("name");
+                optionMapList = new ArrayList<>();
+                Map<String, Object> optionMap = null;
+                System.out.println("jsonArray = " + jsonArray);
+                System.out.println("jsonArray = " + jsonArray.size());
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    optionMap = new HashMap<>();
+                    //size = s
+                    String optName = jsonArray.get(i).toString().replace("\"", "");
+                    String optCategory = optionCategory(pd_seq, optName); //옵션 카테고리 이름 가져오기 (size)
+                    System.out.println("optCategory = " + optCategory);
+                    optionMap.put(optCategory, optName);
+                    optionMapList.add(optionMap);
+                }
+            }
+            map.put("reviewInPdDetail", reviewInPdDetail);
+            map.put("optionMapList", optionMapList);
+            List<String>imgSysname = null;
+            //review img
+            if (isImgExist != 0) { //img 있으면 map put
+                List<ImgDTO> imgDTOList = getReviewImg(review_seq);
+                imgSysname = new ArrayList<>();
+                for (ImgDTO imgDTO : imgDTOList) {
+                    imgSysname.add(imgDTO.getSysname());
+                }
+            }
+            map.put("imgSysname",imgSysname);
+            reviewInfoList.add(map);
+        }
+        return reviewInfoList;
+    }
+
+    public String optionCategory(Integer pd_seq, String optName) throws Exception {
+        return pdReviewMapper.optionCategory(pd_seq, optName);
+    }
+
+
 }

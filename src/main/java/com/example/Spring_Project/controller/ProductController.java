@@ -60,13 +60,22 @@ public class ProductController {
         List<String> category = productService.getCategory(pd_seq);//옵션 카테고리
         Map<String, List<OptionListDTO>> optionList = productService.pdDetail(optionDTO, category, pd_seq);
 
-        //따로 따로 뿌려주기
-        //리뷰를 가져옴
-        //img table에서 review_seq있으면 뿌려줌
+        //대시보드
+        Double starAvg = pdReviewService.starAvg(pd_seq); //상품 별점평균
+        Integer reviewCnt = pdReviewService.reviewCnt(pd_seq);//상품 리뷰 수
+        List<String> dashBoardImgs = pdReviewService.reviewImgsByPd_seq(pd_seq); //리뷰 이미지들
+
+        //상품 detail에 리뷰 뿌리기
+        List<ReviewDTO> reviewDTO = pdReviewService.getReviewByPd_seq(pd_seq);  //리뷰 가져옴
+        List<Map<String,Object>> reviewInfoList = pdReviewService.reviewInfoList(reviewDTO,pd_seq);
         model.addAttribute("productDTO", productDTO);
         model.addAttribute("optionDTO", optionDTO);
         model.addAttribute("category", category);
         model.addAttribute("optionList", optionList);
+        model.addAttribute("starAvg", starAvg);
+        model.addAttribute("reviewCnt", reviewCnt);
+        model.addAttribute("reviewInfoList", reviewInfoList);
+        model.addAttribute("dashBoardImgs", dashBoardImgs);
         return "/product/detail";
     }
 
@@ -867,7 +876,7 @@ public class ProductController {
     @RequestMapping("/history")  //구매내역 최신순부터
     public String history(String id, Model model, Integer cpage) throws Exception {
         if (cpage == null) cpage = 1;
-        Map<String, Object> paging = productService.paging(cpage);
+        Map<String, Object> paging = productService.historyPaging(cpage,id);
         Integer naviPerPage = 10;
         Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage);
         Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
@@ -894,7 +903,7 @@ public class ProductController {
 
         Map<String, Object> reMap = new HashMap<>();
         List<Map<String, Object>> payInfoDTOS = productService.getHistory(id, start, end);
-        Map<String, Object> paging = productService.paging(cpage);
+        Map<String, Object> paging = productService.historyPaging(cpage,id);
         reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
         reMap.put("endNavi", Integer.parseInt(paging.get("endNavi").toString()));
         reMap.put("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));

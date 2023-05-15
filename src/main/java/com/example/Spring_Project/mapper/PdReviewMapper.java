@@ -17,6 +17,7 @@ import java.util.Map;
 
     ReviewDTO reviewInfo(@Param("payPd_seq") Integer payPd_seq);
     ReviewDTO reviewDetail(@Param("review_seq") Integer review_seq);
+
     @Select("SELECT count(*) FROM img WHERE review_seq = #{review_seq}")
     Integer checkImgExist(@Param("review_seq") Integer review_seq);
     List<ImgDTO> getReviewImg(@Param("review_seq") Integer review_seq);
@@ -24,4 +25,17 @@ import java.util.Map;
     void deleteReview(@Param("review_seq") Integer review_seq);
     void updReviewDetail(Map<String,Object>param);
     void deleteImg(List<Integer>deleteSeq);
+    @Select("select round(avg(star)) from review where pd_seq = #{pd_seq}")
+    Double starAvg(@Param("pd_seq") Integer pd_seq);
+    @Select("select count(*) from review where pd_seq = #{pd_seq}")
+    Integer reviewCnt(@Param("pd_seq") Integer pd_seq);
+
+    List<ReviewDTO> getReviewByPd_seq(@Param("pd_seq") Integer pd_seq);
+
+    @Select("select count(*) from img where review_seq = #{review_seq}")
+    Integer isImgExist(@Param("review_seq") Integer review_seq);
+
+    Map<String,Object> reviewInPdDetail(@Param("pd_seq") Integer pd_seq, @Param("payPd_seq") Integer payPd_seq);
+    List<String> reviewImgsByPd_seq(@Param("pd_seq") Integer pd_seq);
+    String optionCategory(@Param("pd_seq") Integer pd_seq, @Param("optName") String optName);
 }
