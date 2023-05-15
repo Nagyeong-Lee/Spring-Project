@@ -1,10 +1,7 @@
 package com.example.Spring_Project.controller;
 
 import com.example.Spring_Project.dto.*;
-import com.example.Spring_Project.service.MemberService;
-import com.example.Spring_Project.service.PayService;
-import com.example.Spring_Project.service.PdReviewService;
-import com.example.Spring_Project.service.ProductService;
+import com.example.Spring_Project.service.*;
 import com.google.gson.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,6 +34,9 @@ public class ProductController {
     @Autowired
     private PdReviewService pdReviewService;
 
+    @Autowired
+    private QnAService qnAService;
+
     @RequestMapping("/list") //전체 상품 리스트
     public String productList(Model model, Integer cpage) throws Exception {
         if (cpage == null) cpage = 1;
@@ -65,6 +65,12 @@ public class ProductController {
         Integer reviewCnt = pdReviewService.reviewCnt(pd_seq);//상품 리뷰 수
         List<String> dashBoardImgs = pdReviewService.reviewImgsByPd_seq(pd_seq); //리뷰 이미지들
 
+
+        //Q&A 뿌리기
+        List<QuestionDTO> questionDTOS = qnAService.getQuestions(pd_seq); // 질문들 가져오기
+        List<Map<String,Object>> qNaList  = qnAService.getQNaList(questionDTOS);  //{질문 , 답변}
+
+
         //상품 detail에 리뷰 뿌리기
         List<ReviewDTO> reviewDTO = pdReviewService.getReviewByPd_seq(pd_seq);  //리뷰 가져옴
         List<Map<String,Object>> reviewInfoList = pdReviewService.reviewInfoList(reviewDTO,pd_seq);
@@ -76,6 +82,7 @@ public class ProductController {
         model.addAttribute("reviewCnt", reviewCnt);
         model.addAttribute("reviewInfoList", reviewInfoList);
         model.addAttribute("dashBoardImgs", dashBoardImgs);
+        model.addAttribute("qNaList", qNaList);
         return "/product/detail";
     }
 

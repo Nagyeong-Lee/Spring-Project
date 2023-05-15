@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <html>
 <head>
     <title>리뷰 작성</title>
@@ -51,14 +52,14 @@
             console.log("fileArr : " + fileArr);
             fileArr = imgArr;
             console.log("fileArr : " + fileArr);
-            create_html();
+            create_html(); //다시 그림
         }
 
         function create_html() {
             let inputFile = $('input[name="file"]');
             let files = inputFile[0].files;
             let str = '';
-            $(".fileDiv").empty();
+            $(".fileDiv").empty(); //fileDiv 내부 지움
             for (let k = 0; k < fileArr.length; k++) {
                 str += '<div id=' + k + '>' + fileArr[k].name + '<button type="button" onclick="delFile(' + k + ')">x</button>' + '</div>';
             }
@@ -66,6 +67,7 @@
         }
 
         $(function () {
+
             $('.summernote').summernote({
                 minHeight: 500,             // 최소 높이
                 maxHeight: null,             // 최대 높이
@@ -130,7 +132,6 @@
                 fileArr = imgArr;  //복사
                 $('input[name="file"]').val("");  //input 초기화
             });
-
 
             //리뷰 작성
             $("#writeBtn").click(function () {

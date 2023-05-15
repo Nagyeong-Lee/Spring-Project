@@ -1,0 +1,54 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.Spring_Project.mapper.QnAMapper">
+
+    <insert id="insertQuestion" parameterType="hashMap">
+        insert
+        into
+        question
+        values(
+        q_seq.nextval,
+        #{id},
+        #{pd_seq},
+        #{content},
+        'Y',
+        sysdate,
+        'N'
+        )
+    </insert>
+
+    <select id="getQuestions" resultType="com.example.Spring_Project.dto.QuestionDTO">
+        select
+            q_seq,
+            id,
+            pd_seq,
+            content,
+            status,
+            to_char(writeDate,'YYYY-MM-DD HH:MI') AS writeDate,
+        from
+        question
+        where status = 'Y' and pd_seq = #{pd_seq}
+    </select>
+
+    <select id="getAnswer" resultType="com.example.Spring_Project.dto.AnswerDTO">
+        select
+            writer,
+            answer,
+            to_char(writeDate,'YYYY-MM-DD HH:MI') AS writeDate
+        from answer
+        where status = 'Y' and ansYN = 'Y'
+    </select>
+
+    <select id="getMyQnAs" resultType="com.example.Spring_Project.dto.QuestionDTO">
+        select
+            q_seq,
+            id,
+            pd_seq,
+            content,
+            status,
+            to_char(writeDate,'YYYY-MM-DD HH:MI') AS writeDate,
+        from question
+        where status = 'Y'
+    </select>
+</mapper>

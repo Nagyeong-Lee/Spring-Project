@@ -27,7 +27,8 @@
             margin-top: 50px;
             text-align: center;
         }
-        input{
+
+        input {
             white-space: pre-line;
         }
     </style>
@@ -35,8 +36,10 @@
 <body>
 <input type="hidden" value="${id}" id="id" name="id">
 <div class="popup">
-    <form action="/QnA/" method="post" id="frm">
-        <textarea style="width: 500px; height: 300px;"></textarea>
+    <form action="/QnA/insert" method="post" id="frm">
+        <input type="hidden" value="${param.id}" name="session" id="session">
+        <input type="hidden" value="${param.pd_seq}" id="pd_seq" name="pd_seq">
+        <textarea style="width: 500px; height: 300px;" id="content"></textarea>
         <div class="btns" style="margin-top: 20px;">
             <button type="button" id="writeBtn" class="btn btn-light">작성</button>
             <button type="button" id="cancleBtn" class="btn btn-light">취소</button>
@@ -44,76 +47,33 @@
     </form>
 </div>
 <script>
-
-    //저장 클릭 시
-    $("#sbn").on("click", function () {
-
-        let regexName = /^[가-힣]{2,5}$/;
-        let regexPhone = /^010\d{4}\d{4}$/;
-
-        let name = $("#name").val();
-        let phone = $("#phone").val();
-        let address = $("#address").val();
-        let nickname = $("#nickname").val();
-        let flag = $("#default").is(':checked');  //기본 주소 체크 여부
-        let id = $("#id").val();
-        if (flag == true) {
-            $("#default").val(1);
-        } else {
-            $("#default").val(0);
+    //작성 클릭
+    $("#writeBtn").click(function () {
+        let id = $("#session").val();
+        let pd_seq = $("#pd_seq").val();
+        let content = $("#content").val();
+        if (content.length === 0) {
+            alert('질문을 작성해주세요.');
+            return;
         }
-        if (name == '') {
-            alert("이름을 입력해주세요.");
-            return false;
-        }
-
-        if (regexName.test(name) == false) {
-            alert("이름 형식이 맞지 않습니다.");
-            return false;
-        }
-
-        if (phone == '') {
-            alert("전화번호를 입력해주세요.");
-            return false;
-        }
-
-        //전화번호 유효성
-        if (regexPhone.test(phone) == false) {
-            alert("전화번호 형식이 맞지 않습니다.");
-            return false;
-        }
-
-        if (address == '') {
-            alert("주소를 입력해주세요.");
-            return false;
-        }
-
-        if (nickname == '') {
-            alert("별칭을 입력해주세요.");
-            return false;
-        }
-
         $.ajax({
-            url: '/product/addDelivery',
+            url: '/QnA/insert',
             type: 'post',
             data: {
-                "name": name,
-                "phone": phone,
-                "address": address,
-                "nickname": nickname,
-                "def": flag,
-                "id": id
+                "id": id,
+                "pd_seq": pd_seq,
+                "content": content
             },
             success: function (data) {
-                if (data == 'success') {
-                    window.close();
-                    opener.parent.location.reload();
+                if (data === 'success') {
+                    window.opener.close;
+                    location.reload();
                 }
             }
         })
-
     })
 
+    //취소
     $("#cancleBtn").click(function () {
         window.close();
     })

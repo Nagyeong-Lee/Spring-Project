@@ -103,7 +103,6 @@
                             </c:when>
                             <c:otherwise>
                                 <option value="${k.name}">${k.name}(${k.stock})</option>
-                                <%--                ${i.value.get(0).name}--%>
                             </c:otherwise>
                         </c:choose>
                     </c:forEach>
@@ -144,13 +143,7 @@
         <div> 리뷰수 ${reviewCnt}개</div>
         </c:if>
     </div>
-    <%--    <div class="dashBoardImgs">--%>
-    <%--        <c:if test="${!empty dashBoardImgs}">--%>
-    <%--            <c:forEach var="i" items="${dashBoardImgs}">--%>
-    <%--                <img src="/resources/img/products/pdReview/${i}" class="reviewImg">--%>
-    <%--            </c:forEach>--%>
-    <%--        </c:if>--%>
-    <%--    </div>--%>
+
     <div class="dashBoardImgs">
         <c:if test="${!empty dashBoardImgs}">
             <c:forEach var="i" items="${dashBoardImgs}" varStatus="status">
@@ -208,12 +201,48 @@
 
 <div class="QnADiv">
     <h4>Q&A</h4>
+    구매하시려는 상품에 대해 궁금하신 점이 있으신 경우 문의해주세요.
     <form action="/QnA" method="post" id="qnaFrm" name="qnaFrm">
         <input type="hidden" value="${id}" id="loginID" name="loginI">
         <input type="hidden" value="${productDTO.pd_seq}" id="pdSeq" name="pdSeq">
-        <button class="btn btn-light writeQnABtn" onclick="popup()">상품Q&A 작성하기</button>
-        <button class="btn btn-light myQnA">나의Q&A 조회</button>
+        <button class="btn btn-light writeQnABtn" onclick="popup()">상품 Q&A 작성하기</button>
+        <button class="btn btn-light myQnA">나의 Q&A 조회</button>
     </form>
+
+    <table id="QnATable">
+        <thead>
+        <th>답변 상태</th>
+        <th>제목</th>
+        <th>작성자</th>
+        <th>작성일</th>
+        </thead>
+        <tbody id="tbody">
+        <tr>
+            <c:choose>
+                <c:when test="${!empty qNaList}">
+                    <c:forEach var="i" items="${qNaList}">
+                        <c:choose>
+                            <c:when test="${!empty i.answerYN && i.answerYN == 'N'}">
+                                <td>미답변</td>
+                            </c:when>
+                            <c:otherwise>
+                                <td>답변 완료</td>
+                            </c:otherwise>
+                        </c:choose>
+                        <td class="question">
+                            <a href="#" onclick="openAnswer(${i})">${i.dto.content}</a>
+                        </td>
+                        <td>${i.dto.id}</td>
+                        <td>${i.dto.writeDate}</td>
+                    </c:forEach>
+                </c:when>
+                <c:otherwise>
+                    <td colspan="4">Q&A가 없습니다.</td>
+                </c:otherwise>
+            </c:choose>
+        </tr>
+        </tbody>
+    </table>
 </div>
 
 <form id="frm" method="post" action="/product/cart">
@@ -224,7 +253,6 @@
 <footer class="py-5 bg-dark" id="footer">
     <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
 </footer>
-
 
 <!-- Bootstrap core JS-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -492,11 +520,62 @@
     function popup() {
         var option = 'width=500, height=500, left=800, top=250';
         window.open("/QnA", "qnaFrm", option);
-        var myForm = document.qnaFrm;
+        // var myForm = document.qnaFrm;
+        var myForm = $("#qnaFrm")[0];
         myForm.method = "post";
         myForm.target = "qnaFrm";
         myForm.submit();
     }
+
+    function newHtml(){
+        $("this").closest("tr").remove();
+        var html = '<tr>';
+        if (qNaList.answerYN != null && qNaList.answerYN == 'N') {
+            html += '<td>미답변</td>';
+        } else {
+            html += '<td>답변 완료</td>';
+        }
+        html += '<td class="question"><a href="#" onclick="removeHtml(' + qNaList + ')">' + qNaList.dto.content + '</a>';
+        html += '<td>' + qNaList.dto.id + '</td>';
+        html += '<td>' + qNaList.dto.writeDate + '</td></tr>';
+        html += '<tr><td></td><td>'+qNaList.content+'</td><td></td><td></td></tr>';
+        return html;
+    }
+
+    function removeHtml(qNaList) {
+        console.log(qNaList);
+        var html = newHtml(qNaList);
+        $("#tbody").append(html);
+    }
+
+    //질문 클릭 시 -> 질문,답변(있으면) append
+    function openAnswer(qNaList) {
+        console.log(qNaList);
+        var html = newHtml(qNaList);
+        if (qNaList.answerDTO != null) { //답변 여부 체크
+            html += '<tr><td></td>';
+            html += '답변 | <td>'+qNaList.answerDTO.answer+'</td>';
+            html += '<td>'+qNaList.answerDTO.writer+'</td>';
+            html += '<td>'+qNaList.answerDTO.writeDate+'</td>';
+        }
+        $("#tbody").append(html);
+    }
+
+
+    //나의 Q&A 조회
+    $(".myQnA").click(function(){
+        let newForm = document.createElement("form");
+        newForm.setAttribute("action","/QnA");
+        newForm.setAttribute("method","post");
+
+        let input = document.createElement("input");
+        input.setAttribute("name","id");
+        input.setAttribute("value",$("#id").val());
+
+        newForm.append(input);
+        document.body.append(newForm);
+        newForm.submit();
+    })
 </script>
 </body>
 </html>
