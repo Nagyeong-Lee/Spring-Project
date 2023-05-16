@@ -195,4 +195,67 @@
         FROM OPTIONS
         WHERE pd_seq = #{pd_seq} AND name = #{optName}
     </select>
+
+    <select id="getReviews" resultType="map">
+        SELECT
+            j.review_seq,
+            j.id,
+            j.payPd_seq,
+            j.pd_seq,
+            j.writeDate AS writeDate,
+            j.status AS review_status,
+            j.star,
+            j.content,
+            j.OPTIONS,
+            j.stock,
+            j.price,
+            img_seq,
+            oriname,
+            sysname,
+            i.status AS img_status
+        FROM img i JOIN
+            (SELECT
+                review_seq,
+                a.id,
+                a.payPd_seq,
+                a.pd_seq,
+                a.writeDate AS writeDate,
+                a.status,
+                a.star,
+                a.content,
+                a.OPTIONS,
+                s.stock,
+                s.price
+            FROM sales s JOIN
+            (SELECT
+                review_seq,
+                id,
+                r.payPd_seq,
+                r.pd_seq,
+                to_char(r.writeDate,'YYYY-MM-DD HH:MI') AS writeDate,
+                r.status,
+                r.star,
+                r.content,
+                p.OPTIONS
+            FROM review r JOIN payProduct p
+            ON r.PAYPD_SEQ = p.PAYPD_SEQ
+            WHERE r.status = 'Y') a
+            ON a.payPd_seq = s.payPd_seq) J
+            ON i.review_seq = j.review_seq
+            WHERE i.STATUS = 'Y'
+    </select>
+
+    <select id="pdInfo" resultType="com.example.Spring_Project.dto.ProductDTO">
+        select
+            pd_seq,
+            name,
+            description,
+            price,
+            stock,
+            status,
+            img,
+            category
+        from product
+        where pd_seq = #{pd_seq}
+    </select>
 </mapper>

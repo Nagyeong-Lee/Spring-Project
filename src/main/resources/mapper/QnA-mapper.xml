@@ -25,10 +25,11 @@
             pd_seq,
             content,
             status,
-            to_char(writeDate,'YYYY-MM-DD HH:MI') AS writeDate,
+        to_char(writeDate,'YYYY-MM-DD HH:MI') AS writeDate
         from
         question
         where status = 'Y' and pd_seq = #{pd_seq}
+        order by writeDate desc
     </select>
 
     <select id="getAnswer" resultType="com.example.Spring_Project.dto.AnswerDTO">
@@ -37,7 +38,7 @@
             answer,
             to_char(writeDate,'YYYY-MM-DD HH:MI') AS writeDate
         from answer
-        where status = 'Y' and ansYN = 'Y'
+        where q_seq = #{q_seq}
     </select>
 
     <select id="getMyQnAs" resultType="com.example.Spring_Project.dto.QuestionDTO">
@@ -47,8 +48,57 @@
             pd_seq,
             content,
             status,
-            to_char(writeDate,'YYYY-MM-DD HH:MI') AS writeDate,
+            to_char(writeDate,'YYYY-MM-DD HH:MI') AS writeDate
         from question
         where status = 'Y'
     </select>
+
+    <select id="getQuestion" resultType="com.example.Spring_Project.dto.QuestionDTO">
+        select
+          q_seq,
+          pd_seq,
+          content,
+          writeDate
+        from question
+        where q_seq = #{q_seq}
+    </select>
+
+    <update id="updQuestion" parameterType="hashMap">
+        update question
+            set content = #{content}
+        where q_seq = #{q_seq}
+    </update>
+
+    <select id="qNaList" resultType="com.example.Spring_Project.dto.QuestionDTO">
+        select
+            q_seq,
+            id,
+            pd_seq,
+            content,
+            status,
+        to_char(writeDate,'YYYY-MM-DD HH:MI') AS writeDate
+        from question
+        where status = 'Y'
+    </select>
+
+    <insert id="insertAns" parameterType="hashMap">
+        insert
+         into answer
+        values(
+            ans_seq.nextval,
+            #{q_seq},
+            #{id},
+            #{answer},
+            sysdate,
+            'Y',
+            'Y'
+        )
+    </insert>
+
+    <update id="updAns" parameterType="HashMap">
+        update
+         answer
+        set answer = #{content}
+        where q_seq = #{q_seq}
+    </update>
 </mapper>

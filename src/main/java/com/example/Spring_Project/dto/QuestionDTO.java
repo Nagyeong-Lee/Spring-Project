@@ -11,6 +11,6 @@ public class QuestionDTO {
     private Integer pd_seq;
     private String content;
     private String status;
-    private Timestamp writeDate;
+    private String writeDate;
     private String ansYN; //답변 여부
 }

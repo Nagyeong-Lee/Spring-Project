@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
@@ -53,6 +50,12 @@ public class AdminController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private QnAService qnAService;
+
+    @Autowired
+    private PdReviewService pdReviewService;
 
     @RequestMapping("/main")  //회원 리스트 출력
     public String toAdminMain(Model model) throws Exception {
@@ -333,6 +336,22 @@ public class AdminController {
         model.addAttribute("courierDTOS", courierDTOS);
         model.addAttribute("sales_seq", sales_seq);
         return "/admin/deliPopup";
+    }
+
+    @GetMapping("/qNa") //관리자 -> Q&A 조회
+    public String toQnAList(Model model) throws Exception{
+        List<QuestionDTO> questionDTOS = qnAService.qNaList();
+        List<Map<String, Object>> qNaList = qnAService.getQnAList(questionDTOS);
+        model.addAttribute("qNaList",qNaList);
+        return "/admin/qNaList";
+    }
+
+    @GetMapping("/reviews")
+    public String getPdReviews(Model model) throws Exception{
+       List<Map<String,Object>> reviewDTOS = pdReviewService.getReviews();
+       List<Map<String,Object>> reviewList = pdReviewService.reviewList(reviewDTOS);
+       model.addAttribute("reviewList",reviewList);
+       return "/admin/pdReviews";
     }
 }
 

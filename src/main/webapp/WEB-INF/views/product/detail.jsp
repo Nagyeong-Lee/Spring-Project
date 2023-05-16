@@ -68,6 +68,10 @@
         .reviewImg:hover {
             transform: scale(1.5, 1.5); /* 가로2배 새로 1.5배 로 커짐 */
         }
+
+        #QnATable {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -150,7 +154,7 @@
                 <c:if test="${status.count <= 10}">
                     <img src="/resources/img/products/pdReview/${i}" class="reviewImg">
                 </c:if>
-                <c:if test="${status.index > 10}">
+                <c:if test="${status.count > 10}">
                     &nbsp&nbsp ...
                 </c:if>
             </c:forEach>
@@ -201,15 +205,14 @@
 
 <div class="QnADiv">
     <h4>Q&A</h4>
-    구매하시려는 상품에 대해 궁금하신 점이 있으신 경우 문의해주세요.
-    <form action="/QnA" method="post" id="qnaFrm" name="qnaFrm">
-        <input type="hidden" value="${id}" id="loginID" name="loginI">
+    <form action="/QnA/popup" method="post" id="qnaFrm" name="qnaFrm">
+        <input type="hidden" value="${id}" id="loginID" name="loginID">
         <input type="hidden" value="${productDTO.pd_seq}" id="pdSeq" name="pdSeq">
-        <button class="btn btn-light writeQnABtn" onclick="popup()">상품 Q&A 작성하기</button>
-        <button class="btn btn-light myQnA">나의 Q&A 조회</button>
+        <button class="btn btn-light writeQnABtn" onclick="popup()" type="button">상품 Q&A 작성하기</button>
+        <button class="btn btn-light myQnA" type="button">나의 Q&A 조회</button>
     </form>
 
-    <table id="QnATable">
+    <table id="QnATable" class="table table-striped">
         <thead>
         <th>답변 상태</th>
         <th>제목</th>
@@ -217,10 +220,10 @@
         <th>작성일</th>
         </thead>
         <tbody id="tbody">
-        <tr>
-            <c:choose>
-                <c:when test="${!empty qNaList}">
-                    <c:forEach var="i" items="${qNaList}">
+        <c:choose>
+            <c:when test="${!empty qNaList}">
+                <c:forEach var="i" varStatus="status" items="${qNaList}">
+                    <tr class="table-active">
                         <c:choose>
                             <c:when test="${!empty i.answerYN && i.answerYN == 'N'}">
                                 <td>미답변</td>
@@ -230,17 +233,33 @@
                             </c:otherwise>
                         </c:choose>
                         <td class="question">
-                            <a href="#" onclick="openAnswer(${i})">${i.dto.content}</a>
+                            <a href="javascript:void(0);" onclick="openAnswer('${status.index}')">${i.questionDTO.content}</a>
                         </td>
-                        <td>${i.dto.id}</td>
-                        <td>${i.dto.writeDate}</td>
-                    </c:forEach>
-                </c:when>
-                <c:otherwise>
-                    <td colspan="4">Q&A가 없습니다.</td>
-                </c:otherwise>
-            </c:choose>
-        </tr>
+                        <td>${i.questionDTO.id}</td>
+                        <td>${i.questionDTO.writeDate}</td>
+                    </tr>
+                    <tr class="content_${status.index} content_tr" style="display: none;" >
+                        <td></td>
+                        <td>${i.questionDTO.content}</td>
+                        <td>${i.questionDTO.id}</td>
+                        <td>${i.questionDTO.writeDate}</td>
+                    </tr>
+                    <c:if test="${i.answerYN == 'Y'}">
+                        <tr class="content_${status.index} content_tr" style="display: none;">
+                            <td></td>
+                            <td>${i.answerDTO.answer}</td>
+                            <td>${i.answerDTO.writer}</td>
+                            <td>${i.answerDTO.writeDate}</td>
+                        </tr>
+                    </c:if>
+                </c:forEach>
+            </c:when>
+            <c:otherwise>
+                <tr class="table-active">
+                    <td colspan="4" class="table-active" style="text-align: center">Q&A가 없습니다.</td>
+                </tr>
+            </c:otherwise>
+        </c:choose>
         </tbody>
     </table>
 </div>
@@ -258,6 +277,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Core theme JS-->
 <script src="/resources/asset/js/scripts.js"></script>
+<script src="/resources/asset/js/shopUtil.js"></script>
 <script>
     $("#keyword").val($("#key").val());
     $("#search").on("click", function () {
@@ -519,7 +539,7 @@
     //QnA 작성 클릭 id,pd_seq
     function popup() {
         var option = 'width=500, height=500, left=800, top=250';
-        window.open("/QnA", "qnaFrm", option);
+        window.open("/QnA/popup", "qnaFrm", option);
         // var myForm = document.qnaFrm;
         var myForm = $("#qnaFrm")[0];
         myForm.method = "post";
@@ -527,52 +547,25 @@
         myForm.submit();
     }
 
-    function newHtml(){
-        $("this").closest("tr").remove();
-        var html = '<tr>';
-        if (qNaList.answerYN != null && qNaList.answerYN == 'N') {
-            html += '<td>미답변</td>';
-        } else {
-            html += '<td>답변 완료</td>';
-        }
-        html += '<td class="question"><a href="#" onclick="removeHtml(' + qNaList + ')">' + qNaList.dto.content + '</a>';
-        html += '<td>' + qNaList.dto.id + '</td>';
-        html += '<td>' + qNaList.dto.writeDate + '</td></tr>';
-        html += '<tr><td></td><td>'+qNaList.content+'</td><td></td><td></td></tr>';
-        return html;
+    function openAnswer(index) {
+        console.log(index);
+        $('.content_tr').css('display' , 'none'); //다 없애고 해당 tr만 보여줌
+        $('.content_'+index).css('display' , 'table-row');
+
     }
 
-    function removeHtml(qNaList) {
-        console.log(qNaList);
-        var html = newHtml(qNaList);
-        $("#tbody").append(html);
-    }
-
-    //질문 클릭 시 -> 질문,답변(있으면) append
-    function openAnswer(qNaList) {
-        console.log(qNaList);
-        var html = newHtml(qNaList);
-        if (qNaList.answerDTO != null) { //답변 여부 체크
-            html += '<tr><td></td>';
-            html += '답변 | <td>'+qNaList.answerDTO.answer+'</td>';
-            html += '<td>'+qNaList.answerDTO.writer+'</td>';
-            html += '<td>'+qNaList.answerDTO.writeDate+'</td>';
-        }
-        $("#tbody").append(html);
-    }
-
-
-    //나의 Q&A 조회
-    $(".myQnA").click(function(){
+    $(".myQnA").click(function () {
+        let id = $("#loginID").val();
         let newForm = document.createElement("form");
-        newForm.setAttribute("action","/QnA");
-        newForm.setAttribute("method","post");
+        newForm.setAttribute("action", "/QnA");
+        newForm.setAttribute("method", "post");
 
         let input = document.createElement("input");
-        input.setAttribute("name","id");
-        input.setAttribute("value",$("#id").val());
+        input.setAttribute("name", "id");
+        input.setAttribute("type", "hidden");
+        input.setAttribute("value", id);
 
-        newForm.append(input);
+        newForm.appendChild(input);
         document.body.append(newForm);
         newForm.submit();
     })

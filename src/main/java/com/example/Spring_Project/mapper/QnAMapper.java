@@ -34,5 +34,10 @@ public interface QnAMapper {
     @Update("update answer set status = 'N' where q_seq = #{q_seq}")
     void deleteAnswer(@Param("q_seq") Integer q_seq);
 
+    QuestionDTO getQuestion(@Param("q_seq") Integer q_seq);
+    void updQuestion(Map<String, Object> param);
+    List<QuestionDTO> qNaList();
+    void insertAns(Map<String,Object> param);
+    void updAns(Map<String,Object> param);
 
 }

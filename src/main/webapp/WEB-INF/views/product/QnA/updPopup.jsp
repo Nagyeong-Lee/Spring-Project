@@ -1,15 +1,15 @@
 <%--
   Created by IntelliJ IDEA.
   User: weaver-gram-0020
-  Date: 2023-05-04
-  Time: 오전 9:54
+  Date: 2023-05-16
+  Time: 오후 1:04
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
-    <title>Q&A 작성</title>
+    <title>Q&A 수정</title>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
@@ -32,31 +32,31 @@
             white-space: pre-line;
         }
 
-        h5{
+        h5 {
             margin-top: 30px;
             text-align: center;
         }
     </style>
 </head>
 <body>
-<input type="hidden" value="${id}" id="id" name="id">
-<h5>Q&A 작성</h5>
+<h5>Q&A 수정</h5>
 <div class="popup">
     <form action="/QnA/insert" method="post" id="frm">
-        <input type="hidden" value="${param.loginID}" name="session" id="session">
-        <input type="hidden" value="${param.pdSeq}" id="pd_seq" name="pd_seq">
-        <textarea style="width: 500px; height: 300px;" id="content"></textarea>
+        <input type="hidden" value="${id}" id="id" name="id">
+        <input type="hidden" value="${questionDTO.q_seq}" id="q_seq" name="q_seq">
+        <input type="hidden" value="${questionDTO.pd_seq}" id="pd_seq" name="pd_seq">
+        <textarea style="width: 500px; height: 300px;" id="content">${questionDTO.content}</textarea>
         <div class="btns" style="margin-top: 20px;">
-            <button type="button" id="writeBtn" class="btn btn-light">작성</button>
+            <button type="button" id="updBtn" class="btn btn-light">수정</button>
             <button type="button" id="cancleBtn" class="btn btn-light">취소</button>
         </div>
     </form>
 </div>
 <script>
     //작성 클릭
-    $("#writeBtn").click(function () {
+    $("#updBtn").click(function () {
         let id = $("#session").val();
-        let pd_seq = $("#pd_seq").val();
+        let q_seq = $("#q_seq").val();
         let content = $("#content").val();
 
 
@@ -66,11 +66,11 @@
         }
 
         $.ajax({
-            url: '/QnA/insert',
+            url: '/QnA/updQuestion',
             type: 'post',
             data: {
-                "id":id,
-                "pd_seq":pd_seq,
+                "id": id,
+                "q_seq": q_seq,
                 "content": content
             },
             success: function (data) {

@@ -1,5 +1,12 @@
 <%--
   Created by IntelliJ IDEA.
+  User: weaver-gram-0020
+  Date: 2023-05-16
+  Time: 오후 1:47
+  To change this template use File | Settings | File Templates.
+--%>
+<%--
+  Created by IntelliJ IDEA.
   User: 이나경
   Date: 2023-05-16
   Time: 오전 12:59
@@ -10,7 +17,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
-    <title>나의 Q&A 조회</title>
+    <title>Q&A 조회</title>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
@@ -56,7 +63,7 @@
 </head>
 <body>
 <input type="hidden" id="id" name="id" value="${id}">
-<%@ include file="/WEB-INF/views/product/shopUtil.jsp" %>
+<%@ include file="/WEB-INF/views/admin/adminNavUtil.jsp" %>
 <div class="cart">
     <table class="cart__list">
         <thead>
@@ -92,8 +99,15 @@
                         <td>${i.questionDTO.writeDate}</td>
                         <input type="hidden" value="${i.questionDTO.q_seq}" class="q_seq">
                         <td>
-                            <button type="button" class="updQuestion btn btn-light">수정</button>
-                            <button type="button" class="delQuestion btn btn-light">삭제</button>
+                            <c:choose>
+                                <c:when test="${i.answerYN != 'N'}">
+                                    <button type="button" class="updAnsBtn btn btn-light">답변 수정</button>
+                                </c:when>
+                                <c:otherwise>
+                                    <button type="button" class="ansWriteBtn btn btn-light">답변 작성</button>
+                                </c:otherwise>
+                            </c:choose>
+                            <button type="button" class="delQBtn btn btn-light">삭제</button>
                         </td>
                     </tr>
                     <tr class="answer_${status.index} answer" style="display:none;">
@@ -122,28 +136,52 @@
                 </tr>
             </c:otherwise>
         </c:choose>
-        </tr>
         </tbody>
     </table>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/resources/asset/js/scripts.js"></script>
-<script src="/resources/asset/js/shopUtil.js"></script>
 <script>
+
     function showAns(index) {
         $(".answer").css("display","none");
         $(".answer_"+index).css("display","table-row");
     }
-    //수정
-    $(".updQuestion").click(function () {
+    //답변 작성
+    $(".ansWriteBtn").click(function () {
         let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
         let id = $("#id").val();
         var option = 'width=500, height=500, left=800, top=250';
 
         let newFrm = document.createElement("form");
         newFrm.setAttribute("method", "post");
-        newFrm.setAttribute("action", "/QnA/updPopup");
+        newFrm.setAttribute("action", "/QnA/ansPopup");
+
+        let input1 = document.createElement("input");
+        input1.setAttribute("type", "hidden");
+        input1.setAttribute("value", q_seq);
+        input1.setAttribute("name", "q_seq");
+
+        newFrm.append(input1);
+        document.body.append(newFrm);
+
+        window.open("/QnA/ansPopup", "newFrm", option);
+        var myForm = newFrm;
+        myForm.method = "post";
+        myForm.target = "newFrm";
+        myForm.submit();
+    })
+
+    //답변 수정
+    $(".updAnsBtn").click(function(){
+        let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
+        let id = $("#id").val();
+        var option = 'width=500, height=500, left=800, top=250';
+
+        let newFrm = document.createElement("form");
+        newFrm.setAttribute("method", "post");
+        newFrm.setAttribute("action", "/QnA/updAnsPopup");
 
         let input1 = document.createElement("input");
         input1.setAttribute("type", "hidden");
@@ -158,28 +196,26 @@
         newFrm.append(input2);
         document.body.append(newFrm);
 
-        window.open("/QnA/updPopup", "newFrm", option);
+        window.open("/QnA/updAnsPopup", "newFrm", option);
         var myForm = newFrm;
         myForm.method = "post";
         myForm.target = "newFrm";
         myForm.submit();
-    })
-
+    });
     //삭제
-    $(".delQuestion").click(function () {
+    $(".delQBtn").click(function () {
         let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
-        let url = '/QnA/' + q_seq;
         $.ajax({
-            url: url,
-            type: "post",
+            url: '/QnA/' + q_seq,
+            type: 'post',
             data: {
                 "q_seq": q_seq
             },
             success: function (data) {
-                if (data === 'success') location.reload();
+                location.reload();
             }
         })
-    })
+    });
 </script>
 </body>
 </html>

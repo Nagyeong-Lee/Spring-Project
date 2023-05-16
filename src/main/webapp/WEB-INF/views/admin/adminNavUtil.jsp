@@ -24,6 +24,12 @@
       <a href="/member/logout?id=${id}"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="logout">
         로그아웃
       </button></a>
+      <a href="/admin/qNa"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="qNa">
+            Q&A조회
+      </button></a>
+      <a href="/admin/reviews"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="reviews">
+           리뷰 조회
+      </button></a>
     </div>
   </div>
 </nav>

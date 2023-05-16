@@ -1,6 +1,7 @@
 package com.example.Spring_Project.service;
 
 import com.example.Spring_Project.dto.ImgDTO;
+import com.example.Spring_Project.dto.ProductDTO;
 import com.example.Spring_Project.dto.ReviewDTO;
 import com.example.Spring_Project.mapper.PdReviewMapper;
 import com.google.gson.JsonArray;
@@ -134,11 +135,11 @@ public class PdReviewService {
         return pdReviewMapper.reviewImgsByPd_seq(pd_seq);
     }
 
-    public List<Map<String, Object>> reviewInfoList(List<ReviewDTO> reviewDTO,Integer pd_seq) throws Exception {
+    public List<Map<String, Object>> reviewInfoList(List<ReviewDTO> reviewDTO, Integer pd_seq) throws Exception {
         JsonParser jsonParser = new JsonParser();
         JsonObject jsonObject = new JsonObject();
         JsonArray jsonArray = new JsonArray();
-        List<Map<String,Object>> reviewInfoList = new ArrayList<>();
+        List<Map<String, Object>> reviewInfoList = new ArrayList<>();
         List<Map<String, Object>> optionMapList = null;
         for (ReviewDTO dto : reviewDTO) {
             Map<String, Object> map = new HashMap<>();
@@ -165,7 +166,7 @@ public class PdReviewService {
             }
             map.put("reviewInPdDetail", reviewInPdDetail);
             map.put("optionMapList", optionMapList);
-            List<String>imgSysname = null;
+            List<String> imgSysname = null;
             //review img
             if (isImgExist != 0) { //img 있으면 map put
                 List<ImgDTO> imgDTOList = getReviewImg(review_seq);
@@ -174,7 +175,7 @@ public class PdReviewService {
                     imgSysname.add(imgDTO.getSysname());
                 }
             }
-            map.put("imgSysname",imgSysname);
+            map.put("imgSysname", imgSysname);
             reviewInfoList.add(map);
         }
         return reviewInfoList;
@@ -184,5 +185,55 @@ public class PdReviewService {
         return pdReviewMapper.optionCategory(pd_seq, optName);
     }
 
+    public List<Map<String, Object>> getReviews() throws Exception {
+        return pdReviewMapper.getReviews();
+    }
+
+    public ProductDTO pdInfo(Integer pd_seq) throws Exception {
+        return pdReviewMapper.pdInfo(pd_seq);
+    }
+
+    public List<Map<String, Object>> reviewList(List<Map<String, Object>> reviewDTOS) throws Exception {
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = new JsonObject();
+        JsonArray jsonArray = new JsonArray();
+        List<Map<String, Object>> optionMapList = null;
+        List<Map<String, Object>> reviewList = new ArrayList<>();
+        Map<String, Object> option = new HashMap<>();
+        System.out.println("reviewDTOS = " + reviewDTOS);
+        Integer size = reviewDTOS.size();
+        for (int i = 0; i < size; i++) {
+            Map<String, Object> map = new HashMap<>();
+            ProductDTO productDTO = pdInfo(Integer.parseInt(reviewDTOS.get(i).get("PD_SEQ").toString()));
+            map.put("productDTO", productDTO);
+            map.put("reviewDTOS", reviewDTOS.get(i));
+            map.put("totalPrice", Integer.parseInt(reviewDTOS.get(i).get("PRICE").toString()) * Integer.parseInt(reviewDTOS.get(i).get("STOCK").toString()));
+            //옵션 있으면
+            if (reviewDTOS.get(i).get("OPTIONS") != null) {
+                Object object = jsonParser.parse(reviewDTOS.get(i).get("OPTIONS").toString());
+                jsonObject = (JsonObject) object;
+                jsonArray = (JsonArray) jsonObject.get("name");
+                optionMapList = new ArrayList<>();
+                Map<String, Object> optionMap = null;
+                System.out.println("jsonArray = " + jsonArray);
+                System.out.println("jsonArray = " + jsonArray.size());
+                for (int k = 0; k < jsonArray.size(); k++) {
+                    optionMap = new HashMap<>();
+                    //size = s
+                    String optName = jsonArray.get(k).toString().replace("\"", "");
+                    System.out.println("optName = " + optName);
+//                    String optCategory = optionCategory(Integer.parseInt(reviewDTOS.get(k).get("PD_SEQ").toString()), optName); //옵션 카테고리 이름 가져오기 (size)
+                    String optCategory = optionCategory(productDTO.getPd_seq(), optName); //옵션 카테고리 이름 가져오기 (size)
+                    System.out.println("optCategory = " + optCategory);
+                    optionMap.put(optCategory, optName);
+                    optionMapList.add(optionMap);
+                    option.put("optionMapList", optionMapList);
+                }
+            }
+            map.put("option",option);
+            reviewList.add(map);
+        }
+        return reviewList;
+    }
 
 }

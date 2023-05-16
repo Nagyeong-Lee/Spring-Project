@@ -68,7 +68,7 @@ public class ProductController {
 
         //Q&A 뿌리기
         List<QuestionDTO> questionDTOS = qnAService.getQuestions(pd_seq); // 질문들 가져오기
-        List<Map<String,Object>> qNaList  = qnAService.getQNaList(questionDTOS);  //{질문 , 답변}
+        List<Map<String,Object>> qNaList  = qnAService.getQnAList(questionDTOS);  //{질문 , 답변}
 
 
         //상품 detail에 리뷰 뿌리기
