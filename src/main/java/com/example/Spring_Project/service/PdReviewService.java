@@ -239,4 +239,8 @@ public class PdReviewService {
         return reviewList;
     }
 
+    public List<Map<String,Object>> getReviewsByOption(Map<String,Object> data) throws Exception{
+        return pdReviewMapper.getReviewsByOption(data);
+    }
+
 }

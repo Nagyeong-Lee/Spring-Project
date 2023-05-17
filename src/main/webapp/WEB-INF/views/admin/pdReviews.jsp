@@ -196,42 +196,6 @@
             </tr>
         </c:otherwise>
     </c:choose>
-    <%--    <c:choose>--%>
-    <%--        <c:when test="${!empty reviewList}">--%>
-    <%--            <c:forEach var="i" items="${reviewList}">--%>
-    <%--                <tr>--%>
-    <%--                    <td>--%>
-    <%--                        <a href="/product/detail?pd_seq=${i.productDTO.pd_seq}">--%>
-    <%--                            <img src="/resources/img/products/${i.productDTO.img}"--%>
-    <%--                                 style="width: 100px; height: 100px;">--%>
-    <%--                        </a>--%>
-    <%--                    </td>--%>
-    <%--                    <td>--%>
-    <%--                        <p>${i.productDTO.name}</p>--%>
-    <%--                        ${i.option}--%>
-    <%--                        <c:if test="${!empty i.option}">--%>
-    <%--                            <c:forEach var="k" items="${i.option}">--%>
-    <%--                                ${k}--%>
-    <%--&lt;%&ndash;                                <c:forEach var="j" items="${k.optionMapList}">&ndash;%&gt;--%>
-    <%--&lt;%&ndash;&lt;%&ndash;                                    <p>${j}</p>&ndash;%&gt;&ndash;%&gt;--%>
-    <%--&lt;%&ndash;                                </c:forEach>&ndash;%&gt;--%>
-    <%--                            </c:forEach>--%>
-    <%--                        </c:if>--%>
-    <%--                    </td>--%>
-    <%--                    <td><fmt:formatNumber pattern="#,###" value="${i.totalPrice}"/>원</td>--%>
-    <%--                    <td>${i.reviewDTOS.ID}</td>--%>
-    <%--                    <td>${i.reviewDTOS.WRITEDATE}</td>--%>
-    <%--                    <td>--%>
-    <%--                        <button type="button" class="delReviewBtn btn btn-light">삭제</button>--%>
-    <%--                    </td>--%>
-    <%--                </tr>--%>
-    <%--&lt;%&ndash;                <hr>&ndash;%&gt;--%>
-    <%--            </c:forEach>--%>
-    <%--        </c:when>--%>
-    <%--        <c:otherwise>--%>
-
-    <%--        </c:otherwise>--%>
-    <%--    </c:choose>--%>
     </tbody>
 </table>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -270,6 +234,17 @@
     //select box change
     $("select[name='type']").on("change", function () {
         let data = chgOptions();
+        $.ajax({
+            url:'/admin/reviewsByOption',
+            type:'post',
+            data:data,
+            success:function(data){
+                console.log(data);
+                //뿌리기
+                $("#tbody").children().remove();
+                var html = '';
+            }
+        })
         console.log(data);
     })
     //상위 카테고리 change

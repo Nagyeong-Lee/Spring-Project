@@ -43,4 +43,6 @@ import java.util.Map;
     List<Map<String,Object>> getReviews(@Param("list")List<Integer>list,@Param("star") Integer star);
     ProductDTO pdInfo(@Param("pd_seq")Integer pd_seq);
 
+    List<Map<String,Object>> getReviewsByOption(Map<String,Object> data);
+
 }

@@ -75,4 +75,6 @@ public class PdReviewController {
         if(deleteSeq != null && deleteSeq.size() !=0)pdReviewService.deleteImg(deleteSeq); //파일 삭제
         return "success";
     }
+
+
 }

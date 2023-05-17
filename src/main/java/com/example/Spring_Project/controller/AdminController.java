@@ -383,6 +383,22 @@ public class AdminController {
         adminService.delReview(r_seq);
         return "success";
     }
+
+    @ResponseBody
+    @PostMapping("/reviewsByOption") //관리자 리뷰 조회 필터링
+    public String reviewsByOption(@RequestParam Map<String,Object> data) throws Exception{
+        System.out.println("data : "+data);
+        System.out.println(data.get("parentCategoryArr"));
+        System.out.println(data.get("childCategoryArr"));
+        //상위,하위카테고리 해당하는 List<p_seq> pseqs
+        //review where pd_seq in (pseqs)
+        //sales랑 join
+        //img랑 join
+        //별점,시간 if문 in으로 조절
+        //keyword 검색
+//        List<Integer> pd_seq = productService.findPdSeqByCtgs(data.get("parentCategoryArr"),data.get("childCategoryArr"));
+        return "success";
+    }
 }
 
 
