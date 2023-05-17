@@ -156,8 +156,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Core theme JS-->
 <script src="/resources/asset/js/scripts.js"></script>
-</body>
-
+<script src="/resources/asset/js/shopUtil.js"></script>
 <script>
 
     //페이징 다시 그려줌

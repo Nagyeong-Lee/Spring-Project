@@ -139,4 +139,10 @@ public interface ProductMapper {
 
     @Select("select count(*) from payInfo where id = #{id}")
     Integer historyCnt(@Param("id") String id);
+    List<String> getParentCategory();
+    List<String> getChildCategory();
+    Integer parentCategorySeq(@Param("parentCtgOption") String parentCtgOption);
+    Integer pdCategorySeq(@Param("seq") Integer parentCategorySeq,@Param("option") String childCtgOption);
+    Map<String,Object> revCategory(@Param("pSeq") Integer parentCategorySeq, @Param("cSeq") Integer pdCategorySeq);
+
 }

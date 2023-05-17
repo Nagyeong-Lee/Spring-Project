@@ -72,6 +72,11 @@
         #QnATable {
             text-align: center;
         }
+
+        .content, .question.qText,.aText{width: 600px;}
+        table{table-layout:fixed;}
+        .question{text-overflow:ellipsis; overflow: hidden; white-space: nowrap;}
+        .qText,.aText{word-break: break-all}
     </style>
 </head>
 <body>
@@ -215,7 +220,7 @@
     <table id="QnATable" class="table table-striped">
         <thead>
         <th>답변 상태</th>
-        <th>제목</th>
+        <th class="content">제목</th>
         <th>작성자</th>
         <th>작성일</th>
         </thead>
@@ -240,14 +245,14 @@
                     </tr>
                     <tr class="content_${status.index} content_tr" style="display: none;" >
                         <td></td>
-                        <td>${i.questionDTO.content}</td>
+                        <td class="qText">${i.questionDTO.content}</td>
                         <td>${i.questionDTO.id}</td>
                         <td>${i.questionDTO.writeDate}</td>
                     </tr>
                     <c:if test="${i.answerYN == 'Y'}">
                         <tr class="content_${status.index} content_tr" style="display: none;">
                             <td></td>
-                            <td>${i.answerDTO.answer}</td>
+                            <td  class="aText">${i.answerDTO.answer}</td>
                             <td>${i.answerDTO.writer}</td>
                             <td>${i.answerDTO.writeDate}</td>
                         </tr>
@@ -538,9 +543,11 @@
 
     //QnA 작성 클릭 id,pd_seq
     function popup() {
-        var option = 'width=500, height=500, left=800, top=250';
-        window.open("/QnA/popup", "qnaFrm", option);
-        // var myForm = document.qnaFrm;
+        var _width = '500';
+        var _height = '400';
+        var _left = Math.ceil((window.screen.width - _width) / 2);
+        var _top = Math.ceil((window.screen.height - _height) / 2);
+        window.open("/QnA/ansPopup", "qnaFrm", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
         var myForm = $("#qnaFrm")[0];
         myForm.method = "post";
         myForm.target = "qnaFrm";

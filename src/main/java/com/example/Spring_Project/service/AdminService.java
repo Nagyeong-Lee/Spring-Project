@@ -176,4 +176,12 @@ public class AdminService {
         return result;
     }
 
+
+    public List<Integer> pdSeqsByCategory(Integer pdCategorySeq) throws Exception{
+        return adminMapper.pdSeqsByCategory(pdCategorySeq);
+    }
+
+    public void delReview(Integer r_seq) throws Exception{
+        adminMapper.delReview(r_seq);
+    }
 }

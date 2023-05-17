@@ -25,7 +25,7 @@
             pd_seq,
             content,
             status,
-        to_char(writeDate,'YYYY-MM-DD HH:MI') AS writeDate
+        to_char(writeDate,'YYYY-MM-DD HH24:MI') AS writeDate
         from
         question
         where status = 'Y' and pd_seq = #{pd_seq}
@@ -36,7 +36,7 @@
         select
             writer,
             answer,
-            to_char(writeDate,'YYYY-MM-DD HH:MI') AS writeDate
+            to_char(writeDate,'YYYY-MM-DD HH24:MI') AS writeDate
         from answer
         where q_seq = #{q_seq}
     </select>
@@ -48,9 +48,10 @@
             pd_seq,
             content,
             status,
-            to_char(writeDate,'YYYY-MM-DD HH:MI') AS writeDate
+            to_char(writeDate,'YYYY-MM-DD HH24:MI') AS writeDate
         from question
         where status = 'Y'
+        order by writeDate desc
     </select>
 
     <select id="getQuestion" resultType="com.example.Spring_Project.dto.QuestionDTO">
@@ -65,7 +66,8 @@
 
     <update id="updQuestion" parameterType="hashMap">
         update question
-            set content = #{content}
+            set content = #{content},
+                writeDate = sysdate
         where q_seq = #{q_seq}
     </update>
 
@@ -76,7 +78,7 @@
             pd_seq,
             content,
             status,
-        to_char(writeDate,'YYYY-MM-DD HH:MI') AS writeDate
+        to_char(writeDate,'YYYY-MM-DD HH24:MI') AS writeDate
         from question
         where status = 'Y'
     </select>
@@ -98,7 +100,22 @@
     <update id="updAns" parameterType="HashMap">
         update
          answer
-        set answer = #{content}
+        set answer = #{content},
+            writeDate = sysdate
         where q_seq = #{q_seq}
     </update>
+
+    <select id="pdInfo" resultType="com.example.Spring_Project.dto.ProductDTO">
+        select
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        from product
+        where pd_seq = #{pd_seq}
+    </select>
 </mapper>

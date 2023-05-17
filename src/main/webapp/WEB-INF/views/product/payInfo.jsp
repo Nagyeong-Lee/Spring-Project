@@ -107,7 +107,7 @@
                 </c:if>
             </c:forEach>
             <button type="button" id="updateBtn" class="btn btn-light">배송지 수정</button>
-            <button type="button" id="delBtn"  class="btn btn-light">배송지 삭제</button>
+            <button type="button" id="delBtn" class="btn btn-light">배송지 삭제</button>
         </c:when>
     </c:choose>
 
@@ -161,43 +161,43 @@
 
     //배송지 수정 클릭 시
     $("#updateBtn").click(function () {
-         let seq = $("input[name=address]:checked").val();
-         popup(seq);
+        let seq = $("input[name=address]:checked").val();
+        popup(seq);
     })
 
     function popup(seq) {
-        window.open('/product/updDeliInfo?seq='+seq, '', 'width=500, height=500, left=650, top=250');
+        window.open('/product/updDeliInfo?seq=' + seq, '', 'width=500, height=500, left=650, top=250');
     }
 
     //배송지 삭제 클릭 시
-    $("#delBtn").click(function(){
+    $("#delBtn").click(function () {
         let seq = $("input[name=address]:checked").val();
         console.log(seq);
         let defaultSeq = 0;
         //기본 배송지 seq 가져오기
         $.ajax({
-            url:'/product/getDefaultAdr',
-            type:'post',
-            async:false,
-            success:function(data){
+            url: '/product/getDefaultAdr',
+            type: 'post',
+            async: false,
+            success: function (data) {
                 defaultSeq = data;
                 console.log(data);
-                if(seq == data){
+                if (seq == data) {
                     alert('기본 배송지를 삭제할 수 없습니다.');
                     return false;
                 }
             }
         })
 
-        if(seq != defaultSeq){
+        if (seq != defaultSeq) {
             $.ajax({
-                url : '/product/deleteDeli',
-                type:'post',
-                async:false,
-                data : {
-                    "seq":seq
+                url: '/product/deleteDeli',
+                type: 'post',
+                async: false,
+                data: {
+                    "seq": seq
                 },
-                success:function(data){
+                success: function (data) {
                     location.reload();
                     console.log(data);
                 }
@@ -231,35 +231,44 @@
     $("#pay").on("click", function () {
         // requestPay();
 
-            //결제 내역으로 이동
-            let frm = document.createElement("form");
-            frm.setAttribute("method", "post");
-            frm.setAttribute("action", "/product/paymentDetails");
-            let newInput = document.createElement("input");
-            let newInput2 = document.createElement("input");
-            let newInput3 = document.createElement("input");
-            let newInput4 = document.createElement("input");
-            newInput.setAttribute("type", "hidden");
-            newInput.setAttribute("value", $("#session").val());
-            newInput.setAttribute("name", "id");
+        if ($('input:radio[name=address]').length ===0) {
+            alert('배송지를 추가해주세요');
+            return false;
+        }
 
-            newInput2.setAttribute("type", "hidden");
-            newInput2.setAttribute("value", $("#totalMoney").val());
-            newInput2.setAttribute("name", "price");
+        if ($('input:radio[name=address]').is(':checked') === false) {
+            alert('배송지를 선택해주세요');
+            return false;
+        }
+        //결제 내역으로 이동
+        let frm = document.createElement("form");
+        frm.setAttribute("method", "post");
+        frm.setAttribute("action", "/product/paymentDetails");
+        let newInput = document.createElement("input");
+        let newInput2 = document.createElement("input");
+        let newInput3 = document.createElement("input");
+        let newInput4 = document.createElement("input");
+        newInput.setAttribute("type", "hidden");
+        newInput.setAttribute("value", $("#session").val());
+        newInput.setAttribute("name", "id");
 
-            newInput3.setAttribute("type", "hidden");
-            newInput3.setAttribute("value", $("input[name=address]:checked").val());
-            newInput3.setAttribute("name", "seq");
+        newInput2.setAttribute("type", "hidden");
+        newInput2.setAttribute("value", $("#totalMoney").val());
+        newInput2.setAttribute("name", "price");
 
-            newInput4.setAttribute("type", "hidden");
-            newInput4.setAttribute("value", $("#totalSum").val());
-            newInput4.setAttribute("name", "pdTotalSum");
-            frm.appendChild(newInput);
-            frm.appendChild(newInput2);
-            frm.appendChild(newInput3);
-            frm.appendChild(newInput4);
-            document.body.appendChild(frm);
-            frm.submit();
+        newInput3.setAttribute("type", "hidden");
+        newInput3.setAttribute("value", $("input[name=address]:checked").val());
+        newInput3.setAttribute("name", "seq");
+
+        newInput4.setAttribute("type", "hidden");
+        newInput4.setAttribute("value", $("#totalSum").val());
+        newInput4.setAttribute("name", "pdTotalSum");
+        frm.appendChild(newInput);
+        frm.appendChild(newInput2);
+        frm.appendChild(newInput3);
+        frm.appendChild(newInput4);
+        document.body.appendChild(frm);
+        frm.submit();
 
     });
 

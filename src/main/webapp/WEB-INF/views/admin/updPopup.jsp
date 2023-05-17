@@ -74,6 +74,7 @@
       success: function (data) {
         if(data === 'success'){
           window.close();
+          opener.parent.alert('답변 수정 완료');
           opener.parent.location.reload();
         }
       }

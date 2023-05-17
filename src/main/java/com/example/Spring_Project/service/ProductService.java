@@ -726,7 +726,7 @@ public class ProductService {
         }
         List<String> list = new ArrayList<>();
         Map<String, List<String>> optionList = new HashMap<>();
-        for (Integer i = 0; i < test.length; i++) {
+        for (int i = 0; i < test.length; i++) {
             Map<String, Object> options = new HashMap<>();
             String option_name = test[i].substring(0, test[i].indexOf("("));
             list.add(option_name);
@@ -763,5 +763,26 @@ public class ProductService {
         }
         return stock;
     }
+
+    public List<String> getParentCategory() throws Exception{
+        return productMapper.getParentCategory();
+    }
+
+    public List<String> getChildCategory() throws Exception{
+        return productMapper.getChildCategory();
+    }
+
+    public Integer parentCategorySeq(String parentCtgOption) throws Exception{
+        return productMapper.parentCategorySeq(parentCtgOption);
+    }
+
+    public Integer pdCategorySeq(Integer parentCategorySeq,String childCtgOption) throws Exception{
+        return productMapper.pdCategorySeq(parentCategorySeq,childCtgOption);
+    }
+
+    public Map<String,Object> revCategory(Integer parentCategorySeq,Integer pdCategorySeq) throws Exception{
+        return productMapper.revCategory(parentCategorySeq,pdCategorySeq);
+    }
+
 
 }

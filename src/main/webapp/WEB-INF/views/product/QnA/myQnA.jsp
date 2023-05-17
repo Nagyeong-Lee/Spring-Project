@@ -14,6 +14,7 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.css" rel="stylesheet">
     <%--    <link rel="stylesheet" type="text/css" href="/resources/navUtil.css">--%>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -52,6 +53,24 @@
         #tbody * {
             text-align: center;
         }
+
+        .content, .question.qText, .aText {
+            width: 600px;
+        }
+
+        table {
+            table-layout: fixed;
+        }
+
+        .question {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .qText, .aText {
+            word-break: break-all
+        }
     </style>
 </head>
 <body>
@@ -62,7 +81,7 @@
         <thead>
         <th>상품</th>
         <th>답변 상태</th>
-        <th>제목</th>
+        <th class="content">제목</th>
         <th>작성자</th>
         <th>작성일</th>
         <th></th>
@@ -87,7 +106,8 @@
                                 <td>답변 완료</td>
                             </c:otherwise>
                         </c:choose>
-                        <td><a href="javascript:;" onclick="showAns(${status.index})">${i.questionDTO.content}</a></td>
+                        <td class="question"><a href="javascript:;"
+                                                onclick="showAns(${status.index})">${i.questionDTO.content}</a></td>
                         <td>${i.questionDTO.id}</td>
                         <td>${i.questionDTO.writeDate}</td>
                         <input type="hidden" value="${i.questionDTO.q_seq}" class="q_seq">
@@ -99,7 +119,7 @@
                     <tr class="answer_${status.index} answer" style="display:none;">
                         <td></td>
                         <td></td>
-                        <td>${i.questionDTO.content}</td>
+                        <td class="qText">${i.questionDTO.content}</td>
                         <td>${i.questionDTO.id}</td>
                         <td>${i.questionDTO.writeDate}</td>
                         <td></td>
@@ -108,7 +128,10 @@
                         <tr class="answer_${status.index} answer" style="display:none;">
                             <td></td>
                             <td></td>
-                            <td>${i.answerDTO.answer}</td>
+                            <td class="aText">
+                                <i class="fa-solid fa-pen"></i>
+                                ${i.answerDTO.answer}
+                            </td>
                             <td>${i.answerDTO.writer}</td>
                             <td>${i.answerDTO.writeDate}</td>
                             <td></td>
@@ -131,15 +154,42 @@
 <script src="/resources/asset/js/scripts.js"></script>
 <script src="/resources/asset/js/shopUtil.js"></script>
 <script>
+
+    $("#keyword").val($("#key").val());
+
+    $("#search").on("click",function(){
+        let keyword = $("#keyword").val();
+        location.href='/product/searchPd?keyword='+keyword;
+    });
+
+    $("#cart").click(function(){
+        let newForm = document.createElement("form");
+        newForm.setAttribute("method","post");
+        newForm.setAttribute("action","/product/cart");
+        let newInput = document.createElement("input");
+        newInput.setAttribute("type","hidden");
+        newInput.setAttribute("name","id");
+        newInput.setAttribute("value",$("#id").val());
+        newForm.appendChild(newInput);
+        document.body.append(newForm);
+        newForm.submit();
+    })
+
     function showAns(index) {
-        $(".answer").css("display","none");
-        $(".answer_"+index).css("display","table-row");
+        $(".answer").css("display", "none");
+        $(".answer_" + index).css("display", "table-row");
     }
+
     //수정
     $(".updQuestion").click(function () {
         let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
         let id = $("#id").val();
-        var option = 'width=500, height=500, left=800, top=250';
+        var _width = '500';
+        var _height = '400';
+
+        // 팝업을 가운데 위치시키기 위해 아래와 같이 값 구하기
+        var _left = Math.ceil((window.screen.width - _width) / 2);
+        var _top = Math.ceil((window.screen.height - _height) / 2);
 
         let newFrm = document.createElement("form");
         newFrm.setAttribute("method", "post");
@@ -158,7 +208,7 @@
         newFrm.append(input2);
         document.body.append(newFrm);
 
-        window.open("/QnA/updPopup", "newFrm", option);
+        window.open("/QnA/ansPopup", "newFrm", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
         var myForm = newFrm;
         myForm.method = "post";
         myForm.target = "newFrm";
@@ -167,18 +217,20 @@
 
     //삭제
     $(".delQuestion").click(function () {
-        let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
-        let url = '/QnA/' + q_seq;
-        $.ajax({
-            url: url,
-            type: "post",
-            data: {
-                "q_seq": q_seq
-            },
-            success: function (data) {
-                if (data === 'success') location.reload();
-            }
-        })
+        if (confirm('삭제하시겠습니까?')) {
+            let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
+            let url = '/QnA/' + q_seq;
+            $.ajax({
+                url: url,
+                type: "post",
+                data: {
+                    "q_seq": q_seq
+                },
+                success: function (data) {
+                    if (data === 'success') location.reload();
+                }
+            })
+        }
     })
 </script>
 </body>

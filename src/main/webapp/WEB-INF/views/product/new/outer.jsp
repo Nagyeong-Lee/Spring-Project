@@ -30,6 +30,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Core theme JS-->
 <script src="/resources/asset/js/scripts.js"></script>
+<script src="/resources/asset/js/shopUtil.js"></script>
 <script>
   $("#keyword").val($("#key").val());
 

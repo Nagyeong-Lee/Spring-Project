@@ -19,8 +19,9 @@ public class QnAService {
     @Autowired
     private QnAMapper qnAMapper;
 
-    @Autowired
-    private ProductService productService;
+//    @Autowired
+//    private ProductService productService;
+
 
     public void insertQuestion(Map<String, Object> param) throws Exception {
         qnAMapper.insertQuestion(param);
@@ -38,6 +39,10 @@ public class QnAService {
         return qnAMapper.getAnswer(q_seq);
     }
 
+    public ProductDTO pdInfo(Integer pd_seq) throws Exception {
+        return qnAMapper.pdInfo(pd_seq);
+    }
+
     //질문 + 답변
     public List<Map<String, Object>> getQnAList(List<QuestionDTO> questionDTOS) throws Exception {
         List<Map<String, Object>> qNaList = new ArrayList<>();
@@ -45,7 +50,8 @@ public class QnAService {
             Map<String, Object> map = new HashMap<>();
             Integer q_seq = dto.getQ_seq();
             Integer isAnswerExist = isAnswerExist(q_seq);
-            ProductDTO productDTO = productService.getPdInfo(dto.getPd_seq());//상품 정보
+//            ProductDTO productDTO = productService.getPdInfo(dto.getPd_seq());//상품 정보
+            ProductDTO productDTO = pdInfo(dto.getPd_seq());//상품 정보
             map.put("productDTO", productDTO);
             if (isAnswerExist != 0) { //답변 있으면 map put
                 AnswerDTO answerDTO = getAnswer(q_seq); //답변

@@ -29,7 +29,8 @@ import java.util.*;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
-
+    @Autowired
+    private ProductService productService;
     @Autowired
     private AdminService adminService;
 
@@ -47,9 +48,6 @@ public class AdminController {
 
     @Autowired
     private BoardService boardService;
-
-    @Autowired
-    private ProductService productService;
 
     @Autowired
     private QnAService qnAService;
@@ -305,7 +303,7 @@ public class AdminController {
                     optionMap.put(optCategory, optName);
                     optionMapList.add(optionMap);
                 }
-            if (optionMapList.size() != 0) param.put("optionMapList", optionMapList);
+                if (optionMapList.size() != 0) param.put("optionMapList", optionMapList);
             }
             PayProductDTO payProductDTO = productService.getDeliYN(salesDTO.getSales_seq()); // deliYN, CODE 가져오기
             param.put("id", salesDTO.getId());
@@ -339,19 +337,51 @@ public class AdminController {
     }
 
     @GetMapping("/qNa") //관리자 -> Q&A 조회
-    public String toQnAList(Model model) throws Exception{
+    public String toQnAList(Model model) throws Exception {
         List<QuestionDTO> questionDTOS = qnAService.qNaList();
         List<Map<String, Object>> qNaList = qnAService.getQnAList(questionDTOS);
-        model.addAttribute("qNaList",qNaList);
+        model.addAttribute("qNaList", qNaList);
         return "/admin/qNaList";
     }
 
     @GetMapping("/reviews")
-    public String getPdReviews(Model model) throws Exception{
-       List<Map<String,Object>> reviewDTOS = pdReviewService.getReviews();
-       List<Map<String,Object>> reviewList = pdReviewService.reviewList(reviewDTOS);
-       model.addAttribute("reviewList",reviewList);
-       return "/admin/pdReviews";
+    public String getPdReviews(Model model) throws Exception {
+        //처음 옵션 값 설정
+        Map<String,Object> optionMap = new HashMap<>();
+        String parentCtgOption = "여성"; //상위 카테고리
+        String childCtgOption = "아우터"; //하위 카테고리
+        Integer star= 5; //별점
+        optionMap.put("parentCtgOption",parentCtgOption);
+        optionMap.put("childCtgOption",childCtgOption);
+        optionMap.put("star",star);
+
+        Integer parentCategorySeq = productService.parentCategorySeq(parentCtgOption); //부모 카테고리
+        Integer pdCategorySeq = productService.pdCategorySeq(parentCategorySeq,childCtgOption); //pd category
+        Map<String,Object> categoryMap = productService.revCategory(parentCategorySeq,pdCategorySeq); //상품 상위,하위 카테고리
+        //ex category = 2인 pd_seq들
+        List<Integer> pdSeqs = adminService.pdSeqsByCategory(pdCategorySeq);
+
+        List<Map<String, Object>> reviewDTOS = pdReviewService.getReviews(pdSeqs,star); //처음 리뷰 리스트
+        List<Map<String, Object>> reviewList = pdReviewService.reviewList(reviewDTOS);
+
+        //부모 카테고리
+        List<String> parentCategory = productService.getParentCategory();
+        //자식 카테고리
+        List<String> childCategory = productService.getChildCategory();
+
+        model.addAttribute("categoryMap", categoryMap);
+        model.addAttribute("reviewList", reviewList);
+        model.addAttribute("parentCategory", parentCategory); //부모 카테고리
+        model.addAttribute("childCategory", childCategory); //자식 카테고리
+        model.addAttribute("optionMap",optionMap);  //처음 옵션 값
+        return "/admin/pdReviews";
+    }
+
+    @ResponseBody
+    @PostMapping("/delReview")
+    public String delReview(Integer r_seq) throws Exception{
+        adminService.delReview(r_seq);
+        return "success";
     }
 }
 

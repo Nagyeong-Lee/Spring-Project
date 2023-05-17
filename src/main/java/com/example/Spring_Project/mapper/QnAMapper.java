@@ -1,6 +1,7 @@
 package com.example.Spring_Project.mapper;
 
 import com.example.Spring_Project.dto.AnswerDTO;
+import com.example.Spring_Project.dto.ProductDTO;
 import com.example.Spring_Project.dto.QuestionDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -39,5 +40,5 @@ public interface QnAMapper {
     List<QuestionDTO> qNaList();
     void insertAns(Map<String,Object> param);
     void updAns(Map<String,Object> param);
-
+    ProductDTO pdInfo(@Param("pd_seq")Integer pd_seq);
 }

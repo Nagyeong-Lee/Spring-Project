@@ -1061,4 +1061,44 @@
     <select id="getPayProductInfo" resultType="com.example.Spring_Project.dto.PayProductDTO">
         SELECT DELIYN , CODE FROM PAYPRODUCT p WHERE pay_seq = #{pay_seq} AND PD_SEQ = #{pd_seq}
     </select>
+
+    <select id="getParentCategory" resultType="String">
+        SELECT name FROM category WHERE PARENT_CATEGORY_SEQ =0
+    </select>
+
+    <select id="getChildCategory" resultType="String">
+        SELECT DISTINCT name FROM category WHERE PARENT_CATEGORY_SEQ NOT IN 0
+    </select>
+
+    <select id="parentCategorySeq" resultType="Integer">
+        SELECT category_seq FROM category WHERE name = #{parentCtgOption}
+    </select>
+
+    <select id="pdCategorySeq" resultType="Integer">
+        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ  = #{seq} AND name = #{option}
+    </select>
+
+    <select id="revCategory" resultType="map">
+        SELECT
+            cc.name AS parentCategory,
+            pc.name AS childCategory
+        FROM (
+            SELECT
+                name,
+                category_seq,
+                parent_category_seq
+        FROM CATEGORY c
+            WHERE CATEGORY_SEQ = #{cSeq}) cc
+            JOIN
+            (
+            SELECT
+                name,
+                category_seq,
+                parent_category_seq
+            FROM category
+            WHERE category_seq = #{pSeq}) pc
+            ON cc.parent_category_seq = pc.category_seq
+    </select>
+
+
 </mapper>

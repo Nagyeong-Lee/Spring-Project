@@ -91,7 +91,7 @@ public class QnAController {
     @ResponseBody
     @PostMapping("/updAns")  //답변 수정
     public String updAns(@RequestParam Map<String,Object> param) throws Exception {
-        System.out.println("param = " + param);
+        System.out.println("updAns = " + param);
         qnAService.updAns(param);
         return "success";
 

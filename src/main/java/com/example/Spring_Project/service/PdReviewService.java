@@ -21,6 +21,9 @@ public class PdReviewService {
     @Autowired
     private PdReviewMapper pdReviewMapper;
 
+    @Autowired
+    private QnAService qnAService;
+
 
     //review insert
     public void reviewInsert(Map<String, Object> param) throws Exception {
@@ -185,8 +188,8 @@ public class PdReviewService {
         return pdReviewMapper.optionCategory(pd_seq, optName);
     }
 
-    public List<Map<String, Object>> getReviews() throws Exception {
-        return pdReviewMapper.getReviews();
+    public List<Map<String, Object>> getReviews(List<Integer>pdSeqs,Integer star) throws Exception {
+        return pdReviewMapper.getReviews(pdSeqs,star);
     }
 
     public ProductDTO pdInfo(Integer pd_seq) throws Exception {
@@ -209,8 +212,8 @@ public class PdReviewService {
             map.put("reviewDTOS", reviewDTOS.get(i));
             map.put("totalPrice", Integer.parseInt(reviewDTOS.get(i).get("PRICE").toString()) * Integer.parseInt(reviewDTOS.get(i).get("STOCK").toString()));
             //옵션 있으면
-            if (reviewDTOS.get(i).get("OPTIONS") != null) {
-                Object object = jsonParser.parse(reviewDTOS.get(i).get("OPTIONS").toString());
+            if (reviewDTOS.get(i).get("PDOPTION") != null) {
+                Object object = jsonParser.parse(reviewDTOS.get(i).get("PDOPTION").toString());
                 jsonObject = (JsonObject) object;
                 jsonArray = (JsonArray) jsonObject.get("name");
                 optionMapList = new ArrayList<>();

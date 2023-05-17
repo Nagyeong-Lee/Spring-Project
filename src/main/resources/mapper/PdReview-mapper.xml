@@ -125,6 +125,7 @@
             content
         from review
         where status = 'Y' and pd_seq = #{pd_seq}
+        order by writeDate desc
     </select>
 
     <select id="reviewInPdDetail" resultType="map">
@@ -196,53 +197,68 @@
         WHERE pd_seq = #{pd_seq} AND name = #{optName}
     </select>
 
-    <select id="getReviews" resultType="map">
-        SELECT
-            j.review_seq,
-            j.id,
-            j.payPd_seq,
-            j.pd_seq,
-            j.writeDate AS writeDate,
-            j.status AS review_status,
-            j.star,
-            j.content,
-            j.OPTIONS,
-            j.stock,
-            j.price,
-            img_seq,
-            oriname,
-            sysname,
-            i.status AS img_status
-        FROM img i JOIN
-            (SELECT
-                review_seq,
-                a.id,
-                a.payPd_seq,
-                a.pd_seq,
-                a.writeDate AS writeDate,
-                a.status,
-                a.star,
-                a.content,
-                a.OPTIONS,
-                s.stock,
-                s.price
-            FROM sales s JOIN
-            (SELECT
-                review_seq,
-                id,
-                r.payPd_seq,
-                r.pd_seq,
-                to_char(r.writeDate,'YYYY-MM-DD HH:MI') AS writeDate,
-                r.status,
-                r.star,
-                r.content,
-                p.OPTIONS
-            FROM review r JOIN payProduct p
-            ON r.PAYPD_SEQ = p.PAYPD_SEQ
-            WHERE r.status = 'Y') a
-            ON a.payPd_seq = s.payPd_seq) J
-            ON i.review_seq = j.review_seq
-            WHERE i.STATUS = 'Y'
+    <select id="getReviews" resultType="HashMap" parameterType="java.util.List">
+<!--        SELECT-->
+<!--            k.review_seq,-->
+<!--            k.id,-->
+<!--            k.payPd_seq,-->
+<!--            k.pd_seq,-->
+<!--            k.writeDate,-->
+<!--            k.star,-->
+<!--            k.content,-->
+<!--            k.pdoption,-->
+<!--            k.stock,-->
+<!--            k.price,-->
+<!--            k.img AS pdImg,-->
+<!--            i.img_seq,-->
+<!--            i.oriname AS revImgOriname,-->
+<!--            i.sysname AS revImgSysname-->
+<!--        FROM img i JOIN (-->
+<!--            SELECT-->
+<!--                a.review_seq,-->
+<!--                a.id,-->
+<!--                a.payPd_seq,-->
+<!--                a.pd_seq,-->
+<!--                writeDate,-->
+<!--                a.star,-->
+<!--                a.content,-->
+<!--                a.img,-->
+<!--                a.category,-->
+<!--                s.stock,-->
+<!--                s.price,-->
+<!--                s.pdoption-->
+<!--        FROM sales s JOIN (-->
+<!--            (SELECT-->
+<!--                r.review_seq,-->
+<!--                r.id,-->
+<!--                r.payPd_seq,-->
+<!--                p.pd_seq,-->
+<!--                to_char(r.writeDate,'YYYY-MM-DD HH24:MI') AS writeDate,-->
+<!--                r.star,-->
+<!--                r.content,-->
+<!--                p.img,-->
+<!--                p.category-->
+<!--            FROM review r JOIN product p-->
+<!--            ON r.pd_seq = p.pd_seq-->
+<!--            WHERE STAR = #{star} AND category = #{seq} AND r.status = 'Y') a)-->
+<!--        ON a.payPd_seq = s.payPd_seq) k-->
+<!--        ON i.REVIEW_SEQ  = k.review_seq-->
+
+<!--        SELECT f.review_seq,f.id,f.payPd_seq,f.revWriteDate,f.star,f.content,f.stock,f.price,f.pdOption,p.pd_seq,p.name AS pdName FROM product p JOIN (-->
+<!--        (SELECT a.review_seq,a.id,a.payPd_seq,a.pd_seq,a.writeDate AS revWriteDate,a.star,a.content,s.stock,s.price,s.pdOption FROM-->
+<!--        (SELECT review_seq,id,payPd_seq,pd_seq,writeDate,star,content FROM REVIEW r WHERE PD_SEQ IN (3,6,7,8,9) AND star = #{star} AND status = 'Y' ORDER BY WRITEDATE ) a-->
+<!--        JOIN sales s ON a.payPd_seq = s.PAYPD_SEQ) f ) ON p.PD_SEQ  = f.pd_seq-->
+
+        SELECT f.review_seq,f.id,f.payPd_seq,to_char(f.revWriteDate,'YYYY-MM-DD HH24:MI') AS writeDate,f.star,f.content,f.stock,f.price,f.pdOption,p.pd_seq,p.name,p.img AS pdName FROM product p JOIN (
+        (SELECT a.review_seq,a.id,a.payPd_seq,a.pd_seq,a.writeDate AS revWriteDate,a.star,a.content,s.stock,s.price,s.pdOption FROM
+        (SELECT review_seq,id,payPd_seq,pd_seq,writeDate,star,content FROM REVIEW r WHERE PD_SEQ IN
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        AND star = #{star} AND status = 'Y' ORDER BY WRITEDATE ) a
+        JOIN sales s ON a.payPd_seq = s.PAYPD_SEQ) f ) ON p.PD_SEQ  = f.pd_seq ORDER BY WRITEDATE
+
+
     </select>
 
     <select id="pdInfo" resultType="com.example.Spring_Project.dto.ProductDTO">
@@ -258,4 +274,7 @@
         from product
         where pd_seq = #{pd_seq}
     </select>
+
+
+
 </mapper>
