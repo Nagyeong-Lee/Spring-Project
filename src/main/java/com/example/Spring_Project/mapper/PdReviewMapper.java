@@ -4,6 +4,7 @@ import com.example.Spring_Project.dto.ImgDTO;
 import com.example.Spring_Project.dto.ProductDTO;
 import com.example.Spring_Project.dto.ReviewDTO;
 import org.apache.ibatis.annotations.*;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
@@ -44,5 +45,6 @@ import java.util.Map;
     ProductDTO pdInfo(@Param("pd_seq")Integer pd_seq);
 
     List<Map<String,Object>> getReviewsByOption(Map<String,Object> data);
-
+    List<Integer> reviewImgs(@Param("seq") Integer review_seq);
+    Map<String,Object> getReviewImgs(@Param("seq") Integer review_seq);
 }

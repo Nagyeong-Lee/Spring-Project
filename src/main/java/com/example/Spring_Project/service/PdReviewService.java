@@ -1,19 +1,22 @@
 package com.example.Spring_Project.service;
 
 import com.example.Spring_Project.dto.ImgDTO;
+import com.example.Spring_Project.dto.ParsedReviewDTO2;
 import com.example.Spring_Project.dto.ProductDTO;
 import com.example.Spring_Project.dto.ReviewDTO;
 import com.example.Spring_Project.mapper.PdReviewMapper;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.server.Jsp;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.Reader;
 import java.util.*;
 
 @Service
@@ -96,8 +99,15 @@ public class PdReviewService {
     }
 
     //delete review
+
+    @Transactional
     public void deleteReview(Integer review_seq) throws Exception {
-        pdReviewMapper.deleteReview(review_seq);
+        pdReviewMapper.deleteReview(review_seq); //리뷰 삭제
+        Integer isRevImgExist = pdReviewMapper.isImgExist(review_seq);
+        if(isRevImgExist != 0 ){ //img있으면 img삭제
+            List<Integer> deleteSeq = pdReviewMapper.reviewImgs(review_seq);
+            pdReviewMapper.deleteImg(deleteSeq);
+        }
     }
 
     //review detail 수정
@@ -241,6 +251,48 @@ public class PdReviewService {
 
     public List<Map<String,Object>> getReviewsByOption(Map<String,Object> data) throws Exception{
         return pdReviewMapper.getReviewsByOption(data);
+    }
+
+    public Map<String,Object> getReviewImgs(Integer review_seq) throws Exception{
+        return pdReviewMapper.getReviewImgs(review_seq);
+    }
+
+    public List<Map<String, Object>> reviewListByOptions(List<ParsedReviewDTO2> objectList) throws Exception {
+
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = new JsonObject();
+        JsonArray jsonArray = new JsonArray();
+        List<Map<String, Object>> optionMapList = null;
+        List<Map<String, Object>> reviewList = new ArrayList<>();
+//        Map<String, Object> option = new HashMap<>();
+        System.out.println("objectList = " + objectList);
+        for (ParsedReviewDTO2 parsedReviewDTO2 : objectList) {
+            Map<String, Object> map = new HashMap<>();
+            ProductDTO productDTO = pdInfo(parsedReviewDTO2.getPd_seq());
+            map.put("productDTO", productDTO);
+            map.put("parsedReviewDTO2", parsedReviewDTO2);
+            map.put("totalPrice", parsedReviewDTO2.getPrice() * parsedReviewDTO2.getStock());
+            if (parsedReviewDTO2.getPdOption() != null) {   //옵션 있으면
+                JsonObject jsonObject1 = (JsonObject) jsonParser.parse(parsedReviewDTO2.getPdOption());
+                JsonArray jsonArray1 = (JsonArray)jsonObject1.get("name");
+                optionMapList = new ArrayList<>();
+                Map<String, Object> optionMap = null;
+                for (int k = 0; k < jsonArray1.size(); k++) {
+                    optionMap = new HashMap<>();
+//                    //size = s
+                    String optName = jsonArray1.get(k).toString().replace("\"", "");
+                    System.out.println("optName = " + optName);
+                    String optCategory = optionCategory(parsedReviewDTO2.getPd_seq(), optName); //옵션 카테고리 이름 가져오기 (size)
+                    System.out.println("optCategory = " + optCategory);
+                    optionMap.put(optCategory, optName);
+                    optionMapList.add(optionMap);
+                }
+            }
+            map.put("optionMapList",optionMapList);
+            reviewList.add(map);
+        }
+        System.out.println("reviewList = " + reviewList);
+        return reviewList;
     }
 
 }

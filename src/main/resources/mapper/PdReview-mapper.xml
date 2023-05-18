@@ -197,7 +197,7 @@
         WHERE pd_seq = #{pd_seq} AND name = #{optName}
     </select>
 
-    <select id="getReviews" resultType="HashMap" parameterType="java.util.List">
+    <select id="getReviews" resultType="map" parameterType="java.util.List">
         SELECT
             f.review_seq,
             f.id,
@@ -291,4 +291,8 @@
     </select>
 
 
+
+    <select id="getReviewImgs" resultType="map">
+        SELECT img_seq,review_seq,sysname FROM img WHERE review_seq = #{seq} AND status = 'Y'
+    </select>
 </mapper>

@@ -66,6 +66,10 @@
         .qText {
             word-break: break-all
         }
+
+        a {
+            text-decoration: none;
+        }
     </style>
 <body>
 <%@include file="/WEB-INF/views/admin/adminNavUtil.jsp" %>
@@ -139,19 +143,19 @@
                         <p>&nbsp${categoryMap.CHILDCATEGORY}</p>
                     </td>
                     <td>
-<%--                            ${i}--%>
-                        <a href="/product/detail?pd_seq=${i.reviewDTOS.PD_SEQ}">
-                            <img src="/resources/img/products/${i.reviewDTOS.PDNAME}"
-                                 style="width: 100px; height: 100px;">
-                        </a>
+                            <%--                            ${i}--%>
+                            <%--                        <a href="/product/detail?pd_seq=${i.reviewDTOS.PD_SEQ}">--%>
+                        <img src="/resources/img/products/${i.reviewDTOS.PDNAME}"
+                             style="width: 100px; height: 100px;">
+                            <%--                        </a>--%>
                     </td>
                     <td>
                         <p>${i.reviewDTOS.NAME}-${i.reviewDTOS.STOCK}개</p>
                         <c:if test="${i.option != null}">
                             <c:forEach var="k" items="${i.option.optionMapList}">
-                               <c:forEach var="j" items="#{k}">
-                                   <p>${j.key} : ${j.value}</p>
-                               </c:forEach>
+                                <c:forEach var="j" items="#{k}">
+                                    <p>${j.key} : ${j.value}</p>
+                                </c:forEach>
                             </c:forEach>
                         </c:if>
                             <%--                                                       옵션.개수 출력--%>
@@ -201,6 +205,63 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/resources/asset/js/scripts.js"></script>
 <script>
+    function showAns(index) {
+        $(".answer").css("display", "none");
+        $(".answer_" + index).css("display", "table-row");
+    }
+
+    //동적 html
+    function createHtml(data) {
+        console.log(data);
+        //카테고리 출력
+        var html = '';
+        if (data.length !== 0) {
+            for (let i = 0; i < data.length; i++) {
+                html += '<tr>';
+                let parentCtg = data[i].parsedReviewDTO2.parentCategory;  //상위 카테고리
+                let childCtg = data[i].parsedReviewDTO2.childCategory; //하위 카테고리
+                html += '<td><p>' + parentCtg + '</p><p>' + childCtg + '</p></td>';
+
+                //상품 정보
+                html += '<td><img src="/resources/img/products/' + data[i].productDTO.img + '" style="width:100px; height: 100px;"></td>';
+                html += '<td><p>' + data[i].productDTO.name + '-' + data[i].parsedReviewDTO2.stock + '개</p>';
+
+                // 옵션 출력
+                if (data[i].optionMapList.length !== 0) {
+                    for (let k = 0; k < data[i].optionMapList.length; k++) {
+                        html += '<p>' + Object.keys(data[i].optionMapList[k]) + ":" + Object.values(data[i].optionMapList[k]) + '</p>';
+                    }
+                }
+                html += '<p>' + data[i].parsedReviewDTO2.price.toLocaleString() + '원</p></td>';
+
+                //별점
+                html += '<td class="tdStyle">';
+                for (let k = 1; k <= 5; k++) {
+                    if (k <= data[i].parsedReviewDTO2.star) {
+                        html += '<label for="1-star" class="startext"><i class="fa-solid fa-star" style="position:relative;color:rgba(250, 208, 0, 0.99);"></i></label>';
+                    } else {
+                        html += '<label for="1-star" class="startext"><i class="fa-solid fa-star" style="position:relative;color:#ddd;"></i></label>';
+                    }
+                }
+                //내용
+                html += '</td>';
+                html += '<td class="question" style="text-overflow: ellipsis;">';
+                html += '<a href="javascript:;" onclick="showAns(' + i + ')">' + data[i].parsedReviewDTO2.content + '</a></td>';
+                //작성자
+                html += '<td class="tdStyle">' + data[i].parsedReviewDTO2.id + '</td>';
+                html += '<td class="tdStyle">' + data[i].parsedReviewDTO2.writeDate + '</td>';
+                html += '<input type="hidden" value="' + data[i].parsedReviewDTO2.review_seq + '" class="r_seq">';
+                html += '<td class="tdStyle"><button type="button" class="btn btn-light delBtn">삭제</button></td</tr>';
+
+                //내용 클릭 시 아래 띄우는것
+                html += '<tr class="answer_' + i + ' answer" style="display:none;"><td></td><td></td><td></td><td></td>';
+                html += '<td class="qText">' + data[i].parsedReviewDTO2.content + '</td>';
+                html += '<td>' + data[i].parsedReviewDTO2.id + '</td>';
+                html += '<td>' + data[i].parsedReviewDTO2.writeDate + '</td></tr>';
+            }
+        }
+        return html;
+    }
 
     //옵션 바뀔때
     function chgOptions() {
@@ -223,55 +284,56 @@
         let data = {
             selectType: $("select[name='type'] option:selected").val(),
             keyword: $("#keyword").val(),
-            parentCategoryArr: parentCategoryArr,
-            childCategoryArr: childCategoryArr,
-            starArr: starArr,
+            parentCategoryArr: parentCategoryArr.toString(),
+            childCategoryArr: childCategoryArr.toString(),
+            starArr: starArr.toString(),
             time: $("input[type=radio]:checked").attr("id")
         }
         return data;
     }
 
-    //select box change
-    $("select[name='type']").on("change", function () {
-        let data = chgOptions();
+    function getReviews(data) {
         $.ajax({
-            url:'/admin/reviewsByOption',
-            type:'post',
-            data:data,
-            success:function(data){
+            url: '/admin/reviewsByOption',
+            type: 'post',
+            data: data,
+            success: function (data) {
                 console.log(data);
                 //뿌리기
                 $("#tbody").children().remove();
-                var html = '';
+                if (data.length !== 0) {
+                    var html = createHtml(data);
+                }
+                $("#tbody").append(html);
             }
         })
-        console.log(data);
-    })
+    }
+
     //상위 카테고리 change
     $(".parentCategory").on("change", function () {
         let data = chgOptions();
-        console.log(data);
+        getReviews(data);
     })
     //하위 카테고리 change
     $(".childCategory").on("change", function () {
         let data = chgOptions();
-        console.log(data);
+        getReviews(data);
     })
     //별점 change
     $(".star").on("change", function () {
         let data = chgOptions();
-        console.log(data);
+        getReviews(data);
     })
     //작성일 change
     $("input[name=writeTime]").on("change", function () {
         let data = chgOptions();
-        console.log(data);
+        getReviews(data);
     })
 
     //검색 클릭시
     $("#searchBtn").on("click", function () {
         let data = chgOptions();
-        console.log(data);
+        getReviews(data);
     })
 
     $("#keyword").val($("#key").val());
@@ -294,12 +356,7 @@
         newForm.submit();
     })
 
-    function showAns(index) {
-        $(".answer").css("display", "none");
-        $(".answer_" + index).css("display", "table-row");
-    }
-
-    $(".delBtn").click(function () {
+    $(document).on("click", ".delBtn", function () {
         if (confirm('삭제하시겠습니까?')) {
             let r_seq = $(this).parent().closest("tr").find(".r_seq").val();
             $.ajax({
@@ -314,6 +371,7 @@
             })
         }
     })
+
 </script>
 </body>
 </html>

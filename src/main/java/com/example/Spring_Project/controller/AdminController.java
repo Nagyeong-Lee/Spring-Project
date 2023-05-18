@@ -347,22 +347,31 @@ public class AdminController {
     @GetMapping("/reviews")
     public String getPdReviews(Model model) throws Exception {
         //처음 옵션 값 설정
-        Map<String,Object> optionMap = new HashMap<>();
+        Map<String, Object> optionMap = new HashMap<>();
         String parentCtgOption = "여성"; //상위 카테고리
         String childCtgOption = "아우터"; //하위 카테고리
-        Integer star= 5; //별점
-        optionMap.put("parentCtgOption",parentCtgOption);
-        optionMap.put("childCtgOption",childCtgOption);
-        optionMap.put("star",star);
+        Integer star = 5; //별점
+        optionMap.put("parentCtgOption", parentCtgOption);
+        optionMap.put("childCtgOption", childCtgOption);
+        optionMap.put("star", star);
 
         Integer parentCategorySeq = productService.parentCategorySeq(parentCtgOption); //부모 카테고리
-        Integer pdCategorySeq = productService.pdCategorySeq(parentCategorySeq,childCtgOption); //pd category
-        Map<String,Object> categoryMap = productService.revCategory(parentCategorySeq,pdCategorySeq); //상품 상위,하위 카테고리
+        Integer pdCategorySeq = productService.pdCategorySeq(parentCategorySeq, childCtgOption); //pd category
+        Map<String, Object> categoryMap = productService.revCategory(parentCategorySeq, pdCategorySeq); //상품 상위,하위 카테고리
         //ex category = 2인 pd_seq들
         List<Integer> pdSeqs = adminService.pdSeqsByCategory(pdCategorySeq);
 
-        List<Map<String, Object>> reviewDTOS = pdReviewService.getReviews(pdSeqs,star); //처음 리뷰 리스트
+        List<Object> pdReviewDTOS = new ArrayList<>();
+        List<Map<String, Object>> reviewDTOS = pdReviewService.getReviews(pdSeqs, star); //처음 리뷰 리스트
         List<Map<String, Object>> reviewList = pdReviewService.reviewList(reviewDTOS);
+//
+//        List<Map<String,Object>> imgs = new ArrayList<>();
+//        for(int i = 0; i<reviewDTOS.size(); i++){
+//            Map<String,Object> map = pdReviewService.getReviewImgs(Integer.parseInt(reviewDTOS.get(i).get("review_seq").toString()));
+//            pdReviewDTOS.add(map);
+//        }
+//        pdReviewDTOS.add(reviewDTOS); //img 빼고 데이터 추출한거
+
 
         //부모 카테고리
         List<String> parentCategory = productService.getParentCategory();
@@ -373,31 +382,47 @@ public class AdminController {
         model.addAttribute("reviewList", reviewList);
         model.addAttribute("parentCategory", parentCategory); //부모 카테고리
         model.addAttribute("childCategory", childCategory); //자식 카테고리
-        model.addAttribute("optionMap",optionMap);  //처음 옵션 값
+        model.addAttribute("optionMap", optionMap);  //처음 옵션 값
         return "/admin/pdReviews";
     }
 
     @ResponseBody
     @PostMapping("/delReview")
-    public String delReview(Integer r_seq) throws Exception{
+    public String delReview(Integer r_seq) throws Exception {
         adminService.delReview(r_seq);
         return "success";
     }
 
     @ResponseBody
     @PostMapping("/reviewsByOption") //관리자 리뷰 조회 필터링
-    public String reviewsByOption(@RequestParam Map<String,Object> data) throws Exception{
-        System.out.println("data : "+data);
-        System.out.println(data.get("parentCategoryArr"));
-        System.out.println(data.get("childCategoryArr"));
-        //상위,하위카테고리 해당하는 List<p_seq> pseqs
-        //review where pd_seq in (pseqs)
-        //sales랑 join
-        //img랑 join
-        //별점,시간 if문 in으로 조절
-        //keyword 검색
-//        List<Integer> pd_seq = productService.findPdSeqByCtgs(data.get("parentCategoryArr"),data.get("childCategoryArr"));
-        return "success";
+    public List<Map<String, Object>> reviewsByOption(@RequestParam Map<String, Object> data) throws Exception {
+        System.out.println("data : " + data);
+        List<String> parentCategoryArr = new ArrayList<>(List.of(data.get("parentCategoryArr").toString().split(",")));
+        List<String> childCategoryArr = new ArrayList<>(List.of(data.get("childCategoryArr").toString().split(",")));
+
+        List<String> pcArr = adminService.parentCategoryArr(parentCategoryArr); //name 바꾼 부모 카테고리 list
+        List<String> chCArr = adminService.childCategoryArr(childCategoryArr); //name 바꾼 자식 카테고리 list
+        List<String> starArr = new ArrayList<>(List.of(data.get("starArr").toString().split(","))); //star list
+        System.out.println(pcArr);
+        System.out.println(chCArr);
+        System.out.println(starArr);
+
+        String selectType = data.get("selectType").toString();
+        String keyword = data.get("keyword").toString();
+        if (keyword.length() == 0) {
+            keyword = null;   //keyword에서 에러
+        }
+        String time = data.get("time").toString();
+
+        System.out.println("selectType = " + selectType);
+        System.out.println("keyword = " + keyword);
+        System.out.println("time = " + time);
+
+        List<ParsedReviewDTO> mapList = adminService.reviewsByOptions(pcArr, chCArr, starArr, selectType, keyword, time); //필터링된 리뷰 가져오기
+        List<ParsedReviewDTO2> objectList = adminService.reviewByOptList(mapList);  //관리자 리뷰 조회에 뿌릴 데이터
+        List<Map<String, Object>> reviewList = pdReviewService.reviewListByOptions(objectList);
+        System.out.println("list = " + reviewList);
+        return reviewList;
     }
 }
 
