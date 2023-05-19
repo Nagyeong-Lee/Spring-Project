@@ -52,7 +52,6 @@ public class QnAController {
 
     @PostMapping("/updPopup")  //질문 수정 팝업으로
     public String toUpdPopup(Model model, @RequestParam Map<String, Object> param) throws Exception {
-        System.out.println("param = " + param);
         QuestionDTO questionDTO = qnAService.getQuestion(Integer.parseInt(param.get("q_seq").toString()));  //질문 1개
 //        model.addAttribute("param",param);
         model.addAttribute("questionDTO", questionDTO);
@@ -75,7 +74,6 @@ public class QnAController {
     @ResponseBody
     @PostMapping("/addAns") //답변 작성
     public String addAns(@RequestParam Map<String, Object> param) throws Exception {
-        System.out.println("param = " + param);
         qnAService.insertAns(param);
         return "success";
     }
@@ -91,7 +89,6 @@ public class QnAController {
     @ResponseBody
     @PostMapping("/updAns")  //답변 수정
     public String updAns(@RequestParam Map<String,Object> param) throws Exception {
-        System.out.println("updAns = " + param);
         qnAService.updAns(param);
         return "success";
 

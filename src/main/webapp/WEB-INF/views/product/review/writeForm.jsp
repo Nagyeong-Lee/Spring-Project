@@ -49,10 +49,7 @@
         function delFile(i) {  //x버튼 클릭 시 삭제
             $("#k").remove();
             let splice = imgArr.splice(i, 1);
-            console.log("imgArr : " + imgArr);
-            console.log("fileArr : " + fileArr);
             fileArr = imgArr;
-            console.log("fileArr : " + fileArr);
             create_html(); //다시 그림
         }
 
@@ -121,8 +118,6 @@
             $("#file").on("change", function () {
                 let inputFile = $('input[name="file"]');
                 let files = inputFile[0].files;
-                console.log(files)
-                console.log(files.length)
                 for (let i = 0; i < files.length; i++) {
                     imgArr.push(files[i]);
                     console.log(imgArr)

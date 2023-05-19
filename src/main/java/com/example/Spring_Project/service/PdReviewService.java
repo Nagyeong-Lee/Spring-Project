@@ -165,14 +165,11 @@ public class PdReviewService {
                 jsonArray = (JsonArray) jsonObject.get("name");
                 optionMapList = new ArrayList<>();
                 Map<String, Object> optionMap = null;
-                System.out.println("jsonArray = " + jsonArray);
-                System.out.println("jsonArray = " + jsonArray.size());
                 for (int i = 0; i < jsonArray.size(); i++) {
                     optionMap = new HashMap<>();
                     //size = s
                     String optName = jsonArray.get(i).toString().replace("\"", "");
                     String optCategory = optionCategory(pd_seq, optName); //옵션 카테고리 이름 가져오기 (size)
-                    System.out.println("optCategory = " + optCategory);
                     optionMap.put(optCategory, optName);
                     optionMapList.add(optionMap);
                 }
@@ -213,7 +210,6 @@ public class PdReviewService {
         List<Map<String, Object>> optionMapList = null;
         List<Map<String, Object>> reviewList = new ArrayList<>();
         Map<String, Object> option = new HashMap<>();
-        System.out.println("reviewDTOS = " + reviewDTOS);
         Integer size = reviewDTOS.size();
         for (int i = 0; i < size; i++) {
             Map<String, Object> map = new HashMap<>();
@@ -245,9 +241,7 @@ public class PdReviewService {
                     optionMap = new HashMap<>();
 //                    //size = s
                     String optName = jsonArray1.get(k).toString().replace("\"", "");
-                    System.out.println("optName = " + optName);
                     String optCategory = optionCategory(productDTO.getPd_seq(), optName); //옵션 카테고리 이름 가져오기 (size)
-                    System.out.println("optCategory = " + optCategory);
                     optionMap.put(optCategory, optName);
                     optionMapList.add(optionMap);
                 }
@@ -274,7 +268,6 @@ public class PdReviewService {
         List<Map<String, Object>> optionMapList = null;
         List<Map<String, Object>> reviewList = new ArrayList<>();
 //        Map<String, Object> option = new HashMap<>();
-        System.out.println("objectList = " + objectList);
         for (ParsedReviewDTO2 parsedReviewDTO2 : objectList) {
             Map<String, Object> map = new HashMap<>();
             ProductDTO productDTO = pdInfo(parsedReviewDTO2.getPd_seq());
@@ -285,7 +278,6 @@ public class PdReviewService {
             //리뷰 이미지 있으면
             List<String> revImg = new ArrayList<>(); //sysname
             if (parsedReviewDTO2.getRevImg_seq() != null) {
-                System.out.println("parsedReviewDTO2.getRevImg_seq() = " + parsedReviewDTO2.getRevImg_seq());
                 JsonObject jsonObject1 = (JsonObject) jsonParser.parse(parsedReviewDTO2.getRevImg_seq());
                 JsonArray jsonArray1 = (JsonArray) jsonObject1.get("seq");
                 for (int k = 0; k < jsonArray1.size(); k++) {
@@ -296,7 +288,6 @@ public class PdReviewService {
                 map.put("revImgSysname", revImg);
             }
 
-            System.out.println("parsedReviewDTO2.getPdOption() = " + parsedReviewDTO2.getPdOption());
             if (parsedReviewDTO2.getPdOption() != null) {   //옵션 있으면
                 JsonObject jsonObject1 = (JsonObject) jsonParser.parse(parsedReviewDTO2.getPdOption());
                 JsonArray jsonArray1 = (JsonArray) jsonObject1.get("name");
@@ -306,9 +297,7 @@ public class PdReviewService {
                     optionMap = new HashMap<>();
 //                    //size = s
                     String optName = jsonArray1.get(k).toString().replace("\"", "");
-                    System.out.println("optName = " + optName);
                     String optCategory = optionCategory(parsedReviewDTO2.getPd_seq(), optName); //옵션 카테고리 이름 가져오기 (size)
-                    System.out.println("optCategory = " + optCategory);
                     optionMap.put(optCategory, optName);
                     optionMapList.add(optionMap);
                 }
@@ -316,7 +305,6 @@ public class PdReviewService {
             }
             reviewList.add(map);
         }
-        System.out.println("reviewList = " + reviewList);
         return reviewList;
     }
 

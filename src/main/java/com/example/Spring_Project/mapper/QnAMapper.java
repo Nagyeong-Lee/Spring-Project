@@ -37,8 +37,11 @@ public interface QnAMapper {
 
     QuestionDTO getQuestion(@Param("q_seq") Integer q_seq);
     void updQuestion(Map<String, Object> param);
-    List<QuestionDTO> qNaList();
+    List<QuestionDTO> qNaList(@Param("start") Integer start,@Param("end") Integer end);
     void insertAns(Map<String,Object> param);
     void updAns(Map<String,Object> param);
     ProductDTO pdInfo(@Param("pd_seq")Integer pd_seq);
+
+    @Select("select count(*) from question")
+    Integer countQuestion();
 }

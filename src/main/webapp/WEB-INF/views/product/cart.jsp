@@ -26,16 +26,17 @@
     <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
 
     <style>
-        #footer {
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: #343a40; /* 배경색상 */
-            color: white; /* 글자색상 */
-            text-align: center; /* 가운데 정렬 */
-            padding: 15px; /* 위아래/좌우 패딩 */
+        html, body {
+            height: 100%;
         }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        .cart{
+            flex: 1 0 auto;
+        }
+        #footer{  flex-shrink: 0;}
     </style>
 
 </head>
@@ -144,14 +145,12 @@
     <input type="hidden" value="${totalSum}" id="hiddenTotalSum"><br>
     <input type="hidden" value="${totalPrice}" id="hiddenTotalPreviousTotalPrice"><br>
 
-
     <div class="cart__mainbtns">
         <button class="cart__bigorderbtn left" id="continue">쇼핑 계속하기</button>
         <button class="cart__bigorderbtn right" id="pay" type="button">결제하기</button>
     </div>
 </div>
 
-<!-- Footer-->
 <footer class="py-5 bg-dark" id="footer">
     <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
 </footer>

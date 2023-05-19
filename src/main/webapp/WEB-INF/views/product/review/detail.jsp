@@ -35,18 +35,17 @@
     <link rel="stylesheet" type="text/css" href="/resources/asset/css/util.css">
 
     <style>
-        #footer {
-            /*position: fixed;*/
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: #343a40; /* 배경색상 */
-            color: white; /* 글자색상 */
-            text-align: center; /* 가운데 정렬 */
-            padding: 15px; /* 위아래/좌우 패딩 */
-            position: relative;
-            /*transform: translatY(-100%);*/
+        html, body {
+            height: 100%;
         }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        .cart, .pagingDiv{
+            flex: 1 0 auto;
+        }
+        #footer{  flex-shrink: 0;}
 
         .pagingDiv {
             position: fixed;
@@ -66,7 +65,6 @@
         let deleteSeq = [];
 
         function deleteFile(i) {  //사진+x
-            console.log(i);
             $("#"+i).parent().remove(); //imgDiv 삭제
             $("#" + i).remove();  //x 버튼 삭제
             deleteSeq.push(i);  //status=n으로 변경
@@ -75,10 +73,7 @@
         function delFile(i) {  //x버튼 클릭 시 삭제  파일명+x
             $("#k").remove();
             let splice = imgArr.splice(i, 1);
-            console.log("imgArr : " + imgArr);
-            console.log("fileArr : " + fileArr);
             fileArr = imgArr;
-            console.log("fileArr : " + fileArr);
             create_html();
         }
 
@@ -242,6 +237,7 @@
 <input type="file" name="file" id="file" multiple style="display: none;">
 <%@ include file="/WEB-INF/views/product/shopUtil.jsp" %>
 <h5>리뷰 작성</h5>
+<div class="revDiv">
 <form action="/pdReview/insertReview" method="post" id="frm">
 <input type="hidden" id="review_seq" name="review_seq" value="${reviewDTO.review_seq}">
     <c:choose>
@@ -283,7 +279,10 @@
         </c:when>
     </c:choose>
 </form>
-
+</div>
+<footer class="py-5 bg-dark" id="footer">
+    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+</footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/resources/asset/js/scripts.js"></script>
 <script src="/resources/asset/js/shopUtil.js"></script>

@@ -27,17 +27,17 @@
     <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
 
     <style>
-        #footer {
-            position: relative;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: #343a40; /* 배경색상 */
-            color: white; /* 글자색상 */
-            text-align: center; /* 가운데 정렬 */
-            padding: 15px; /* 위아래/좌우 패딩 */
-            /*transform: translatY(-100%);*/
+        html, body {
+            height: 100%;
         }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        .cart,.pagingDiv {
+            flex: 1 0 auto;
+        }
+        #footer{  flex-shrink: 0;}
     </style>
 </head>
 <body>
@@ -96,7 +96,6 @@
         </tbody>
     </table>
 </div>
-
 <div class="pagingDiv" style="text-align: center;">
     <c:if test="${paging.needPrev eq true}">
         <a href="javascript:void(0); onclick=paging(${paging.startNavi-1}});"><</a>
@@ -115,8 +114,6 @@
         <a href="javascript:void(0); onclick=paging(${paging.totalPageCount});">맨끝</a>
     </c:if>
 </div>
-
-<!-- Footer-->
 <footer class="py-5 bg-dark" id="footer">
     <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
 </footer>

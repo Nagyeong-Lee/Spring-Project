@@ -24,18 +24,6 @@
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
     <style>
-        #footer {
-            position: relative;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: #343a40; /* 배경색상 */
-            color: white; /* 글자색상 */
-            text-align: center; /* 가운데 정렬 */
-            padding: 15px; /* 위아래/좌우 패딩 */
-            transform: translatY(-100%);
-        }
-
         img {
             width: 300px;
             height: 300px;
@@ -71,68 +59,69 @@
             text-decoration: none;
         }
 
-        #footer {
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: #343a40; /* 배경색상 */
-            color: white; /* 글자색상 */
-            text-align: center; /* 가운데 정렬 */
-            padding: 15px; /* 위아래/좌우 패딩 */
-            /*transform: translatY(-100%);*/
+
+        html, body {
+            height: 100%;
         }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        .filter{
+            flex: 1 0 auto;
+        }
+        #footer{  flex-shrink: 0;}
     </style>
 <body>
 <%@include file="/WEB-INF/views/admin/adminNavUtil.jsp" %>
-<form action="/admin/chgOption" method="post">
-    <div class="searchDiv">
-        <select name="type">
-            <option value="pdName">상품명</option>
-            <option value="content">내용</option>
-            <option value="writer">작성자</option>
-        </select>
-        <input type="text" id="keyword" name="keyword"> <%--상품명/내용/작성자--%>
-        <button type="button" id="searchBtn" class="btn btn-light">검색</button>
-    </div>
-    <div class="optionDiv">
-        <c:choose>
-            <c:when test="${!empty parentCategory && !empty childCategory}">
-                상위 카테고리 :
-                <c:forEach var="i" items="${parentCategory}" varStatus="status">
-                    <%--                    ${i}<input type="checkbox" id="parentCategory${status.count}" name="parentCategory${status.count}"--%>
-                    <%--                               class="parentCategory">--%>
-                    ${i}<input type="checkbox" id="parentCategory${status.count}" class="parentCategory"
-                    <c:out value="${i eq '여성'?'name=W': (i eq '남성'?'name=M': (i eq '신상품'?'name=NEW':''))}"/>
-                    <c:out value="${i eq optionMap.parentCtgOption?'checked':''}"/>
-                >
-                </c:forEach>
-                <br>
-                하위 카테고리 :
-                <c:forEach var="i" items="${childCategory}" varStatus="status">
-                    ${i}<input type="checkbox" id="childCategory${status.count}" class="childCategory"
-                    <c:out
-                            value="${i eq '악세사리'?'name=accessory':(i eq '아우터'?'name=outer':(i eq '상의'?'name=top':(i eq '하의'?'name=pants':'')))}"/>
-                    <c:out value="${i eq optionMap.childCtgOption?'checked':''}"/>
-                >
-                </c:forEach>
-                <br>
-                별점 :
-                <c:forEach var="i" begin="1" end="5" varStatus="status">
-                    ${status.count}<input type="checkbox" id="star${status.count}" name="${status.count}"
-                                          class="star"
-                    <c:out value="${i eq optionMap.star?'checked':''}"/>
-                >
-                </c:forEach>
-            </c:when>
-        </c:choose>
-        <br>
-        작성일 :
-        오름차순<input type="radio" name="writeTime" id="writeTimeAsc" checked>
-        내림차순<input type="radio" name="writeTime" id="writeTimeDesc">
-    </div>
-</form>
-
+<div class="filter">
+    <form action="/admin/chgOption" method="post">
+        <div class="searchDiv">
+            <select name="type">
+                <option value="pdName">상품명</option>
+                <option value="content">내용</option>
+                <option value="writer">작성자</option>
+            </select>
+            <input type="text" id="keyword" name="keyword"> <%--상품명/내용/작성자--%>
+            <button type="button" id="searchBtn" class="btn btn-light">검색</button>
+        </div>
+        <div class="optionDiv">
+            <c:choose>
+                <c:when test="${!empty parentCategory && !empty childCategory}">
+                    상위 카테고리 :
+                    <c:forEach var="i" items="${parentCategory}" varStatus="status">
+                        <%--                    ${i}<input type="checkbox" id="parentCategory${status.count}" name="parentCategory${status.count}"--%>
+                        <%--                               class="parentCategory">--%>
+                        ${i}<input type="checkbox" id="parentCategory${status.count}" class="parentCategory"
+                        <c:out value="${i eq '여성'?'name=W': (i eq '남성'?'name=M': (i eq '신상품'?'name=NEW':''))}"/>
+                        <c:out value="${i eq optionMap.parentCtgOption?'checked':''}"/>
+                    >
+                    </c:forEach>
+                    <br>
+                    하위 카테고리 :
+                    <c:forEach var="i" items="${childCategory}" varStatus="status">
+                        ${i}<input type="checkbox" id="childCategory${status.count}" class="childCategory"
+                        <c:out
+                                value="${i eq '악세사리'?'name=accessory':(i eq '아우터'?'name=outer':(i eq '상의'?'name=top':(i eq '하의'?'name=pants':'')))}"/>
+                        <c:out value="${i eq optionMap.childCtgOption?'checked':''}"/>
+                    >
+                    </c:forEach>
+                    <br>
+                    별점 :
+                    <c:forEach var="i" begin="1" end="5" varStatus="status">
+                        ${status.count}<input type="checkbox" id="star${status.count}" name="${status.count}"
+                                              class="star"
+                        <c:out value="${i eq optionMap.star?'checked':''}"/>
+                    >
+                    </c:forEach>
+                </c:when>
+            </c:choose>
+            <br>
+            작성일 :
+            오름차순<input type="radio" name="writeTime" id="writeTimeAsc" checked>
+            내림차순<input type="radio" name="writeTime" id="writeTimeDesc">
+        </div>
+    </form>
 <table id="QnATable" class="table table-striped">
     <thead>
     <th>카테고리</th>
@@ -229,8 +218,7 @@
     </c:choose>
     </tbody>
 </table>
-
-<!-- Footer-->
+</div>
 <footer class="py-5 bg-dark" id="footer" >
     <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
 </footer>

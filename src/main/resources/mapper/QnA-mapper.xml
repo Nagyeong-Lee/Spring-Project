@@ -72,15 +72,27 @@
     </update>
 
     <select id="qNaList" resultType="com.example.Spring_Project.dto.QuestionDTO">
-        select
-            q_seq,
-            id,
-            pd_seq,
-            content,
-            status,
+<!--        select-->
+<!--            q_seq,-->
+<!--            id,-->
+<!--            pd_seq,-->
+<!--            content,-->
+<!--            status,-->
+<!--        to_char(writeDate,'YYYY-MM-DD HH24:MI') AS writeDate-->
+<!--        from question-->
+        SELECT a.* FROM (
+        SELECT rownum r,a.*
+        from
+        (select
+        q_seq,
+        id,
+        pd_seq,
+        content,
+        status,
         to_char(writeDate,'YYYY-MM-DD HH24:MI') AS writeDate
-        from question
-        where status = 'Y'
+        from question ORDER BY WRITEDATE desc) a)a WHERE r BETWEEN #{start} AND #{end}
+
+<!--        where status = 'Y'-->
     </select>
 
     <insert id="insertAns" parameterType="hashMap">

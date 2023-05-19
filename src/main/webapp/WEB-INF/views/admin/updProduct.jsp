@@ -84,10 +84,6 @@
         let optionCategory = $(this).closest(".optionBox").find(".optionCategory").val();
         let optionName = $(this).closest(".optionBox").find(".optionName").val();
         let optionStock = $(this).closest(".optionBox").find(".optionStock").val();
-        console.log(optionCategory);
-        console.log(optionName);
-        console.log(optionStock);
-
     });
 
     let key = -1;
@@ -137,15 +133,9 @@
 
     //옵션 수정
     function update(key, e) {
-        console.log('업데이트');
-        console.log('key : ' + key);
         let optionCategory = $(e).closest(".optionBox").find(".optionCategory").val();
         let optionName = $(e).closest(".optionBox").find(".optionName").val();
         let optionStock = $(e).closest(".optionBox").find(".optionStock").val();
-
-        console.log(optionCategory);
-        console.log(optionName);
-        console.log(optionStock);
 
         let map = new Map();
         map.set("key", key);

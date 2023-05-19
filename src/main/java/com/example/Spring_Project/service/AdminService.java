@@ -241,17 +241,11 @@ public class AdminService {
             //리뷰 이미지 있는지 체크
             Map<String, Object> imgSeqMap = new HashMap<>();
             Integer reviewSeq = parsedReviewDTO.getReview_seq();
-            System.out.println("reviewSeq = " + reviewSeq);
             Integer isRevImgExist = pdReviewMapper.isImgExist(reviewSeq);
-            System.out.println("isRevImgExist = " + isRevImgExist);
             Integer chkInsert = pdReviewMapper.chkInsert(reviewSeq);
-            System.out.println("chkInsert = " + chkInsert);
             if (isRevImgExist != 0 && chkInsert == 0) {
                 List<Integer> imgSeqs = pdReviewMapper.getImgSeqs(reviewSeq);
-                System.out.println("imgSeqs = " + imgSeqs);
                 imgSeqMap.put("seq", imgSeqs);
-                System.out.println("imgSeq = " + imgSeqMap);
-                System.out.println("imgSeq = " + imgSeqMap);
                 //db에 저장
                 pdReviewMapper.insertRevSeq(reviewSeq, imgSeqMap.toString());  // img 조인하려고 새로운 테이블에 1 : {seq : []}
             }
@@ -273,18 +267,6 @@ public class AdminService {
             Map<String, Object> imgSeqMap = new HashMap<>();
             Integer reviewSeq = parsedReviewDTO.getReview_seq();
             Integer isRevImgExist = pdReviewMapper.isImgExist(reviewSeq);
-
-//            //table에 insert했는지 체크
-//            Integer chkInsert = pdReviewMapper.chkInsert(reviewSeq);
-//            if (isRevImgExist != 0 && chkInsert ==0) {
-//                List<Integer> imgSeqs = pdReviewMapper.getImgSeqs(reviewSeq);
-//                System.out.println("imgSeqs = " + imgSeqs);
-//                imgSeqMap.put("seq", imgSeqs);
-//                System.out.println("imgSeq = " + imgSeqMap);
-//                System.out.println("imgSeq = " + imgSeqMap);
-//                //db에 저장
-//                pdReviewMapper.insertRevSeq(reviewSeq, imgSeqMap.toString());  // img 조인하려고 새로운 테이블에 1 : {seq : []}
-//            }
 
             int review_seq = parsedReviewDTO.getReview_seq();
             String revImgSeqs   = pdReviewMapper.getRevImg(review_seq);

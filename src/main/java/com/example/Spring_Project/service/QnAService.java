@@ -85,15 +85,49 @@ public class QnAService {
         qnAMapper.updQuestion(param);
     }
 
-    public List<QuestionDTO> qNaList() throws Exception{
-       return qnAMapper.qNaList();
+    public List<QuestionDTO> qNaList(Integer start, Integer end) throws Exception {
+        return qnAMapper.qNaList(start, end);
     }
 
-    public void insertAns(Map<String,Object> param) throws Exception{
+    public void insertAns(Map<String, Object> param) throws Exception {
         qnAMapper.insertAns(param);
     }
 
-    public void updAns(Map<String,Object> param) throws Exception{
+    public void updAns(Map<String, Object> param) throws Exception {
         qnAMapper.updAns(param);
+    }
+
+    public Integer countQuestion() throws Exception {
+        return qnAMapper.countQuestion();
+    }
+
+    //페이징
+    public List<Object> repaging(List<QuestionDTO>questionDTOS,Map<String, Object> paging) throws Exception {
+        List<Object> qNaList = new ArrayList<>();
+        for (QuestionDTO dto : questionDTOS) {
+            Map<String, Object> reMap = new HashMap<>();
+            reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
+            reMap.put("endNavi", Integer.parseInt(paging.get("endNavi").toString()));
+            reMap.put("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));
+            reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
+            reMap.put("paging", paging);
+            reMap.put("cpage", Integer.parseInt(paging.get("cpage").toString()));
+
+            Integer q_seq = dto.getQ_seq();
+            Integer isAnswerExist = isAnswerExist(q_seq);
+//            ProductDTO productDTO = productService.getPdInfo(dto.getPd_seq());//상품 정보
+            ProductDTO productDTO = pdInfo(dto.getPd_seq());//상품 정보
+            reMap.put("productDTO", productDTO);
+            if (isAnswerExist != 0) { //답변 있으면 map put
+                AnswerDTO answerDTO = getAnswer(q_seq); //답변
+                reMap.put("answerDTO", answerDTO);
+                reMap.put("answerYN", "Y");
+            } else {
+                reMap.put("answerYN", "N");
+            }
+            reMap.put("questionDTO", dto);
+            qNaList.add(reMap);
+        }
+        return qNaList;
     }
 }

@@ -220,11 +220,11 @@ public class AdminController {
     @RequestMapping("/registeredPd")
     public String registeredPd(Model model, Integer cpage) throws Exception {
         if (cpage == null) cpage = 1;
-        Map<String, Object> paging = productService.paging(cpage);
+        Integer postCnt = productService.countRegisteredPd(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
         Integer naviPerPage = 10;
         Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
         Integer end = cpage * naviPerPage; // 끝 글 번호
-
         List<ProductDTO> list = productService.getProducts(start, end); //상품정보
         List<OptionDTO> optionDTOList = null;
         List<Map<String, Object>> registeredPd = new ArrayList<>();
@@ -236,7 +236,6 @@ public class AdminController {
                 optionDTOList = productService.getOptByGroup(productDTO.getPd_seq());
                 tmp.put("optionDTOList", optionDTOList);
             }
-            System.out.println("isOptExist = " + isOptExist);
             tmp.put("productDTO", productDTO);
             registeredPd.add(tmp);
         }
@@ -269,7 +268,8 @@ public class AdminController {
     @RequestMapping("/salesList") //판매 정보 조회
     public String salesList(Model model, Integer cpage) throws Exception {
         if (cpage == null) cpage = 1;
-        Map<String, Object> paging = productService.paging(cpage);
+        Integer postCnt = productService.countSalesPd(); //판매 상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
         Integer naviPerPage = 10;
         Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
         Integer end = cpage * naviPerPage; // 끝 글 번호
@@ -279,11 +279,9 @@ public class AdminController {
         JsonArray jsonArray = new JsonArray();
 
         List<SalesDTO> salesDTOS = productService.getSalesList(start, end);//판매 테이블에서 가져오기
-        System.out.println("salesDTOS = " + salesDTOS);
         List<Map<String, Object>> paramList = new ArrayList<>();
         for (SalesDTO salesDTO : salesDTOS) {
             Map<String, Object> param = new HashMap<>();
-            System.out.println(salesDTO.getPdOption());
             if (salesDTO.getPdOption() != null) { //옵션 있을때 size : s
                 List<Map<String, Object>> optionMapList = null;
                 param.put("option", salesDTO.getPdOption());
@@ -298,8 +296,6 @@ public class AdminController {
                     //size = s
                     String optName = jsonArray.get(i).toString().replace("\"", "");
                     String optCategory = productService.getOptCategory(salesDTO.getPd_seq(), optName); //옵션 카테고리 이름 가져오기 (size)
-                    System.out.println("optName = " + optName);
-                    System.out.println("optCategory = " + optCategory);
                     optionMap.put(optCategory, optName);
                     optionMapList.add(optionMap);
                 }
@@ -328,7 +324,6 @@ public class AdminController {
 
     @RequestMapping("/chgDeliStatus")
     public String chgDeliStatus(Model model, @RequestParam Integer sales_seq) throws Exception {
-        System.out.println("sales_seq = " + sales_seq);
         //택배사 정보 가져오기
         List<CourierDTO> courierDTOS = productService.getCourierInfo();
         model.addAttribute("courierDTOS", courierDTOS);
@@ -337,11 +332,35 @@ public class AdminController {
     }
 
     @GetMapping("/qNa") //관리자 -> Q&A 조회
-    public String toQnAList(Model model) throws Exception {
-        List<QuestionDTO> questionDTOS = qnAService.qNaList();
+    public String toQnAList(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = qnAService.countQuestion(); //질문 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+
+        List<QuestionDTO> questionDTOS = qnAService.qNaList(start, end);
         List<Map<String, Object>> qNaList = qnAService.getQnAList(questionDTOS);
         model.addAttribute("qNaList", qNaList);
+        model.addAttribute("paging", paging);
         return "/admin/qNaList";
+    }
+
+
+    @ResponseBody
+    @PostMapping("/qNaRepaging")
+    public List<Object> rePagingSalesList(Integer cpage) throws Exception {
+        Integer naviPerPage = 10;
+        Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage);
+        Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
+        Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
+        Integer postCnt = qnAService.countQuestion(); //질문 개수
+        List<QuestionDTO> questionDTOS = qnAService.qNaList(start, end);
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+
+        List<Object> qNaList = qnAService.repaging(questionDTOS,paging);
+        return qNaList;
     }
 
     @GetMapping("/reviews")   //처음 필터 선택된 리뷰 가져오기
@@ -364,7 +383,6 @@ public class AdminController {
         List<Object> pdReviewDTOS = new ArrayList<>();
         List<Map<String, Object>> reviewDTOS = pdReviewService.getReviews(pdSeqs, star); //처음 리뷰 리스트
         List<Map<String, Object>> reviewList = pdReviewService.reviewList(reviewDTOS);
-        System.out.println("reviewList = " + reviewList);
 
         //부모 카테고리
         List<String> parentCategory = productService.getParentCategory();
@@ -389,16 +407,12 @@ public class AdminController {
     @ResponseBody
     @PostMapping("/reviewsByOption") //관리자 리뷰 조회 필터링
     public List<Map<String, Object>> reviewsByOption(@RequestParam Map<String, Object> data) throws Exception {
-        System.out.println("data : " + data);
         List<String> parentCategoryArr = new ArrayList<>(List.of(data.get("parentCategoryArr").toString().split(",")));
         List<String> childCategoryArr = new ArrayList<>(List.of(data.get("childCategoryArr").toString().split(",")));
 
         List<String> pcArr = adminService.parentCategoryArr(parentCategoryArr); //name 바꾼 부모 카테고리 list
         List<String> chCArr = adminService.childCategoryArr(childCategoryArr); //name 바꾼 자식 카테고리 list
         List<String> starArr = new ArrayList<>(List.of(data.get("starArr").toString().split(","))); //star list
-        System.out.println(pcArr);
-        System.out.println(chCArr);
-        System.out.println(starArr);
 
         String selectType = data.get("selectType").toString();
         String keyword = data.get("keyword").toString();
@@ -407,15 +421,10 @@ public class AdminController {
         }
         String time = data.get("time").toString();
 
-        System.out.println("selectType = " + selectType);
-        System.out.println("keyword = " + keyword);
-        System.out.println("time = " + time);
-
         List<ParsedReviewDTO> mapList = adminService.reviewsByOptions(pcArr, chCArr, starArr, selectType, keyword, time);//필터링된 리뷰 가져오기
         adminService.insertRevSeq(mapList); //insert
         List<ParsedReviewDTO2> objectList = adminService.reviewByOptList(mapList);
         List<Map<String, Object>> reviewList = pdReviewService.reviewListByOptions(objectList);//관리자 리뷰 조회에 뿌릴 데이터
-        System.out.println("list = " + reviewList);
         return reviewList;
     }
 }

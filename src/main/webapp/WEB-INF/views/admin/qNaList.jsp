@@ -34,27 +34,14 @@
     <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
 
     <style>
-        #footer {
-            /*position: fixed;*/
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: #343a40; /* 배경색상 */
-            color: white; /* 글자색상 */
-            text-align: center; /* 가운데 정렬 */
-            padding: 15px; /* 위아래/좌우 패딩 */
-            position: relative;
-            /*transform: translatY(-100%);*/
-        }
-
         .pagingDiv {
             position: fixed;
             left: 0;
-            bottom: 100px;
+            bottom: 150px;
             width: 100%;
-            color: white; /* 글자색상 */
-            text-align: center; /* 가운데 정렬 */
-            padding: 15px; /* 위아래/좌우 패딩 */
+            /*color: white; !* 글자색상 *!*/
+            /*text-align: center; !* 가운데 정렬 *!*/
+            /*padding: 15px; !* 위아래/좌우 패딩 *!*/
         }
 
         #tbody * {
@@ -78,16 +65,22 @@
         .qText, .aText {
             word-break: break-all
         }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart {
+            flex: 1 0 auto;
+        }
+
         #footer {
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: #343a40; /* 배경색상 */
-            color: white; /* 글자색상 */
-            text-align: center; /* 가운데 정렬 */
-            padding: 15px; /* 위아래/좌우 패딩 */
-            /*transform: translatY(-100%);*/
+            flex-shrink: 0;
         }
     </style>
 </head>
@@ -175,9 +168,25 @@
         </tbody>
     </table>
 </div>
-
-<!-- Footer-->
-<footer class="py-5 bg-dark" id="footer" >
+<div class="pagingDiv" style="text-align: center; ">
+    <c:if test="${paging.needPrev eq true}">
+        <a href="javascript:void(0); onclick=paging(${paging.startNavi-1}});"><</a>
+        <a href="javascript:void(0); onclick=paging(1);">맨 처음</a>
+    </c:if>
+    <c:forEach var="i" begin="${paging.startNavi}" end="${paging.endNavi}" varStatus="var">
+        <c:if test="${paging.cpage eq i}">
+            <a href="javascript:void(0); onclick=paging(${i});" style="font-weight: bold;">${i}</a>
+        </c:if>
+        <c:if test="${paging.cpage ne i}">
+            <a href="javascript:void(0); onclick=paging(${i});">${i}</a>
+        </c:if>
+    </c:forEach>
+    <c:if test="${paging.needNext eq true}">
+        <a href="javascript:void(0); onclick=paging(${paging.endNavi+1});">></a>
+        <a href="javascript:void(0); onclick=paging(${paging.totalPageCount});">맨끝</a>
+    </c:if>
+</div>
+<footer class="py-5 bg-dark" id="footer">
     <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
 </footer>
 
@@ -291,6 +300,110 @@
             })
         }
     });
+
+
+    //페이징 다시 그려줌
+    function paging(startNavi) {
+        console.log(startNavi);
+        $.ajax({
+            url: '/admin/qNaRepaging',
+            type: 'post',
+            data: {
+                "cpage": startNavi
+            },
+            success: function (data) {
+                console.log(data);
+                $(".pagingDiv").children().remove();
+                createPaging(data);
+            }
+        })
+    }
+
+    function createPaging(data) {
+        $("#tbody").children().remove();
+        for (let i = 0; i < data.length; i++) {
+            var newHtml = createHtml(data[i], data[i].startNavi, i);
+            $("#tbody").append(newHtml);
+        }
+
+        if (data[0].needPrev) {
+            var html = createPrev(startNavi);
+            $(".pagingDiv").append(html);
+        }
+        for (let k = data[0].startNavi; k <= data[0].endNavi; k++) {
+            if (data[0].startNavi == k) {
+                var html = createNewPage1(k);
+                $(".pagingDiv").append(html);
+            } else {
+                var html = createNewPage2(k);
+                $(".pagingDiv").append(html);
+            }
+        }
+        if (data[0].needNext) {
+            var html = createNext(data[0].endNavi, data[0].totalPageCount);
+            $(".pagingDiv").append(html);
+        }
+    }
+
+    function createPrev(startNavi) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (startNavi - 1) + ');">' + "<" + '</a>';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (1) + ');">' + "맨 처음" + '</a>';
+        return html;
+    }
+
+    function createNewPage1(k) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + k + ')"> ' + k + ' </a>';
+        return html;
+    }
+
+    function createNewPage2(k) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + k + ')" style="font-weight: bold;"> ' + k + ' </a>';
+        return html;
+    }
+
+    function createNext(endNavi, totalPageCount) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (endNavi + 1) + ');">' + ">" + '</a>';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (totalPageCount) + ');">' + "맨끝" + '</a>';
+        return html;
+    }
+
+    function createHtml(item, cpage, i) {
+        let pd_seq = item.productDTO.pd_seq;
+        var temp = '';
+        var HTML = '<tr><td><a href="/product/detail?pd_seq=' + pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width:100px; height: 100px;"></a>';
+        HTML += '<p>' + item.productDTO.name + '</p></td>';
+        if (item.answerYN == 'N' && item.answerYN != null) { //옵션 없을때
+            HTML += '<td>미답변</td>';
+        } else {
+            HTML += '<td>미답변</td>';
+        }
+        HTML += '<td class="question"><a href="javascript:;" onclick="showAns(' + i + ')">' + item.questionDTO.content + '</a></td>';
+        HTML += '<td>' + item.questionDTO.writeDate + '</td>';
+        HTML += '<td>' + item.questionDTO.id + '</td>';
+        HTML += '<input type="hidden" value="' + item.questionDTO.q_seq + '" class="q_seq">';
+        HTML += '<td>';
+        if (item.answerYN != 'N') {
+            HTML += '<button type="button" class="updAnsBtn btn btn-light">답변 수정</button>';
+        } else {
+            HTML += '<button type="button" class="ansWriteBtn btn btn-light">답변 작성</button>';
+        }
+        HTML += '<button type="button" class="delQBtn btn btn-light">삭제</button></td></tr>';
+        HTML += '<tr class="answer_'+i+' answer" style="display:none;"><td></td><td></td>';
+        HTML += '<td class="qText">'+item.questionDTO.content+'</td>';
+        HTML += '<td>' + item.questionDTO.writeDate + '</td>';
+        HTML += '<td>' + item.questionDTO.id + '</td><td></td></tr>';
+        if (item.answerYN == 'Y') {
+            HTML += '<tr class="answer_'+i+' answer" style="display:none;"><td></td><td></td>';
+            HTML += '<td class="aText"><i class="fa-solid fa-pen"></i>'+item.answerDTO.answer+'</td>';
+            HTML += '<td>' + item.answerDTO.writer + '</td>';
+            HTML += '<td>' + item.answerDTO.writeDate + '</td><td></td></tr>';
+        }
+        return HTML;
+    }
 </script>
 </body>
 </html>

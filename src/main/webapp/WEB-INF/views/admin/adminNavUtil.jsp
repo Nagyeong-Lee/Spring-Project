@@ -24,7 +24,7 @@
       <a href="/member/logout?id=${id}"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="logout">
         로그아웃
       </button></a>
-      <a href="/admin/qNa"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="qNa">
+      <a href="/admin/qNa?cpage=1"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="qNa">
             Q&A조회
       </button></a>
       <a href="/admin/reviews"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="reviews">

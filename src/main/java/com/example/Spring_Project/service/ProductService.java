@@ -25,6 +25,13 @@ public class ProductService {
         return productMapper.getProducts(start, end);
     }
 
+    public Integer countRegisteredPd() throws Exception{
+        return productMapper.countRegisteredPd();
+    }
+    public Integer countSalesPd() throws Exception{
+        return productMapper.countSalesPd();
+    }
+
     public ProductDTO getProductDetail(Integer pd_seq) throws Exception { //상품 상세 정보
         return productMapper.getProductDetail(pd_seq);
     }
@@ -475,8 +482,6 @@ public class ProductService {
             endNavi = totalPageCount;
         }
 
-        System.out.println("startNavi = " + startNavi);
-        System.out.println("endNavi = " + endNavi);
         boolean needPrev = true;
         boolean needNext = true;
 
@@ -497,10 +502,11 @@ public class ProductService {
     }
 
     //페이징
-    public Map<String, Object> paging(Integer cpage) throws Exception {
+    public Map<String, Object> paging(Integer cpage,Integer postCnt) throws Exception {
         //현재 페이지
-        System.out.println("cpage = " + cpage);
-        Integer postCount = salesPdCount(); //판매 상품수
+//        Integer postCount = salesPdCount(); //판매 상품수
+        Integer postCount = postCnt; //판매 상품수
+        System.out.println("postCount = " + postCount);
         Integer postPerPage = 10; //페이지 당 글 개수
         Integer naviPerPage = 10; //페이지 당 내비 수
         Integer totalPageCount = 0; //전체 페이지 수
@@ -522,8 +528,6 @@ public class ProductService {
             endNavi = totalPageCount;
         }
 
-        System.out.println("startNavi = " + startNavi);
-        System.out.println("endNavi = " + endNavi);
         boolean needPrev = true;
         boolean needNext = true;
 
@@ -548,7 +552,6 @@ public class ProductService {
     }
     public Map<String, Object> historyPaging(Integer cpage,String id) throws Exception {
         //현재 페이지
-        System.out.println("cpage = " + cpage);
         Integer postCount = historyCnt(id); //판매 상품수
         Integer postPerPage = 10; //페이지 당 글 개수
         Integer naviPerPage = 10; //페이지 당 내비 수
@@ -571,8 +574,6 @@ public class ProductService {
             endNavi = totalPageCount;
         }
 
-        System.out.println("startNavi = " + startNavi);
-        System.out.println("endNavi = " + endNavi);
         boolean needPrev = true;
         boolean needNext = true;
 
@@ -617,7 +618,6 @@ public class ProductService {
                 map.put("reviewDTO", reviewDTO);
             }
             map.put("productDTO", productDTO);
-            System.out.println("reviewDTO = " + reviewDTO);
             map.put("price", price);
             map.put("payMethod", payMethod);
             map.put("payDate", payDate);
@@ -629,28 +629,20 @@ public class ProductService {
             deliDTO.setPhone(parsedPhone);
             map.put("deliDTO", deliDTO);
             map.put("count", count);
-            System.out.println("payInfoDTO = " + payInfoDTO.containsKey("OPTIONS"));
             if (payInfoDTO.containsKey("OPTIONS")) { //옵션 있을때
                 Object object = jsonParser.parse(payInfoDTO.get("OPTIONS").toString());
                 jsonObject = (JsonObject) object;
                 jsonArray = (JsonArray) jsonObject.get("name");
                 List<Map<String, Object>> optionMapList = new ArrayList<>();
                 Map<String, Object> optionMap = null;
-                System.out.println("jsonArray = " + jsonArray);
-                System.out.println("jsonArray = " + jsonArray.size());
                 for (int i = 0; i < jsonArray.size(); i++) {
                     optionMap = new HashMap<>();
                     //size = s
                     String optName = jsonArray.get(i).toString().replace("\"", "");
-                    System.out.println("optName = " + optName);
                     String optCategory = this.getOptCategory(productDTO.getPd_seq(), optName); //옵션 카테고리 이름 가져오기 (size)
-                    System.out.println("optName = " + optName);
-                    System.out.println("optCategory = " + optCategory);
                     optionMap.put(optCategory, optName);
                     optionMapList.add(optionMap);
                 }
-                System.out.println("optionMap = " + optionMap);
-                System.out.println("optionMapList = " + optionMapList);
                 map.put("option", optionMapList);
             }
             historyList.add(map);

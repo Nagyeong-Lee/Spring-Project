@@ -31,7 +31,6 @@
       $("select").on("change",function(){
         flag= true;
         let checkedName = $("select option:checked").val();
-        console.log(checkedName);
       });
 
       //변경 클릭시
@@ -57,7 +56,6 @@
               "invoiceNum":invoiceNum
             },
             success:function(data){
-              console.log(data);
               if(data === 'success'){
                 window.close();
                 opener.parent.location.reload();

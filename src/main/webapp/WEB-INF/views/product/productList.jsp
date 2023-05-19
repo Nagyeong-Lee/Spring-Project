@@ -116,23 +116,23 @@
             heigth: 200px;
         }
 
-        #footer {
-            /*position: fixed;*/
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: #343a40; /* 배경색상 */
-            color: white; /* 글자색상 */
-            text-align: center; /* 가운데 정렬 */
-            padding: 15px; /* 위아래/좌우 패딩 */
-            position: relative;
-            /*transform: translatY(-100%);*/
+        html, body {
+            height: 100%;
         }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        .detailDiv{
+            flex: 1 0 auto;
+        }
+        #footer{  flex-shrink: 0;}
     </style>
 </head>
 <body>
 <input type="hidden" value="${keyword}" id="key" name="key">
 <input type="hidden" value="${id}" id="id" name="id">
+<div class="detailDiv">
 <%@ include file="/WEB-INF/views/product/pdListUtil.jsp"%>
 
 <div class="pagingDiv" style="text-align: center;">
@@ -153,7 +153,7 @@
         <a href="javascript:void(0); onclick=paging(${paging.totalPageCount});">맨끝</a>
     </c:if>
 </div>
-
+</div>
 
 <!-- Footer-->
 <footer class="py-5 bg-dark" id="footer" >

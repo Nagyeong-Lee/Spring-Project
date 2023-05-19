@@ -15,6 +15,12 @@ import java.util.Map;
 @Repository
 public interface ProductMapper {
     List<ProductDTO> getProducts(@Param("start") Integer start,@Param("end") Integer end);
+
+    @Select("select count(*) from product where status = 'Y'")
+    Integer countRegisteredPd();
+
+    @Select("select count(*) from sales")
+    Integer countSalesPd();
     ProductDTO getProductDetail(@Param("pd_seq") Integer pd_seq);
 
     List<ProductDTO> getWProduct(); //여자 카테고리만
