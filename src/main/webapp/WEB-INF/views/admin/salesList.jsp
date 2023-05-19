@@ -28,7 +28,7 @@
 
     <style>
         #footer {
-            position: fixed;
+            position: relative;
             left: 0;
             bottom: 0;
             width: 100%;
@@ -36,6 +36,7 @@
             color: white; /* 글자색상 */
             text-align: center; /* 가운데 정렬 */
             padding: 15px; /* 위아래/좌우 패딩 */
+            /*transform: translatY(-100%);*/
         }
     </style>
 </head>
@@ -114,6 +115,11 @@
         <a href="javascript:void(0); onclick=paging(${paging.totalPageCount});">맨끝</a>
     </c:if>
 </div>
+
+<!-- Footer-->
+<footer class="py-5 bg-dark" id="footer">
+    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+</footer>
 
 <script>
     // /*택배사 db 저장*/
@@ -216,7 +222,7 @@
             HTML += '<td style="text-align: center;">배송중</td>';
         } else if (item.deliYN == 'N') {
             HTML += '<td style="text-align: center;"><button class="selectCourier btn btn-light">택배사 입력</button></td>';
-        }else{
+        } else {
             HTML += '<td style="text-align: center;">배송 완료</td>';
         }
         return HTML;

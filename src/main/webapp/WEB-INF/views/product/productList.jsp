@@ -116,8 +116,8 @@
             heigth: 200px;
         }
 
-        footer{
-            position: fixed;
+        #footer {
+            /*position: fixed;*/
             left: 0;
             bottom: 0;
             width: 100%;
@@ -125,6 +125,8 @@
             color: white; /* 글자색상 */
             text-align: center; /* 가운데 정렬 */
             padding: 15px; /* 위아래/좌우 패딩 */
+            position: relative;
+            /*transform: translatY(-100%);*/
         }
     </style>
 </head>
@@ -152,6 +154,11 @@
     </c:if>
 </div>
 
+
+<!-- Footer-->
+<footer class="py-5 bg-dark" id="footer" >
+    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+</footer>
 <!-- Bootstrap core JS-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Core theme JS-->

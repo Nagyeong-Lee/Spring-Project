@@ -5,6 +5,7 @@ import com.example.Spring_Project.dto.ParsedReviewDTO;
 import com.example.Spring_Project.dto.ParsedReviewDTO2;
 import com.example.Spring_Project.excel.ExcelRead;
 import com.example.Spring_Project.mapper.AdminMapper;
+import com.example.Spring_Project.mapper.PdReviewMapper;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.ibatis.annotations.Delete;
@@ -28,6 +29,9 @@ import java.util.Map;
 public class AdminService {
     @Autowired
     private AdminMapper adminMapper;
+
+    @Autowired
+    private PdReviewMapper pdReviewMapper;
 
     @Autowired
     private ExcelRead excelRead;
@@ -211,38 +215,79 @@ public class AdminService {
     }
 
     public List<String> childCategoryArr(List<String> childCategoryArr) throws Exception {
-        for(String str : childCategoryArr){
-            if(str.equals("accessory")){
+        for (String str : childCategoryArr) {
+            if (str.equals("accessory")) {
                 int index = childCategoryArr.indexOf("accessory");
-                childCategoryArr.set(index,"악세사리");
+                childCategoryArr.set(index, "악세사리");
             }
-            if(str.equals("outer")){
+            if (str.equals("outer")) {
                 int index = childCategoryArr.indexOf("outer");
-                childCategoryArr.set(index,"아우터");
+                childCategoryArr.set(index, "아우터");
             }
-            if(str.equals("top")){
+            if (str.equals("top")) {
                 int index = childCategoryArr.indexOf("top");
-                childCategoryArr.set(index,"상의");
+                childCategoryArr.set(index, "상의");
             }
-            if(str.equals("pants")){
+            if (str.equals("pants")) {
                 int index = childCategoryArr.indexOf("pants");
-                childCategoryArr.set(index,"하의");
+                childCategoryArr.set(index, "하의");
             }
         }
         return childCategoryArr;
     }
 
-    public List<ParsedReviewDTO> reviewsByOptions(List<String> pcArr, List<String> chCArr, List<String> starArr
-    , String selectType, String keyword, String time){
-        return adminMapper.reviewsByOptions(pcArr,chCArr,starArr,selectType,keyword,time);
+    public void insertRevSeq( List<ParsedReviewDTO> mapList) throws Exception{
+        for (ParsedReviewDTO parsedReviewDTO : mapList) {
+            //리뷰 이미지 있는지 체크
+            Map<String, Object> imgSeqMap = new HashMap<>();
+            Integer reviewSeq = parsedReviewDTO.getReview_seq();
+            System.out.println("reviewSeq = " + reviewSeq);
+            Integer isRevImgExist = pdReviewMapper.isImgExist(reviewSeq);
+            System.out.println("isRevImgExist = " + isRevImgExist);
+            Integer chkInsert = pdReviewMapper.chkInsert(reviewSeq);
+            System.out.println("chkInsert = " + chkInsert);
+            if (isRevImgExist != 0 && chkInsert == 0) {
+                List<Integer> imgSeqs = pdReviewMapper.getImgSeqs(reviewSeq);
+                System.out.println("imgSeqs = " + imgSeqs);
+                imgSeqMap.put("seq", imgSeqs);
+                System.out.println("imgSeq = " + imgSeqMap);
+                System.out.println("imgSeq = " + imgSeqMap);
+                //db에 저장
+                pdReviewMapper.insertRevSeq(reviewSeq, imgSeqMap.toString());  // img 조인하려고 새로운 테이블에 1 : {seq : []}
+            }
+        }
     }
 
-    public List<ParsedReviewDTO2> reviewByOptList(List<ParsedReviewDTO> mapList ) throws Exception{
+    public List<ParsedReviewDTO> reviewsByOptions(List<String> pcArr, List<String> chCArr, List<String> starArr
+            , String selectType, String keyword, String time) {
+        return adminMapper.reviewsByOptions(pcArr, chCArr, starArr, selectType, keyword, time);
+    }
+
+    public List<ParsedReviewDTO2> reviewByOptList(List<ParsedReviewDTO> mapList) throws Exception {
         System.out.println("mapList = " + mapList);
         JsonParser jsonParser = new JsonParser();
         List<ParsedReviewDTO2> objectList = new ArrayList<>();
         for (ParsedReviewDTO parsedReviewDTO : mapList) {
+
+            //리뷰 이미지 있는지 체크
+            Map<String, Object> imgSeqMap = new HashMap<>();
+            Integer reviewSeq = parsedReviewDTO.getReview_seq();
+            Integer isRevImgExist = pdReviewMapper.isImgExist(reviewSeq);
+
+//            //table에 insert했는지 체크
+//            Integer chkInsert = pdReviewMapper.chkInsert(reviewSeq);
+//            if (isRevImgExist != 0 && chkInsert ==0) {
+//                List<Integer> imgSeqs = pdReviewMapper.getImgSeqs(reviewSeq);
+//                System.out.println("imgSeqs = " + imgSeqs);
+//                imgSeqMap.put("seq", imgSeqs);
+//                System.out.println("imgSeq = " + imgSeqMap);
+//                System.out.println("imgSeq = " + imgSeqMap);
+//                //db에 저장
+//                pdReviewMapper.insertRevSeq(reviewSeq, imgSeqMap.toString());  // img 조인하려고 새로운 테이블에 1 : {seq : []}
+//            }
+
             int review_seq = parsedReviewDTO.getReview_seq();
+            String revImgSeqs   = pdReviewMapper.getRevImg(review_seq);
             String id = parsedReviewDTO.getId();
             int pd_seq = parsedReviewDTO.getPd_seq();
             int payPd_seq = parsedReviewDTO.getPayPd_seq();
@@ -259,6 +304,7 @@ public class AdminService {
             String parentCtg = adminMapper.getParentCtg(Integer.parseInt(childCtg.get("PARENT_CATEGORY_SEQ").toString()));
             ParsedReviewDTO2 parsedReviewDTO2 = ParsedReviewDTO2.builder()
                     .review_seq(review_seq)
+                    .revImg_seq(revImgSeqs)
                     .id(id)
                     .pd_seq(pd_seq)
                     .payPd_seq(payPd_seq)

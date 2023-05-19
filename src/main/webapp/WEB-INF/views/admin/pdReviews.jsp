@@ -70,6 +70,18 @@
         a {
             text-decoration: none;
         }
+
+        #footer {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40; /* 배경색상 */
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            padding: 15px; /* 위아래/좌우 패딩 */
+            /*transform: translatY(-100%);*/
+        }
     </style>
 <body>
 <%@include file="/WEB-INF/views/admin/adminNavUtil.jsp" %>
@@ -125,7 +137,7 @@
     <thead>
     <th>카테고리</th>
     <th>이미지</th>
-    <th>상품 정보</th>
+    <th style="width: 300px;">상품 정보</th>
     <th>별점</th>
     <th class="content">내용</th>
     <th>작성자</th>
@@ -143,22 +155,18 @@
                         <p>&nbsp${categoryMap.CHILDCATEGORY}</p>
                     </td>
                     <td>
-                            <%--                            ${i}--%>
-                            <%--                        <a href="/product/detail?pd_seq=${i.reviewDTOS.PD_SEQ}">--%>
                         <img src="/resources/img/products/${i.reviewDTOS.PDNAME}"
                              style="width: 100px; height: 100px;">
-                            <%--                        </a>--%>
                     </td>
                     <td>
                         <p>${i.reviewDTOS.NAME}-${i.reviewDTOS.STOCK}개</p>
-                        <c:if test="${i.option != null}">
-                            <c:forEach var="k" items="${i.option.optionMapList}">
+                        <c:if test="${i.optionMapList != null}">
+                            <c:forEach var="k" items="${i.optionMapList}">
                                 <c:forEach var="j" items="#{k}">
                                     <p>${j.key} : ${j.value}</p>
                                 </c:forEach>
                             </c:forEach>
                         </c:if>
-                            <%--                                                       옵션.개수 출력--%>
                         <p><fmt:formatNumber value="${i.totalPrice}" pattern="#,###"/>원</p>
                     </td>
                     <td class="tdStyle">
@@ -188,10 +196,29 @@
                     <td></td>
                     <td></td>
                     <td class="qText">${i.reviewDTOS.CONTENT}</td>
-                    <td>${i.reviewDTOS.ID}</td>
-                    <td>${i.reviewDTOS.WRITEDATE}</td>
+<%--                    <td>${i.reviewDTOS.ID}</td>--%>
+<%--                    <td>${i.reviewDTOS.WRITEDATE}</td>--%>
+                    <td></td>
+                    <td></td>
                     <td></td>
                 </tr>
+                <%--리뷰 이미지 있으면 --%>
+                <c:if test="${!empty i.revImgSysname}">
+                    <tr class="answer_${status.index} answer" style="display:none;">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="qText">
+                            <c:forEach items="${i.revImgSysname}" var="k">
+                                <img src="/resources/img/products/pdReview/${k}" style="width: 100px; height: 100px;">
+                            </c:forEach>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </c:if>
             </c:forEach>
         </c:when>
         <c:otherwise>
@@ -202,6 +229,12 @@
     </c:choose>
     </tbody>
 </table>
+
+<!-- Footer-->
+<footer class="py-5 bg-dark" id="footer" >
+    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+</footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/resources/asset/js/scripts.js"></script>
 <script>
@@ -212,6 +245,7 @@
 
     //동적 html
     function createHtml(data) {
+        console.log('데이터');
         console.log(data);
         //카테고리 출력
         var html = '';
@@ -254,11 +288,21 @@
                 html += '<input type="hidden" value="' + data[i].parsedReviewDTO2.review_seq + '" class="r_seq">';
                 html += '<td class="tdStyle"><button type="button" class="btn btn-light delBtn">삭제</button></td</tr>';
 
-                //내용 클릭 시 아래 띄우는것
+                //내용 클릭 시 내용 전체 보여줌
                 html += '<tr class="answer_' + i + ' answer" style="display:none;"><td></td><td></td><td></td><td></td>';
                 html += '<td class="qText">' + data[i].parsedReviewDTO2.content + '</td>';
                 html += '<td>' + data[i].parsedReviewDTO2.id + '</td>';
                 html += '<td>' + data[i].parsedReviewDTO2.writeDate + '</td></tr>';
+
+                if(data[i].revImgSysname != null){
+                //내용 클릭 시 내용 전체 보여줌
+                html += '<tr class="answer_' + i + ' answer" style="display:none;"><td></td><td></td><td></td><td></td><td class="qText">';
+                for(let j = 0 ; j<data[i].revImgSysname.length; j++){
+                    html += '<img src="/resources/img/products/pdReview/'+data[i].revImgSysname[j]+'" style="width: 100px; height: 100px;">';
+                }
+                html += '</td>';
+                html += '<td></td><td></td><td></td></tr>';
+                }
             }
         }
         return html;

@@ -344,7 +344,7 @@ public class AdminController {
         return "/admin/qNaList";
     }
 
-    @GetMapping("/reviews")
+    @GetMapping("/reviews")   //처음 필터 선택된 리뷰 가져오기
     public String getPdReviews(Model model) throws Exception {
         //처음 옵션 값 설정
         Map<String, Object> optionMap = new HashMap<>();
@@ -364,14 +364,7 @@ public class AdminController {
         List<Object> pdReviewDTOS = new ArrayList<>();
         List<Map<String, Object>> reviewDTOS = pdReviewService.getReviews(pdSeqs, star); //처음 리뷰 리스트
         List<Map<String, Object>> reviewList = pdReviewService.reviewList(reviewDTOS);
-//
-//        List<Map<String,Object>> imgs = new ArrayList<>();
-//        for(int i = 0; i<reviewDTOS.size(); i++){
-//            Map<String,Object> map = pdReviewService.getReviewImgs(Integer.parseInt(reviewDTOS.get(i).get("review_seq").toString()));
-//            pdReviewDTOS.add(map);
-//        }
-//        pdReviewDTOS.add(reviewDTOS); //img 빼고 데이터 추출한거
-
+        System.out.println("reviewList = " + reviewList);
 
         //부모 카테고리
         List<String> parentCategory = productService.getParentCategory();
@@ -418,9 +411,10 @@ public class AdminController {
         System.out.println("keyword = " + keyword);
         System.out.println("time = " + time);
 
-        List<ParsedReviewDTO> mapList = adminService.reviewsByOptions(pcArr, chCArr, starArr, selectType, keyword, time); //필터링된 리뷰 가져오기
-        List<ParsedReviewDTO2> objectList = adminService.reviewByOptList(mapList);  //관리자 리뷰 조회에 뿌릴 데이터
-        List<Map<String, Object>> reviewList = pdReviewService.reviewListByOptions(objectList);
+        List<ParsedReviewDTO> mapList = adminService.reviewsByOptions(pcArr, chCArr, starArr, selectType, keyword, time);//필터링된 리뷰 가져오기
+        adminService.insertRevSeq(mapList); //insert
+        List<ParsedReviewDTO2> objectList = adminService.reviewByOptList(mapList);
+        List<Map<String, Object>> reviewList = pdReviewService.reviewListByOptions(objectList);//관리자 리뷰 조회에 뿌릴 데이터
         System.out.println("list = " + reviewList);
         return reviewList;
     }

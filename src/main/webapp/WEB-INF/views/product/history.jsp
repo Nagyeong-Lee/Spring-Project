@@ -14,7 +14,6 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
-    <%--    <link rel="stylesheet" type="text/css" href="/resources/navUtil.css">--%>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,24 +25,22 @@
     <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
 
     <style>
-        #footer {
-            /*position: fixed;*/
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: #343a40; /* 배경색상 */
-            color: white; /* 글자색상 */
-            text-align: center; /* 가운데 정렬 */
-            padding: 15px; /* 위아래/좌우 패딩 */
-            position: relative;
-            /*transform: translatY(-100%);*/
-        }
-
         .pagingDiv {
             position: fixed;
             left: 0;
             bottom: 100px;
             width: 100%;
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            padding: 15px; /* 위아래/좌우 패딩 */
+        }
+
+        #footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40; /* 배경색상 */
             color: white; /* 글자색상 */
             text-align: center; /* 가운데 정렬 */
             padding: 15px; /* 위아래/좌우 패딩 */
@@ -151,10 +148,10 @@
     </c:if>
 </div>
 
-<%--<!-- Footer-->--%>
-<%--<footer class="py-5 bg-dark" id="footer">--%>
-<%--    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>--%>
-<%--</footer>--%>
+<!-- Footer-->
+<footer class="py-5 bg-dark" id="footer">
+    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/resources/asset/js/scripts.js"></script>
@@ -228,13 +225,13 @@
         newHtml = newTable;
         if (item.option == null) { //옵션 없을때
             newTable += '<td style="text-align: center"><p>' + item.productDTO.name + '  ' + item.count + '개' + '</p>';
-            newTable +='<input type="hidden" value="'+item.payPd_seq+'" name="payPd_seq" class="payPd_seq"><input type="hidden" value="'+item.productDTO.pd_seq+'" name="pd_seq" class="pd_seq"></td>';
+            newTable += '<input type="hidden" value="' + item.payPd_seq + '" name="payPd_seq" class="payPd_seq"><input type="hidden" value="' + item.productDTO.pd_seq + '" name="pd_seq" class="pd_seq"></td>';
         } else { //옵션 있을때
             temp += '<td><p>' + item.productDTO.name + '  ' + item.count + '개' + '</p>';
             for (let i = 0; i < item.option.length; i++) {
                 temp += '<p>' + Object.keys(item.option[i])[0] + ' : ' + item.option[i][Object.keys(item.option[i])[0]] + '</p>';
             }
-            temp +='<input type="hidden" value="'+item.payPd_seq+'" name="payPd_seq" class="payPd_seq"><input type="hidden" value="'+item.productDTO.pd_seq+'" name="pd_seq" class="pd_seq"></td>';
+            temp += '<input type="hidden" value="' + item.payPd_seq + '" name="payPd_seq" class="payPd_seq"><input type="hidden" value="' + item.productDTO.pd_seq + '" name="pd_seq" class="pd_seq"></td>';
             newTable = newTable + temp;
         }
         newTable += '<td style="text-align: center"><p>받는 사람 : ' + item.deliDTO.name + '</p><p>전화번호 : ' + item.deliDTO.phone + '</p><p>주소 : ' + item.deliDTO.address + '</p></td>';
@@ -246,9 +243,9 @@
         } else {
             // newTable += '<td style="text-align: center;">배송 완료<button type="button" class="reviewBtn btn btn-light" style="font-size: 13px;">리뷰 작성하기</button></td></tr>';
             newTable += '<td style="text-align: center;">배송 완료';
-            if(item.reviewDTO != null){
+            if (item.reviewDTO != null) {
                 if (item.reviewDTO.status == 'Y') {
-                    newTable += '<button type="button" class="updReviewBtn btn btn-light" style="font-size: 13px;"><input type="hidden" value="'+item.reviewDTO.review_seq+'">리뷰 수정하기</button></td>';
+                    newTable += '<button type="button" class="updReviewBtn btn btn-light" style="font-size: 13px;"><input type="hidden" value="' + item.reviewDTO.review_seq + '">리뷰 수정하기</button></td>';
                 } else {
                     newTable += '<button type="button" class="reviewBtn btn btn-light" style="font-size: 13px;">리뷰 작성하기</button></td>';
                 }
@@ -329,19 +326,19 @@
     });
 
     //리뷰 수정하기 클릭 시
-    $(document).on("click",".updReviewBtn ",function(){
+    $(document).on("click", ".updReviewBtn ", function () {
         // let pd_seq = $(this).parent().parent().find(".pd_seq").val();
         // let payPd_seq = $(this).parent().parent().find(".payPd_seq").val();
         let review_seq = $(this).children().val();
 
         let newForm = document.createElement("form");
-        newForm.setAttribute("method","post");
-        newForm.setAttribute("action","/pdReview/updReview");
+        newForm.setAttribute("method", "post");
+        newForm.setAttribute("action", "/pdReview/updReview");
 
-        let input1= document.createElement("input");
-        input1.setAttribute("type","hidden");
-        input1.setAttribute("name","review_seq");
-        input1.setAttribute("value",review_seq);
+        let input1 = document.createElement("input");
+        input1.setAttribute("type", "hidden");
+        input1.setAttribute("name", "review_seq");
+        input1.setAttribute("value", review_seq);
 
         newForm.appendChild(input1);
         document.body.append(newForm);

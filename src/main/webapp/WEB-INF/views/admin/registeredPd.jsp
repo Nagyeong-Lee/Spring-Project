@@ -24,6 +24,20 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
+    <style>
+        #footer {
+            /*position: fixed;*/
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40; /* 배경색상 */
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            padding: 15px; /* 위아래/좌우 패딩 */
+            position: relative;
+            /*transform: translatY(-100%);*/
+        }
+    </style>
 </head>
 <body>
 <%@include file="/WEB-INF/views/admin/adminNavUtil.jsp" %>
@@ -91,6 +105,10 @@
     </c:if>
 </div>
 
+<!-- Footer-->
+<footer class="py-5 bg-dark" id="footer" >
+    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/resources/asset/js/scripts.js"></script>

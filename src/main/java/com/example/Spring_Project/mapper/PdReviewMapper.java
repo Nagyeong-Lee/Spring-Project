@@ -38,6 +38,9 @@ import java.util.Map;
     @Select("select count(*) from img where review_seq = #{review_seq}")
     Integer isImgExist(@Param("review_seq") Integer review_seq);
 
+    @Select("select count(*) from revImg WHERE review_seq = #{review_seq}")
+    Integer chkInsert(@Param("review_seq") Integer review_seq);
+
     Map<String,Object> reviewInPdDetail(@Param("pd_seq") Integer pd_seq, @Param("payPd_seq") Integer payPd_seq);
     List<String> reviewImgsByPd_seq(@Param("pd_seq") Integer pd_seq);
     String optionCategory(@Param("pd_seq") Integer pd_seq, @Param("optName") String optName);
@@ -47,4 +50,8 @@ import java.util.Map;
     List<Map<String,Object>> getReviewsByOption(Map<String,Object> data);
     List<Integer> reviewImgs(@Param("seq") Integer review_seq);
     Map<String,Object> getReviewImgs(@Param("seq") Integer review_seq);
+    List<Integer> getImgSeqs(@Param("review_seq") Integer review_seq);
+    void insertRevSeq(@Param("review_seq") Integer review_seq,@Param("imgSeqMap") String imgSeqMap);
+    String getRevImgSysname(@Param("imgSeq") Integer imgSeq);
+    String getRevImg(@Param("review_seq") Integer review_seq);
 }

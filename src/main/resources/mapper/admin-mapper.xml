@@ -80,99 +80,181 @@
         SELECT pd_seq FROM PRODUCT p WHERE CATEGORY = #{seq}
     </select>
 
-    <select id="reviewsByOptions" parameterType="java.util.List" resultType="com.example.Spring_Project.dto.ParsedReviewDTO">
-        SELECT
-            r.review_seq,
-            r.id,
-            r.pd_seq,
-            r.payPd_seq,
-            r.stock,
-            r.price,
-            r.pdOption,
-            r.star,
-            r.content,
-            writeDate,
-            p.name AS pdName,
-            p.img AS PdImg
-        FROM PRODUCT p JOIN (
-            SELECT
-                r.review_seq,
-                r.id,
-                r.pd_seq,
-                r.payPd_seq,
-                s.stock,
-                s.price,
-                s.pdOption,
-                r.star,
-                r.content,
-                writeDate
-        FROM sales s JOIN (
-            SELECT
-                r.review_seq,
-                r.id,
-                r.payPd_seq,
-                r.pd_seq,
-                to_char(writeDate,'YYYY-MM-DD HH24:MI') AS writeDate,
-                r.star,
-                r.content
-        FROM review r WHERE pd_seq IN (
-            SELECT
-                pd_seq
-            FROM product
-            WHERE CATEGORY IN (
+    <select id="reviewsByOptions" parameterType="java.util.List"
+            resultType="com.example.Spring_Project.dto.ParsedReviewDTO">
                 SELECT
-                    category_seq
-                FROM category
-                WHERE PARENT_CATEGORY_SEQ  IN (
-                SELECT
-                    CATEGORY_SEQ
-                FROM category
-                WHERE name IN
-                <foreach collection="pcArr" item="pcArr" open="(" close=")" separator=",">
-                     #{pcArr}
-                </foreach>)
-                AND name IN
-                <foreach collection="chCArr" item="chCArr" open="(" close=")" separator=",">
-                                #{chCArr}
-                </foreach>
-                )) AND status = 'Y') r ON s.payPd_seq  = r.payPd_seq
-                WHERE r.star IN
-                <foreach collection="starArr" item="starArr" open="(" close=")" separator=",">
-                     #{starArr}
-                </foreach>
-                ORDER BY writeDate
-                <if test='time.equals("writeTimeAsc")'>
-                    asc
-                </if>
-                <if test='time.equals("writeTimeDesc")'>
-                    desc
-                </if>
-                ) r on p.pd_seq = r.pd_seq
-                <choose>
-                     <when test='type.equals("pdName") and keyword != null'>
-                         where p.name like '%'||#{keyword}||'%'
-                     </when>
-                     <when test='type.equals("content") and keyword != null'>
-                         where r.content like '%'||#{keyword}||'%'
-                     </when>
-                    <when test='type.equals("writer") and keyword != null'>
-                        where r.id like '%'||#{keyword}||'%'
-                    </when>
-                </choose>
+                    r.review_seq,
+                    r.id,
+                    r.pd_seq,
+                    r.payPd_seq,
+                    r.stock,
+                    r.price,
+                    r.pdOption,
+                    r.star,
+                    r.content,
+                    writeDate,
+                    p.name AS pdName,
+                    p.img AS PdImg
+                FROM PRODUCT p JOIN (
+                    SELECT
+                        r.review_seq,
+                        r.id,
+                        r.pd_seq,
+                        r.payPd_seq,
+                        s.stock,
+                        s.price,
+                        s.pdOption,
+                        r.star,
+                        r.content,
+                        writeDate
+                FROM sales s JOIN (
+                    SELECT
+                        r.review_seq,
+                        r.id,
+                        r.payPd_seq,
+                        r.pd_seq,
+                        to_char(writeDate,'YYYY-MM-DD HH24:MI') AS writeDate,
+                        r.star,
+                        r.content
+                FROM review r WHERE pd_seq IN (
+                    SELECT
+                        pd_seq
+                    FROM product
+                    WHERE CATEGORY IN (
+                        SELECT
+                            category_seq
+                        FROM category
+                        WHERE PARENT_CATEGORY_SEQ  IN (
+                        SELECT
+                            CATEGORY_SEQ
+                        FROM category
+                        WHERE name IN
+                        <foreach collection="pcArr" item="pcArr" open="(" close=")" separator=",">
+                             #{pcArr}
+                        </foreach>)
+                        AND name IN
+                        <foreach collection="chCArr" item="chCArr" open="(" close=")" separator=",">
+                                        #{chCArr}
+                        </foreach>
+                        )) AND status = 'Y') r ON s.payPd_seq  = r.payPd_seq
+                        WHERE r.star IN
+                        <foreach collection="starArr" item="starArr" open="(" close=")" separator=",">
+                             #{starArr}
+                        </foreach>
+                        ORDER BY writeDate
+                        <if test='time.equals("writeTimeAsc")'>
+                            asc
+                        </if>
+                        <if test='time.equals("writeTimeDesc")'>
+                            desc
+                        </if>
+                        ) r on p.pd_seq = r.pd_seq
+                        <choose>
+                             <when test='type.equals("pdName") and keyword != null'>
+                                 where p.name like '%'||#{keyword}||'%'
+                             </when>
+                             <when test='type.equals("content") and keyword != null'>
+                                 where r.content like '%'||#{keyword}||'%'
+                             </when>
+                            <when test='type.equals("writer") and keyword != null'>
+                                where r.id like '%'||#{keyword}||'%'
+                            </when>
+                        </choose>
+
+
+<!--        SELECT r.review_seq,-->
+<!--        revImg.revImg_seq,r.id,-->
+<!--        r.pd_seq,-->
+<!--        r.payPd_seq,-->
+<!--        r.stock,-->
+<!--        r.price,-->
+<!--        r.pdOption,-->
+<!--        r.star,-->
+<!--        r.content,-->
+<!--        writeDate,-->
+<!--        pdName,-->
+<!--        PdImg FROM revImg JOIN-->
+<!--        (SELECT r.review_seq,-->
+<!--        r.id,-->
+<!--        r.pd_seq,-->
+<!--        r.payPd_seq,-->
+<!--        r.stock,-->
+<!--        r.price,-->
+<!--        r.pdOption,-->
+<!--        r.star,-->
+<!--        r.content,-->
+<!--        writeDate,-->
+<!--        p.name AS pdName,-->
+<!--        p.img AS PdImg-->
+<!--        FROM PRODUCT p JOIN (-->
+<!--        SELECT-->
+<!--        r.review_seq,-->
+<!--        r.id,-->
+<!--        r.pd_seq,-->
+<!--        r.payPd_seq,-->
+<!--        s.stock,-->
+<!--        s.price,-->
+<!--        s.pdOption,-->
+<!--        r.star,-->
+<!--        r.content,-->
+<!--        writeDate-->
+<!--        FROM sales s JOIN (-->
+<!--        SELECT-->
+<!--        r.review_seq,-->
+<!--        r.id,-->
+<!--        r.payPd_seq,-->
+<!--        r.pd_seq,-->
+<!--        to_char(writeDate,'YYYY-MM-DD HH24:MI') AS writeDate,-->
+<!--        r.star,-->
+<!--        r.content-->
+<!--        FROM review r WHERE pd_seq IN (-->
+<!--        SELECT-->
+<!--        pd_seq-->
+<!--        FROM product-->
+<!--        WHERE CATEGORY IN (-->
+<!--        SELECT-->
+<!--        category_seq-->
+<!--        FROM category-->
+<!--        WHERE PARENT_CATEGORY_SEQ IN (-->
+<!--        SELECT-->
+<!--        CATEGORY_SEQ-->
+<!--        FROM category-->
+<!--        WHERE name IN-->
+<!--        <foreach collection="pcArr" item="pcArr" open="(" close=")" separator=",">-->
+<!--            #{pcArr}-->
+<!--        </foreach>)-->
+<!--        AND name IN-->
+<!--        <foreach collection="chCArr" item="chCArr" open="(" close=")" separator=",">-->
+<!--            #{chCArr}-->
+<!--        </foreach>-->
+<!--        )) AND status = 'Y') r ON s.payPd_seq = r.payPd_seq-->
+<!--        WHERE r.star IN-->
+<!--        <foreach collection="starArr" item="starArr" open="(" close=")" separator=",">-->
+<!--            #{starArr}-->
+<!--        </foreach>-->
+<!--        ORDER BY writeDate-->
+<!--        <if test='time.equals("writeTimeAsc")'>-->
+<!--            asc-->
+<!--        </if>-->
+<!--        <if test='time.equals("writeTimeDesc")'>-->
+<!--            desc-->
+<!--        </if>-->
+<!--        ) r on p.pd_seq = r.pd_seq) r-->
+<!--        ON revImg.review_seq = r.review_seq-->
     </select>
 
 
     <select id="getChildCtg" resultType="map">
         SELECT
-            name,
-            parent_category_seq
+        name,
+        parent_category_seq
         FROM CATEGORY c
         WHERE CATEGORY_SEQ
         IN (
-            SELECT category FROM PRODUCT p WHERE pd_seq   = #{pd_seq})
+        SELECT category FROM PRODUCT p WHERE pd_seq = #{pd_seq})
     </select>
 
     <select id="getParentCtg" resultType="String">
-        SELECT name FROM category WHERE CATEGORY_SEQ  = #{seq}
+        SELECT name FROM category WHERE CATEGORY_SEQ = #{seq}
     </select>
 </mapper>

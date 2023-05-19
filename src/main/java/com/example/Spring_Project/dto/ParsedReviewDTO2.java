@@ -7,6 +7,7 @@ import lombok.Data;
 @Builder
 public class ParsedReviewDTO2 {
     private Integer review_seq;
+    private String revImg_seq;
     private String id;
     private Integer pd_seq;
     private Integer payPd_seq;
