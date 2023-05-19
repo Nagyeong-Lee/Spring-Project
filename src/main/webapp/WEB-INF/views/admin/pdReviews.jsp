@@ -227,8 +227,9 @@
                 html += '<td><p>' + data[i].productDTO.name + '-' + data[i].parsedReviewDTO2.stock + '개</p>';
 
                 // 옵션 출력
-                if (data[i].optionMapList.length !== 0) {
+                if (Object.keys(data[i]).includes('optionMapList')) {  //key가 optionMapList 있으면 출력
                     for (let k = 0; k < data[i].optionMapList.length; k++) {
+                        console.log(Object.keys(data[i].optionMapList[k]) + ":" + Object.values(data[i].optionMapList[k]));
                         html += '<p>' + Object.keys(data[i].optionMapList[k]) + ":" + Object.values(data[i].optionMapList[k]) + '</p>';
                     }
                 }

@@ -272,6 +272,7 @@ public class PdReviewService {
             map.put("productDTO", productDTO);
             map.put("parsedReviewDTO2", parsedReviewDTO2);
             map.put("totalPrice", parsedReviewDTO2.getPrice() * parsedReviewDTO2.getStock());
+            System.out.println("parsedReviewDTO2.getPdOption() = " + parsedReviewDTO2.getPdOption());
             if (parsedReviewDTO2.getPdOption() != null) {   //옵션 있으면
                 JsonObject jsonObject1 = (JsonObject) jsonParser.parse(parsedReviewDTO2.getPdOption());
                 JsonArray jsonArray1 = (JsonArray)jsonObject1.get("name");
@@ -287,8 +288,8 @@ public class PdReviewService {
                     optionMap.put(optCategory, optName);
                     optionMapList.add(optionMap);
                 }
-            }
             map.put("optionMapList",optionMapList);
+            }
             reviewList.add(map);
         }
         System.out.println("reviewList = " + reviewList);
