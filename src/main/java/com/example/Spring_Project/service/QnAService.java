@@ -66,8 +66,8 @@ public class QnAService {
         return qNaList;
     }
 
-    public List<QuestionDTO> getMyQnAs(String id) throws Exception {
-        return qnAMapper.getMyQnAs(id);
+    public List<QuestionDTO> getMyQnAs(Integer start,Integer end,String id) throws Exception {
+        return qnAMapper.getMyQnAs(start,end,id);
     }
 
     @Transactional
@@ -81,8 +81,8 @@ public class QnAService {
         return qnAMapper.getQuestion(q_seq);
     }
 
-    public void updQuestion(Map<String, Object> param) throws Exception {
-        qnAMapper.updQuestion(param);
+    public void updQuestion(Integer q_seq,String content) throws Exception {
+        qnAMapper.updQuestion(q_seq,content);
     }
 
     public List<QuestionDTO> qNaList(Integer start, Integer end) throws Exception {
@@ -129,5 +129,62 @@ public class QnAService {
             qNaList.add(reMap);
         }
         return qNaList;
+    }
+
+    public Integer countMyQuestion(String id) throws Exception{
+        return qnAMapper.countMyQuestion(id);
+    }
+    public Map<String, Object> paging(Integer cpage,Integer postCnt) throws Exception {
+        //현재 페이지
+//        Integer postCount = salesPdCount(); //판매 상품수
+        Integer postCount = postCnt; //판매 상품수
+        System.out.println("postCount = " + postCount);
+        Integer postPerPage = 10; //페이지 당 글 개수
+        Integer naviPerPage = 10; //페이지 당 내비 수
+        Integer totalPageCount = 0; //전체 페이지 수
+        Map<String, Object> map = new HashMap<>();
+        if (postCount % naviPerPage > 0) {
+            totalPageCount = postCount / naviPerPage + 1;
+        } else {
+            totalPageCount = postCount / naviPerPage;
+        }
+
+        if (cpage > totalPageCount) {
+            cpage = totalPageCount;
+        }
+
+        int startNavi = (cpage - 1) / naviPerPage * naviPerPage + 1;  //페이지 start
+        int endNavi = startNavi + naviPerPage - 1; //페이지 end
+
+        if (endNavi > totalPageCount) {
+            endNavi = totalPageCount;
+        }
+
+        boolean needPrev = true;
+        boolean needNext = true;
+
+        if (startNavi == 1) {
+            needPrev = false;
+        }
+        if (endNavi == totalPageCount) {
+            needNext = false;
+        }
+
+        map.put("startNavi", startNavi);
+        map.put("endNavi", endNavi);
+        map.put("needPrev", needPrev);
+        map.put("needNext", needNext);
+        map.put("totalPageCount", totalPageCount);
+        map.put("cpage", cpage);
+        return map;
+    }
+
+    public Map<String, Object> pagingStartEnd(Integer cpage, Integer naviPerPage) throws Exception {
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+        Map<String, Object> map = new HashMap<>();
+        map.put("start", start);
+        map.put("end", end);
+        return map;
     }
 }

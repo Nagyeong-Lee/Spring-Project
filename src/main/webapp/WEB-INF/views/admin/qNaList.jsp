@@ -122,6 +122,7 @@
                         <td>${i.questionDTO.id}</td>
                         <td>${i.questionDTO.writeDate}</td>
                         <input type="hidden" value="${i.questionDTO.q_seq}" class="q_seq">
+                        <input type="hidden" value="${paging.cpage}" class="cpage">
                         <td>
                             <c:choose>
                                 <c:when test="${i.answerYN != 'N'}">
@@ -220,8 +221,10 @@
     }
 
     //답변 작성
-    $(".ansWriteBtn").click(function () {
+    $(document).on("click",".ansWriteBtn",function(){
+
         let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
+        let cpage = $(this).parent().closest("tr").find(".cpage").val();
         let id = $("#id").val();
         var _width = '500';
         var _height = '400';
@@ -239,7 +242,13 @@
         input1.setAttribute("value", q_seq);
         input1.setAttribute("name", "q_seq");
 
+        let input3 = document.createElement("input");
+        input3.setAttribute("type", "hidden");
+        input3.setAttribute("value", cpage);
+        input3.setAttribute("name",cpage );
+
         newFrm.append(input1);
+        newFrm.append(input3);
         document.body.append(newFrm);
 
         window.open("/QnA/ansPopup", "newFrm", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
@@ -248,11 +257,14 @@
         myForm.method = "post";
         myForm.target = "newFrm";
         myForm.submit();
+
     })
 
     //답변 수정
-    $(".updAnsBtn").click(function () {
+    $(document).on("click",".updAnsBtn",function(){
+
         let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
+        let cpage = $(this).parent().closest("tr").find(".cpage").val();
         let id = $("#id").val();
         var _width = '500';
         var _height = '400';
@@ -273,9 +285,15 @@
         input2.setAttribute("type", "hidden");
         input2.setAttribute("value", id);
         input2.setAttribute("name", "id");
+        let input3 = document.createElement("input");
+        input3.setAttribute("type", "hidden");
+        input3.setAttribute("value", cpage);
+        input3.setAttribute("name",cpage );
+
 
         newFrm.append(input1);
         newFrm.append(input2);
+        newFrm.append(input3);
         document.body.append(newFrm);
 
         window.open("/QnA/ansPopup", "newFrm", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
@@ -285,11 +303,12 @@
         myForm.submit();
     });
     //삭제
-    $(".delQBtn").click(function () {
+    $(document).on("click",".delQBtn",function(){
+
         if (confirm('삭제하시겠습니까?')) {
             let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
             $.ajax({
-                url: '/QnA/' + q_seq,
+                url: '/QnA/delete',
                 type: 'post',
                 data: {
                     "q_seq": q_seq
@@ -385,6 +404,7 @@
         HTML += '<td>' + item.questionDTO.writeDate + '</td>';
         HTML += '<td>' + item.questionDTO.id + '</td>';
         HTML += '<input type="hidden" value="' + item.questionDTO.q_seq + '" class="q_seq">';
+        HTML += '<input type="hidden" value="'+item.cpage+'" class="cpage">';
         HTML += '<td>';
         if (item.answerYN != 'N') {
             HTML += '<button type="button" class="updAnsBtn btn btn-light">답변 수정</button>';

@@ -45,6 +45,7 @@
         <input type="hidden" value="${id}" id="id" name="id">
         <input type="hidden" value="${questionDTO.q_seq}" id="q_seq" name="q_seq">
         <input type="hidden" value="${questionDTO.pd_seq}" id="pd_seq" name="pd_seq">
+        <input type="hidden" value="${param}" id="cpage" name="cpage">
         <textarea style="width: 500px; height: 300px;" id="content">${questionDTO.content}</textarea>
         <div class="btns" style="margin-top: 20px;">
             <button type="button" id="updBtn" class="btn btn-light">수정</button>
@@ -53,12 +54,10 @@
     </form>
 </div>
 <script>
-    //작성 클릭
-    $("#updBtn").click(function () {
+    $(document).on("click","#updBtn",function(){
         let id = $("#session").val();
         let q_seq = $("#q_seq").val();
         let content = $("#content").val();
-
 
         if (content.length === 0) {
             alert('질문을 작성해주세요.');
@@ -76,10 +75,10 @@
             success: function (data) {
                 window.close();
                 opener.parent.location.reload();
+                // location.href='/QnA?id='+$("#id").val()+'&cpage='+$("#cpage").val();
             }
         })
     })
-
     //취소
     $("#cancleBtn").click(function () {
         window.close();

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
@@ -35,17 +36,42 @@ public class QnAController {
     }
 
     @RequestMapping("") //나의 Q&A 조회로
-    public String toMyQnA(Model model, String id) throws Exception {
-        List<QuestionDTO> questionDTOS = qnAService.getMyQnAs(id);  //작성한 Q&A 모두 가져옴
+    public String toMyQnA(Model model, String id, Integer cpage) throws Exception {
+        System.out.println("다시옴");
+        System.out.println("cpage = " + cpage);
+        if (cpage == null) {
+            cpage = 1;
+        }
+        Integer postCnt = qnAService.countMyQuestion(id); //질문 개수
+        Map<String, Object> paging = qnAService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+        List<QuestionDTO> questionDTOS = qnAService.getMyQnAs(start, end, id);  //작성한 Q&A 모두 가져옴
         List<Map<String, Object>> qNaList = qnAService.getQnAList(questionDTOS);
         model.addAttribute("qNaList", qNaList);
+        model.addAttribute("paging", paging);
         return "/product/QnA/myQnA";
     }
 
 
     @ResponseBody
-    @PostMapping("/{q_seq}") //Q&A 삭제 ans있으면 ans 같이 삭제
-    public String deleteQuestion(@PathVariable("q_seq") Integer q_seq) throws Exception {
+    @PostMapping("/repaging")
+    public List<Object> repaging(Integer cpage, String id) throws Exception {
+        Integer naviPerPage = 10;
+        Map<String, Object> pagingStartEnd = qnAService.pagingStartEnd(cpage, naviPerPage);
+        Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
+        Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
+        Integer postCnt = qnAService.countMyQuestion(id); //질문 개수
+        List<QuestionDTO> questionDTOS = qnAService.getMyQnAs(start, end, id);  //작성한 Q&A 모두 가져옴
+        Map<String, Object> paging = qnAService.paging(cpage, postCnt);
+        List<Object> qNaList = qnAService.repaging(questionDTOS, paging);
+        return qNaList;
+    }
+
+    @ResponseBody
+    @PostMapping("/delete") //Q&A 삭제 ans있으면 ans 같이 삭제
+    public String deleteQuestion(Integer q_seq) throws Exception {
         qnAService.deleteQuestion(q_seq);
         return "success";
     }
@@ -55,18 +81,22 @@ public class QnAController {
         QuestionDTO questionDTO = qnAService.getQuestion(Integer.parseInt(param.get("q_seq").toString()));  //질문 1개
 //        model.addAttribute("param",param);
         model.addAttribute("questionDTO", questionDTO);
+        model.addAttribute("param", param);
         return "/product/QnA/updPopup";
     }
 
     @ResponseBody
     @PostMapping("/updQuestion")
     public String updQuestion(@RequestParam Map<String, Object> param) throws Exception {
-        qnAService.updQuestion(param);
+       Integer q_seq = Integer.parseInt(param.get("q_seq").toString());
+       String content = param.get("content").toString();
+        qnAService.updQuestion(q_seq,content);
         return "success";
     }
 
     @PostMapping("/ansPopup")  //답변 작성 팝업으로
     public String toAnsPopup(Model model, @RequestParam Map<String, Object> param) throws Exception {
+        System.out.println("ㅅㅂ = " + param);
         model.addAttribute("param", param);
         return "/admin/ansPopup";
     }
@@ -81,6 +111,7 @@ public class QnAController {
     @PostMapping("/updAnsPopup")  //관리자 답변 수정 팝업으로
     public String toUpdAnsPopup(Model model, @RequestParam Map<String, Object> param) throws Exception {
         AnswerDTO answerDTO = qnAService.getAnswer(Integer.parseInt(param.get("q_seq").toString()));
+        System.out.println("ㅅㅂ = " + param);
         model.addAttribute("param", param);
         model.addAttribute("answerDTO", answerDTO);
         return "/admin/updPopup";
@@ -88,7 +119,7 @@ public class QnAController {
 
     @ResponseBody
     @PostMapping("/updAns")  //답변 수정
-    public String updAns(@RequestParam Map<String,Object> param) throws Exception {
+    public String updAns(@RequestParam Map<String, Object> param) throws Exception {
         qnAService.updAns(param);
         return "success";
 

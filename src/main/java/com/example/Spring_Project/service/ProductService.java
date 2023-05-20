@@ -776,7 +776,7 @@ public class ProductService {
         return productMapper.revCategory(parentCategorySeq,pdCategorySeq);
     }
 
-//    public List<Integer> findPdSeqByCtgs() throws Exception{
-//
-//    }
+    public Integer countReview() throws Exception{
+        return productMapper.countReview();
+    }
 }

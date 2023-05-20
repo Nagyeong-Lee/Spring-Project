@@ -195,8 +195,8 @@ public class PdReviewService {
         return pdReviewMapper.optionCategory(pd_seq, optName);
     }
 
-    public List<Map<String, Object>> getReviews(List<Integer> pdSeqs, Integer star) throws Exception {
-        return pdReviewMapper.getReviews(pdSeqs, star);
+    public List<Map<String, Object>> getReviews(List<Integer> pdSeqs, Integer star,Integer start,Integer end) throws Exception {
+        return pdReviewMapper.getReviews(pdSeqs, star,start,end);
     }
 
     public ProductDTO pdInfo(Integer pd_seq) throws Exception {

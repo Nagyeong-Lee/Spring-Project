@@ -219,6 +219,24 @@
     </tbody>
 </table>
 </div>
+<div class="pagingDiv" style="text-align: center;">
+<c:if test="${paging.needPrev eq true}">
+    <a href="javascript:void(0); onclick=paging(${paging.startNavi-1}});"><</a>
+    <a href="javascript:void(0); onclick=paging(1);">맨 처음</a>
+</c:if>
+<c:forEach var="i" begin="${paging.startNavi}" end="${paging.endNavi}" varStatus="var">
+    <c:if test="${paging.cpage eq i}">
+        <a href="javascript:void(0); onclick=paging(${i});" style="font-weight: bold;">${i}</a>
+    </c:if>
+    <c:if test="${paging.cpage ne i}">
+        <a href="javascript:void(0); onclick=paging(${i});">${i}</a>
+    </c:if>
+</c:forEach>
+<c:if test="${paging.needNext eq true}">
+    <a href="javascript:void(0); onclick=paging(${paging.endNavi+1});">></a>
+    <a href="javascript:void(0); onclick=paging(${paging.totalPageCount});">맨끝</a>
+</c:if>
+</div>
 <footer class="py-5 bg-dark" id="footer" >
     <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
 </footer>
@@ -338,6 +356,11 @@
                     var html = createHtml(data);
                 }
                 $("#tbody").append(html);
+
+
+                console.log(data);
+                $(".pagingDiv").children().remove();
+                createPaging(data);
             }
         })
     }
@@ -400,10 +423,106 @@
                 },
                 success: function (data) {
                     location.reload();
+
+
                 }
             })
         }
     })
+
+    //페이징 다시 그려줌
+    function paging(startNavi) {
+        $.ajax({
+            url: '/admin/repaging',
+            type: 'post',
+            data: {
+                "cpage": startNavi,
+                "id": $("#id").val()
+            },
+            success: function (data) {
+                console.log(data);
+                $(".pagingDiv").children().remove();
+                createPaging(data);
+            }
+        })
+    }
+
+    function createPaging(data) {
+        $("#tbody").children().remove();
+        for (let i = 0; i < data.length; i++) {
+            var newHtml = createHtml(data[i], data[i].startNavi);
+            $("#tbody").append(newHtml);
+        }
+
+        if (data[0].needPrev) {
+            var html = createPrev(startNavi);
+            $(".pagingDiv").append(html);
+        }
+        for (let k = data[0].startNavi; k <= data[0].endNavi; k++) {
+            if (data[0].startNavi == k) {
+                var html = createNewPage1(k);
+                $(".pagingDiv").append(html);
+            } else {
+                var html = createNewPage2(k);
+                $(".pagingDiv").append(html);
+            }
+        }
+        if (data[0].needNext) {
+            var html = createNext(data[0].endNavi, data[0].totalPageCount);
+            $(".pagingDiv").append(html);
+        }
+    }
+
+    function createHtml(item, cpage) {
+        let pd_seq = item.productDTO.pd_seq;
+        var temp = '';
+        var HTML = '<tr><td><a href="/product/detail?pd_seq=' + pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width:120px; height: 100px;"></a></td>';
+        if (item.optionMapList == null) { //옵션 없을때
+            HTML += '<td style="text-align: center;"><p>' + item.productDTO.name + item.productDTO.stock + '개</p>';
+        } else if (item.optionMapList != null) { //옵션 있을때
+            temp += '<td style="text-align: center;"><p>' + item.productDTO.name + ' ' + item.productDTO.stock + '개</p>';
+            for (let i = 0; i < item.optionMapList.length; i++) {
+                temp += '<p>' + Object.keys(item.optionMapList[i])[0] + ' : ' + item.optionMapList[i][Object.keys(item.optionMapList[i])[0]] + '</p>';
+            }
+            temp += '</td>';
+            HTML = HTML + temp;
+        }
+        HTML += '<td style="text-align: center;">' + item.productDTO.stock + '개</td>';
+        if (item.deliYN == 'M') {
+            HTML += '<td style="text-align: center;">배송중</td>';
+        } else if (item.deliYN == 'N') {
+            HTML += '<td style="text-align: center;"><button class="selectCourier btn btn-light">택배사 입력</button></td>';
+        } else {
+            HTML += '<td style="text-align: center;">배송 완료</td>';
+        }
+        return HTML;
+    }
+
+    function createPrev(startNavi) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (startNavi - 1) + ');">' + "<" + '</a>';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (1) + ');">' + "맨 처음" + '</a>';
+        return html;
+    }
+
+    function createNewPage1(k) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + k + ')"> ' + k + ' </a>';
+        return html;
+    }
+
+    function createNewPage2(k) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + k + ')" style="font-weight: bold;"> ' + k + ' </a>';
+        return html;
+    }
+
+    function createNext(endNavi, totalPageCount) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (endNavi + 1) + ');">' + ">" + '</a>';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (totalPageCount) + ');">' + "맨끝" + '</a>';
+        return html;
+    }
 
 </script>
 </body>

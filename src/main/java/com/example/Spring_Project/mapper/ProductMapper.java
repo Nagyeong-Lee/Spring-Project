@@ -151,4 +151,6 @@ public interface ProductMapper {
     Integer pdCategorySeq(@Param("seq") Integer parentCategorySeq,@Param("option") String childCtgOption);
     Map<String,Object> revCategory(@Param("pSeq") Integer parentCategorySeq, @Param("cSeq") Integer pdCategorySeq);
 
+    @Select(" SELECT  count(*) FROM review WHERE pd_seq in( SELECT pd_seq FROM product WHERE category IN (1,2)) AND star = 5 AND status = 'Y'")
+    Integer countReview();
 }

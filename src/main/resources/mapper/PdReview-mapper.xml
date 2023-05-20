@@ -198,55 +198,67 @@
     </select>
 
     <select id="getReviews" resultType="map" parameterType="java.util.List">
+
 <!--        SELECT-->
-<!--            f.review_seq,-->
-<!--            f.id,-->
-<!--            f.payPd_seq,-->
-<!--            to_char(f.revWriteDate,'YYYY-MM-DD HH24:MI') AS writeDate,-->
-<!--            f.star,-->
-<!--            f.content,-->
-<!--            f.stock,-->
-<!--            f.price,-->
-<!--            f.pdOption,-->
-<!--            p.pd_seq,-->
-<!--            p.name,-->
-<!--            p.img AS pdName FROM product p JOIN (-->
-<!--                (SELECT-->
-<!--                    a.review_seq,-->
-<!--                    a.id,-->
-<!--                    a.payPd_seq,-->
-<!--                    a.pd_seq,-->
-<!--                    a.writeDate AS revWriteDate,-->
-<!--                    a.star,-->
-<!--                    a.content,-->
-<!--                    s.stock,-->
-<!--                    s.price,-->
-<!--                    s.pdOption-->
-<!--                FROM-->
-<!--                (SELECT-->
-<!--                    review_seq,-->
-<!--                    id,-->
-<!--                    payPd_seq,-->
-<!--                    pd_seq,-->
-<!--                    writeDate,-->
-<!--                    star,-->
-<!--                    content-->
-<!--                FROM REVIEW r WHERE PD_SEQ IN-->
-<!--                <foreach collection="list" item="item" separator="," open="(" close=")">-->
-<!--                    #{item}-->
-<!--                </foreach>-->
-<!--                AND star = #{star} AND status = 'Y' ORDER BY WRITEDATE ) a-->
-<!--                JOIN sales s ON a.payPd_seq = s.PAYPD_SEQ) f )-->
-<!--                ON p.PD_SEQ  = f.pd_seq ORDER BY WRITEDATE-->
+<!--        r.review_seq,-->
+<!--        revImg.revImg_seq,r.id,-->
+<!--        r.payPd_seq,-->
+<!--        writeDate,-->
+<!--        r.star,-->
+<!--        r.content,-->
+<!--        r.stock,-->
+<!--        r.price,-->
+<!--        r.pdOption,-->
+<!--        r.pd_seq,-->
+<!--        r.name,-->
+<!--        r.pdName-->
+<!--        FROM revImg JOIN-->
+<!--        (SELECT-->
+<!--        f.review_seq,-->
+<!--        f.id,-->
+<!--        f.payPd_seq,-->
+<!--        to_char(f.revWriteDate,'YYYY-MM-DD HH24:MI') AS writeDate,-->
+<!--        f.star,-->
+<!--        f.content,-->
+<!--        f.stock,-->
+<!--        f.price,-->
+<!--        f.pdOption,-->
+<!--        p.pd_seq,-->
+<!--        p.name,-->
+<!--        p.img AS pdName FROM product p JOIN (-->
+<!--        (SELECT-->
+<!--        a.review_seq,-->
+<!--        a.id,-->
+<!--        a.payPd_seq,-->
+<!--        a.pd_seq,-->
+<!--        a.writeDate AS revWriteDate,-->
+<!--        a.star,-->
+<!--        a.content,-->
+<!--        s.stock,-->
+<!--        s.price,-->
+<!--        s.pdOption-->
+<!--        FROM-->
+<!--        (SELECT-->
+<!--        review_seq,-->
+<!--        id,-->
+<!--        payPd_seq,-->
+<!--        pd_seq,-->
+<!--        writeDate,-->
+<!--        star,-->
+<!--        content-->
+<!--        FROM REVIEW r WHERE PD_SEQ IN-->
+<!--        <foreach collection="list" item="item" separator="," open="(" close=")">-->
+<!--            #{item}-->
+<!--        </foreach>-->
+<!--        AND star = #{star} AND status = 'Y' ORDER BY WRITEDATE ) a-->
+<!--        JOIN sales s ON a.payPd_seq = s.PAYPD_SEQ) f )-->
+<!--        ON p.PD_SEQ  = f.pd_seq ORDER BY WRITEDATE)r-->
+<!--        ON revImg.review_seq = r.review_seq-->
 
-
-
-
-
-
-
-
-        SELECT
+        SELECT  a.*
+        FROM (
+        SELECT ROWNUM r, review.* FROM
+        (SELECT
         r.review_seq,
         revImg.revImg_seq,r.id,
         r.payPd_seq,
@@ -295,12 +307,12 @@
         content
         FROM REVIEW r WHERE PD_SEQ IN
         <foreach collection="list" item="item" separator="," open="(" close=")">
-            #{item}
-        </foreach>
-        AND star = #{star} AND status = 'Y' ORDER BY WRITEDATE ) a
+                    #{item}
+                </foreach>
+        AND star = 5 AND status = 'Y' ORDER BY WRITEDATE ) a
         JOIN sales s ON a.payPd_seq = s.PAYPD_SEQ) f )
         ON p.PD_SEQ  = f.pd_seq ORDER BY WRITEDATE)r
-        ON revImg.review_seq = r.review_seq
+        ON revImg.review_seq = r.review_seq) review) a WHERE r BETWEEN #{start} AND #{end}
     </select>
 
     <select id="pdInfo" resultType="com.example.Spring_Project.dto.ProductDTO">

@@ -42,16 +42,28 @@
     </select>
 
     <select id="getMyQnAs" resultType="com.example.Spring_Project.dto.QuestionDTO">
-        select
-            q_seq,
-            id,
-            pd_seq,
-            content,
-            status,
-            to_char(writeDate,'YYYY-MM-DD HH24:MI') AS writeDate
-        from question
-        where status = 'Y'
-        order by writeDate desc
+<!--        select-->
+<!--            q_seq,-->
+<!--            id,-->
+<!--            pd_seq,-->
+<!--            content,-->
+<!--            status,-->
+<!--            to_char(writeDate,'YYYY-MM-DD HH24:MI') AS writeDate-->
+<!--        from question-->
+<!--        where status = 'Y'-->
+<!--        order by writeDate desc-->
+
+        SELECT a.* FROM (
+        SELECT rownum r,a.*
+        from
+        (select
+        q_seq,
+        id,
+        pd_seq,
+        content,
+        status,
+        to_char(writeDate,'YYYY-MM-DD HH24:MI') AS writeDate
+        from question where id = #{id} and status = 'Y' ORDER BY 1 desc) a)a WHERE r BETWEEN #{start} AND #{end}
     </select>
 
     <select id="getQuestion" resultType="com.example.Spring_Project.dto.QuestionDTO">
@@ -90,7 +102,7 @@
         content,
         status,
         to_char(writeDate,'YYYY-MM-DD HH24:MI') AS writeDate
-        from question ORDER BY WRITEDATE desc) a)a WHERE r BETWEEN #{start} AND #{end}
+        from question where status = 'Y' ORDER BY 1 desc) a)a WHERE r BETWEEN #{start} AND #{end}
 
 <!--        where status = 'Y'-->
     </select>

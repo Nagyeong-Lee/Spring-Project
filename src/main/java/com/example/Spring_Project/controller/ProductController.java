@@ -895,25 +895,50 @@ public class ProductController {
     @ResponseBody
     @PostMapping("/rePaging")
     public Map<String, Object> rePaging(Integer cpage, String id) throws Exception {
-        List<Map<String, Object>> historyList = new ArrayList<>();
-        Integer naviPerPage = 10;
-        Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage);
-        Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
-        Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
+//        List<Map<String, Object>> historyList = new ArrayList<>();
+//        Integer naviPerPage = 10;
+//        Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage);
+//        Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
+//        Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
 
         Map<String, Object> reMap = new HashMap<>();
-        List<Map<String, Object>> payInfoDTOS = productService.getHistory(id, start, end);
-        Map<String, Object> paging = productService.historyPaging(cpage,id);
-        reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
-        reMap.put("endNavi", Integer.parseInt(paging.get("endNavi").toString()));
-        reMap.put("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));
-        reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
-        reMap.put("paging", paging);
-        reMap.put("cpage", Integer.parseInt(paging.get("cpage").toString()));
+//        List<Map<String, Object>> payInfoDTOS = productService.getHistory(id, start, end);
+//        Map<String, Object> paging = productService.historyPaging(cpage,id);
+//        reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
+//        reMap.put("endNavi", Integer.parseInt(paging.get("endNavi").toString()));
+//        reMap.put("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));
+//        reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
+//        reMap.put("paging", paging);
+//        reMap.put("cpage", Integer.parseInt(paging.get("cpage").toString()));
+//
+//        //옵션 정보 가져오기
+//        historyList = productService.pdOptionInfo(payInfoDTOS);
+//        reMap.put("historyList", historyList);
 
-        //옵션 정보 가져오기
-        historyList = productService.pdOptionInfo(payInfoDTOS);
-        reMap.put("historyList", historyList);
+
+
+
+        Integer postCnt = productService.countRegisteredPd(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+        List<ProductDTO> list = productService.getProducts(start, end); //상품정보
+        List<OptionDTO> optionDTOList = null;
+        List<Map<String, Object>> registeredPd = new ArrayList<>();
+        Map<String, Object> tmp = null;
+        for (ProductDTO productDTO : list) {
+            tmp = new HashMap<>();
+            Integer isOptExist = productService.isOptExist(productDTO.getPd_seq()); //상품의 옵션이 있는지 확인
+            if (isOptExist != 0) { //상품의 옵션이 있을 경우
+                optionDTOList = productService.getOptByGroup(productDTO.getPd_seq());
+                tmp.put("optionDTOList", optionDTOList);
+            }
+            tmp.put("productDTO", productDTO);
+            registeredPd.add(tmp);
+        }
+        reMap.put("registeredPd",registeredPd);
+        reMap.put("paging",paging);
         return reMap;
     }
 

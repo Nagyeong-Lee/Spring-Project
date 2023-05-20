@@ -45,6 +45,7 @@
     <form action="/QnA/insert" method="post" id="frm">
         <input type="hidden" value="${param.id}" name="session" id="session">
         <input type="hidden" value="${param.q_seq}" id="q_seq" name="q_seq">
+        <input type="hidden" value="${param.cpage}" id="cpage" name="cpage">
         <textarea style="width: 500px; height: 300px;" id="content"></textarea>
         <div class="btns" style="margin-top: 20px;">
             <button type="button" id="writeBtn" class="btn btn-light">작성</button>
@@ -72,9 +73,9 @@
                 "answer":answer
             },
             success: function (data) {
-
                     window.close();
                     opener.parent.location.reload();
+
             }
         })
     })

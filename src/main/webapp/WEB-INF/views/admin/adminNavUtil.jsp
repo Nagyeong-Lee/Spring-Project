@@ -27,7 +27,7 @@
       <a href="/admin/qNa?cpage=1"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="qNa">
             Q&A조회
       </button></a>
-      <a href="/admin/reviews"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="reviews">
+      <a href="/admin/reviews?cpage=1"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="reviews">
            리뷰 조회
       </button></a>
     </div>

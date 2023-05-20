@@ -38,7 +38,7 @@
         img,
         category
         from product
-        where status = 'Y' ORDER BY 1) a)
+        where status = 'Y' ORDER BY 1 desc) a)
         WHERE rn BETWEEN #{start} AND #{end}
     </select>
 
@@ -908,7 +908,7 @@
         code,p.pay_seq
         FROM payInfo p JOIN PAYPRODUCT pp
         ON p.PAY_SEQ = pp.pay_seq
-        WHERE p.id = #{id}
+        WHERE p.id = #{id} and status = 'Y'
         ORDER BY PAYDATE DESC) a)
         where rn between #{start} and #{end}
 

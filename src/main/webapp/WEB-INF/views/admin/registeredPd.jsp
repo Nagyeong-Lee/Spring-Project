@@ -51,11 +51,11 @@
         <th>수량</th>
         <th></th>
         </thead>
-        <tbody>
+        <tbody class="itemDiv">
         <c:choose>
             <c:when test="${!empty registeredPd}">
                 <c:forEach var="i" items="${registeredPd}">
-                    <tr class="itemDiv">
+                    <tr>
                         <td><img src="/resources/img/products/${i.productDTO.img}" style="width: 120px; height: 100px;">
                         </td>
                         <td style="width: 500px; text-align: center">${i.productDTO.name}</td>
@@ -74,8 +74,8 @@
                         <td style="text-align: center;"><fmt:formatNumber pattern="#,###" value="${i.productDTO.price}"/>원</td>
                         <td style="text-align: center;">${i.productDTO.stock}개</td>
                         <td style="text-align: center">
-                            <button type="button" class="delBtn btn btn-light" value="${i.pd_seq}">삭제</button>
-                            <button type="button" class="updBtn btn btn-light" value="${i.pd_seq}">수정</button>
+                            <button type="button" class="delBtn btn btn-light" value="${i.productDTO.pd_seq}">삭제</button>
+                            <button type="button" class="updBtn btn btn-light" value="${i.productDTO.pd_seq}">수정</button>
                         </td>
                     </tr>
                 </c:forEach>
@@ -125,6 +125,7 @@
             success: function (data) {
                 console.log('데이터');
                 console.log(data);
+                $(".itemDiv").children().remove();
                 $(".pagingDiv").children().remove();
                 createPaging(data);
             }
@@ -132,25 +133,25 @@
     }
 
     function createPaging(data) {
-        let startNavi = data.startNavi;
-        let endNavi = data.endNavi;
-        let needPrev = data.needPrev;
-        let needNext = data.needNext;
-        let paging = data.paging;
-        let historyList = data.historyList;
+        let startNavi = data.paging.startNavi;
+        let endNavi = data.paging.endNavi;
+        let needPrev = data.paging.needPrev;
+        let needNext = data.paging.needNext;
+        let paging = data.paging.paging;
+        let registeredPd = data.registeredPd;
         let cpage = data.cpage;
+        // debugger;
 
         console.log("startNavi : " + startNavi);
         console.log("endNavi : " + endNavi);
         console.log("needPrev : " + needPrev);
         console.log("needNext : " + needNext);
         console.log("paging : " + paging);
-        console.log("historyList " + historyList);
+        console.log(" registeredPd.length : " +  registeredPd.length);
 
-        $("#tbody").children().remove();
-        for (let i = 0; i < historyList.length; i++) {
-            var newHtml = createHtml(historyList[i], startNavi);
-            $("#tbody").append(newHtml);
+        for (let i = 0; i < registeredPd.length; i++) {
+            var newHtml = createHtml(registeredPd[i], startNavi);
+            $(".itemDiv").append(newHtml);
         }
 
         if (needPrev) {
@@ -173,25 +174,25 @@
     }
 
     function createHtml(item, cpage) {
-        console.log(item.productDTO.pd_seq);
-        console.log(cpage);
-        var newTable = '';
-        var temp = '';
-        newTable = '<tr><td><a href="/product/detail?pd_seq=' + item.productDTO.pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width:120px; height: 100px;"></a></td>';
-        newHtml = newTable;
-        if (item.option == null) { //옵션 없을때
-            newTable += '<td><p>' + item.productDTO.name + '  ' + item.count + '개' + '</p></td>';
+        console.log('아이템')
+        console.log(item);
+        var Html = '';
+        Html = '<tr><td><a href="/product/detail?pd_seq=' + item.productDTO.pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width: 120px; height: 100px;"></a></td>';
+        Html +='<td style="width: 500px; text-align: center">'+item.productDTO.name+'</td>';
+        if (item.optionDTOList == null) { //옵션 없을때
+            Html += '<td></td>';
         } else { //옵션 있을때
-            temp += '<td><p>' + item.productDTO.name + '  ' + item.count + '개' + '</p>';
-            for (let i = 0; i < item.option.length; i++) {
-                temp += '<p>' + Object.keys(item.option[i])[0] + ' : ' + item.option[i][Object.keys(item.option[i])[0]] + '</p>';
+            Html += '<td style="text-align: center">';
+            for (let i = 0; i < item.optionDTOList.length; i++) {
+                Html += '<p>' + item.optionDTOList[i].category + ' : ' + item.optionDTOList[i].name + '-'+item.optionDTOList[i].stock +'개</p>';
             }
-            temp += '</td>';
-            newTable = newTable + temp;
+            Html += '</td>';
         }
-        newTable += '<td><p>받는 사람 : ' + item.deliDTO.name + '</p><p>전화번호 : ' + item.deliDTO.phone + '</p><p>주소 : ' + item.deliDTO.address + '</p></td>';
-        newTable += '<td><p>결제 일자 : ' + item.payDate + '</p><p>결제 방법 : ' + item.payMethod + '</p><p>결제 금액 : ' + item.price.toLocaleString() + '원</p></td></tr>';
-        return newTable;
+        Html += '<td style="text-align: center;">'+item.productDTO.price.toLocaleString()+'원</td>';
+        Html += '<td style="text-align: center;">'+item.productDTO.stock+'개</td>';
+        Html += '<td style="text-align: center"><button type="button" class="delBtn btn btn-light" value="'+item.productDTO.pd_seq+'">삭제</button>';
+        Html += '<button type="button" class="updBtn btn btn-light" value="'+item.productDTO.pd_seq+'">수정</button></td></tr>';
+        return Html;
     }
 
     function createPrev(startNavi) {
@@ -220,19 +221,17 @@
         return html;
     }
 
-
-
     //관리자 메인으로
     $("#toList").click(function () {
         location.href = '/admin/main';
     });
 
     // 상품 삭제 클릭 시
-    $(".delBtn").on("click", function () {
+    $(document).on("click",".delBtn",function(){
         $this = $(this);
         let cf = confirm('상품을 삭제하시겠습니까?');
         let pd_seq = $(this).val();
-        if (cf == true) {
+        if (cf === true) {
             console.log(pd_seq);
             $.ajax({
                 url: '/product/deletePd',
@@ -250,10 +249,12 @@
     });
 
     //상품 수정 클릭 시
-    $(".updBtn").on("click", function () {
+
+    $(document).on("click",".updBtn",function(){
         let pd_seq = $(this).val();
         location.href = '/admin/updProduct?pd_seq=' + pd_seq;
-    });
+    })
+
 </script>
 </body>
 </html>

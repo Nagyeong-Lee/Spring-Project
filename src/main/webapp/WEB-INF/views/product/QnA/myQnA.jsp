@@ -63,18 +63,23 @@
         html, body {
             height: 100%;
         }
+
         body {
             display: flex;
             flex-direction: column;
         }
-        .cart{
+
+        .cart {
             flex: 1 0 auto;
         }
-        #footer{  flex-shrink: 0;}
+
+        #footer {
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
-<input type="hidden" id="id" name="id" value="${id}">
+<%--<input type="hidden" id="id" name="id" value="${id}">--%>
 <%@ include file="/WEB-INF/views/product/shopUtil.jsp" %>
 <div class="cart">
     <table class="cart__list">
@@ -111,6 +116,7 @@
                         <td>${i.questionDTO.id}</td>
                         <td>${i.questionDTO.writeDate}</td>
                         <input type="hidden" value="${i.questionDTO.q_seq}" class="q_seq">
+                        <input type="hidden" value="${paging.cpage}" class="cpage">
                         <td>
                             <button type="button" class="updQuestion btn btn-light">수정</button>
                             <button type="button" class="delQuestion btn btn-light">삭제</button>
@@ -130,7 +136,7 @@
                             <td></td>
                             <td class="aText">
                                 <i class="fa-solid fa-pen"></i>
-                                ${i.answerDTO.answer}
+                                    ${i.answerDTO.answer}
                             </td>
                             <td>${i.answerDTO.writer}</td>
                             <td>${i.answerDTO.writeDate}</td>
@@ -149,8 +155,25 @@
         </tbody>
     </table>
 </div>
-
-<footer class="py-5 bg-dark" id="footer" >
+<div class="pagingDiv" style="text-align: center;">
+    <c:if test="${paging.needPrev eq true}">
+        <a href="javascript:void(0); onclick=paging(${paging.startNavi-1}});"><</a>
+        <a href="javascript:void(0); onclick=paging(1);">맨 처음</a>
+    </c:if>
+    <c:forEach var="i" begin="${paging.startNavi}" end="${paging.endNavi}" varStatus="var">
+        <c:if test="${paging.cpage eq i}">
+            <a href="javascript:void(0); onclick=paging(${i});" style="font-weight: bold;">${i}</a>
+        </c:if>
+        <c:if test="${paging.cpage ne i}">
+            <a href="javascript:void(0); onclick=paging(${i});">${i}</a>
+        </c:if>
+    </c:forEach>
+    <c:if test="${paging.needNext eq true}">
+        <a href="javascript:void(0); onclick=paging(${paging.endNavi+1});">></a>
+        <a href="javascript:void(0); onclick=paging(${paging.totalPageCount});">맨끝</a>
+    </c:if>
+</div>
+<footer class="py-5 bg-dark" id="footer">
     <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
 </footer>
 
@@ -162,19 +185,19 @@
 
     $("#keyword").val($("#key").val());
 
-    $("#search").on("click",function(){
+    $("#search").on("click", function () {
         let keyword = $("#keyword").val();
-        location.href='/product/searchPd?keyword='+keyword;
+        location.href = '/product/searchPd?keyword=' + keyword;
     });
 
-    $("#cart").click(function(){
+    $("#cart").click(function () {
         let newForm = document.createElement("form");
-        newForm.setAttribute("method","post");
-        newForm.setAttribute("action","/product/cart");
+        newForm.setAttribute("method", "post");
+        newForm.setAttribute("action", "/product/cart");
         let newInput = document.createElement("input");
-        newInput.setAttribute("type","hidden");
-        newInput.setAttribute("name","id");
-        newInput.setAttribute("value",$("#id").val());
+        newInput.setAttribute("type", "hidden");
+        newInput.setAttribute("name", "id");
+        newInput.setAttribute("value", $("#id").val());
         newForm.appendChild(newInput);
         document.body.append(newForm);
         newForm.submit();
@@ -186,8 +209,9 @@
     }
 
     //수정
-    $(".updQuestion").click(function () {
+    $(document).on("click",".updQuestion",function(){
         let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
+        let cpage = $(this).parent().closest("tr").find(".cpage").val();
         let id = $("#id").val();
         var _width = '500';
         var _height = '400';
@@ -209,8 +233,15 @@
         input2.setAttribute("value", id);
         input2.setAttribute("name", "id");
 
+        let input3 = document.createElement("input");
+        input3.setAttribute("type", "hidden");
+        input3.setAttribute("value", cpage);
+        input3.setAttribute("name",cpage );
+
+
         newFrm.append(input1);
         newFrm.append(input2);
+        newFrm.append(input3);
         document.body.append(newFrm);
 
         window.open("/QnA/ansPopup", "newFrm", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
@@ -221,22 +252,124 @@
     })
 
     //삭제
-    $(".delQuestion").click(function () {
+    $(document).on("click",".delQuestion",function(){
         if (confirm('삭제하시겠습니까?')) {
             let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
-            let url = '/QnA/' + q_seq;
+            console.log(q_seq)
             $.ajax({
-                url: url,
+                url: '/QnA/delete',
                 type: "post",
                 data: {
                     "q_seq": q_seq
                 },
                 success: function (data) {
-                    if (data === 'success') location.reload();
+                   location.reload();
                 }
             })
         }
     })
+
+
+    //페이징 다시 그려줌
+    function paging(startNavi) {
+        $.ajax({
+            url: '/QnA/repaging',
+            type: 'post',
+            data: {
+                "cpage": startNavi,
+                "id": $("#id").val()
+            },
+            success: function (data) {
+                console.log(data);
+                $(".pagingDiv").children().remove();
+                createPaging(data);
+            }
+        })
+    }
+
+    function createPaging(data) {
+        $("#tbody").children().remove();
+        for (let i = 0; i < data.length; i++) {
+            var newHtml = createHtml(data[i], data[i].startNavi, i);
+            $("#tbody").append(newHtml);
+        }
+
+        if (data[0].needPrev) {
+            var html = createPrev(startNavi);
+            $(".pagingDiv").append(html);
+        }
+        for (let k = data[0].startNavi; k <= data[0].endNavi; k++) {
+            if (data[0].startNavi == k) {
+                var html = createNewPage1(k);
+                $(".pagingDiv").append(html);
+            } else {
+                var html = createNewPage2(k);
+                $(".pagingDiv").append(html);
+            }
+        }
+        if (data[0].needNext) {
+            var html = createNext(data[0].endNavi, data[0].totalPageCount);
+            $(".pagingDiv").append(html);
+        }
+    }
+
+    function createPrev(startNavi) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (startNavi - 1) + ');">' + "<" + '</a>';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (1) + ');">' + "맨 처음" + '</a>';
+        return html;
+    }
+
+    function createNewPage1(k) {
+        console.log(k)
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + k + ')"> ' + k + ' </a>';
+        return html;
+    }
+
+    function createNewPage2(k) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + k + ')" style="font-weight: bold;"> ' + k + ' </a>';
+        return html;
+    }
+
+    function createNext(endNavi, totalPageCount) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (endNavi + 1) + ');">' + ">" + '</a>';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (totalPageCount) + ');">' + "맨끝" + '</a>';
+        return html;
+    }
+
+    function createHtml(item, cpage, i) {
+        let pd_seq = item.productDTO.pd_seq;
+        var temp = '';
+        var HTML = '<tr><td><a href="/product/detail?pd_seq=' + pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width:100px; height: 100px;"></a>';
+        HTML += '<p>' + item.productDTO.name + '</p></td>';
+        if (item.answerYN == 'N' && item.answerYN != null) { //옵션 없을때
+            HTML += '<td>미답변</td>';
+        } else {
+            HTML += '<td>미답변</td>';
+        }
+        HTML += '<td class="question"><a href="javascript:;" onclick="showAns(' + i + ')">' + item.questionDTO.content + '</a></td>';
+        HTML += '<td>' + item.questionDTO.writeDate + '</td>';
+        HTML += '<td>' + item.questionDTO.id + '</td>';
+        HTML += '<input type="hidden" value="' + item.questionDTO.q_seq + '" class="q_seq">';
+        HTML += '<input type="hidden" value="'+item.cpage+'" class="cpage">';
+        HTML += '<td>';
+        HTML += '<button type="button" class="updQuestion btn btn-light">수정</button>';
+        HTML += '<button type="button" class="delQuestion btn btn-light">삭제</button></td></tr>';
+        HTML += '<tr class="answer_' + i + ' answer" style="display:none;"><td></td><td></td>';
+        HTML += '<td class="qText">' + item.questionDTO.content + '</td>';
+        HTML += '<td>' + item.questionDTO.writeDate + '</td>';
+        HTML += '<td>' + item.questionDTO.id + '</td><td></td></tr>';
+        if (item.answerYN == 'Y') {
+            HTML += '<tr class="answer_' + i + ' answer" style="display:none;"><td></td><td></td>';
+            HTML += '<td class="aText"><i class="fa-solid fa-pen"></i>' + item.answerDTO.answer + '</td>';
+            HTML += '<td>' + item.answerDTO.writer + '</td>';
+            HTML += '<td>' + item.answerDTO.writeDate + '</td><td></td></tr>';
+        }
+        return HTML;
+    }
 </script>
 </body>
 </html>
