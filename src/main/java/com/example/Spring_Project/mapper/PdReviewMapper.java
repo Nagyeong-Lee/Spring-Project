@@ -1,6 +1,7 @@
 package com.example.Spring_Project.mapper;
 
 import com.example.Spring_Project.dto.ImgDTO;
+import com.example.Spring_Project.dto.ParsedReviewDTO;
 import com.example.Spring_Project.dto.ProductDTO;
 import com.example.Spring_Project.dto.ReviewDTO;
 import org.apache.ibatis.annotations.*;
@@ -44,7 +45,8 @@ import java.util.Map;
     Map<String,Object> reviewInPdDetail(@Param("pd_seq") Integer pd_seq, @Param("payPd_seq") Integer payPd_seq);
     List<String> reviewImgsByPd_seq(@Param("pd_seq") Integer pd_seq);
     String optionCategory(@Param("pd_seq") Integer pd_seq, @Param("optName") String optName);
-    List<Map<String,Object>> getReviews(@Param("list")List<Integer>list,@Param("star") Integer star,@Param("start") Integer start,@Param("end") Integer end);
+    List<ParsedReviewDTO> getReviews(@Param("start") Integer start, @Param("end") Integer end);
+//    List<Map<String,Object>> getReviews(@Param("list")List<Integer>list,@Param("star") Integer star,@Param("start") Integer start,@Param("end") Integer end);
     ProductDTO pdInfo(@Param("pd_seq")Integer pd_seq);
 
     List<Map<String,Object>> getReviewsByOption(Map<String,Object> data);

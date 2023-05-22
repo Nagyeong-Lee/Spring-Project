@@ -26,7 +26,7 @@ public interface AdminMapper {
     @Update("update review set status = 'N' where review_seq = #{r_seq}")
     void delReview(@Param("r_seq") Integer r_seq);
     List<ParsedReviewDTO> reviewsByOptions(@Param("pcArr") List<String> pcArr, @Param("chCArr") List<String> chCArr, @Param("starArr") List<String> starArr
-            , @Param("type") String selectType, @Param("keyword") String keyword, @Param("time") String time);
+            , @Param("type") String selectType, @Param("keyword") String keyword, @Param("time") String time,@Param("start") Integer start,@Param("end") Integer end);
 
 
     Map<String,Object> getChildCtg(@Param("pd_seq")Integer pd_seq);

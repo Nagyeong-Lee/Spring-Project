@@ -1,9 +1,6 @@
 package com.example.Spring_Project.service;
 
-import com.example.Spring_Project.dto.ImgDTO;
-import com.example.Spring_Project.dto.ParsedReviewDTO2;
-import com.example.Spring_Project.dto.ProductDTO;
-import com.example.Spring_Project.dto.ReviewDTO;
+import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.mapper.PdReviewMapper;
 import com.google.gson.*;
 import org.json.JSONObject;
@@ -195,8 +192,11 @@ public class PdReviewService {
         return pdReviewMapper.optionCategory(pd_seq, optName);
     }
 
-    public List<Map<String, Object>> getReviews(List<Integer> pdSeqs, Integer star,Integer start,Integer end) throws Exception {
-        return pdReviewMapper.getReviews(pdSeqs, star,start,end);
+//    public List<Map<String, Object>> getReviews(List<Integer> pdSeqs, Integer star,Integer start,Integer end) throws Exception {
+//        return pdReviewMapper.getReviews(pdSeqs, star,start,end);
+//    }
+    public List<ParsedReviewDTO> getReviews(Integer start, Integer end) throws Exception {
+        return pdReviewMapper.getReviews(start,end);
     }
 
     public ProductDTO pdInfo(Integer pd_seq) throws Exception {
@@ -260,7 +260,7 @@ public class PdReviewService {
         return pdReviewMapper.getReviewImgs(review_seq);
     }
 
-    public List<Map<String, Object>> reviewListByOptions(List<ParsedReviewDTO2> objectList) throws Exception {
+    public List<Map<String, Object>> reviewListByOptions(List<ParsedReviewDTO2> objectList,Map<String, Object> paging) throws Exception {
 
         JsonParser jsonParser = new JsonParser();
         JsonObject jsonObject = new JsonObject();
@@ -274,7 +274,17 @@ public class PdReviewService {
             map.put("productDTO", productDTO);
             map.put("parsedReviewDTO2", parsedReviewDTO2);
             map.put("totalPrice", parsedReviewDTO2.getPrice() * parsedReviewDTO2.getStock());
+            System.out.println("parsedReviewDTO2.getPrice() = " + parsedReviewDTO2.getPrice());
+            System.out.println("parsedReviewDTO2.getPrice() = " + parsedReviewDTO2.getStock());
 
+            Map<String, Object> reMap = new HashMap<>();
+            reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
+            reMap.put("endNavi", Integer.parseInt(paging.get("endNavi").toString()));
+            reMap.put("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));
+            reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
+            reMap.put("paging", paging);
+            reMap.put("cpage", Integer.parseInt(paging.get("cpage").toString()));
+            map.put("reMap",reMap);
             //리뷰 이미지 있으면
             List<String> revImg = new ArrayList<>(); //sysname
             if (parsedReviewDTO2.getRevImg_seq() != null) {

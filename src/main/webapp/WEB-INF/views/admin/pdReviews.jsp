@@ -63,14 +63,19 @@
         html, body {
             height: 100%;
         }
+
         body {
             display: flex;
             flex-direction: column;
         }
-        .filter{
+
+        .filter {
             flex: 1 0 auto;
         }
-        #footer{  flex-shrink: 0;}
+
+        #footer {
+            flex-shrink: 0;
+        }
     </style>
 <body>
 <%@include file="/WEB-INF/views/admin/adminNavUtil.jsp" %>
@@ -90,154 +95,150 @@
                 <c:when test="${!empty parentCategory && !empty childCategory}">
                     상위 카테고리 :
                     <c:forEach var="i" items="${parentCategory}" varStatus="status">
-                        <%--                    ${i}<input type="checkbox" id="parentCategory${status.count}" name="parentCategory${status.count}"--%>
-                        <%--                               class="parentCategory">--%>
                         ${i}<input type="checkbox" id="parentCategory${status.count}" class="parentCategory"
+                                   checked="checked"
                         <c:out value="${i eq '여성'?'name=W': (i eq '남성'?'name=M': (i eq '신상품'?'name=NEW':''))}"/>
-                        <c:out value="${i eq optionMap.parentCtgOption?'checked':''}"/>
                     >
                     </c:forEach>
                     <br>
                     하위 카테고리 :
                     <c:forEach var="i" items="${childCategory}" varStatus="status">
                         ${i}<input type="checkbox" id="childCategory${status.count}" class="childCategory"
+                                   checked="checked"
                         <c:out
                                 value="${i eq '악세사리'?'name=accessory':(i eq '아우터'?'name=outer':(i eq '상의'?'name=top':(i eq '하의'?'name=pants':'')))}"/>
-                        <c:out value="${i eq optionMap.childCtgOption?'checked':''}"/>
                     >
                     </c:forEach>
                     <br>
                     별점 :
                     <c:forEach var="i" begin="1" end="5" varStatus="status">
                         ${status.count}<input type="checkbox" id="star${status.count}" name="${status.count}"
-                                              class="star"
-                        <c:out value="${i eq optionMap.star?'checked':''}"/>
+                                              class="star" checked="checked"
                     >
                     </c:forEach>
                 </c:when>
             </c:choose>
             <br>
             작성일 :
-            오름차순<input type="radio" name="writeTime" id="writeTimeAsc" checked>
-            내림차순<input type="radio" name="writeTime" id="writeTimeDesc">
+            오름차순<input type="radio" name="writeTime" id="writeTimeAsc">
+            내림차순<input type="radio" name="writeTime" id="writeTimeDesc" checked>
         </div>
     </form>
-<table id="QnATable" class="table table-striped">
-    <thead>
-    <th>카테고리</th>
-    <th>이미지</th>
-    <th style="width: 300px;">상품 정보</th>
-    <th>별점</th>
-    <th class="content">내용</th>
-    <th>작성자</th>
-    <th>작성시간</th>
-    <th></th>
-    </thead>
-    <tbody id="tbody">
-
-    <c:choose>
-        <c:when test="${!empty reviewList}">
-            <c:forEach var="i" items="${reviewList}" varStatus="status">
-                <tr>
-                    <td>
-                        <p>${categoryMap.PARENTCATEGORY}</p>
-                        <p>&nbsp${categoryMap.CHILDCATEGORY}</p>
-                    </td>
-                    <td>
-                        <img src="/resources/img/products/${i.reviewDTOS.PDNAME}"
-                             style="width: 100px; height: 100px;">
-                    </td>
-                    <td>
-                        <p>${i.reviewDTOS.NAME}-${i.reviewDTOS.STOCK}개</p>
-                        <c:if test="${i.optionMapList != null}">
-                            <c:forEach var="k" items="${i.optionMapList}">
-                                <c:forEach var="j" items="#{k}">
-                                    <p>${j.key} : ${j.value}</p>
+    <table id="QnATable" class="table table-striped">
+        <thead>
+        <th>카테고리</th>
+        <th>이미지</th>
+        <th style="width: 300px;">상품 정보</th>
+        <th>별점</th>
+        <th class="content">내용</th>
+        <th>작성자</th>
+        <th>작성시간</th>
+        <th></th>
+        </thead>
+        <tbody id="tbody">
+        <c:choose>
+            <c:when test="${!empty reviewList}">
+                <c:forEach var="i" items="${reviewList}" varStatus="status">
+                    <tr>
+                        <td>
+<%--                            ${i}--%>
+                            <p>${i.parsedReviewDTO2.parentCategory}</p>
+                            <p>&nbsp${i.parsedReviewDTO2.childCategory}</p>
+                        </td>
+                        <td>
+                            <img src="/resources/img/products/${i.productDTO.img}"
+                                 style="width: 100px; height: 100px;">
+                        </td>
+                        <td>
+                            <p>${i.parsedReviewDTO2.pdName}-${i.parsedReviewDTO2.stock}개</p>
+                            <c:if test="${i.optionMapList != null}">
+                                <c:forEach var="k" items="${i.optionMapList}">
+                                    <c:forEach var="j" items="#{k}">
+                                        <p>${j.key} : ${j.value}</p>
+                                    </c:forEach>
                                 </c:forEach>
-                            </c:forEach>
-                        </c:if>
-                        <p><fmt:formatNumber value="${i.totalPrice}" pattern="#,###"/>원</p>
-                    </td>
-                    <td class="tdStyle">
-                        <c:forEach var="star" begin="1" end="5">
-                            <c:set var="starColor" value="#ddd"/>
-                            <c:if test="${star le i.reviewDTOS.STAR}">
-                                <c:set var="starColor" value="rgba(250, 208, 0, 0.99)"/>
                             </c:if>
-                            <label for="1-star" id="star_${star}" class="startext">
-                                <i class="fa-solid fa-star" style="position:relative;color:${starColor};"></i>
-                            </label>
-                        </c:forEach>
-                    </td>
-                    <td class="question" style="text-overflow: ellipsis;"><a href="javascript:;"
-                                                                             onclick="showAns(${status.index})">${i.reviewDTOS.CONTENT}</a>
-                    </td>
-                    <td class="tdStyle">${i.reviewDTOS.ID}</td>
-                    <td class="tdStyle">${i.reviewDTOS.WRITEDATE}</td>
-                    <input type="hidden" value="${i.reviewDTOS.REVIEW_SEQ}" class="r_seq">
-                    <td class="tdStyle">
-                        <button type="button" class="btn btn-light delBtn">삭제</button>
-                    </td>
-                </tr>
-                <tr class="answer_${status.index} answer" style="display:none;">
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td class="qText">${i.reviewDTOS.CONTENT}</td>
-<%--                    <td>${i.reviewDTOS.ID}</td>--%>
-<%--                    <td>${i.reviewDTOS.WRITEDATE}</td>--%>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <%--리뷰 이미지 있으면 --%>
-                <c:if test="${!empty i.revImgSysname}">
+                            <p><fmt:formatNumber value="${i.parsedReviewDTO2.price}" pattern="#,###"/>원</p>
+                        </td>
+                        <td class="tdStyle">
+                            <c:forEach var="star" begin="1" end="5">
+                                <c:set var="starColor" value="#ddd"/>
+                                <c:if test="${star le i.parsedReviewDTO2.star}">
+                                    <c:set var="starColor" value="rgba(250, 208, 0, 0.99)"/>
+                                </c:if>
+                                <label for="1-star" id="star_${star}" class="startext">
+                                    <i class="fa-solid fa-star" style="position:relative;color:${starColor};"></i>
+                                </label>
+                            </c:forEach>
+                        </td>
+                        <td class="question" style="text-overflow: ellipsis;"><a href="javascript:;"
+                                                                                 onclick="showAns(${status.index})">${i.parsedReviewDTO2.content}</a>
+                        </td>
+                        <td class="tdStyle">${i.parsedReviewDTO2.id}</td>
+                        <td class="tdStyle">${i.parsedReviewDTO2.writeDate}</td>
+                        <input type="hidden" value="${i.parsedReviewDTO2.review_seq}" class="r_seq">
+                        <td class="tdStyle">
+                            <button type="button" class="btn btn-light delBtn">삭제</button>
+                        </td>
+                    </tr>
                     <tr class="answer_${status.index} answer" style="display:none;">
                         <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td class="qText">
-                            <c:forEach items="${i.revImgSysname}" var="k">
-                                <img src="/resources/img/products/pdReview/${k}" style="width: 100px; height: 100px;">
-                            </c:forEach>
-                        </td>
+                        <td class="qText">${i.parsedReviewDTO2.content}</td>
                         <td></td>
                         <td></td>
                         <td></td>
                     </tr>
-                </c:if>
-            </c:forEach>
-        </c:when>
-        <c:otherwise>
-            <tr>
-                <td colspan="7" style="text-align: center;">리뷰가 없습니다.</td>
-            </tr>
-        </c:otherwise>
-    </c:choose>
-    </tbody>
-</table>
+                    <%--리뷰 이미지 있으면 --%>
+                    <c:if test="${!empty i.revImgSysname}">
+                        <tr class="answer_${status.index} answer" style="display:none;">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="qText">
+                                <c:forEach items="${i.revImgSysname}" var="k">
+                                    <img src="/resources/img/products/pdReview/${k}"
+                                         style="width: 100px; height: 100px;">
+                                </c:forEach>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </c:if>
+                </c:forEach>
+            </c:when>
+            <c:otherwise>
+                <tr>
+                    <td colspan="7" style="text-align: center;">리뷰가 없습니다.</td>
+                </tr>
+            </c:otherwise>
+        </c:choose>
+        </tbody>
+    </table>
 </div>
 <div class="pagingDiv" style="text-align: center;">
-<c:if test="${paging.needPrev eq true}">
-    <a href="javascript:void(0); onclick=paging(${paging.startNavi-1}});"><</a>
-    <a href="javascript:void(0); onclick=paging(1);">맨 처음</a>
-</c:if>
-<c:forEach var="i" begin="${paging.startNavi}" end="${paging.endNavi}" varStatus="var">
-    <c:if test="${paging.cpage eq i}">
-        <a href="javascript:void(0); onclick=paging(${i});" style="font-weight: bold;">${i}</a>
+    <c:if test="${paging.needPrev eq true}">
+        <a href="javascript:void(0); onclick=paging(${paging.startNavi-1}});"><</a>
+        <a href="javascript:void(0); onclick=paging(1);">맨 처음</a>
     </c:if>
-    <c:if test="${paging.cpage ne i}">
-        <a href="javascript:void(0); onclick=paging(${i});">${i}</a>
+    <c:forEach var="i" begin="${paging.startNavi}" end="${paging.endNavi}" varStatus="var">
+        <c:if test="${paging.cpage eq i}">
+            <a href="javascript:void(0); onclick=paging(${i});" style="font-weight: bold;">${i}</a>
+        </c:if>
+        <c:if test="${paging.cpage ne i}">
+            <a href="javascript:void(0); onclick=paging(${i});">${i}</a>
+        </c:if>
+    </c:forEach>
+    <c:if test="${paging.needNext eq true}">
+        <a href="javascript:void(0); onclick=paging(${paging.endNavi+1});">></a>
+        <a href="javascript:void(0); onclick=paging(${paging.totalPageCount});">맨끝</a>
     </c:if>
-</c:forEach>
-<c:if test="${paging.needNext eq true}">
-    <a href="javascript:void(0); onclick=paging(${paging.endNavi+1});">></a>
-    <a href="javascript:void(0); onclick=paging(${paging.totalPageCount});">맨끝</a>
-</c:if>
 </div>
-<footer class="py-5 bg-dark" id="footer" >
+<footer class="py-5 bg-dark" id="footer">
     <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
 </footer>
 
@@ -300,14 +301,14 @@
                 html += '<td>' + data[i].parsedReviewDTO2.id + '</td>';
                 html += '<td>' + data[i].parsedReviewDTO2.writeDate + '</td></tr>';
 
-                if(data[i].revImgSysname != null){
-                //내용 클릭 시 내용 전체 보여줌
-                html += '<tr class="answer_' + i + ' answer" style="display:none;"><td></td><td></td><td></td><td></td><td class="qText">';
-                for(let j = 0 ; j<data[i].revImgSysname.length; j++){
-                    html += '<img src="/resources/img/products/pdReview/'+data[i].revImgSysname[j]+'" style="width: 100px; height: 100px;">';
-                }
-                html += '</td>';
-                html += '<td></td><td></td><td></td></tr>';
+                if (data[i].revImgSysname != null) {
+                    //내용 클릭 시 내용 전체 보여줌
+                    html += '<tr class="answer_' + i + ' answer" style="display:none;"><td></td><td></td><td></td><td></td><td class="qText">';
+                    for (let j = 0; j < data[i].revImgSysname.length; j++) {
+                        html += '<img src="/resources/img/products/pdReview/' + data[i].revImgSysname[j] + '" style="width: 100px; height: 100px;">';
+                    }
+                    html += '</td>';
+                    html += '<td></td><td></td><td></td></tr>';
                 }
             }
         }
@@ -316,6 +317,15 @@
 
     //옵션 바뀔때
     function chgOptions() {
+        //옵션 모두 선택 안할때
+        if ($("input[class=parentCategory]:checked").length == 0 &&
+            $("input[class=childCategory]:checked").length == 0 &&
+            $("input[class=star]:checked").length == 0) {
+            alert('옵션을 선택해주세요');
+            $("input[class=parentCategory]").attr("checked",true);
+            $("input[class=childCategory]").attr("checked",true);
+            $("input[class=star]").attr("checked",true);
+        }
         let parentCategoryArr = []; //상위 카테고리 name
         let childCategoryArr = []; //하위 카테고리 name
         let starArr = []; //별점 arr
@@ -344,6 +354,10 @@
     }
 
     function getReviews(data) {
+        // let data = chgOptions();
+        //cpage 추가
+        // $(".pagingDiv").children().remove();
+        data.cpage = 1;
         $.ajax({
             url: '/admin/reviewsByOption',
             type: 'post',
@@ -356,10 +370,7 @@
                     var html = createHtml(data);
                 }
                 $("#tbody").append(html);
-
-
                 console.log(data);
-                $(".pagingDiv").children().remove();
                 createPaging(data);
             }
         })
@@ -387,14 +398,14 @@
     })
 
     //검색 클릭시
-    $("#searchBtn").on("click", function () {
+    $(document).on("click", "#searchBtn", function () {
         let data = chgOptions();
         getReviews(data);
     })
 
     $("#keyword").val($("#key").val());
 
-    $("#search").on("click", function () {
+    $(document).on("click", "#search", function () {
         let keyword = $("#keyword").val();
         location.href = '/product/searchPd?keyword=' + keyword;
     });
@@ -423,8 +434,6 @@
                 },
                 success: function (data) {
                     location.reload();
-
-
                 }
             })
         }
@@ -432,34 +441,43 @@
 
     //페이징 다시 그려줌
     function paging(startNavi) {
+        $(".pagingDiv").children().remove();
+        let data = chgOptions();
+        console.log(data);
+        data.cpage = startNavi;
         $.ajax({
-            url: '/admin/repaging',
+            url: '/admin/reviewsByOption',
             type: 'post',
-            data: {
-                "cpage": startNavi,
-                "id": $("#id").val()
-            },
+            data: data,
             success: function (data) {
+                console.log('페이징');
                 console.log(data);
-                $(".pagingDiv").children().remove();
+                //뿌리기
+                $("#tbody").children().remove();
+                if (data.length !== 0) {
+                    var html = createHtml(data);
+                }
+                $("#tbody").append(html);
+                console.log(data);
                 createPaging(data);
             }
         })
     }
 
+
     function createPaging(data) {
-        $("#tbody").children().remove();
+        $(".pagingDiv").children().remove();
         for (let i = 0; i < data.length; i++) {
             var newHtml = createHtml(data[i], data[i].startNavi);
             $("#tbody").append(newHtml);
         }
-
-        if (data[0].needPrev) {
-            var html = createPrev(startNavi);
+        // debugger;
+        if (data[0].reMap.needPrev) {
+            var html = createPrev(reMap.startNavi);
             $(".pagingDiv").append(html);
         }
-        for (let k = data[0].startNavi; k <= data[0].endNavi; k++) {
-            if (data[0].startNavi == k) {
+        for (let k = data[0].reMap.startNavi; k <= data[0].reMap.endNavi; k++) {
+            if (data[0].reMap.startNavi == k) {
                 var html = createNewPage1(k);
                 $(".pagingDiv").append(html);
             } else {
@@ -467,35 +485,10 @@
                 $(".pagingDiv").append(html);
             }
         }
-        if (data[0].needNext) {
-            var html = createNext(data[0].endNavi, data[0].totalPageCount);
+        if (data[0].reMap.needNext) {
+            var html = createNext(data[0].reMap.endNavi, data[0].reMap.totalPageCount);
             $(".pagingDiv").append(html);
         }
-    }
-
-    function createHtml(item, cpage) {
-        let pd_seq = item.productDTO.pd_seq;
-        var temp = '';
-        var HTML = '<tr><td><a href="/product/detail?pd_seq=' + pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width:120px; height: 100px;"></a></td>';
-        if (item.optionMapList == null) { //옵션 없을때
-            HTML += '<td style="text-align: center;"><p>' + item.productDTO.name + item.productDTO.stock + '개</p>';
-        } else if (item.optionMapList != null) { //옵션 있을때
-            temp += '<td style="text-align: center;"><p>' + item.productDTO.name + ' ' + item.productDTO.stock + '개</p>';
-            for (let i = 0; i < item.optionMapList.length; i++) {
-                temp += '<p>' + Object.keys(item.optionMapList[i])[0] + ' : ' + item.optionMapList[i][Object.keys(item.optionMapList[i])[0]] + '</p>';
-            }
-            temp += '</td>';
-            HTML = HTML + temp;
-        }
-        HTML += '<td style="text-align: center;">' + item.productDTO.stock + '개</td>';
-        if (item.deliYN == 'M') {
-            HTML += '<td style="text-align: center;">배송중</td>';
-        } else if (item.deliYN == 'N') {
-            HTML += '<td style="text-align: center;"><button class="selectCourier btn btn-light">택배사 입력</button></td>';
-        } else {
-            HTML += '<td style="text-align: center;">배송 완료</td>';
-        }
-        return HTML;
     }
 
     function createPrev(startNavi) {

@@ -14,7 +14,7 @@ import java.util.Map;
 @Mapper
 @Repository
 public interface ProductMapper {
-    List<ProductDTO> getProducts(@Param("start") Integer start,@Param("end") Integer end);
+    List<ProductDTO> getProducts(@Param("keyword") String keyword,@Param("start") Integer start,@Param("end") Integer end);
 
     @Select("select count(*) from product where status = 'Y'")
     Integer countRegisteredPd();
@@ -96,7 +96,7 @@ public interface ProductMapper {
     Integer getNextOptSeq();
     void insertNewOptions(Map<String,Object>insertParam);
     void updOptions(Map<String, Object> updParam);
-    List<ProductDTO> getProductsByKeyword(@Param("keyword") String keyword);
+    List<ProductDTO> getProductsByKeyword(@Param("keyword") String keyword,@Param("start") Integer start,@Param("end") Integer end);
     List<CartDTO> cartInfo(@Param("cart_seq") Integer cart_seq);
     Integer getPdCount(@Param("cart_seq") Integer cart_seq);
     String getOption(@Param("cart_seq")  Integer cart_seq);
@@ -138,7 +138,7 @@ public interface ProductMapper {
     void deliveryStatus(@Param("code") Integer code,@Param("sales_seq") Integer sales_seq);
     PayInfoDTO getPayInfo(@Param("pay_seq") Integer pay_seq);
     Integer getCurrPayPdSeq();
-    Integer productCnt();
+    Integer productCnt(@Param("keyword") String keyword);
     PayProductDTO getDeliYN(@Param("salesSeq") Integer salesSeq);
     void updDeliveryStatus(@Param("sales_seq") Integer sales_seq, @Param("code") Integer courierCode);
     PayProductDTO getPayProductInfo(@Param("pay_seq") Integer pay_seq, @Param("pd_seq") Integer pd_seq);
@@ -151,6 +151,8 @@ public interface ProductMapper {
     Integer pdCategorySeq(@Param("seq") Integer parentCategorySeq,@Param("option") String childCtgOption);
     Map<String,Object> revCategory(@Param("pSeq") Integer parentCategorySeq, @Param("cSeq") Integer pdCategorySeq);
 
-    @Select(" SELECT  count(*) FROM review WHERE pd_seq in( SELECT pd_seq FROM product WHERE category IN (1,2)) AND star = 5 AND status = 'Y'")
+//    @Select(" SELECT  count(*) FROM review WHERE pd_seq in( SELECT pd_seq FROM product WHERE category IN (1,2)) AND star = 5 AND status = 'Y'")
+    @Select("  SELECT count(*) FROM review WHERE status = 'Y'")
     Integer countReview();
+    Integer searchPdCnt(@Param("keyword") String keyword);
 }

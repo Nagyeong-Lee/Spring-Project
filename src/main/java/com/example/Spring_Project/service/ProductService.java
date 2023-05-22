@@ -21,8 +21,8 @@ public class ProductService {
     private PdReviewService pdReviewService;
 
 
-    public List<ProductDTO> getProducts(Integer start, Integer end) throws Exception { //상품 리스트 가져오기
-        return productMapper.getProducts(start, end);
+    public List<ProductDTO> getProducts(String keyword,Integer start, Integer end) throws Exception { //상품 리스트 가져오기
+        return productMapper.getProducts(keyword,start, end);
     }
 
     public Integer countRegisteredPd() throws Exception{
@@ -323,8 +323,8 @@ public class ProductService {
         productMapper.updOptions(updParam);
     }
 
-    public List<ProductDTO> getProductsByKeyword(String keyword) throws Exception {
-        return productMapper.getProductsByKeyword(keyword);
+    public List<ProductDTO> getProductsByKeyword(String keyword,Integer start,Integer end) throws Exception {
+        return productMapper.getProductsByKeyword(keyword,start,end);
     }
 
     public List<CartDTO> cartInfo(Integer cart_seq) throws Exception {
@@ -448,8 +448,8 @@ public class ProductService {
         return productMapper.salesPdCount();
     }
 
-    public Integer productCnt() throws Exception {  //상품 총 개수
-        return productMapper.productCnt();
+    public Integer productCnt(String keyword) throws Exception {  //상품 총 개수
+        return productMapper.productCnt(keyword);
     }
 
     public PayProductDTO getPayProductInfo(Integer pay_seq, Integer pd_seq) throws Exception {
@@ -457,10 +457,10 @@ public class ProductService {
     }
 
     //페이징
-    public Map<String, Object> pagingPdList(Integer cpage) throws Exception {
+    public Map<String, Object> pagingPdList(Integer cpage,String keyword) throws Exception {
         //현재 페이지
         System.out.println("cpage = " + cpage);
-        Integer postCount = productCnt(); //전체 상품수
+        Integer postCount = productCnt(keyword); //전체 상품수
         Integer postPerPage = 10; //페이지 당 글 개수
         Integer naviPerPage = 10; //페이지 당 내비 수
         Integer totalPageCount = 0; //전체 페이지 수
@@ -778,5 +778,9 @@ public class ProductService {
 
     public Integer countReview() throws Exception{
         return productMapper.countReview();
+    }
+
+    public Integer searchPdCnt(String keyword) throws Exception{
+        return productMapper.searchPdCnt(keyword);
     }
 }

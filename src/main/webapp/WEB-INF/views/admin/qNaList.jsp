@@ -34,15 +34,16 @@
     <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
 
     <style>
-        .pagingDiv {
-            position: fixed;
-            left: 0;
-            bottom: 150px;
-            width: 100%;
-            /*color: white; !* 글자색상 *!*/
-            /*text-align: center; !* 가운데 정렬 *!*/
-            /*padding: 15px; !* 위아래/좌우 패딩 *!*/
-        }
+        /*.pagingDiv {*/
+        /*    position: fixed;*/
+        /*    left: 0;*/
+        /*    !*bottom: 150px;*!*/
+        /*    width: 100%;*/
+        /*    color: white; !* 글자색상 *!*/
+        /*    text-align: center; !* 가운데 정렬 *!*/
+        /*    !*margin-top: 20px; !* 위아래/좌우 패딩 *!*!*/
+        /*    padding: 15px;*/
+        /*}*/
 
         #tbody * {
             text-align: center;
@@ -52,9 +53,9 @@
             width: 600px;
         }
 
-        table {
-            table-layout: fixed;
-        }
+        /*table {*/
+        /*    table-layout: fixed;*/
+        /*}*/
 
         .question {
             text-overflow: ellipsis;
@@ -75,12 +76,19 @@
             flex-direction: column;
         }
 
-        .cart {
+        .cart,.pagingDiv{
             flex: 1 0 auto;
         }
 
         #footer {
-            flex-shrink: 0;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40; /* 배경색상 */
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            padding: 15px; /* 위아래/좌우 패딩 */
         }
     </style>
 </head>
@@ -221,7 +229,7 @@
     }
 
     //답변 작성
-    $(document).on("click",".ansWriteBtn",function(){
+    $(document).on("click", ".ansWriteBtn", function () {
 
         let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
         let cpage = $(this).parent().closest("tr").find(".cpage").val();
@@ -245,7 +253,7 @@
         let input3 = document.createElement("input");
         input3.setAttribute("type", "hidden");
         input3.setAttribute("value", cpage);
-        input3.setAttribute("name",cpage );
+        input3.setAttribute("name", cpage);
 
         newFrm.append(input1);
         newFrm.append(input3);
@@ -261,7 +269,7 @@
     })
 
     //답변 수정
-    $(document).on("click",".updAnsBtn",function(){
+    $(document).on("click", ".updAnsBtn", function () {
 
         let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
         let cpage = $(this).parent().closest("tr").find(".cpage").val();
@@ -288,7 +296,7 @@
         let input3 = document.createElement("input");
         input3.setAttribute("type", "hidden");
         input3.setAttribute("value", cpage);
-        input3.setAttribute("name",cpage );
+        input3.setAttribute("name", cpage);
 
 
         newFrm.append(input1);
@@ -303,7 +311,7 @@
         myForm.submit();
     });
     //삭제
-    $(document).on("click",".delQBtn",function(){
+    $(document).on("click", ".delQBtn", function () {
 
         if (confirm('삭제하시겠습니까?')) {
             let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
@@ -404,7 +412,7 @@
         HTML += '<td>' + item.questionDTO.writeDate + '</td>';
         HTML += '<td>' + item.questionDTO.id + '</td>';
         HTML += '<input type="hidden" value="' + item.questionDTO.q_seq + '" class="q_seq">';
-        HTML += '<input type="hidden" value="'+item.cpage+'" class="cpage">';
+        HTML += '<input type="hidden" value="' + item.cpage + '" class="cpage">';
         HTML += '<td>';
         if (item.answerYN != 'N') {
             HTML += '<button type="button" class="updAnsBtn btn btn-light">답변 수정</button>';
@@ -412,13 +420,13 @@
             HTML += '<button type="button" class="ansWriteBtn btn btn-light">답변 작성</button>';
         }
         HTML += '<button type="button" class="delQBtn btn btn-light">삭제</button></td></tr>';
-        HTML += '<tr class="answer_'+i+' answer" style="display:none;"><td></td><td></td>';
-        HTML += '<td class="qText">'+item.questionDTO.content+'</td>';
+        HTML += '<tr class="answer_' + i + ' answer" style="display:none;"><td></td><td></td>';
+        HTML += '<td class="qText">' + item.questionDTO.content + '</td>';
         HTML += '<td>' + item.questionDTO.writeDate + '</td>';
         HTML += '<td>' + item.questionDTO.id + '</td><td></td></tr>';
         if (item.answerYN == 'Y') {
-            HTML += '<tr class="answer_'+i+' answer" style="display:none;"><td></td><td></td>';
-            HTML += '<td class="aText"><i class="fa-solid fa-pen"></i>'+item.answerDTO.answer+'</td>';
+            HTML += '<tr class="answer_' + i + ' answer" style="display:none;"><td></td><td></td>';
+            HTML += '<td class="aText"><i class="fa-solid fa-pen"></i>' + item.answerDTO.answer + '</td>';
             HTML += '<td>' + item.answerDTO.writer + '</td>';
             HTML += '<td>' + item.answerDTO.writeDate + '</td><td></td></tr>';
         }

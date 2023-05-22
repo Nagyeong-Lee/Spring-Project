@@ -73,10 +73,23 @@
             text-align: center;
         }
 
-        .content, .question.qText,.aText{width: 600px;}
-        table{table-layout:fixed;}
-        .question{text-overflow:ellipsis; overflow: hidden; white-space: nowrap;}
-        .qText,.aText{word-break: break-all}
+        .content, .question.qText, .aText {
+            width: 600px;
+        }
+
+        table {
+            table-layout: fixed;
+        }
+
+        .question {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .qText, .aText {
+            word-break: break-all
+        }
     </style>
 </head>
 <body>
@@ -159,7 +172,7 @@
                 <c:if test="${status.count <= 10}">
                     <img src="/resources/img/products/pdReview/${i}" class="reviewImg">
                 </c:if>
-                <c:if test="${status.count > 10}">
+                <c:if test="${status.count == 11}">
                     &nbsp&nbsp ...
                 </c:if>
             </c:forEach>
@@ -238,12 +251,13 @@
                             </c:otherwise>
                         </c:choose>
                         <td class="question">
-                            <a href="javascript:void(0);" onclick="openAnswer('${status.index}')">${i.questionDTO.content}</a>
+                            <a href="javascript:void(0);"
+                               onclick="openAnswer('${status.index}')">${i.questionDTO.content}</a>
                         </td>
                         <td>${i.questionDTO.id}</td>
                         <td>${i.questionDTO.writeDate}</td>
                     </tr>
-                    <tr class="content_${status.index} content_tr" style="display: none;" >
+                    <tr class="content_${status.index} content_tr" style="display: none;">
                         <td></td>
                         <td class="qText">${i.questionDTO.content}</td>
                         <td>${i.questionDTO.id}</td>
@@ -252,7 +266,7 @@
                     <c:if test="${i.answerYN == 'Y'}">
                         <tr class="content_${status.index} content_tr" style="display: none;">
                             <td></td>
-                            <td  class="aText">${i.answerDTO.answer}</td>
+                            <td class="aText">${i.answerDTO.answer}</td>
                             <td>${i.answerDTO.writer}</td>
                             <td>${i.answerDTO.writeDate}</td>
                         </tr>
@@ -556,8 +570,8 @@
 
     function openAnswer(index) {
         console.log(index);
-        $('.content_tr').css('display' , 'none'); //다 없애고 해당 tr만 보여줌
-        $('.content_'+index).css('display' , 'table-row');
+        $('.content_tr').css('display', 'none'); //다 없애고 해당 tr만 보여줌
+        $('.content_' + index).css('display', 'table-row');
 
     }
 

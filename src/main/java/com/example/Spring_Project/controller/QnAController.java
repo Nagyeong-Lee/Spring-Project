@@ -37,7 +37,6 @@ public class QnAController {
 
     @RequestMapping("") //나의 Q&A 조회로
     public String toMyQnA(Model model, String id, Integer cpage) throws Exception {
-        System.out.println("다시옴");
         System.out.println("cpage = " + cpage);
         if (cpage == null) {
             cpage = 1;
@@ -96,7 +95,6 @@ public class QnAController {
 
     @PostMapping("/ansPopup")  //답변 작성 팝업으로
     public String toAnsPopup(Model model, @RequestParam Map<String, Object> param) throws Exception {
-        System.out.println("ㅅㅂ = " + param);
         model.addAttribute("param", param);
         return "/admin/ansPopup";
     }
@@ -111,7 +109,6 @@ public class QnAController {
     @PostMapping("/updAnsPopup")  //관리자 답변 수정 팝업으로
     public String toUpdAnsPopup(Model model, @RequestParam Map<String, Object> param) throws Exception {
         AnswerDTO answerDTO = qnAService.getAnswer(Integer.parseInt(param.get("q_seq").toString()));
-        System.out.println("ㅅㅂ = " + param);
         model.addAttribute("param", param);
         model.addAttribute("answerDTO", answerDTO);
         return "/admin/updPopup";

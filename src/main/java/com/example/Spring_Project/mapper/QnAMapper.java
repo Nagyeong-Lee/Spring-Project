@@ -46,4 +46,7 @@ public interface QnAMapper {
     Integer countQuestion();
     @Select("select count(*) from question where id = #{id} and status = 'Y'")
     Integer countMyQuestion(@Param("id") String id);
+
+    Integer filteredReviewCnt(@Param("pcArr") List<String> pcArr, @Param("chCArr") List<String> chCArr, @Param("starArr") List<String> starArr
+            , @Param("type") String selectType, @Param("keyword") String keyword);
 }

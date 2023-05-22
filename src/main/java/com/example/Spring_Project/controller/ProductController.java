@@ -38,15 +38,16 @@ public class ProductController {
     private QnAService qnAService;
 
     @RequestMapping("/list") //전체 상품 리스트
-    public String productList(Model model, Integer cpage) throws Exception {
+    public String productList(Model model, Integer cpage,String keyword) throws Exception {
+        if(keyword == null) keyword = null;
         if (cpage == null) cpage = 1;
-        Map<String, Object> paging = productService.pagingPdList(cpage);
+        Map<String, Object> paging = productService.pagingPdList(cpage,keyword);
         Integer naviPerPage = 10;
         Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage); //시작 글번호,끝 글번호 계산
         Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
         Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
 
-        List<ProductDTO> productDTOList = productService.getProducts(start, end);
+        List<ProductDTO> productDTOList = productService.getProducts(keyword,start, end);
         model.addAttribute("productDTOList", productDTOList);
         model.addAttribute("paging", paging);
         return "/product/productList";
@@ -765,10 +766,17 @@ public class ProductController {
 
     //상품 검색
     @RequestMapping("/searchPd")
-    public String searchPd(String keyword, Model model) throws Exception {
-        List<ProductDTO> productDTOList = productService.getProductsByKeyword(keyword);
+    public String searchPd(String keyword, Model model,Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer naviPerPage = 10;
+        Integer postCnt = productService.searchPdCnt(keyword);//검색한 상품 수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+        List<ProductDTO> productDTOList = productService.getProductsByKeyword(keyword,start,end);
         model.addAttribute("productDTOList", productDTOList);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("paging", paging);
         return "/product/productList";
     }
 
@@ -894,7 +902,7 @@ public class ProductController {
 
     @ResponseBody
     @PostMapping("/rePaging")
-    public Map<String, Object> rePaging(Integer cpage, String id) throws Exception {
+    public Map<String, Object> rePaging(Integer cpage, String id,String keyword) throws Exception {
 //        List<Map<String, Object>> historyList = new ArrayList<>();
 //        Integer naviPerPage = 10;
 //        Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage);
@@ -923,7 +931,7 @@ public class ProductController {
         Integer naviPerPage = 10;
         Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
         Integer end = cpage * naviPerPage; // 끝 글 번호
-        List<ProductDTO> list = productService.getProducts(start, end); //상품정보
+        List<ProductDTO> list = productService.getProducts(keyword,start, end); //상품정보
         List<OptionDTO> optionDTOList = null;
         List<Map<String, Object>> registeredPd = new ArrayList<>();
         Map<String, Object> tmp = null;
@@ -944,15 +952,15 @@ public class ProductController {
 
     @ResponseBody
     @PostMapping("/rePagingPdList")
-    public Map<String, Object> rePagingPdList(Integer cpage, String id) throws Exception {
+    public Map<String, Object> rePagingPdList(Integer cpage, String id,String keyword) throws Exception {
         Integer naviPerPage = 10;
         Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage);
         Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
         Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
 
         Map<String, Object> reMap = new HashMap<>();
-        List<ProductDTO> productDTOList = productService.getProducts(start, end);
-        Map<String, Object> paging = productService.pagingPdList(cpage);
+        List<ProductDTO> productDTOList = productService.getProducts(keyword,start, end);
+        Map<String, Object> paging = productService.pagingPdList(cpage,keyword);
         reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
         reMap.put("endNavi", Integer.parseInt(paging.get("endNavi").toString()));
         reMap.put("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));

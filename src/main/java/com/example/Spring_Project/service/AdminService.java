@@ -253,8 +253,8 @@ public class AdminService {
     }
 
     public List<ParsedReviewDTO> reviewsByOptions(List<String> pcArr, List<String> chCArr, List<String> starArr
-            , String selectType, String keyword, String time) {
-        return adminMapper.reviewsByOptions(pcArr, chCArr, starArr, selectType, keyword, time);
+            , String selectType, String keyword, String time,Integer start,Integer end) {
+        return adminMapper.reviewsByOptions(pcArr, chCArr, starArr, selectType, keyword, time,start,end);
     }
 
     public List<ParsedReviewDTO2> reviewByOptList(List<ParsedReviewDTO> mapList) throws Exception {
@@ -300,7 +300,6 @@ public class AdminService {
                     .childCategory(childCtgName)
                     .parentCategory(parentCtg)
                     .build();
-
             objectList.add(parsedReviewDTO2);
         }
         return objectList;

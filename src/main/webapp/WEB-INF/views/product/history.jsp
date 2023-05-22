@@ -45,7 +45,17 @@
         .cart, .pagingDiv{
             flex: 1 0 auto;
         }
-        #footer{  flex-shrink: 0;}
+        /*#footer{  flex-shrink: 0;}*/
+        #footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40; /* 배경색상 */
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            padding: 15px; /* 위아래/좌우 패딩 */
+        }
     </style>
 </head>
 <body>

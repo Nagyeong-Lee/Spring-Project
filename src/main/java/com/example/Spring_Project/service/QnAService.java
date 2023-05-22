@@ -187,4 +187,9 @@ public class QnAService {
         map.put("end", end);
         return map;
     }
+
+    public Integer filteredReviewCnt(List<String> pcArr, List<String> chCArr, List<String> starArr
+            , String selectType, String keyword) throws Exception{
+        return qnAMapper.filteredReviewCnt(pcArr,chCArr,starArr,selectType,keyword);
+    }
 }

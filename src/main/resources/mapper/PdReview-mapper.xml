@@ -197,9 +197,13 @@
         WHERE pd_seq = #{pd_seq} AND name = #{optName}
     </select>
 
-    <select id="getReviews" resultType="map" parameterType="java.util.List">
+    <select id="getReviews" resultType="com.example.Spring_Project.dto.ParsedReviewDTO" parameterType="java.util.List">
 
-<!--        SELECT-->
+
+<!--        SELECT  a.*-->
+<!--        FROM (-->
+<!--        SELECT ROWNUM r, review.* FROM-->
+<!--        (SELECT-->
 <!--        r.review_seq,-->
 <!--        revImg.revImg_seq,r.id,-->
 <!--        r.payPd_seq,-->
@@ -248,72 +252,115 @@
 <!--        content-->
 <!--        FROM REVIEW r WHERE PD_SEQ IN-->
 <!--        <foreach collection="list" item="item" separator="," open="(" close=")">-->
-<!--            #{item}-->
-<!--        </foreach>-->
-<!--        AND star = #{star} AND status = 'Y' ORDER BY WRITEDATE ) a-->
+<!--                    #{item}-->
+<!--                </foreach>-->
+<!--        AND star = 5 AND status = 'Y' ORDER BY WRITEDATE ) a-->
 <!--        JOIN sales s ON a.payPd_seq = s.PAYPD_SEQ) f )-->
 <!--        ON p.PD_SEQ  = f.pd_seq ORDER BY WRITEDATE)r-->
-<!--        ON revImg.review_seq = r.review_seq-->
+<!--        ON revImg.review_seq = r.review_seq) review) a WHERE r BETWEEN #{start} AND #{end}-->
 
-        SELECT  a.*
-        FROM (
-        SELECT ROWNUM r, review.* FROM
-        (SELECT
-        r.review_seq,
-        revImg.revImg_seq,r.id,
+
+        SELECT r.review_seq,
+        r.id,
+        r.pd_seq,
         r.payPd_seq,
-        writeDate,
-        r.star,
-        r.content,
         r.stock,
         r.price,
         r.pdOption,
+        r.star,
+        r.content,
+        r.writeDate,
+        r.pdName,
+        r.PdImg
+        FROM (
+        SELECT ROWNUM rn, a.*
+        FROM (
+        SELECT
+        r.review_seq,
+        r.id,
         r.pd_seq,
-        r.name,
-        r.pdName
-        FROM revImg JOIN
-        (SELECT
-        f.review_seq,
-        f.id,
-        f.payPd_seq,
-        to_char(f.revWriteDate,'YYYY-MM-DD HH24:MI') AS writeDate,
-        f.star,
-        f.content,
-        f.stock,
-        f.price,
-        f.pdOption,
-        p.pd_seq,
-        p.name,
-        p.img AS pdName FROM product p JOIN (
-        (SELECT
-        a.review_seq,
-        a.id,
-        a.payPd_seq,
-        a.pd_seq,
-        a.writeDate AS revWriteDate,
-        a.star,
-        a.content,
+        r.payPd_seq,
+        r.stock,
+        r.price,
+        r.pdOption,
+        r.star,
+        r.content,
+        writeDate,
+        p.name AS pdName,
+        p.img AS PdImg
+        FROM PRODUCT p JOIN (
+        SELECT
+        r.review_seq,
+        r.id,
+        r.pd_seq,
+        r.payPd_seq,
         s.stock,
         s.price,
-        s.pdOption
-        FROM
-        (SELECT
-        review_seq,
-        id,
-        payPd_seq,
-        pd_seq,
-        writeDate,
-        star,
-        content
-        FROM REVIEW r WHERE PD_SEQ IN
-        <foreach collection="list" item="item" separator="," open="(" close=")">
-                    #{item}
-                </foreach>
-        AND star = 5 AND status = 'Y' ORDER BY WRITEDATE ) a
-        JOIN sales s ON a.payPd_seq = s.PAYPD_SEQ) f )
-        ON p.PD_SEQ  = f.pd_seq ORDER BY WRITEDATE)r
-        ON revImg.review_seq = r.review_seq) review) a WHERE r BETWEEN #{start} AND #{end}
+        s.pdOption,
+        r.star,
+        r.content,
+        writeDate
+        FROM sales s JOIN (
+        SELECT
+        r.review_seq,
+        r.id,
+        r.payPd_seq,
+        r.pd_seq,
+        to_char(writeDate,'YYYY-MM-DD HH24:MI') AS writeDate,
+        r.star,
+        r.content
+        FROM review r WHERE pd_seq IN (
+        SELECT
+        pd_seq
+        FROM product
+        WHERE CATEGORY IN (
+        SELECT
+        category_seq
+        FROM category
+        WHERE PARENT_CATEGORY_SEQ IN (
+        SELECT
+        CATEGORY_SEQ
+        FROM category
+        WHERE name IN
+        (
+        '여성'
+        ,
+        '남성'
+        ,
+        '신상품'
+        ) )
+        AND name IN
+        (
+        '악세사리'
+        ,
+        '아우터'
+        ,
+        '상의'
+        ,
+        '하의'
+        )
+        )) AND status = 'Y') r ON s.payPd_seq = r.payPd_seq
+        WHERE r.star IN
+        (
+        '1'
+        ,
+        '2'
+        ,
+        '3'
+        ,
+        '4'
+        ,
+        '5'
+        )
+        ) r on p.pd_seq = r.pd_seq
+        ORDER BY writeDate
+        desc
+        ) a) r
+        WHERE rn BETWEEN #{start} AND #{end}
     </select>
+
+
+
 
     <select id="pdInfo" resultType="com.example.Spring_Project.dto.ProductDTO">
         select
