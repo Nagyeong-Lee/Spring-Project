@@ -116,47 +116,67 @@
             heigth: 200px;
         }
 
+        .pagingDiv {
+            position: fixed;
+            left: 0;
+            bottom: 100px;
+            width: 100%;
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            padding: 15px; /* 위아래/좌우 패딩 */
+        }
+
+        #tbody * {
+            text-align: center;
+        }
+
         html, body {
             height: 100%;
         }
-        body {
-            display: flex;
-            flex-direction: column;
+
+        /*body {*/
+        /*    display: flex;*/
+        /*    flex-direction: column;*/
+        /*}*/
+
+        #footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40; /* 배경색상 */
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            padding: 15px; /* 위아래/좌우 패딩 */
         }
-        .detailDiv{
-            flex: 1 0 auto;
-        }
-        #footer{  flex-shrink: 0;}
     </style>
 </head>
 <body>
 <input type="hidden" value="${keyword}" id="key" name="key">
 <input type="hidden" value="${id}" id="id" name="id">
-<div class="detailDiv">
-    <%@ include file="/WEB-INF/views/product/pdListUtil.jsp" %>
-    <div class="pagingDiv" style="text-align: center;">
-        <c:if test="${paging.needPrev eq true}">
-            <a href="javascript:void(0); onclick=paging(${paging.startNavi-1}});"><</a>
-            <a href="javascript:void(0); onclick=paging(1);">맨 처음</a>
+<%@ include file="/WEB-INF/views/product/pdListUtil.jsp" %>
+<div class="pagingDiv" style="text-align: center;">
+    <c:if test="${paging.needPrev eq true}">
+        <a href="javascript:void(0); onclick=paging(${paging.startNavi-1}});"><</a>
+        <a href="javascript:void(0); onclick=paging(1);">맨 처음</a>
+    </c:if>
+    <c:forEach var="i" begin="${paging.startNavi}" end="${paging.endNavi}" varStatus="var">
+        <c:if test="${paging.cpage eq i}">
+            <a href="javascript:void(0); onclick=paging(${i});" style="font-weight: bold;">${i}</a>
         </c:if>
-        <c:forEach var="i" begin="${paging.startNavi}" end="${paging.endNavi}" varStatus="var">
-            <c:if test="${paging.cpage eq i}">
-                <a href="javascript:void(0); onclick=paging(${i});" style="font-weight: bold;">${i}</a>
-            </c:if>
-            <c:if test="${paging.cpage ne i}">
-                <a href="javascript:void(0); onclick=paging(${i});">${i}</a>
-            </c:if>
-        </c:forEach>
-        <c:if test="${paging.needNext eq true}">
-            <a href="javascript:void(0); onclick=paging(${paging.endNavi+1});">></a>
-            <a href="javascript:void(0); onclick=paging(${paging.totalPageCount});">맨끝</a>
+        <c:if test="${paging.cpage ne i}">
+            <a href="javascript:void(0); onclick=paging(${i});">${i}</a>
         </c:if>
-    </div>
-    <footer class="py-5 bg-dark" id="footer">
-        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
-    </footer>
-
+    </c:forEach>
+    <c:if test="${paging.needNext eq true}">
+        <a href="javascript:void(0); onclick=paging(${paging.endNavi+1});">></a>
+        <a href="javascript:void(0); onclick=paging(${paging.totalPageCount});">맨끝</a>
+    </c:if>
 </div>
+<footer class="py-5 bg-dark" id="footer">
+    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+</footer>
+
 <!-- Bootstrap core JS-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Core theme JS-->

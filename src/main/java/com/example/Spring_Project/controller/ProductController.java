@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.rmi.MarshalledObject;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -287,9 +288,6 @@ public class ProductController {
         model.addAttribute("totalPrice", totalPrice);
         model.addAttribute("totalSum", totalSum);
         model.addAttribute("couponDTOList", couponDTOList);
-        //해당 아이디 포인트 가져오기
-        Integer point = productService.getMemPoint(id);
-        model.addAttribute("point", point);
         return "/product/cart";
     }
 
@@ -326,9 +324,7 @@ public class ProductController {
     }
 
     @RequestMapping("/payInfo") //결제하기
-    public String toPayInfo(Model model, String data, Integer price, String buyPdSeq,Integer usedPoint) throws Exception { //data : id
-        System.out.println("price = " + price);
-        System.out.println("usedPoint = " + usedPoint);
+    public String toPayInfo(Model model, String data, Integer price, String buyPdSeq) throws Exception { //data : id
         String[] arr = buyPdSeq.split(",");
         List<Integer> buyList = new ArrayList<>();
         // 구매할 cart_seq
@@ -359,9 +355,10 @@ public class ProductController {
             totalSum += count;
 
             //포인트 적립
-            point = pd_price * productDTO.getPoint() / 100;
+            point = pd_price * productDTO.getPoint() *count / 100;
             memPoint += point;
-
+            System.out.println("point = " + point);
+            System.out.println("memPoint = " + memPoint);
             Map<String, Object> item = new HashMap<>();
             item.put("id", data);
             item.put("count", count);
@@ -407,9 +404,29 @@ public class ProductController {
         model.addAttribute("memberDTO", memberDTO); //회원 정보
         model.addAttribute("totalPrice", totalPrice); // 최종 금액
         model.addAttribute("totalSum", totalSum); // 최종 수량
+        //해당 아이디 포인트 가져오기
+        Integer memberPoint = productService.getMemPoint(data);
+        model.addAttribute("memberPoint", memberPoint);
+        model.addAttribute("point", point);
         model.addAttribute("memPoint", memPoint); // 최종 적립 포인트
-        model.addAttribute("usedPoint", usedPoint); // 사용한 포인트
+//        model.addAttribute("usedPoint", usedPoint); // 사용한 포인트
         return "/product/payInfo";
+    }
+
+    //포인트 사용가능한지 검사
+    @ResponseBody
+    @PostMapping("/checkPoint")
+    public boolean checkPoint(@RequestParam Integer inputPoint, @RequestParam String id) throws Exception {
+        boolean result;
+        System.out.println("inputPoint = " + inputPoint);
+        System.out.println("id = " + id);
+        Integer memPoint = productService.getMemPoint(id);
+        if (memPoint >= inputPoint) {
+            result = true;
+        } else {
+            result = false;
+        }
+        return result;
     }
 
 
@@ -434,8 +451,24 @@ public class ProductController {
 
     @RequestMapping("/paymentDetails")
     @Transactional
-    public String paymentDetails(Model model, String id, Integer price, String carts, Integer seq, Integer pdTotalSum,Integer point,Integer usedPoint) throws Exception {
-
+//    public String paymentDetails(Model model, String id, Integer price, String carts, Integer seq, Integer pdTotalSum, Integer usedPoint, @RequestBody List<Map<String,Object>> productArr) throws Exception {
+    public String paymentDetails(Model model, String id, Integer price, String carts, Integer seq, Integer pdTotalSum, Integer usedPoint, @RequestParam String testArray) throws Exception {
+        //productArr - 가격
+        System.out.println("testArray = " + testArray);
+        JsonParser jsonParser = new JsonParser();
+        JsonArray jsonObject2 = (JsonArray) jsonParser.parse(testArray);
+        Integer totalPdPrice = 0;
+        Integer totalNewPoint = 0;
+        for (int i = 0; i < jsonObject2.size(); i++) {
+            JsonObject jsonObject1 = (JsonObject) jsonObject2.get(i);
+            Integer pdSeq = jsonObject1.get("pdSeq").getAsInt();
+            Integer pdStock = jsonObject1.get("pdStock").getAsInt();
+            Integer pdPrice = productService.getPdPrice(pdSeq);
+            totalPdPrice += pdPrice * pdStock;
+            Integer percent = productService.getPercent(pdSeq);
+            totalNewPoint += pdPrice *pdStock* percent / 100;
+        }
+        totalPdPrice -= usedPoint;
         //기본 배송지 수정
         productService.updDeliStatus(seq);
         productService.updStatus(seq);
@@ -454,7 +487,7 @@ public class ProductController {
 
         PayInfoDTO payInfoDTO = payService.getPayInfo(pay_seq);//결제 정보 가져오기
 
-        JsonParser jsonParser = new JsonParser();
+
         JsonArray jsonArray = new JsonArray();
         JsonObject jsonObject = new JsonObject();
         List<String> list = new ArrayList<>();
@@ -581,9 +614,14 @@ public class ProductController {
         model.addAttribute("totalSum", totalSum);
         model.addAttribute("defaultAddr", defaultAddr);
         model.addAttribute("payInfoDTO", payInfoDTO);
-        System.out.println("point = " + point);
-        productService.updMemPoint(id, point,usedPoint); // 멤버 포인트 변경
-        model.addAttribute("point", point);// 적립될 포인트
+        model.addAttribute("totalPdPrice", totalPdPrice); // 총 결제 금액 (포인트뺀거)
+        Integer memPoint = productService.getMemPoint(id); //멤버 포인트 조회
+        productService.updMemPoint(id, memPoint, usedPoint); // 멤버 포인트 변경
+
+        //적립될 포인트
+        System.out.println("totalNewPoint = " + totalNewPoint);
+        System.out.println("totalPdPrice = " + totalPdPrice);
+        model.addAttribute("totalNewPoint", totalNewPoint);// 적립될 포인트
         return "/product/paymentDetail";
     }
 

@@ -198,6 +198,7 @@ public class ProductService {
     public Integer getMemPoint(String id) throws Exception{
         return productMapper.getMemPoint(id);
     }
+
     public void updateCount(Integer count, Integer cart_seq) throws Exception {
         productMapper.updateCount(count, cart_seq);
     }
@@ -368,6 +369,14 @@ public class ProductService {
 
     public Integer getPrice(String id) throws Exception {
         return productMapper.getPrice(id);
+    }
+
+//    public Integer getPrice(Integer pdSeq) throws Exception{
+//        return productMapper.getPrice(pdSeq);
+//    }
+
+    public Integer getPercent(Integer pdSeq) throws Exception{
+        return productMapper.getPercent(pdSeq);
     }
 
     public void updCartFlag(Integer cart_seq) throws Exception {

@@ -129,16 +129,7 @@
     <hr>
     <br>
     <hr id="priceHr">
-    <%--포인트 사용--%>
-    <c:if test="${!empty cart}">
-    <div class="pointDiv">
-        <input type="hidden" name="usablePoint" id="usablePoint" value="${point}">
-        사용 가능한 포인트  : <fmt:formatNumber value="${point}" pattern="#,###"/>점
-        <br>
-        <input type="number" name="point" id="point" min="1">
-        <button type="button" name="usePointBtn" id="usePointBtn" class="btn btn-light">사용하기</button>
-    </div>
-    </c:if>
+
     <span style="text-align: right" id="sum"> 총 수량 : ${totalSum}개</span><br>
     <span style="text-align: right" id="total"> 총 합계 : <fmt:formatNumber pattern="#,###" value="${totalPrice}"/>원</span>
     <input type="hidden" value="${totalPrice}" id="hiddenTotalPrice">
@@ -194,29 +185,6 @@
         location.href = "/product/list?cpage=1";
     });
 
-    //포인트 사용 클릭 시 -> 총합계 변경
-    $("#usePointBtn").on("click",function(){
-        let inputPoint = Number($("#point").val());//입력한 포인트
-        let usablePoint = $("#usablePoint").val();//나의 포인트
-        if(inputPoint <= 0){
-            alert('포인트를 다시 입력해주세요.');
-            $("#point").val("");
-            return false;
-        }
-        if(inputPoint > usablePoint){
-            alert('사용가능한 포인트가 아닙니다.');
-            $("#point").val("");
-            return false;
-        }
-
-        let hiddenTotalPrice = $("#hiddenTotalPrice").val();  //총 합계 금액
-        hiddenTotalPrice -= inputPoint;
-        console.log(hiddenTotalPrice);
-        $("#hiddenTotalPrice").val(hiddenTotalPrice);
-
-        let totalHtml = '총 합계 : '+hiddenTotalPrice.toLocaleString()+'원';
-        $("#total").text(totalHtml);
-    })
 
     //구매 클릭 시
     function buyPd() {

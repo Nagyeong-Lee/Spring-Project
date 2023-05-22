@@ -114,7 +114,7 @@
 
 <c:choose>
     <c:when test="${!empty optionList}">
-        <div style="margin-left: 1150px;">
+        <div style="margin-left: 1190px;">
             <c:forEach var="i" items="${optionList}" varStatus="status">
                 <select name="${i.key}">
                     <option value="option" class="option">--option--</option>

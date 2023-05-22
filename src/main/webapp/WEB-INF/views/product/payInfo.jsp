@@ -55,13 +55,14 @@
                     <tbody>
                     <c:forEach var="i" items="${cart}" varStatus="status">
                         <tr class="itemDiv">
+                            <input type="hidden" value="${i.get('pd_seq')}" name="pdSeq" id="pdSeq">
                             <td colspan="2"><a href="/product/detail?pd_seq=${i.get('pd_seq')}"><img
                                     src="/resources/img/products/${i.get("img")}" style="width: 120px; height: 100px;"></a>
                             </td>
                             <td colspan="2">
                                 <p class="pdName${status.count}">${i.get("name")}</p>
                                 <p>수량 : ${i.get("count")}</p>
-                                <input type="hidden" class="pdCnt${status.count}" value="${i.get("count")}">
+                                <input type="hidden" class="pdCnt${status.count} pdStock" value="${i.get("count")}">
                                 <c:choose>
                                     <c:when test="${!empty i.get('option')}">
                                         <c:forEach var="k" items="${i.get('option')}">
@@ -82,9 +83,18 @@
     <hr>
     <br>
     <h5>적립될 포인트</h5>
-    <input type="hidden" value="${memPoint}" id="point" name="point">
-    <input type="hidden" value="${usedPoint}" id="usedPoint" name="usedPoint">
+    <%--    <input type="hidden" value="${usedPoint}" id="usedPoint" name="usedPoint">--%>
     <h5><fmt:formatNumber value="${memPoint}" pattern="#,###"/>점</h5><br>
+
+    <%--포인트 사용--%>
+    <div class="pointDiv">
+        <input type="hidden" name="usablePoint" id="usablePoint" value="${memberPoint}">
+        사용 가능한 포인트 : <fmt:formatNumber value="${memberPoint}" pattern="#,###"/>점
+        <br>
+        <input type="number" name="point" id="point" min="1">
+        <button type="button" name="usePointBtn" id="usePointBtn" class="btn btn-light">사용하기</button>
+    </div>
+
     <h3>배송지 선택</h3>
     <button type="button" id="addBtn" class="btn btn-light">배송지 추가</button>
     <br>
@@ -126,6 +136,45 @@
 <script src="/resources/asset/js/scripts.js"></script>
 <script src="/resources/asset/js/shopUtil.js"></script>
 <script>
+
+    //포인트 사용 클릭 시 -> 서버에서 포인트 쓸 수 있는지 확인
+    $("#usePointBtn").on("click", function () {
+        let inputPoint = Number($("#point").val());//입력한 포인트
+        let usablePoint = $("#usablePoint").val();//나의 포인트
+        let isPointUsable = false;
+        console.log(inputPoint);
+        console.log(usablePoint);
+
+        $.ajax({
+            url: '/product/checkPoint',
+            type: 'post',
+            async : false,
+            data: {
+                "inputPoint": inputPoint,
+                "id": $("#session").val()
+            },
+            success: function (data) {
+                if (data == true) {
+                    isPointUsable = data;
+                }
+            }
+        })
+
+        if(isPointUsable == false){
+            alert('사용가능한 포인트가 아닙니다.');
+            $("#point").val("");
+            let totalPrice = $("#totalPrice").val();  //총 합계 금액
+            let totalHtml = totalPrice+'원 결제하기';
+            $("#pay").text(totalHtml);
+            return false;
+        }else{
+            let totalPrice = $("#totalPrice").val();  //총 합계 금액
+            totalPrice -= inputPoint;
+            let totalHtml = totalPrice.toLocaleString()+'원 결제하기';
+            $("#pay").text(totalHtml);
+        }
+
+    })
 
     $("#keyword").val($("#key").val());
 
@@ -233,7 +282,7 @@
     $("#pay").on("click", function () {
         // requestPay();
         console.log($("#point").val());
-        if ($('input:radio[name=address]').length ===0) {
+        if ($('input:radio[name=address]').length === 0) {
             alert('배송지를 추가해주세요');
             return false;
         }
@@ -242,6 +291,19 @@
             alert('배송지를 선택해주세요');
             return false;
         }
+
+        let productArr = [];
+        let testArray = [];
+        $(".itemDiv").each(function(){
+            let map = new Map();
+            let pdSeq = $(this).find("#pdSeq").val();
+            let pdStock = $(this).find(".pdStock").val();
+            map.set("pdSeq",pdSeq);
+            map.set("pdStock",pdStock);
+            productArr.push(map);
+        })
+
+        console.log(productArr);
         //결제 내역으로 이동
         let frm = document.createElement("form");
         frm.setAttribute("method", "post");
@@ -252,6 +314,7 @@
         let newInput4 = document.createElement("input");
         let newInput5 = document.createElement("input");
         let newInput6 = document.createElement("input");
+        let newInput7 = document.createElement("input");
         newInput.setAttribute("type", "hidden");
         newInput.setAttribute("value", $("#session").val());
         newInput.setAttribute("name", "id");
@@ -268,20 +331,25 @@
         newInput4.setAttribute("value", $("#totalSum").val());
         newInput4.setAttribute("name", "pdTotalSum");
 
-
         newInput5.setAttribute("type", "hidden");
-        newInput5.setAttribute("value", $("#point").val());
-        newInput5.setAttribute("name", "point");
+        newInput5.setAttribute("value", $("#point").val());  //입력한 포인트
+        newInput5.setAttribute("name", "usedPoint");
 
-        newInput6.setAttribute("type", "hidden");
-        newInput6.setAttribute("value", $("#usedPoint").val());
-        newInput6.setAttribute("name", "usedPoint");
+        for (let i = 0; i < productArr.length; i++) {
+            var param = Object.fromEntries(productArr[i]);
+            testArray.push(param);
+        }
+
+        newInput7.setAttribute("type", "hidden");
+        newInput7.setAttribute("value", JSON.stringify(testArray));
+        newInput7.setAttribute("name", "testArray");
         frm.appendChild(newInput);
         frm.appendChild(newInput2);
         frm.appendChild(newInput3);
         frm.appendChild(newInput4);
         frm.appendChild(newInput5);
         frm.appendChild(newInput6);
+        frm.appendChild(newInput7);
         document.body.appendChild(frm);
         frm.submit();
 
