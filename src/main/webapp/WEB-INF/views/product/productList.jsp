@@ -126,49 +126,37 @@
         .detailDiv{
             flex: 1 0 auto;
         }
-        /*#footer{  flex-shrink: 0;}*/
-        #footer {
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: #343a40; /* 배경색상 */
-            color: white; /* 글자색상 */
-            text-align: center; /* 가운데 정렬 */
-            padding: 15px; /* 위아래/좌우 패딩 */
-        }
+        #footer{  flex-shrink: 0;}
     </style>
 </head>
 <body>
 <input type="hidden" value="${keyword}" id="key" name="key">
 <input type="hidden" value="${id}" id="id" name="id">
 <div class="detailDiv">
-<%@ include file="/WEB-INF/views/product/pdListUtil.jsp"%>
-
-<div class="pagingDiv" style="text-align: center;">
-    <c:if test="${paging.needPrev eq true}">
-        <a href="javascript:void(0); onclick=paging(${paging.startNavi-1}});"><</a>
-        <a href="javascript:void(0); onclick=paging(1);">맨 처음</a>
-    </c:if>
-    <c:forEach var="i" begin="${paging.startNavi}" end="${paging.endNavi}" varStatus="var">
-        <c:if test="${paging.cpage eq i}">
-            <a href="javascript:void(0); onclick=paging(${i});" style="font-weight: bold;">${i}</a>
+    <%@ include file="/WEB-INF/views/product/pdListUtil.jsp" %>
+    <div class="pagingDiv" style="text-align: center;">
+        <c:if test="${paging.needPrev eq true}">
+            <a href="javascript:void(0); onclick=paging(${paging.startNavi-1}});"><</a>
+            <a href="javascript:void(0); onclick=paging(1);">맨 처음</a>
         </c:if>
-        <c:if test="${paging.cpage ne i}">
-            <a href="javascript:void(0); onclick=paging(${i});">${i}</a>
+        <c:forEach var="i" begin="${paging.startNavi}" end="${paging.endNavi}" varStatus="var">
+            <c:if test="${paging.cpage eq i}">
+                <a href="javascript:void(0); onclick=paging(${i});" style="font-weight: bold;">${i}</a>
+            </c:if>
+            <c:if test="${paging.cpage ne i}">
+                <a href="javascript:void(0); onclick=paging(${i});">${i}</a>
+            </c:if>
+        </c:forEach>
+        <c:if test="${paging.needNext eq true}">
+            <a href="javascript:void(0); onclick=paging(${paging.endNavi+1});">></a>
+            <a href="javascript:void(0); onclick=paging(${paging.totalPageCount});">맨끝</a>
         </c:if>
-    </c:forEach>
-    <c:if test="${paging.needNext eq true}">
-        <a href="javascript:void(0); onclick=paging(${paging.endNavi+1});">></a>
-        <a href="javascript:void(0); onclick=paging(${paging.totalPageCount});">맨끝</a>
-    </c:if>
-</div>
-</div>
+    </div>
+    <footer class="py-5 bg-dark" id="footer">
+        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+    </footer>
 
-<!-- Footer-->
-<footer class="py-5 bg-dark" id="footer" >
-    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
-</footer>
+</div>
 <!-- Bootstrap core JS-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Core theme JS-->
@@ -184,7 +172,7 @@
             data: {
                 "cpage": startNavi,
                 "id": $("#id").val(),
-                "keyword":$("#key").val()
+                "keyword": $("#key").val()
             },
             success: function (data) {
                 $(".pagingDiv").children().remove();
@@ -231,11 +219,11 @@
         let pdName = item.name;
         let pd_seq = item.pd_seq;
         var HTML = '<div class="col mb-5"><div class="card h-100">';
-        HTML+='<img class="card-img-top img" src="/resources/img/products/'+item.img+'" style="width: 225px;">';
-        HTML+='<div class="card-body p-4"><div class="text-center"><h5 class="fw-bolder">';
-        HTML+='<a href="/product/detail?pd_seq='+pd_seq+'">'+pdName+'</a></h5>';
-        HTML+=item.price.toLocaleString()+'원';
-        HTML+='</div></div></div></div>';
+        HTML += '<img class="card-img-top img" src="/resources/img/products/' + item.img + '" style="width: 225px;">';
+        HTML += '<div class="card-body p-4"><div class="text-center"><h5 class="fw-bolder">';
+        HTML += '<a href="/product/detail?pd_seq=' + pd_seq + '">' + pdName + '</a></h5>';
+        HTML += item.price.toLocaleString() + '원';
+        HTML += '</div></div></div></div>';
         console.log(HTML);
         return HTML;
     }
@@ -259,21 +247,21 @@
         return html;
     }
 
-    function createNext(endNavi,totalPageCount){
+    function createNext(endNavi, totalPageCount) {
         var html = '';
         html += '<a href="javascript:void(0);" onclick="paging(' + (endNavi + 1) + ');">' + ">" + '</a>';
         html += '<a href="javascript:void(0);" onclick="paging(' + (totalPageCount) + ');">' + "맨끝" + '</a>';
         return html;
     }
 
-    $("#cart").click(function(){
+    $("#cart").click(function () {
         let newForm = document.createElement("form");
-        newForm.setAttribute("method","post");
-        newForm.setAttribute("action","/product/cart");
+        newForm.setAttribute("method", "post");
+        newForm.setAttribute("action", "/product/cart");
         let newInput = document.createElement("input");
-        newInput.setAttribute("type","hidden");
-        newInput.setAttribute("name","id");
-        newInput.setAttribute("value",$("#id").val());
+        newInput.setAttribute("type", "hidden");
+        newInput.setAttribute("name", "id");
+        newInput.setAttribute("value", $("#id").val());
         newForm.appendChild(newInput);
         document.body.append(newForm);
         newForm.submit();
@@ -281,21 +269,21 @@
     $("#keyword").val($("#key").val());
     $("#search").on("click", function () {
         let keyword = $("#keyword").val();
-        if(keyword.length == 0 ){
+        if (keyword.length == 0) {
             alert('상품을 입력하세요.');
             return;
         }
         location.href = '/product/searchPd?keyword=' + keyword;
     });
 
-    $("#cart").click(function(){
+    $("#cart").click(function () {
         let newForm = document.createElement("form");
-        newForm.setAttribute("method","post");
-        newForm.setAttribute("action","/product/cart");
+        newForm.setAttribute("method", "post");
+        newForm.setAttribute("action", "/product/cart");
         let newInput = document.createElement("input");
-        newInput.setAttribute("type","hidden");
-        newInput.setAttribute("name","id");
-        newInput.setAttribute("value",$("#id").val());
+        newInput.setAttribute("type", "hidden");
+        newInput.setAttribute("name", "id");
+        newInput.setAttribute("value", $("#id").val());
         newForm.appendChild(newInput);
         document.body.append(newForm);
         newForm.submit();

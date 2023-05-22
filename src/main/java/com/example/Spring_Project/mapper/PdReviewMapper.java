@@ -19,6 +19,8 @@ import java.util.Map;
     @Select("select review_seq.currval from dual")
     Integer currRevSeq();
 
+    @Update("update member set point = point + 100 where id = #{id}")
+    void updMemPoint(@Param("id") String id);
     ReviewDTO reviewInfo(@Param("payPd_seq") Integer payPd_seq);
     ReviewDTO reviewDetail(@Param("review_seq") Integer review_seq);
 

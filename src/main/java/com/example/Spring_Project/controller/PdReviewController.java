@@ -40,9 +40,12 @@ public class PdReviewController {
     @ResponseBody
     @PostMapping("/insertReview") //상품 리뷰 작성
     public void insertReview(@RequestParam Map<String, Object> param, @RequestParam(value = "file", required = false) List<MultipartFile> file, HttpServletRequest request) throws Exception {
+        String id = param.get("loginID").toString();
         pdReviewService.reviewInsert(param); //review insert
         Integer review_seq = pdReviewService.currRevSeq();//현재 review_seq 가져오기
         pdReviewService.imgInsert(file,request,review_seq);//img insert
+        //리뷰 작성 시 포인트 주기
+        pdReviewService.updMemPoint(id);
 
     }
 

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
@@ -38,16 +39,16 @@ public class ProductController {
     private QnAService qnAService;
 
     @RequestMapping("/list") //전체 상품 리스트
-    public String productList(Model model, Integer cpage,String keyword) throws Exception {
-        if(keyword == null) keyword = null;
+    public String productList(Model model, Integer cpage, String keyword) throws Exception {
+        if (keyword == null) keyword = null;
         if (cpage == null) cpage = 1;
-        Map<String, Object> paging = productService.pagingPdList(cpage,keyword);
+        Map<String, Object> paging = productService.pagingPdList(cpage, keyword);
         Integer naviPerPage = 10;
         Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage); //시작 글번호,끝 글번호 계산
         Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
         Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
 
-        List<ProductDTO> productDTOList = productService.getProducts(keyword,start, end);
+        List<ProductDTO> productDTOList = productService.getProducts(keyword, start, end);
         model.addAttribute("productDTOList", productDTOList);
         model.addAttribute("paging", paging);
         return "/product/productList";
@@ -69,12 +70,12 @@ public class ProductController {
 
         //Q&A 뿌리기
         List<QuestionDTO> questionDTOS = qnAService.getQuestions(pd_seq); // 질문들 가져오기
-        List<Map<String,Object>> qNaList  = qnAService.getQnAList(questionDTOS);  //{질문 , 답변}
+        List<Map<String, Object>> qNaList = qnAService.getQnAList(questionDTOS);  //{질문 , 답변}
 
 
         //상품 detail에 리뷰 뿌리기
         List<ReviewDTO> reviewDTO = pdReviewService.getReviewByPd_seq(pd_seq);  //리뷰 가져옴
-        List<Map<String,Object>> reviewInfoList = pdReviewService.reviewInfoList(reviewDTO,pd_seq);
+        List<Map<String, Object>> reviewInfoList = pdReviewService.reviewInfoList(reviewDTO, pd_seq);
         model.addAttribute("productDTO", productDTO);
         model.addAttribute("optionDTO", optionDTO);
         model.addAttribute("category", category);
@@ -96,9 +97,16 @@ public class ProductController {
     }
 
     @RequestMapping("/women/outer")
-    public String wOuter(Model model) throws Exception {
-        List<ProductDTO> productDTOList = productService.getWOuter();
+    public String wOuter(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.wOuterCnt(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+        List<ProductDTO> productDTOList = productService.getWOuter(start, end);
         model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("paging", paging);
         return "/product/women/outer";
     }
 
@@ -204,7 +212,7 @@ public class ProductController {
         Integer pd_seq = Integer.parseInt(map.get("pd_seq").toString());
 
         if (map.get("optionList") != null) { //옵션 있을때
-            Map<String,List<String>> optionList = productService.getOptionList(map);
+            Map<String, List<String>> optionList = productService.getOptionList(map);
             productService.insertCart(id, count, pd_seq, optionList.toString());  //옵션 있을때 장바구니 insert
         } else if (map.get("optionList") == null) { //옵션 없을때
             productService.insertCartWtOption(id, count, pd_seq);
@@ -279,6 +287,9 @@ public class ProductController {
         model.addAttribute("totalPrice", totalPrice);
         model.addAttribute("totalSum", totalSum);
         model.addAttribute("couponDTOList", couponDTOList);
+        //해당 아이디 포인트 가져오기
+        Integer point = productService.getMemPoint(id);
+        model.addAttribute("point", point);
         return "/product/cart";
     }
 
@@ -294,7 +305,7 @@ public class ProductController {
     @RequestMapping("/count")
     public Integer getCount(Integer cart_seq) throws Exception {
         Map<String, Object> cartOption = productService.getCartOption(cart_seq);
-        int stock = productService.count(cartOption,cart_seq);
+        int stock = productService.count(cartOption, cart_seq);
         return stock;
     }
 
@@ -315,7 +326,9 @@ public class ProductController {
     }
 
     @RequestMapping("/payInfo") //결제하기
-    public String toPayInfo(Model model, String data, Integer price, String buyPdSeq) throws Exception { //data : id
+    public String toPayInfo(Model model, String data, Integer price, String buyPdSeq,Integer usedPoint) throws Exception { //data : id
+        System.out.println("price = " + price);
+        System.out.println("usedPoint = " + usedPoint);
         String[] arr = buyPdSeq.split(",");
         List<Integer> buyList = new ArrayList<>();
         // 구매할 cart_seq
@@ -331,9 +344,8 @@ public class ProductController {
         List<Map<String, Object>> cart = new ArrayList<>();
         Integer totalPrice = 0;  //상품 총 합계
         Integer totalSum = 0;  //상품 총 개수
-
-        /*중복 제거*/
-
+        Integer memPoint = 0; //총 적립될 포인트
+        Integer point = 0; //상품당 적립될 포인트
         for (Integer i = 0; i < buyList.size(); i++) {
             //count,pd_seq,options
             Integer pd_seq = productService.getPdSeq(buyList.get(i));
@@ -345,6 +357,10 @@ public class ProductController {
 
             totalPrice += count * pd_price;
             totalSum += count;
+
+            //포인트 적립
+            point = pd_price * productDTO.getPoint() / 100;
+            memPoint += point;
 
             Map<String, Object> item = new HashMap<>();
             item.put("id", data);
@@ -381,6 +397,7 @@ public class ProductController {
         //배송지 불러오기 (별칭으로)
         List<DeliDTO> deliDTOList = productService.getDeliveryInfo(data);
         List<DeliDTO> deliveryInfo = productService.deliveryInfo(data);
+
         System.out.println("deliDTOList = " + deliDTOList);
         model.addAttribute("cart", cart);
         model.addAttribute("deliDTOList", deliDTOList);
@@ -390,6 +407,8 @@ public class ProductController {
         model.addAttribute("memberDTO", memberDTO); //회원 정보
         model.addAttribute("totalPrice", totalPrice); // 최종 금액
         model.addAttribute("totalSum", totalSum); // 최종 수량
+        model.addAttribute("memPoint", memPoint); // 최종 적립 포인트
+        model.addAttribute("usedPoint", usedPoint); // 사용한 포인트
         return "/product/payInfo";
     }
 
@@ -415,7 +434,7 @@ public class ProductController {
 
     @RequestMapping("/paymentDetails")
     @Transactional
-    public String paymentDetails(Model model, String id, Integer price, String carts, Integer seq, Integer pdTotalSum) throws Exception {
+    public String paymentDetails(Model model, String id, Integer price, String carts, Integer seq, Integer pdTotalSum,Integer point,Integer usedPoint) throws Exception {
 
         //기본 배송지 수정
         productService.updDeliStatus(seq);
@@ -562,6 +581,9 @@ public class ProductController {
         model.addAttribute("totalSum", totalSum);
         model.addAttribute("defaultAddr", defaultAddr);
         model.addAttribute("payInfoDTO", payInfoDTO);
+        System.out.println("point = " + point);
+        productService.updMemPoint(id, point,usedPoint); // 멤버 포인트 변경
+        model.addAttribute("point", point);// 적립될 포인트
         return "/product/paymentDetail";
     }
 
@@ -611,9 +633,9 @@ public class ProductController {
         Integer price = Integer.parseInt(map.get("price").toString());
         String category1 = map.get("category1").toString();
         String category2 = map.get("category2").toString();
+        Integer point = Integer.parseInt(String.valueOf(map.get("point")));
         //상품 인서트할때 category_seq 가져오기
         Integer category_seq = productService.getCategorySeq(category1, category2);
-
         Map<String, Object> param = new HashMap<>();
         param.put("name", name);
         param.put("description", description);
@@ -621,6 +643,7 @@ public class ProductController {
         param.put("stock", stock);
         param.put("img", sysname);
         param.put("category", category_seq);
+        param.put("point", point);
 
         productService.insertPd(param);
 
@@ -673,6 +696,7 @@ public class ProductController {
         String category1 = map.get("category1").toString();
         String category2 = map.get("category2").toString();
         Integer pd_seq = Integer.parseInt(map.get("pd_seq").toString());
+        Integer point = Integer.parseInt(map.get("point").toString());
 
         Map<String, Object> param = new HashMap<>();
         if (map.get("img").toString().replace("\"", "").length() != 0) { //이미지 변경 될때
@@ -702,6 +726,7 @@ public class ProductController {
         param.put("price", price);
         param.put("category_seq", category_seq);
         param.put("pd_seq", pd_seq);
+        param.put("point", point);
         productService.updProduct(param);//상품 정보 update
 
         /*옵션 업데이트*/
@@ -766,14 +791,14 @@ public class ProductController {
 
     //상품 검색
     @RequestMapping("/searchPd")
-    public String searchPd(String keyword, Model model,Integer cpage) throws Exception {
+    public String searchPd(String keyword, Model model, Integer cpage) throws Exception {
         if (cpage == null) cpage = 1;
         Integer naviPerPage = 10;
         Integer postCnt = productService.searchPdCnt(keyword);//검색한 상품 수
         Map<String, Object> paging = productService.paging(cpage, postCnt);
         Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
         Integer end = cpage * naviPerPage; // 끝 글 번호
-        List<ProductDTO> productDTOList = productService.getProductsByKeyword(keyword,start,end);
+        List<ProductDTO> productDTOList = productService.getProductsByKeyword(keyword, start, end);
         model.addAttribute("productDTOList", productDTOList);
         model.addAttribute("keyword", keyword);
         model.addAttribute("paging", paging);
@@ -884,7 +909,7 @@ public class ProductController {
     @RequestMapping("/history")  //구매내역 최신순부터
     public String history(String id, Model model, Integer cpage) throws Exception {
         if (cpage == null) cpage = 1;
-        Map<String, Object> paging = productService.historyPaging(cpage,id);
+        Map<String, Object> paging = productService.historyPaging(cpage, id);
         Integer naviPerPage = 10;
         Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage);
         Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
@@ -902,7 +927,7 @@ public class ProductController {
 
     @ResponseBody
     @PostMapping("/rePaging")
-    public Map<String, Object> rePaging(Integer cpage, String id,String keyword) throws Exception {
+    public Map<String, Object> rePaging(Integer cpage, String id, String keyword) throws Exception {
 //        List<Map<String, Object>> historyList = new ArrayList<>();
 //        Integer naviPerPage = 10;
 //        Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage);
@@ -924,14 +949,12 @@ public class ProductController {
 //        reMap.put("historyList", historyList);
 
 
-
-
         Integer postCnt = productService.countRegisteredPd(); //상품 개수
         Map<String, Object> paging = productService.paging(cpage, postCnt);
         Integer naviPerPage = 10;
         Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
         Integer end = cpage * naviPerPage; // 끝 글 번호
-        List<ProductDTO> list = productService.getProducts(keyword,start, end); //상품정보
+        List<ProductDTO> list = productService.getProducts(keyword, start, end); //상품정보
         List<OptionDTO> optionDTOList = null;
         List<Map<String, Object>> registeredPd = new ArrayList<>();
         Map<String, Object> tmp = null;
@@ -945,22 +968,22 @@ public class ProductController {
             tmp.put("productDTO", productDTO);
             registeredPd.add(tmp);
         }
-        reMap.put("registeredPd",registeredPd);
-        reMap.put("paging",paging);
+        reMap.put("registeredPd", registeredPd);
+        reMap.put("paging", paging);
         return reMap;
     }
 
     @ResponseBody
     @PostMapping("/rePagingPdList")
-    public Map<String, Object> rePagingPdList(Integer cpage, String id,String keyword) throws Exception {
+    public Map<String, Object> rePagingPdList(Integer cpage, String id, String keyword) throws Exception {
         Integer naviPerPage = 10;
         Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage);
         Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
         Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
 
         Map<String, Object> reMap = new HashMap<>();
-        List<ProductDTO> productDTOList = productService.getProducts(keyword,start, end);
-        Map<String, Object> paging = productService.pagingPdList(cpage,keyword);
+        List<ProductDTO> productDTOList = productService.getProducts(keyword, start, end);
+        Map<String, Object> paging = productService.pagingPdList(cpage, keyword);
         reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
         reMap.put("endNavi", Integer.parseInt(paging.get("endNavi").toString()));
         reMap.put("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));
@@ -985,7 +1008,7 @@ public class ProductController {
         Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
         Integer postCnt = productService.countSalesPd(); //판매 상품 개수
         List<SalesDTO> salesDTOS = productService.getSalesList(start, end);//판매 테이블에서 가져오기
-        Map<String, Object> paging = productService.paging(cpage,postCnt);
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
         for (SalesDTO salesDTO : salesDTOS) {
             PayProductDTO payProductDTO = productService.getDeliYN(salesDTO.getSales_seq()); // deliYN, CODE 가져오기
             Map<String, Object> reMap = new HashMap<>();

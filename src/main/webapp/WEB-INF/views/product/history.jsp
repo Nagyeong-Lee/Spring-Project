@@ -25,27 +25,27 @@
     <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
 
     <style>
-        .pagingDiv {
-            position: fixed;
-            left: 0;
-            bottom: 100px;
-            width: 100%;
-            color: white; /* 글자색상 */
-            text-align: center; /* 가운데 정렬 */
-            padding: 15px; /* 위아래/좌우 패딩 */
-        }
-
         html, body {
             height: 100%;
         }
+
         body {
             display: flex;
             flex-direction: column;
         }
-        .cart, .pagingDiv{
+
+        .cart,.pagingDiv{
             flex: 1 0 auto;
         }
-        /*#footer{  flex-shrink: 0;}*/
+        .pagingDiv {
+            position: fixed;
+            left: 0;
+            bottom: 130px;
+            width: 100%;
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            /*padding: 15px; !* 위아래/좌우 패딩 *!*/
+        }
         #footer {
             position: fixed;
             left: 0;

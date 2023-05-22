@@ -32,4 +32,5 @@ public class MemberDTO {
     private String type;
     private String fileIsEmpty;
     private Date lastLoginDate;
+    private Integer point;
 }

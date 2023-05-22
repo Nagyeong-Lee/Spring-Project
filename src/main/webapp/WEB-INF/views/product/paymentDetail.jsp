@@ -79,6 +79,9 @@
   <div>총 합계 : <fmt:formatNumber pattern="#,###" value="${price}" />원</div>
   <input type="hidden" id="hiddenPay" value="<fmt:formatNumber pattern="#,###" value="${totalPrice}" />">
   <div>결제 방법 : ${payInfoDTO.payMethod}</div>
+<br>
+  <h5>적립될 포인트 </h5>
+  <h5><fmt:formatNumber pattern="#,###" value="${point}"/>점</h5>
 
   <div class="cart__mainbtns">
     <button class="cart__bigorderbtn left" id="continue" style="margin-left:70px;">상품 리스트로 이동</button>

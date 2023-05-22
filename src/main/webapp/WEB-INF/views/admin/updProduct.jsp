@@ -25,8 +25,8 @@
         ></div>
         <div>가격 : <input type="number" min="1" id="price" name="price" value="${map.productDTO.price}"
         ></div>
-        <div>재고 : <input type="number" min="1" id="stock" name="stock" value="${map.productDTO.stock}"
-        ></div>
+        <div>재고 : <input type="number" min="1" id="stock" name="stock" value="${map.productDTO.stock}"></div>
+        <div>포인트 : <input type="number" min="1" id="point" name="point" value="${map.productDTO.point}"></div>
         <div>
             <img src="/resources/img/products/${map.productDTO.img}" style="width: 200px; height: 200px;"
                  id="pdImg"><br>

@@ -40,8 +40,11 @@ public class ProductService {
         return productMapper.getWProduct();
     }
 
-    public List<ProductDTO> getWOuter() throws Exception { //여자 아우터
-        return productMapper.getWOuter();
+    public Integer wOuterCnt() throws Exception{
+        return productMapper.wOuterCnt();
+    }
+    public List<ProductDTO> getWOuter(Integer start,Integer end) throws Exception { //여자 아우터
+        return productMapper.getWOuter(start,end);
     }
 
     public List<ProductDTO> getWTop() throws Exception { //여자 상의
@@ -51,6 +54,7 @@ public class ProductService {
     public List<ProductDTO> getWPants() throws Exception {  //여자 하의
         return productMapper.getWPants();
     }
+
 
     public List<ProductDTO> getWAccessories() throws Exception {  //여자 악세사리
         return productMapper.getWAccessories();
@@ -191,6 +195,9 @@ public class ProductService {
         return productMapper.getCoupon(m_seq);
     }
 
+    public Integer getMemPoint(String id) throws Exception{
+        return productMapper.getMemPoint(id);
+    }
     public void updateCount(Integer count, Integer cart_seq) throws Exception {
         productMapper.updateCount(count, cart_seq);
     }
@@ -337,6 +344,10 @@ public class ProductService {
 
     public String getOption(Integer cart_seq) throws Exception {
         return productMapper.getOption(cart_seq);
+    }
+
+    public void updMemPoint(String id,Integer memPoint,Integer usedPoint) throws Exception{
+        productMapper.updMemPoint(id,memPoint,usedPoint);
     }
 
     public Integer getId(String id) throws Exception {

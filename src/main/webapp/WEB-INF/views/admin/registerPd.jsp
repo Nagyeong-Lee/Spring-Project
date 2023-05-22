@@ -21,13 +21,15 @@
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
     <style>
-        .registerFrm{
+        .registerFrm {
             text-align: center;
             margin-top: 50px;
         }
-        .registerFrm *{
+
+        .registerFrm * {
             text-align: center;
         }
+
         #footer {
             position: absolute;
             left: 0;
@@ -52,9 +54,12 @@
         <%--        <div>이미지 : <input type="file" id="img" name="img"></div>--%>
         <%--        <img src="" style="width: 200px; height: 200px;"--%>
         <%--             id="pdImg">--%>
-        <input type="file" id="img" name="img"><br>
-        <input type="hidden" id="img_name" name="img_name">
-        카테고리
+        <div> 적립 퍼센티지 : <input type="number" id="point" name="point"></div>
+        <div>
+            <input type="file" id="img" name="img">
+            <input type="hidden" id="img_name" name="img_name">
+        </div>
+        <div id="category">카테고리</div>
         <div id="mainCategory">
             <select name="category1" id="category1">
                 <option value="여성">여성</option>
@@ -76,12 +81,12 @@
 
         <button type="button" id="addPdBtn" class="btn btn-light">상품 등록</button>
         <button type="button" id="reset" class="btn btn-light">초기화</button>
-<%--        <button type="button" id="toList">관리자 메인페지로</button>--%>
+        <%--        <button type="button" id="toList">관리자 메인페지로</button>--%>
     </form>
 </div>
 
 <!-- Footer-->
-<footer class="py-5 bg-dark" id="footer" >
+<footer class="py-5 bg-dark" id="footer">
     <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
 </footer>
 
@@ -99,8 +104,8 @@
         checkFileName(fileName);
         readURL(this);
 
-        var html = '<img src="" style="width: 200px; height: 200px;"id="pdImg">';
-        $("#cnt").after(html);
+        var html = '<img src="" style="width: 200px; height: 200px;" id="pdImg">';
+        $("#category").before(html);
     });
 
     function checkFileName(str) {

@@ -35,6 +35,9 @@ public class PdReviewService {
         return pdReviewMapper.currRevSeq();
     }
 
+    public void updMemPoint(String id) throws Exception{
+        pdReviewMapper.updMemPoint(id);
+    }
     public void imgInsert(List<MultipartFile> file, HttpServletRequest request, Integer review_seq) throws Exception {
 
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();

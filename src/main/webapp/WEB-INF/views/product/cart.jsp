@@ -129,16 +129,16 @@
     <hr>
     <br>
     <hr id="priceHr">
-
-    <%--    &lt;%&ndash;쿠폰&ndash;%&gt;--%>
-    <%--    <select name="discount" id="discount">--%>
-    <%--        <option value="coupon">--coupon--</option>--%>
-    <%--        <c:if test="${!empty couponDTOList}">--%>
-    <%--            <c:forEach var="i" items="${couponDTOList}">--%>
-    <%--                <option value="${i.discount}" class="useCoupon">${i.title}${i.discount}%</option>--%>
-    <%--            </c:forEach>--%>
-    <%--        </c:if>--%>
-    <%--    </select><br>--%>
+    <%--포인트 사용--%>
+    <c:if test="${!empty cart}">
+    <div class="pointDiv">
+        <input type="hidden" name="usablePoint" id="usablePoint" value="${point}">
+        사용 가능한 포인트  : <fmt:formatNumber value="${point}" pattern="#,###"/>점
+        <br>
+        <input type="number" name="point" id="point" min="1">
+        <button type="button" name="usePointBtn" id="usePointBtn" class="btn btn-light">사용하기</button>
+    </div>
+    </c:if>
     <span style="text-align: right" id="sum"> 총 수량 : ${totalSum}개</span><br>
     <span style="text-align: right" id="total"> 총 합계 : <fmt:formatNumber pattern="#,###" value="${totalPrice}"/>원</span>
     <input type="hidden" value="${totalPrice}" id="hiddenTotalPrice">
@@ -193,6 +193,30 @@
     $("#continue").on("click", function () {
         location.href = "/product/list?cpage=1";
     });
+
+    //포인트 사용 클릭 시 -> 총합계 변경
+    $("#usePointBtn").on("click",function(){
+        let inputPoint = Number($("#point").val());//입력한 포인트
+        let usablePoint = $("#usablePoint").val();//나의 포인트
+        if(inputPoint <= 0){
+            alert('포인트를 다시 입력해주세요.');
+            $("#point").val("");
+            return false;
+        }
+        if(inputPoint > usablePoint){
+            alert('사용가능한 포인트가 아닙니다.');
+            $("#point").val("");
+            return false;
+        }
+
+        let hiddenTotalPrice = $("#hiddenTotalPrice").val();  //총 합계 금액
+        hiddenTotalPrice -= inputPoint;
+        console.log(hiddenTotalPrice);
+        $("#hiddenTotalPrice").val(hiddenTotalPrice);
+
+        let totalHtml = '총 합계 : '+hiddenTotalPrice.toLocaleString()+'원';
+        $("#total").text(totalHtml);
+    })
 
     //구매 클릭 시
     function buyPd() {
@@ -429,7 +453,6 @@
     //결제하기 버튼 클릭
     //옵션,상품 개수 변경
     $("#pay").on("click", function () {
-
         var buyPdSeq = []; //구매할 cart_seq 담을 배열
 
         $("input[name=buyPdSeq]:checked").each(function () {
@@ -445,20 +468,30 @@
             var newInput = document.createElement("input");
             var newInput2 = document.createElement("input");
             var newInput3 = document.createElement("input");
+            var newInput4 = document.createElement("input");
+
             newForm.setAttribute("action", "/product/payInfo");
             newForm.setAttribute("method", "post");
             newInput.setAttribute("value", $("#session").val());
             newInput.setAttribute("type", "hidden");
             newInput.setAttribute("name", "data");
+
             newInput2.setAttribute("value", $("#hiddenTotalPrice").val());
             newInput2.setAttribute("type", "hidden");
             newInput2.setAttribute("name", "price");
+
             newInput3.setAttribute("value", buyPdSeq.toString());
             newInput3.setAttribute("type", "hidden");
             newInput3.setAttribute("name", "buyPdSeq");
+
+            newInput4.setAttribute("value", $("#point").val());
+            newInput4.setAttribute("type", "hidden");
+            newInput4.setAttribute("name", "usedPoint");  //사용한 포인트
+
             newForm.appendChild(newInput);
             newForm.appendChild(newInput2);
             newForm.appendChild(newInput3);
+            newForm.appendChild(newInput4);
             document.body.append(newForm);
             newForm.submit();
         }

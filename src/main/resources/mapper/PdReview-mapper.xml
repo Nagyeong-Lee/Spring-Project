@@ -147,10 +147,11 @@
                     star,
                     content,
                     pdOption,
-                    stock
+                    stock,
+                    r.status
                 FROM review r JOIN sales s
                 ON r.payPd_seq = s.payPd_seq
-                WHERE r.payPd_seq = #{payPd_seq}) a
+                WHERE r.payPd_seq = #{payPd_seq} and status = 'Y') a
                 on a.pd_seq = p.pd_seq WHERE a.pd_seq = #{pd_seq}
 
 

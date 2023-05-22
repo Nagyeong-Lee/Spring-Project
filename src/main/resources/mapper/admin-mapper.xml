@@ -73,7 +73,9 @@
         'Y',
         'ROLE_MEMBER',
         #{fileIsEmpty, jdbcType=VARCHAR},
-        #{lastLoginDate, jdbcType=DATE})
+        #{lastLoginDate, jdbcType=DATE},
+        0
+        )
     </insert>
 
     <select id="pdSeqsByCategory" resultType="Integer">

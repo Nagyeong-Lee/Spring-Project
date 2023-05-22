@@ -233,7 +233,7 @@ public class AdminController {
         for (ProductDTO productDTO : list) {
             tmp = new HashMap<>();
             Integer isOptExist = productService.isOptExist(productDTO.getPd_seq()); //상품의 옵션이 있는지 확인
-            if (isOptExist != 0) { //상품의 옵션이 있을 경우
+            if (isOptExist != 0) { //상품의 옵션이 있을 경우F
                 optionDTOList = productService.getOptByGroup(productDTO.getPd_seq());
                 tmp.put("optionDTOList", optionDTOList);
             }

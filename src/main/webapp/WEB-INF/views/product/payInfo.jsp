@@ -81,8 +81,10 @@
     </table>
     <hr>
     <br>
-
-
+    <h5>적립될 포인트</h5>
+    <input type="hidden" value="${memPoint}" id="point" name="point">
+    <input type="hidden" value="${usedPoint}" id="usedPoint" name="usedPoint">
+    <h5><fmt:formatNumber value="${memPoint}" pattern="#,###"/>점</h5><br>
     <h3>배송지 선택</h3>
     <button type="button" id="addBtn" class="btn btn-light">배송지 추가</button>
     <br>
@@ -114,7 +116,7 @@
     <div class="cart__mainbtns">
         <button class="cart__bigorderbtn left" id="continue">쇼핑 계속하기</button>
         <button class="cart__bigorderbtn right" id="pay" type="button">
-            <fmt:formatNumber pattern="#,###" value="${totalPrice}"/>원 결제하기
+            <fmt:formatNumber pattern="#,###" value="${price}"/>원 결제하기
         </button>
         <input type="hidden" value="${price}" id="totalMoney" name="price">
     </div>
@@ -227,10 +229,10 @@
 
     var pd_sum;
     var pd_price;
-    //결제 하기 클릭
+    //결제 하기 클릭 -> 결제 상세 페이지로 이동
     $("#pay").on("click", function () {
         // requestPay();
-
+        console.log($("#point").val());
         if ($('input:radio[name=address]').length ===0) {
             alert('배송지를 추가해주세요');
             return false;
@@ -248,6 +250,8 @@
         let newInput2 = document.createElement("input");
         let newInput3 = document.createElement("input");
         let newInput4 = document.createElement("input");
+        let newInput5 = document.createElement("input");
+        let newInput6 = document.createElement("input");
         newInput.setAttribute("type", "hidden");
         newInput.setAttribute("value", $("#session").val());
         newInput.setAttribute("name", "id");
@@ -263,10 +267,21 @@
         newInput4.setAttribute("type", "hidden");
         newInput4.setAttribute("value", $("#totalSum").val());
         newInput4.setAttribute("name", "pdTotalSum");
+
+
+        newInput5.setAttribute("type", "hidden");
+        newInput5.setAttribute("value", $("#point").val());
+        newInput5.setAttribute("name", "point");
+
+        newInput6.setAttribute("type", "hidden");
+        newInput6.setAttribute("value", $("#usedPoint").val());
+        newInput6.setAttribute("name", "usedPoint");
         frm.appendChild(newInput);
         frm.appendChild(newInput2);
         frm.appendChild(newInput3);
         frm.appendChild(newInput4);
+        frm.appendChild(newInput5);
+        frm.appendChild(newInput6);
         document.body.appendChild(frm);
         frm.submit();
 

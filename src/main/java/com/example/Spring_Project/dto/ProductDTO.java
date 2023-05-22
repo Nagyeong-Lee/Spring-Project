@@ -18,4 +18,5 @@ public class ProductDTO {
     private String status;
     private String img;
     private Integer category;
+    private Integer point; //포인트 적립될 퍼센티지
 }
