@@ -21,14 +21,15 @@ public class ProductService {
     private PdReviewService pdReviewService;
 
 
-    public List<ProductDTO> getProducts(String keyword,Integer start, Integer end) throws Exception { //상품 리스트 가져오기
-        return productMapper.getProducts(keyword,start, end);
+    public List<ProductDTO> getProducts(String keyword, Integer start, Integer end) throws Exception { //상품 리스트 가져오기
+        return productMapper.getProducts(keyword, start, end);
     }
 
-    public Integer countRegisteredPd() throws Exception{
+    public Integer countRegisteredPd() throws Exception {
         return productMapper.countRegisteredPd();
     }
-    public Integer countSalesPd() throws Exception{
+
+    public Integer countSalesPd() throws Exception {
         return productMapper.countSalesPd();
     }
 
@@ -40,11 +41,12 @@ public class ProductService {
         return productMapper.getWProduct();
     }
 
-    public Integer wOuterCnt() throws Exception{
+    public Integer wOuterCnt() throws Exception {
         return productMapper.wOuterCnt();
     }
-    public List<ProductDTO> getWOuter(Integer start,Integer end) throws Exception { //여자 아우터
-        return productMapper.getWOuter(start,end);
+
+    public List<ProductDTO> getWOuter(Integer start, Integer end) throws Exception { //여자 아우터
+        return productMapper.getWOuter(start, end);
     }
 
     public List<ProductDTO> getWTop() throws Exception { //여자 상의
@@ -195,7 +197,7 @@ public class ProductService {
         return productMapper.getCoupon(m_seq);
     }
 
-    public Integer getMemPoint(String id) throws Exception{
+    public Integer getMemPoint(String id) throws Exception {
         return productMapper.getMemPoint(id);
     }
 
@@ -331,8 +333,8 @@ public class ProductService {
         productMapper.updOptions(updParam);
     }
 
-    public List<ProductDTO> getProductsByKeyword(String keyword,Integer start,Integer end) throws Exception {
-        return productMapper.getProductsByKeyword(keyword,start,end);
+    public List<ProductDTO> getProductsByKeyword(String keyword, Integer start, Integer end) throws Exception {
+        return productMapper.getProductsByKeyword(keyword, start, end);
     }
 
     public List<CartDTO> cartInfo(Integer cart_seq) throws Exception {
@@ -347,8 +349,8 @@ public class ProductService {
         return productMapper.getOption(cart_seq);
     }
 
-    public void updMemPoint(String id,Integer usedPoint,double totalNewPoint) throws Exception{
-        productMapper.updMemPoint(id,usedPoint,totalNewPoint);
+    public void updMemPoint(String id, Integer usedPoint, double totalNewPoint) throws Exception {
+        productMapper.updMemPoint(id, usedPoint, totalNewPoint);
     }
 
     public Integer getId(String id) throws Exception {
@@ -375,7 +377,7 @@ public class ProductService {
 //        return productMapper.getPrice(pdSeq);
 //    }
 
-    public Double getPercent(Integer pdSeq) throws Exception{
+    public Double getPercent(Integer pdSeq) throws Exception {
         return productMapper.getPercent(pdSeq);
     }
 
@@ -439,8 +441,8 @@ public class ProductService {
         productMapper.insertPayProduct(parameter);
     }
 
-    public void insertPayPd(Integer pd_seq, Integer pay_seq) throws Exception {
-        productMapper.insertPayPd(pd_seq, pay_seq);
+    public void insertPayPd(Integer pd_seq, Integer pay_seq, Integer count) throws Exception {
+        productMapper.insertPayPd(pd_seq, pay_seq, count);
     }
 
     public Integer getDefaultAdr() throws Exception {
@@ -477,7 +479,7 @@ public class ProductService {
     }
 
     //페이징
-    public Map<String, Object> pagingPdList(Integer cpage,String keyword) throws Exception {
+    public Map<String, Object> pagingPdList(Integer cpage, String keyword) throws Exception {
         //현재 페이지
         System.out.println("cpage = " + cpage);
         Integer postCount = productCnt(keyword); //전체 상품수
@@ -522,7 +524,7 @@ public class ProductService {
     }
 
     //페이징
-    public Map<String, Object> paging(Integer cpage,Integer postCnt) throws Exception {
+    public Map<String, Object> paging(Integer cpage, Integer postCnt) throws Exception {
         //현재 페이지
 //        Integer postCount = salesPdCount(); //판매 상품수
         Integer postCount = postCnt; //판매 상품수
@@ -567,10 +569,11 @@ public class ProductService {
         return map;
     }
 
-    public Integer historyCnt(String id) throws Exception{
+    public Integer historyCnt(String id) throws Exception {
         return productMapper.historyCnt(id);
     }
-    public Map<String, Object> historyPaging(Integer cpage,String id) throws Exception {
+
+    public Map<String, Object> historyPaging(Integer cpage, String id) throws Exception {
         //현재 페이지
         Integer postCount = historyCnt(id); //판매 상품수
         Integer postPerPage = 10; //페이지 당 글 개수
@@ -629,13 +632,14 @@ public class ProductService {
             String payMethod = payInfoDTO.get("PAYMETHOD").toString();  //결제 방법
             String payDate = payInfoDTO.get("PAYDATE").toString(); //결제 일자
             DeliDTO deliDTO = this.getDeliInfoBySeq(Integer.parseInt(payInfoDTO.get("DELI_SEQ").toString())); //배송지
-            Integer count = Integer.parseInt(payInfoDTO.get("COUNT").toString());
+            Integer count = Integer.parseInt(payInfoDTO.get("TOTALPAYPDCNT").toString());  //한 번에 결제했을때 총 결제한 개수
+            Integer cntPerPd = Integer.parseInt(payInfoDTO.get("PAYPDCNT").toString()); //상품 하나당 결제 개수
             Integer pay_seq = Integer.parseInt(payInfoDTO.get("PAY_SEQ").toString());
             Integer pd_seq = Integer.parseInt(payInfoDTO.get("PD_SEQ").toString());
             PayProductDTO payProductDTO1 = this.getPayProductInfo(pay_seq, pd_seq);
 
             ReviewDTO reviewDTO = pdReviewService.reviewInfo(Integer.parseInt(payInfoDTO.get("PAYPD_SEQ").toString()));//리뷰 상태
-            if(reviewDTO != null){
+            if (reviewDTO != null) {
                 map.put("reviewDTO", reviewDTO);
             }
             map.put("productDTO", productDTO);
@@ -645,11 +649,13 @@ public class ProductService {
             map.put("deliYN", payProductDTO1.getDeliYN());
             map.put("code", payProductDTO1.getCode());
             map.put("payPd_seq", payInfoDTO.get("PAYPD_SEQ"));
+            map.put("pay_seq", payInfoDTO.get("PAY_SEQ"));
             String phone = deliDTO.getPhone();
             String parsedPhone = phone.substring(0, 3) + "-" + phone.substring(3, 7) + "-" + phone.substring(7, 11);
             deliDTO.setPhone(parsedPhone);
             map.put("deliDTO", deliDTO);
             map.put("count", count);
+            map.put("cntPerPd", cntPerPd);
             map.put("usedPoint", Integer.parseInt(payInfoDTO.get("USEDPOINT").toString()));
             if (payInfoDTO.containsKey("OPTIONS")) { //옵션 있을때
                 Object object = jsonParser.parse(payInfoDTO.get("OPTIONS").toString());
@@ -778,31 +784,56 @@ public class ProductService {
         return stock;
     }
 
-    public List<String> getParentCategory() throws Exception{
+    public List<String> getParentCategory() throws Exception {
         return productMapper.getParentCategory();
     }
 
-    public List<String> getChildCategory() throws Exception{
+    public List<String> getChildCategory() throws Exception {
         return productMapper.getChildCategory();
     }
 
-    public Integer parentCategorySeq(String parentCtgOption) throws Exception{
+    public Integer parentCategorySeq(String parentCtgOption) throws Exception {
         return productMapper.parentCategorySeq(parentCtgOption);
     }
 
-    public Integer pdCategorySeq(Integer parentCategorySeq,String childCtgOption) throws Exception{
-        return productMapper.pdCategorySeq(parentCategorySeq,childCtgOption);
+    public Integer pdCategorySeq(Integer parentCategorySeq, String childCtgOption) throws Exception {
+        return productMapper.pdCategorySeq(parentCategorySeq, childCtgOption);
     }
 
-    public Map<String,Object> revCategory(Integer parentCategorySeq,Integer pdCategorySeq) throws Exception{
-        return productMapper.revCategory(parentCategorySeq,pdCategorySeq);
+    public Map<String, Object> revCategory(Integer parentCategorySeq, Integer pdCategorySeq) throws Exception {
+        return productMapper.revCategory(parentCategorySeq, pdCategorySeq);
     }
 
-    public Integer countReview() throws Exception{
+    public Integer countReview() throws Exception {
         return productMapper.countReview();
     }
 
-    public Integer searchPdCnt(String keyword) throws Exception{
+    public Integer searchPdCnt(String keyword) throws Exception {
         return productMapper.searchPdCnt(keyword);
+    }
+
+    public Map<String, Object> refundPdInfo(Map<String, Object> map) throws Exception {
+        Integer payPdSeq = Integer.parseInt(map.get("payPdSeq").toString());
+        String id = map.get("id").toString();
+        Map<String, Object> refundPdInfo = productMapper.refundPdInfo(payPdSeq);
+        return refundPdInfo;
+    }
+
+    public List<Map<String, Object>> refundPdWithOpt(Map<String, Object> refundPdInfo) throws Exception {
+        JsonParser jsonParser = new JsonParser();
+        Object object = jsonParser.parse((String) refundPdInfo.get("options"));
+        JsonObject jsonObject = (JsonObject) object;
+        JsonArray jsonArray = (JsonArray) jsonObject.get("name");
+        List<Map<String, Object>> optionMapList = new ArrayList<>();
+        Map<String, Object> optionMap = null;
+        for (int i = 0; i < jsonArray.size(); i++) {
+            optionMap = new HashMap<>();
+            //size = s
+            String optName = jsonArray.get(i).toString().replace("\"", "");
+            String optCategory = this.getOptCategory(Integer.parseInt(refundPdInfo.get("pd_seq").toString()), optName); //옵션 카테고리 이름 가져오기 (size)
+            optionMap.put(optCategory, optName);
+            optionMapList.add(optionMap);
+        }
+        return optionMapList;
     }
 }

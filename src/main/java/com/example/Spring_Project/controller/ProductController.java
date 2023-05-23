@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
-import java.rmi.MarshalledObject;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -409,7 +408,15 @@ public class ProductController {
         MemberDTO memberDTO = memberService.getMemInfo(data);
         //배송지 불러오기 (별칭으로)
         List<DeliDTO> deliDTOList = productService.getDeliveryInfo(data);
+        for(DeliDTO dto : deliDTOList){
+            String phone = dto.getPhone().substring(0,3)+"-"+dto.getPhone().substring(3,7)+"-"+dto.getPhone().substring(7,11);
+            dto.setPhone(phone);
+        }
         List<DeliDTO> deliveryInfo = productService.deliveryInfo(data);
+        for(DeliDTO dto : deliveryInfo){
+            String phone = dto.getPhone().substring(0,3)+"-"+dto.getPhone().substring(3,7)+"-"+dto.getPhone().substring(7,11);
+            dto.setPhone(phone);
+        }
 
         System.out.println("deliDTOList = " + deliDTOList);
         model.addAttribute("cart", cart);
@@ -495,7 +502,8 @@ public class ProductController {
         productService.updStatus(seq);
 
         DeliDTO defaultAddr = productService.getDefaultAddr();
-
+        String phone = defaultAddr.getPhone().substring(0,3)+"-"+defaultAddr.getPhone().substring(3,7)+"-"+defaultAddr.getPhone().substring(7,11);
+        defaultAddr.setPhone(phone);
         //결제 테이블에 인서트
         Map<String, Object> param = new HashMap<>();
         param.put("id", id);
@@ -549,6 +557,7 @@ public class ProductController {
                 parameter.put("pd_seq", cartInfo.get(i).getPd_seq());
                 parameter.put("option", cartInfo.get(i).getOptions());
                 parameter.put("payPd_seq", pay_seq);
+                parameter.put("count", cartInfo.get(i).getCount());
                 productService.insertPayProduct(parameter);//결제한 상품
 
                 Object object = jsonParser.parse(cartInfo.get(i).getOptions());
@@ -567,7 +576,7 @@ public class ProductController {
                 cart.add(item);
             } else if (cartInfo.get(i).getOptions() == null) {
                 cart.add(item);
-                productService.insertPayPd(cartInfo.get(i).getPd_seq(), pay_seq);//결제한 상품
+                productService.insertPayPd(cartInfo.get(i).getPd_seq(), pay_seq,cartInfo.get(i).getCount());//결제한 상품
             }
 
             //판매 테이블에 인서트할 map (상품당 insert)
@@ -922,6 +931,8 @@ public class ProductController {
     @PostMapping("/getSeqDeli")
     public DeliDTO getSeqDeli(Integer seq) throws Exception {
         DeliDTO deliDTO = productService.getSeqDeli(seq);
+        String phone = deliDTO.getPhone().substring(0,3)+"-"+deliDTO.getPhone().substring(3,7)+"-"+deliDTO.getPhone().substring(7,11);
+        deliDTO.setPhone(phone);
         return deliDTO;
     }
 
@@ -1127,5 +1138,19 @@ public class ProductController {
         Integer courierCode = productService.getCourierCode(data.get("courier").toString()); //택배사 이름
         productService.updDeliveryStatus(sales_seq, courierCode); //sales table -> payPdSeq
         return "success";
+    }
+    
+    
+    @PostMapping("/refundPopup")  //교환 신청 팝업으로 이동
+    public String toRefundPopup(Model model,@RequestParam Map<String,Object>map) throws Exception{
+        Map<String,Object> refundPdInfo  = productService.refundPdInfo(map);//교환할 상품 정보
+        ProductDTO productDTO = productService.getPdInfo(Integer.parseInt(refundPdInfo.get("pd_seq").toString()));
+        if(refundPdInfo.get("options") != null){
+            List<Map<String, Object>> optionList = productService.refundPdWithOpt(refundPdInfo); //옵션 있으면 옵션 정보 가공해서 다시 가져옴
+            model.addAttribute("optionList",optionList);
+        }
+        model.addAttribute("productDTO",productDTO);
+        model.addAttribute("refundPdInfo",refundPdInfo);
+        return "/product/refundPopup";
     }
 }

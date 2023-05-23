@@ -35,9 +35,10 @@ public class PdReviewService {
         return pdReviewMapper.currRevSeq();
     }
 
-    public void updMemPoint(String id) throws Exception{
+    public void updMemPoint(String id) throws Exception {
         pdReviewMapper.updMemPoint(id);
     }
+
     public void imgInsert(List<MultipartFile> file, HttpServletRequest request, Integer review_seq) throws Exception {
 
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
@@ -154,52 +155,54 @@ public class PdReviewService {
         JsonArray jsonArray = new JsonArray();
         List<Map<String, Object>> reviewInfoList = new ArrayList<>();
         List<Map<String, Object>> optionMapList = null;
-        for (ReviewDTO dto : reviewDTO) {
-            Map<String, Object> map = new HashMap<>();
-            Integer review_seq = dto.getReview_seq();
-            Integer isImgExist = isImgExist(review_seq);
-            Map<String, Object> reviewInPdDetail = reviewInPdDetail(pd_seq, dto.getPayPd_seq()); //join해서 detailReview에 필요한 데이터
-            if (reviewInPdDetail.get("PDOPTION") != null) {
-                Object object = jsonParser.parse(reviewInPdDetail.get("PDOPTION").toString());
-                jsonObject = (JsonObject) object;
-                jsonArray = (JsonArray) jsonObject.get("name");
-                optionMapList = new ArrayList<>();
-                Map<String, Object> optionMap = null;
-                for (int i = 0; i < jsonArray.size(); i++) {
-                    optionMap = new HashMap<>();
-                    //size = s
-                    String optName = jsonArray.get(i).toString().replace("\"", "");
-                    String optCategory = optionCategory(pd_seq, optName); //옵션 카테고리 이름 가져오기 (size)
-                    optionMap.put(optCategory, optName);
-                    optionMapList.add(optionMap);
+//        if (reviewDTO != null) {
+            for (ReviewDTO dto : reviewDTO) {
+                Map<String, Object> map = new HashMap<>();
+                Integer review_seq = dto.getReview_seq();
+                Integer isImgExist = isImgExist(review_seq);
+                Map<String, Object> reviewInPdDetail = reviewInPdDetail(pd_seq, dto.getPayPd_seq()); //join해서 detailReview에 필요한 데이터
+                if (reviewInPdDetail.get("PDOPTION") != null) {
+                    Object object = jsonParser.parse(reviewInPdDetail.get("PDOPTION").toString());
+                    jsonObject = (JsonObject) object;
+                    jsonArray = (JsonArray) jsonObject.get("name");
+                    optionMapList = new ArrayList<>();
+                    Map<String, Object> optionMap = null;
+                    for (int i = 0; i < jsonArray.size(); i++) {
+                        optionMap = new HashMap<>();
+                        //size = s
+                        String optName = jsonArray.get(i).toString().replace("\"", "");
+                        String optCategory = optionCategory(pd_seq, optName); //옵션 카테고리 이름 가져오기 (size)
+                        optionMap.put(optCategory, optName);
+                        optionMapList.add(optionMap);
+                    }
                 }
-            }
-            map.put("reviewInPdDetail", reviewInPdDetail);
-            map.put("optionMapList", optionMapList);
-            List<String> imgSysname = null;
-            //review img
-            if (isImgExist != 0) { //img 있으면 map put
-                List<ImgDTO> imgDTOList = getReviewImg(review_seq);
-                imgSysname = new ArrayList<>();
-                for (ImgDTO imgDTO : imgDTOList) {
-                    imgSysname.add(imgDTO.getSysname());
+                map.put("reviewInPdDetail", reviewInPdDetail);
+                map.put("optionMapList", optionMapList);
+                List<String> imgSysname = null;
+                //review img
+                if (isImgExist != 0) { //img 있으면 map put
+                    List<ImgDTO> imgDTOList = getReviewImg(review_seq);
+                    imgSysname = new ArrayList<>();
+                    for (ImgDTO imgDTO : imgDTOList) {
+                        imgSysname.add(imgDTO.getSysname());
+                    }
                 }
+                map.put("imgSysname", imgSysname);
+                reviewInfoList.add(map);
             }
-            map.put("imgSysname", imgSysname);
-            reviewInfoList.add(map);
-        }
-        return reviewInfoList;
+            return reviewInfoList;
+//        }
     }
 
     public String optionCategory(Integer pd_seq, String optName) throws Exception {
         return pdReviewMapper.optionCategory(pd_seq, optName);
     }
 
-//    public List<Map<String, Object>> getReviews(List<Integer> pdSeqs, Integer star,Integer start,Integer end) throws Exception {
+    //    public List<Map<String, Object>> getReviews(List<Integer> pdSeqs, Integer star,Integer start,Integer end) throws Exception {
 //        return pdReviewMapper.getReviews(pdSeqs, star,start,end);
 //    }
     public List<ParsedReviewDTO> getReviews(Integer start, Integer end) throws Exception {
-        return pdReviewMapper.getReviews(start,end);
+        return pdReviewMapper.getReviews(start, end);
     }
 
     public ProductDTO pdInfo(Integer pd_seq) throws Exception {
@@ -235,7 +238,7 @@ public class PdReviewService {
             }
 
             //옵션 있으면
-            if (reviewDTOS.get(i).get("PDOPTION")  != null) {   //옵션 있으면
+            if (reviewDTOS.get(i).get("PDOPTION") != null) {   //옵션 있으면
                 JsonObject jsonObject1 = (JsonObject) jsonParser.parse(reviewDTOS.get(i).get("PDOPTION").toString());
                 JsonArray jsonArray1 = (JsonArray) jsonObject1.get("name");
                 optionMapList = new ArrayList<>();
@@ -263,7 +266,7 @@ public class PdReviewService {
         return pdReviewMapper.getReviewImgs(review_seq);
     }
 
-    public List<Map<String, Object>> reviewListByOptions(List<ParsedReviewDTO2> objectList,Map<String, Object> paging) throws Exception {
+    public List<Map<String, Object>> reviewListByOptions(List<ParsedReviewDTO2> objectList, Map<String, Object> paging) throws Exception {
 
         JsonParser jsonParser = new JsonParser();
         JsonObject jsonObject = new JsonObject();
@@ -287,7 +290,7 @@ public class PdReviewService {
             reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
             reMap.put("paging", paging);
             reMap.put("cpage", Integer.parseInt(paging.get("cpage").toString()));
-            map.put("reMap",reMap);
+            map.put("reMap", reMap);
             //리뷰 이미지 있으면
             List<String> revImg = new ArrayList<>(); //sysname
             if (parsedReviewDTO2.getRevImg_seq() != null) {

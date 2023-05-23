@@ -130,7 +130,7 @@ public interface ProductMapper {
     DeliDTO getDefaultAddr();
     Integer currPaySeq();
     void insertPayProduct(Map<String,Object>parameter);
-    void insertPayPd(@Param("pd_seq") Integer pd_seq, @Param("pay_seq")Integer pay_seq);
+    void insertPayPd(@Param("pd_seq") Integer pd_seq, @Param("pay_seq")Integer pay_seq,@Param("count") Integer count);
     Integer getDefaultAdr();
     List<Map<String,Object>> getHistory(@Param("id") String id,@Param("start") Integer start,@Param("end")Integer end);
     DeliDTO getDeliInfoBySeq(@Param("deli_seq") Integer deli_seq);
@@ -163,4 +163,5 @@ public interface ProductMapper {
     @Select("  SELECT count(*) FROM review WHERE status = 'Y'")
     Integer countReview();
     Integer searchPdCnt(@Param("keyword") String keyword);
+    Map<String,Object> refundPdInfo(@Param("payPdSeq") Integer payPdSeq);
 }

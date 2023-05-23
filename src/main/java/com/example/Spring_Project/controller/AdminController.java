@@ -312,6 +312,7 @@ public class AdminController {
             ProductDTO productDTO = productService.getPdInfo(salesDTO.getPd_seq());//상품 관련 정보
             param.put("productDTO", productDTO);
             Integer pdStock = productService.getPdStock(salesDTO.getPd_seq());//판매하고 남은 상품 개수
+            System.out.println("tq = " + pdStock);
             param.put("pdStock", pdStock);
             param.put("deliYN", payProductDTO.getDeliYN());
             param.put("code", payProductDTO.getCode());

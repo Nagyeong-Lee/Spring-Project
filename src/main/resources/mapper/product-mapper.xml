@@ -928,18 +928,20 @@
         #{pd_seq},
         #{option},
         'N',
-        null
+        null,
+        #{count}
         )
     </insert>
 
     <insert id="insertPayPd">
-        insert into payProduct(payPd_seq,pay_seq,pd_seq,deliYN,code)
+        insert into payProduct(payPd_seq,pay_seq,pd_seq,deliYN,code,count)
         values(
         payPd_seq.nextval,
         #{pay_seq},
         #{pd_seq},
         'N',
-        null
+        null,
+        #{count}
         )
     </insert>
 
@@ -951,23 +953,25 @@
 
     <select id="getHistory" resultType="java.util.Map">
 
-        SELECT pd_seq,payPd_seq,deli_seq,price,TO_CHAR(PAYDATE,'YYYY-MM-DD HH:MI') AS PAYDATE,PAYMETHOD,OPTIONS,COUNT,pay_seq,usedPoint
+        SELECT pd_seq,payPd_seq,deli_seq,price,TO_CHAR(PAYDATE,'YYYY-MM-DD HH:MI') AS PAYDATE,PAYMETHOD,OPTIONS,totalPayPdCnt,payPdCnt,pay_seq,usedPoint
         from( SELECT ROWNUM rn, a.* FROM(SELECT
         pd_seq,
         payPd_seq,
-        deli_seq,
-        price,
-        PAYDATE,
+        p.deli_seq,
+        p.price,
+        p.PAYDATE,
         PAYMETHOD,
         OPTIONS,
-        count,
-        code,p.pay_seq,
+        p.count AS totalPayPdCnt,
+        pp.count AS payPdCnt,
+        code,
+        p.pay_seq,
         usedPoint
         FROM payInfo p JOIN PAYPRODUCT pp
         ON p.PAY_SEQ = pp.pay_seq
         WHERE p.id = #{id} and status = 'Y'
         ORDER BY PAYDATE DESC) a)
-        where rn between #{start} and #{end}
+        where rn between #{start} AND #{end}
 
 
 <!--        SELECT pd_seq,payPd_seq,deli_seq,price,TO_CHAR(PAYDATE,'YYYY-MM-DD HH:MI') AS PAYDATE,PAYMETHOD,OPTIONS,COUNT, deliYN,code-->
@@ -1184,5 +1188,26 @@
 
     <select id="getPercent" resultType="double">
      select point from product where pd_seq = #{pd_seq}
+    </select>
+
+    <select id="refundPdInfo" resultType="map">
+        SELECT
+            pi.pay_seq,
+            pp.payPd_seq,
+            pp.pd_seq,
+            pp.OPTIONS,
+            id,
+            to_char(payDate,'YYYY-MM-DD HH24:MI') AS payDate,payMethod,
+            pp.count
+        FROM payInfo pi JOIN (
+                SELECT
+                    payPd_seq,
+                    pay_seq,
+                    pd_seq,
+                    OPTIONS,
+                    count
+                FROM payProduct
+                WHERE payPd_seq = #{payPdSeq}) pp
+        on pi.pay_seq = pp.pay_seq
     </select>
 </mapper>

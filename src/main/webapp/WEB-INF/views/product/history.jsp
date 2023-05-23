@@ -34,9 +34,10 @@
             flex-direction: column;
         }
 
-        .cart,.pagingDiv{
+        .cart, .pagingDiv {
             flex: 1 0 auto;
         }
+
         .pagingDiv {
             position: fixed;
             left: 0;
@@ -46,6 +47,7 @@
             text-align: center; /* 가운데 정렬 */
             /*padding: 15px; !* 위아래/좌우 패딩 *!*/
         }
+
         #footer {
             position: fixed;
             left: 0;
@@ -73,13 +75,15 @@
         <tbody id="tbody">
         <c:choose>
             <c:when test="${!empty historyList}">
-                <c:forEach var="i" items="${historyList}">
+                <c:set var="paySeq" value="0"/>
+                <c:forEach var="i" items="${historyList}" varStatus="status">
+                    <c:set var="loop_flag" value="false"/>
                     <tr>
                         <td><a href="/product/detail?pd_seq=${i.productDTO.pd_seq}"><img
                                 src="/resources/img/products/${i.productDTO.img}" style="width: 120px; height: 100px;"></a>
                         </td>
                         <td>
-                            <p>${i.productDTO.name} ${i.count}개</p>
+                            <p>${i.productDTO.name} ${i.cntPerPd}개</p>
                             <input type="hidden" value="${i.payPd_seq}" name="payPd_seq" class="payPd_seq">
                             <input type="hidden" value="${i.productDTO.pd_seq}" name="pd_seq" class="pd_seq">
                                 <%--옵션 있을때--%>
@@ -91,17 +95,21 @@
                                 </c:forEach>
                             </c:if>
                         </td>
-                        <td style="text-align: center;">
-                            <p>받는 사람 : ${i.deliDTO.name}</p>
-                            <p>전화번호 : ${i.deliDTO.phone}</p>
-                            <p>주소 : ${i.deliDTO.address}</p>
-                        </td>
-                        <td style="text-align: center">
-                            <p>결제 일자 : ${i.payDate}</p>
-                            <p>결제 방법 : ${i.payMethod}</p>
-                            <p>결제 금액 : <fmt:formatNumber pattern="#,###" value="${i.price}"/>원</p>
-                            <p>사용 포인트 : <fmt:formatNumber pattern="#,###" value="${i.usedPoint}"/>점</p>
-                        </td>
+                        <c:if test="${i.pay_seq != paySeq}">
+                            <c:set var="paySeq" value="${i.pay_seq}"/>
+                            <td style="text-align: center;" rowspan="${i.count}">
+                                <p>받는 사람 : ${i.deliDTO.name}</p>
+                                <p>전화번호 : ${i.deliDTO.phone}</p>
+                                <p>주소 : ${i.deliDTO.address}</p>
+                            </td>
+                            <td style="text-align: center" rowspan="${i.count}">
+                                <p>결제 일자 : ${i.payDate}</p>
+                                <p>결제 방법 : ${i.payMethod}</p>
+                                <p>결제 금액 : <fmt:formatNumber pattern="#,###" value="${i.price}"/>원</p>
+                                <p>사용 포인트 : <fmt:formatNumber pattern="#,###" value="${i.usedPoint}"/>점</p>
+                            </td>
+                            <c:set var="loop_flag" value="true"/>
+                        </c:if>
                         <c:choose>
                             <c:when test="${i.deliYN == 'N'}"> <%--배송 안했을때--%>
                                 <td style="text-align: center;">배송전</td>
@@ -118,6 +126,7 @@
                                                     style="font-size: 13px;">
                                                 <input type="hidden" value="${i.reviewDTO.review_seq}">리뷰 수정하기
                                             </button>
+                                            <button type="button" class="btn btn-light refund">교환/반품</button>
                                         </c:when>
                                         <c:otherwise>
                                             <button type="button" class="reviewBtn btn btn-light"
@@ -168,6 +177,40 @@
 <script src="/resources/asset/js/scripts.js"></script>
 <script src="/resources/asset/js/shopUtil.js"></script>
 <script>
+
+    //교환/반품 클릭 시
+    $(".refund").on("click",function(){
+        let id = $("#id").val();
+        let payPdSeq = $(this).closest("tr").find(".payPd_seq").val();
+        var _width = '500';
+        var _height = '400';
+
+        var _left = Math.ceil((window.screen.width - _width) / 2);
+        var _top = Math.ceil((window.screen.height - _height) / 2);
+
+        let newForm = document.createElement("form");
+        newForm.setAttribute("method", "post");
+        newForm.setAttribute("action", "/product/refundPopup");
+
+        let input1 = document.createElement("input");
+        input1.setAttribute("type", "hidden");
+        input1.setAttribute("value", id);
+        input1.setAttribute("name", "id");
+        let input2 = document.createElement("input");
+        input2.setAttribute("type", "hidden");
+        input2.setAttribute("value", payPdSeq);
+        input2.setAttribute("name", "payPdSeq");
+
+        newForm.append(input1);
+        newForm.append(input2);
+        document.body.append(newForm);
+
+        window.open("/product/refundPopup", "newForm", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
+        let newForm1 = newForm;
+        newForm1.method = "post";
+        newForm1.target = "newForm";
+        newForm1.submit();
+    })
 
     //페이징 다시 그려줌
     function paging(startNavi) {
