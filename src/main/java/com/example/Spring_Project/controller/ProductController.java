@@ -1143,14 +1143,29 @@ public class ProductController {
     
     @PostMapping("/refundPopup")  //교환 신청 팝업으로 이동
     public String toRefundPopup(Model model,@RequestParam Map<String,Object>map) throws Exception{
+        String id = map.get("id").toString();
         Map<String,Object> refundPdInfo  = productService.refundPdInfo(map);//교환할 상품 정보
         ProductDTO productDTO = productService.getPdInfo(Integer.parseInt(refundPdInfo.get("pd_seq").toString()));
         if(refundPdInfo.get("options") != null){
             List<Map<String, Object>> optionList = productService.refundPdWithOpt(refundPdInfo); //옵션 있으면 옵션 정보 가공해서 다시 가져옴
             model.addAttribute("optionList",optionList);
         }
+        //배송지 불러오기 (별칭으로)
+        List<DeliDTO> deliDTOList = productService.getDeliveryInfo(id);
+        for(DeliDTO dto : deliDTOList){
+            String phone = dto.getPhone().substring(0,3)+"-"+dto.getPhone().substring(3,7)+"-"+dto.getPhone().substring(7,11);
+            dto.setPhone(phone);
+        }
         model.addAttribute("productDTO",productDTO);
         model.addAttribute("refundPdInfo",refundPdInfo);
+        model.addAttribute("deliDTOList",deliDTOList);
         return "/product/refundPopup";
     }
+
+    @RequestMapping("applyRefund") // 교환 신청 클릭 시 안내 팝업 띄움
+    public String toNoticePopup(@RequestParam String id) throws Exception{
+        //어드민 - 교환 신청 테이블에 인서트
+        return "/product/noticePopup";
+    }
+
 }

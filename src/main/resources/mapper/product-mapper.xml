@@ -1195,7 +1195,7 @@
             pi.pay_seq,
             pp.payPd_seq,
             pp.pd_seq,
-            pp.OPTIONS,
+            pp.options,
             id,
             to_char(payDate,'YYYY-MM-DD HH24:MI') AS payDate,payMethod,
             pp.count
@@ -1204,7 +1204,7 @@
                     payPd_seq,
                     pay_seq,
                     pd_seq,
-                    OPTIONS,
+                    options,
                     count
                 FROM payProduct
                 WHERE payPd_seq = #{payPdSeq}) pp
