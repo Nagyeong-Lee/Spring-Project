@@ -22,5 +22,6 @@ public class PayInfoDTO {
     private String status;
     private String payMethod;
     private Integer count;
+    private Double usedPoint;
 
 }

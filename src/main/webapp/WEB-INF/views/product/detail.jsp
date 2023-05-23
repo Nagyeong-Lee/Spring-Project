@@ -104,7 +104,8 @@
         상품명 : ${productDTO.name}<br>
         상품 소개 : ${productDTO.description}<br>
         가격 : <fmt:formatNumber value="${productDTO.price}" type="number"/>원<br>
-        재고 : <span id="totalStock">${productDTO.stock}</span>개
+        재고 : <span id="totalStock">${productDTO.stock}</span>개<br>
+        포인트 적립률 : ${productDTO.point}%
     </div>
 </div>
 

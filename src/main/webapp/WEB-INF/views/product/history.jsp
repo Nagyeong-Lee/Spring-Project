@@ -100,6 +100,7 @@
                             <p>결제 일자 : ${i.payDate}</p>
                             <p>결제 방법 : ${i.payMethod}</p>
                             <p>결제 금액 : <fmt:formatNumber pattern="#,###" value="${i.price}"/>원</p>
+                            <p>사용 포인트 : <fmt:formatNumber pattern="#,###" value="${i.usedPoint}"/>점</p>
                         </td>
                         <c:choose>
                             <c:when test="${i.deliYN == 'N'}"> <%--배송 안했을때--%>

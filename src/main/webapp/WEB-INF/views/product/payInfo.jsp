@@ -34,8 +34,8 @@
 <%--<%@ include file="/WEB-INF/views/product/navUtil.jsp" %>--%>
 <input type="hidden" value="${id}" id="session">
 <input type="hidden" value="${cart}" id="cartInfo">
-<input type="hidden" value="${totalPrice}" id="totalPrice">
-<input type="hidden" value="${totalSum}" id="totalSum">
+<input type="hidden" value="${totalPayPrice}" id="totalPrice">
+<input type="hidden" value="${totalPayCount}" id="totalSum">
 <input type="hidden" value="${memberDTO.name}" id="mem_name">
 <input type="hidden" value="${memberDTO.phone}" id="mem_phone">
 <input type="hidden" value="${memberDTO.email}" id="mem_email">
@@ -87,14 +87,14 @@
     <h5><fmt:formatNumber value="${memPoint}" pattern="#,###"/>점</h5><br>
 
     <%--포인트 사용--%>
-    <div class="pointDiv">
-        <input type="hidden" name="usablePoint" id="usablePoint" value="${memberPoint}">
-        사용 가능한 포인트 : <fmt:formatNumber value="${memberPoint}" pattern="#,###"/>점
-        <br>
-        <input type="number" name="point" id="point" min="1">
-        <button type="button" name="usePointBtn" id="usePointBtn" class="btn btn-light">사용하기</button>
-    </div>
 
+        <div class="pointDiv">
+            <input type="hidden" name="usablePoint" id="usablePoint" value="${memberPoint}">
+            사용 가능한 포인트 : <fmt:formatNumber value="${memberPoint}" pattern="#,###"/>점
+            <br>
+            <input type="number" name="point" id="point" min="1" >
+            <button type="button" name="usePointBtn" id="usePointBtn" class="btn btn-light">사용하기</button>
+        </div>
     <h3>배송지 선택</h3>
     <button type="button" id="addBtn" class="btn btn-light">배송지 추가</button>
     <br>
@@ -126,9 +126,9 @@
     <div class="cart__mainbtns">
         <button class="cart__bigorderbtn left" id="continue">쇼핑 계속하기</button>
         <button class="cart__bigorderbtn right" id="pay" type="button">
-            <fmt:formatNumber pattern="#,###" value="${price}"/>원 결제하기
+            <fmt:formatNumber pattern="#,###" value="${totalPayPrice}"/>원 결제하기
         </button>
-        <input type="hidden" value="${price}" id="totalMoney" name="price">
+        <input type="hidden" value="${totalPayPrice}" id="totalMoney" name="price">
     </div>
 </div>
 

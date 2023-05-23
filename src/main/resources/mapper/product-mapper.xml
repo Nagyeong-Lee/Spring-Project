@@ -62,14 +62,15 @@
 
     <select id="getProductDetail" resultType="com.example.Spring_Project.dto.ProductDTO">
         select
-        pd_seq,
-        name,
-        description,
-        price,
-        stock,
-        status,
-        img,
-        category
+            pd_seq,
+            name,
+            description,
+            price,
+            stock,
+            status,
+            img,
+            category,
+            point
         from product
         where pd_seq=#{pd_seq} and status = 'Y'
     </select>
@@ -950,7 +951,7 @@
 
     <select id="getHistory" resultType="java.util.Map">
 
-        SELECT pd_seq,payPd_seq,deli_seq,price,TO_CHAR(PAYDATE,'YYYY-MM-DD HH:MI') AS PAYDATE,PAYMETHOD,OPTIONS,COUNT,pay_seq
+        SELECT pd_seq,payPd_seq,deli_seq,price,TO_CHAR(PAYDATE,'YYYY-MM-DD HH:MI') AS PAYDATE,PAYMETHOD,OPTIONS,COUNT,pay_seq,usedPoint
         from( SELECT ROWNUM rn, a.* FROM(SELECT
         pd_seq,
         payPd_seq,
@@ -960,7 +961,8 @@
         PAYMETHOD,
         OPTIONS,
         count,
-        code,p.pay_seq
+        code,p.pay_seq,
+        usedPoint
         FROM payInfo p JOIN PAYPRODUCT pp
         ON p.PAY_SEQ = pp.pay_seq
         WHERE p.id = #{id} and status = 'Y'
@@ -1172,11 +1174,15 @@
     </select>
 
     <update id="updMemPoint">
-        update member set point = point - #{usedPoint} + #{memPoint} where id = #{id}
+        update member set point = point - #{usedPoint} + #{newPoint} where id = #{id}
     </update>
 
     <select id="getMemPoint" resultType="Integer">
         select point from member where id = #{id}
     </select>
 
+
+    <select id="getPercent" resultType="double">
+     select point from product where pd_seq = #{pd_seq}
+    </select>
 </mapper>

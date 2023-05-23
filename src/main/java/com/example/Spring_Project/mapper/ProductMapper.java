@@ -103,15 +103,16 @@ public interface ProductMapper {
     Integer getPdCount(@Param("cart_seq") Integer cart_seq);
     String getOption(@Param("cart_seq")  Integer cart_seq);
     Integer getId(@Param("id")  String id);
-    void updMemPoint(@Param("id") String id,@Param("memPoint") Integer memPoint,@Param("usedPoint") Integer usedPoint);
+    void updMemPoint(@Param("id") String id,@Param("usedPoint") Integer usedPoint, @Param("newPoint") double totalNewPoint);
     void insertBuyPd(@Param("id")  String id,@Param("sum") Integer sum,@Param("price")  Integer price);
     void updateBuyPd(@Param("id")  String id,@Param("sum") Integer sum,@Param("price")  Integer price);
     Integer getSum(@Param("id")  String id);
     Integer getPrice(@Param("id")  String id);
 //    @Select("select price from product where pd_seq = #{pd_seq}")
 //    Integer getPrice(@Param("pd_seq") Integer pdSeq);
-    @Select("select point from product where pd_seq = #{pd_seq}")
-    Integer getPercent(@Param("pd_seq") Integer pdSeq);
+//    @Select("select point from product where pd_seq = #{pd_seq}")
+
+    Double getPercent(@Param("pd_seq") Integer pdSeq);
 
     void updCartFlag(@Param("cart_seq") Integer cart_seq);
     void updFlagToY(@Param("cart_seq") Integer cart_seq);

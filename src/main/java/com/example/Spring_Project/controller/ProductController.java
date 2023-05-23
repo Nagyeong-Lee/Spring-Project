@@ -288,6 +288,10 @@ public class ProductController {
         model.addAttribute("totalPrice", totalPrice);
         model.addAttribute("totalSum", totalSum);
         model.addAttribute("couponDTOList", couponDTOList);
+
+        //나의 포인트 가져오기
+        Integer memPoint = productService.getMemPoint(id);
+        model.addAttribute("memPoint",memPoint);
         return "/product/cart";
     }
 
@@ -324,7 +328,19 @@ public class ProductController {
     }
 
     @RequestMapping("/payInfo") //결제하기
-    public String toPayInfo(Model model, String data, Integer price, String buyPdSeq) throws Exception { //data : id
+    public String toPayInfo(Model model, String data, Integer price, String buyPdSeq,String productArr) throws Exception { //data : id
+        JsonParser jsonParser = new JsonParser();
+        System.out.println("productArr = " + productArr);
+        JsonArray pdArr = (JsonArray) jsonParser.parse(productArr);
+        Integer totalPayPrice = 0;
+        Integer totalPayCount = 0;
+        for(int i = 0 ; i<pdArr.size(); i++){
+           Integer pdPrice = productService.getPdPrice(pdArr.get(i).getAsJsonObject().get("seq").getAsInt());
+           Integer productPrice = pdPrice * pdArr.get(i).getAsJsonObject().get("count").getAsInt();
+           totalPayPrice += productPrice;
+           totalPayCount += pdArr.get(i).getAsJsonObject().get("count").getAsInt();
+        }
+
         String[] arr = buyPdSeq.split(",");
         List<Integer> buyList = new ArrayList<>();
         // 구매할 cart_seq
@@ -332,7 +348,7 @@ public class ProductController {
             buyList.add(Integer.parseInt(arr[i]));
         }
         List<Map<String, Object>> optionList = new ArrayList<>();
-        JsonParser jsonParser = new JsonParser();
+
         JsonArray jsonArray = new JsonArray();
         JsonObject jsonObject = new JsonObject();
         List<String> list = new ArrayList<>();
@@ -340,8 +356,8 @@ public class ProductController {
         List<Map<String, Object>> cart = new ArrayList<>();
         Integer totalPrice = 0;  //상품 총 합계
         Integer totalSum = 0;  //상품 총 개수
-        Integer memPoint = 0; //총 적립될 포인트
-        Integer point = 0; //상품당 적립될 포인트
+        double memPoint = 0; //총 적립될 포인트
+        double point = 0; //상품당 적립될 포인트
         for (Integer i = 0; i < buyList.size(); i++) {
             //count,pd_seq,options
             Integer pd_seq = productService.getPdSeq(buyList.get(i));
@@ -355,7 +371,7 @@ public class ProductController {
             totalSum += count;
 
             //포인트 적립
-            point = pd_price * productDTO.getPoint() *count / 100;
+            point = (double) Math.round(pd_price * productDTO.getPoint() *count / 100);
             memPoint += point;
             System.out.println("point = " + point);
             System.out.println("memPoint = " + memPoint);
@@ -402,14 +418,16 @@ public class ProductController {
 //        model.addAttribute("deliAddress", deliAddress);
         model.addAttribute("price", price);
         model.addAttribute("memberDTO", memberDTO); //회원 정보
-        model.addAttribute("totalPrice", totalPrice); // 최종 금액
-        model.addAttribute("totalSum", totalSum); // 최종 수량
+        model.addAttribute("totalPrice", totalPrice);
+        model.addAttribute("totalSum", totalSum);
         //해당 아이디 포인트 가져오기
         Integer memberPoint = productService.getMemPoint(data);
         model.addAttribute("memberPoint", memberPoint);
         model.addAttribute("point", point);
         model.addAttribute("memPoint", memPoint); // 최종 적립 포인트
 //        model.addAttribute("usedPoint", usedPoint); // 사용한 포인트
+        model.addAttribute("totalPayPrice", totalPayPrice);  // 최종 결제할 금액
+        model.addAttribute("totalPayCount", totalPayCount); // 최종 결제할 수량
         return "/product/payInfo";
     }
 
@@ -421,7 +439,9 @@ public class ProductController {
         System.out.println("inputPoint = " + inputPoint);
         System.out.println("id = " + id);
         Integer memPoint = productService.getMemPoint(id);
-        if (memPoint >= inputPoint) {
+        if(inputPoint == 0){
+            result = false;
+        }else if (memPoint >= inputPoint) {
             result = true;
         } else {
             result = false;
@@ -452,21 +472,22 @@ public class ProductController {
     @RequestMapping("/paymentDetails")
     @Transactional
 //    public String paymentDetails(Model model, String id, Integer price, String carts, Integer seq, Integer pdTotalSum, Integer usedPoint, @RequestBody List<Map<String,Object>> productArr) throws Exception {
-    public String paymentDetails(Model model, String id, Integer price, String carts, Integer seq, Integer pdTotalSum, Integer usedPoint, @RequestParam String testArray) throws Exception {
+    public String paymentDetails(Model model, String id, Integer price, String carts, Integer seq, Integer pdTotalSum, @RequestParam(required = false) Integer usedPoint, @RequestParam String testArray) throws Exception {
+        if(usedPoint == null) usedPoint = 0 ;
         //productArr - 가격
         System.out.println("testArray = " + testArray);
         JsonParser jsonParser = new JsonParser();
         JsonArray jsonObject2 = (JsonArray) jsonParser.parse(testArray);
         Integer totalPdPrice = 0;
-        Integer totalNewPoint = 0;
+        double totalNewPoint = 0.0;
         for (int i = 0; i < jsonObject2.size(); i++) {
             JsonObject jsonObject1 = (JsonObject) jsonObject2.get(i);
             Integer pdSeq = jsonObject1.get("pdSeq").getAsInt();
             Integer pdStock = jsonObject1.get("pdStock").getAsInt();
             Integer pdPrice = productService.getPdPrice(pdSeq);
             totalPdPrice += pdPrice * pdStock;
-            Integer percent = productService.getPercent(pdSeq);
-            totalNewPoint += pdPrice *pdStock* percent / 100;
+            double percent = productService.getPercent(pdSeq);
+            totalNewPoint +=  pdStock*pdPrice*percent/100;
         }
         totalPdPrice -= usedPoint;
         //기본 배송지 수정
@@ -478,9 +499,10 @@ public class ProductController {
         //결제 테이블에 인서트
         Map<String, Object> param = new HashMap<>();
         param.put("id", id);
-        param.put("price", price);
+        param.put("price", totalPdPrice);
         param.put("deliSeq", defaultAddr.getSeq());
         param.put("pdTotalSum", pdTotalSum);
+        param.put("usedPoint", usedPoint);
         payService.insertPayInfo(param);
         Integer pay_seq = productService.currPaySeq();//현재 pay_seq
         Timestamp timestamp = productService.getPayDate(pay_seq);
@@ -615,12 +637,10 @@ public class ProductController {
         model.addAttribute("defaultAddr", defaultAddr);
         model.addAttribute("payInfoDTO", payInfoDTO);
         model.addAttribute("totalPdPrice", totalPdPrice); // 총 결제 금액 (포인트뺀거)
-        Integer memPoint = productService.getMemPoint(id); //멤버 포인트 조회
-        productService.updMemPoint(id, memPoint, usedPoint); // 멤버 포인트 변경
+//        Integer memPoint = productService.getMemPoint(id); //멤버 포인트 조회
+        productService.updMemPoint(id,usedPoint,totalNewPoint); // 멤버 포인트 변경
 
         //적립될 포인트
-        System.out.println("totalNewPoint = " + totalNewPoint);
-        System.out.println("totalPdPrice = " + totalPdPrice);
         model.addAttribute("totalNewPoint", totalNewPoint);// 적립될 포인트
         return "/product/paymentDetail";
     }

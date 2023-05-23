@@ -347,8 +347,8 @@ public class ProductService {
         return productMapper.getOption(cart_seq);
     }
 
-    public void updMemPoint(String id,Integer memPoint,Integer usedPoint) throws Exception{
-        productMapper.updMemPoint(id,memPoint,usedPoint);
+    public void updMemPoint(String id,Integer usedPoint,double totalNewPoint) throws Exception{
+        productMapper.updMemPoint(id,usedPoint,totalNewPoint);
     }
 
     public Integer getId(String id) throws Exception {
@@ -375,7 +375,7 @@ public class ProductService {
 //        return productMapper.getPrice(pdSeq);
 //    }
 
-    public Integer getPercent(Integer pdSeq) throws Exception{
+    public Double getPercent(Integer pdSeq) throws Exception{
         return productMapper.getPercent(pdSeq);
     }
 
@@ -622,6 +622,7 @@ public class ProductService {
         JsonArray jsonArray = new JsonArray();
 
         for (Map<String, Object> payInfoDTO : payInfoDTOS) {
+            System.out.println("payInfoDTOS = " + payInfoDTOS);
             Map<String, Object> map = new HashMap<>();
             ProductDTO productDTO = this.getPdInfo(Integer.parseInt(payInfoDTO.get("PD_SEQ").toString())); //상품 정보
             Integer price = Integer.parseInt(payInfoDTO.get("PRICE").toString());  //결제 금액
@@ -649,6 +650,7 @@ public class ProductService {
             deliDTO.setPhone(parsedPhone);
             map.put("deliDTO", deliDTO);
             map.put("count", count);
+            map.put("usedPoint", Integer.parseInt(payInfoDTO.get("USEDPOINT").toString()));
             if (payInfoDTO.containsKey("OPTIONS")) { //옵션 있을때
                 Object object = jsonParser.parse(payInfoDTO.get("OPTIONS").toString());
                 jsonObject = (JsonObject) object;

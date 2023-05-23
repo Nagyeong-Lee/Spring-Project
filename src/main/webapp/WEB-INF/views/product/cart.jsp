@@ -29,14 +29,19 @@
         html, body {
             height: 100%;
         }
+
         body {
             display: flex;
             flex-direction: column;
         }
-        .cart{
+
+        .cart {
             flex: 1 0 auto;
         }
-        #footer{  flex-shrink: 0;}
+
+        #footer {
+            flex-shrink: 0;
+        }
     </style>
 
 </head>
@@ -67,6 +72,8 @@
                     <tbody>
                     <c:forEach var="i" items="${cart}">
                         <tr class="itemDiv">
+                            <input type="hidden" value="${i.get("count")}" class="pdCnt">
+                            <input type="hidden" value="${i.get("pd_seq")}" class="seq">
                             <td>
                                 <input type="checkbox" name="buyPdSeq" value="${i.get('cart_seq')}" class="buyPdSeq"
                                        checked="checked">
@@ -77,6 +84,7 @@
                             <td colspan="2" style="text-align: center">
                                 <p>${i.get("name")}</p>
                                 <p class="chgCnt">수량 : ${i.get("count")}</p>
+                                <input type="hidden" name="chgedCnt" class="chgedCnt" value="${i.get("count")}">
                                 <c:choose>
                                     <c:when test="${!empty i.get('option')}">
                                         <c:forEach var="k" items="${i.get('option')}">
@@ -129,7 +137,9 @@
     <hr>
     <br>
     <hr id="priceHr">
-
+    <div class="pointDiv"  style="margin-bottom: 20px; margin-top: 20px;">
+        <h5>나의 포인트 : <fmt:formatNumber value="${memPoint}" pattern="#,###"/>점</h5>
+    </div>
     <span style="text-align: right" id="sum"> 총 수량 : ${totalSum}개</span><br>
     <span style="text-align: right" id="total"> 총 합계 : <fmt:formatNumber pattern="#,###" value="${totalPrice}"/>원</span>
     <input type="hidden" value="${totalPrice}" id="hiddenTotalPrice">
@@ -289,6 +299,8 @@
                     $this.hide();
                 } else {
                     $this.closest(".itemDiv").find(".chgCnt").text('수량 : ' + count);
+                    $this.closest(".itemDiv").find(".chgedCnt").val(count);//해당 상품 수량 변경
+                    console.log($this.closest(".itemDiv").find(".chgedCnt").val());
                 }
             }
         });
@@ -368,6 +380,7 @@
                         $this.closest(".count").find(".stock").val(count);
                         $this.closest(".count").find(".plus").show();
                         $this.closest(".itemDiv").find(".chgCnt").text('수량 : ' + count);
+                        $this.closest(".itemDiv").find(".chgedCnt").val(count);//해당 상품 수량 변경
                     }
                 }
             });
@@ -421,6 +434,25 @@
     //결제하기 버튼 클릭
     //옵션,상품 개수 변경
     $("#pay").on("click", function () {
+
+        var testArr = [];
+        var productArr = new Array();
+        //List<Map> 뒷단에서 가격 계산
+        $(".itemDiv").each(function () {
+            let count = $(this).closest(".itemDiv").find(".chgedCnt").val(); //구매할 상품 수량
+            let seq = $(this).closest(".itemDiv").find(".seq").val(); //구매할 상품 seq
+            let map = new Map();
+            console.log(count);
+            map.set("count", Number(count));
+            map.set("seq", Number(seq));
+            testArr.push(map);
+        })
+
+        console.log(testArr);
+        for (let i = 0; i < testArr.length; i++) {
+            productArr.push(Object.fromEntries(testArr[i]));
+        }
+
         var buyPdSeq = []; //구매할 cart_seq 담을 배열
 
         $("input[name=buyPdSeq]:checked").each(function () {
@@ -437,6 +469,7 @@
             var newInput2 = document.createElement("input");
             var newInput3 = document.createElement("input");
             var newInput4 = document.createElement("input");
+            var newInput5 = document.createElement("input");
 
             newForm.setAttribute("action", "/product/payInfo");
             newForm.setAttribute("method", "post");
@@ -456,10 +489,15 @@
             newInput4.setAttribute("type", "hidden");
             newInput4.setAttribute("name", "usedPoint");  //사용한 포인트
 
+            newInput5.setAttribute("value", JSON.stringify(productArr));
+            newInput5.setAttribute("type", "hidden");
+            newInput5.setAttribute("name", "productArr");  //사용한 포인트
+
             newForm.appendChild(newInput);
             newForm.appendChild(newInput2);
             newForm.appendChild(newInput3);
             newForm.appendChild(newInput4);
+            newForm.appendChild(newInput5);
             document.body.append(newForm);
             newForm.submit();
         }
