@@ -116,31 +116,49 @@
 <c:choose>
     <c:when test="${!empty optionList}">
         <div style="margin-left: 1190px;">
-            <c:forEach var="i" items="${optionList}" varStatus="status">
-                <select name="${i.key}">
-                    <option value="option" class="option">--option--</option>
-                    <c:forEach var="k" items="${i.value}">
-                        <c:choose>
-                            <c:when test="${k.status eq 'N'}"> <%--품절일때--%>
-                                <option value="${k.name}" disabled="disabled">${k.name}(${k.stock})</option>
-                            </c:when>
-                            <c:otherwise>
-                                <option value="${k.name}">${k.name}(${k.stock})</option>
-                            </c:otherwise>
-                        </c:choose>
+            <c:choose>
+                <c:when test="${productDTO.stock == 0}">
+                    <div style="font-weight: bold">품절된 상품입니다.</div>
+                </c:when>
+                <c:otherwise>
+                    <c:forEach var="i" items="${optionList}" varStatus="status">
+                        <select name="${i.key}">
+                            <option value="option" class="option">--option--</option>
+                            <c:forEach var="k" items="${i.value}">
+                                <c:choose>
+                                    <c:when test="${k.status eq 'N'}"> <%--품절일때--%>
+                                        <option value="${k.name}" disabled="disabled">${k.name}(${k.stock})</option>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <option value="${k.name}">${k.name}(${k.stock})</option>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:forEach>
+                        </select>
                     </c:forEach>
-                </select>
-            </c:forEach>
+                </c:otherwise>
+            </c:choose>
+        </div>
+    </c:when>
+    <c:otherwise>
+        <c:if test="${productDTO.stock == 0}">
+            <div style="font-weight: bold; text-align: center;">품절된 상품입니다.</div>
+        </c:if>
+    </c:otherwise>
+</c:choose>
+
+
+<c:choose>
+    <c:when test="${productDTO.stock != 0}">
+        <div class="count" style="margin-left: 1180px;">
+            <input type="text" style="width: 40px;" value="0" id="count" readonly>
+            <button style="width: 30px;" id="plus" class="btn btn-light">+</button>
+            <button style="width: 30px;" id="minus" class="btn btn-light">-</button>
+            <button type="button" id="addItems" class="btn btn-dark">담기</button>
         </div>
     </c:when>
 </c:choose>
 
-<div class="count" style="margin-left: 1180px;">
-    <input type="text" style="width: 40px;" value="0" id="count" readonly>
-    <button style="width: 30px;" id="plus" class="btn btn-light">+</button>
-    <button style="width: 30px;" id="minus" class="btn btn-light">-</button>
-    <button type="button" id="addItems" class="btn btn-dark">담기</button>
-</div>
 
 <%--좋아요--%>
 <button type="button" id="likeBtn" style="margin-left: 1250px;"><i class="far fa-thumbs-up" id="like"></i></button>

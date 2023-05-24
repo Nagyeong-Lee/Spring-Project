@@ -340,6 +340,26 @@
             testArray.push(param);
         }
 
+        //재고 있는지 확인
+        $.ajax({
+            url:'/product/checkStock',
+            type:'post',
+            async:false,
+            data:{
+                "testArray":JSON.stringify(testArray)
+            },
+            success:function(data){
+                console.log(data);
+                //재고 없으면
+                if(data == false){
+                    alert('재고가 없습니다.');
+                    return false;
+                }
+            }
+        })
+
+
+
         newInput7.setAttribute("type", "hidden");
         newInput7.setAttribute("value", JSON.stringify(testArray));
         newInput7.setAttribute("name", "testArray");

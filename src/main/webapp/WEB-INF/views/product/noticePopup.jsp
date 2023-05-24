@@ -25,9 +25,22 @@
     <style>
         .popup{ margin-top: 50px; text-align: center;  }
         input {white-space: pre-line;}
+        .text{text-align: center;}
+        .notice{margin-top: 50px;}
     </style>
 </head>
-
 <body>
+<div class="notice">
+    <p class="text">서울특별시 구로구 구로동 디지털로26길 123 </p>
+    <p class="text">지플러스타워 4층으로 배송해주세요.</p>
+    <button type="button" id="close" class="btn btn-light" style="margin-left: 250px;">닫기</button>
+</div>
+
+<script>
+    $("#close").click(function(){
+        opener.parent().location.reload();
+        window.close();
+    });
+</script>
 </body>
 </html>

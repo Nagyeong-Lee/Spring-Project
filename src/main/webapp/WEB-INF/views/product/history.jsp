@@ -126,12 +126,28 @@
                                                     style="font-size: 13px;">
                                                 <input type="hidden" value="${i.reviewDTO.review_seq}">리뷰 수정하기
                                             </button>
-                                            <button type="button" class="btn btn-light refund">교환/반품</button>
+                                            <c:if test="${i.refundDTO.status != 'Y'}">
+                                            <button type="button" class="btn btn-light refund">반품</button>
+                                            </c:if>
+                                            <c:if test="${i.refundDTO.status == 'Y'}">
+                                                <button type="button" class="btn btn-light refund" disabled>반품 처리중</button>
+                                            </c:if>
                                         </c:when>
                                         <c:otherwise>
                                             <button type="button" class="reviewBtn btn btn-light"
                                                     style="font-size: 13px;">리뷰 작성하기
                                             </button>
+                                            <c:choose>
+                                                <c:when test="${i.refundDTO.status == 'M'}">
+                                                    <button type="button" class="btn btn-light refund" disabled>반품 처리중</button>
+                                                </c:when>
+                                                <c:when test="${i.refundDTO.status == 'Y'}">
+                                                    <button type="button" class="btn btn-light refund" disabled>반품 완료</button>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <button type="button" class="btn btn-light refund">반품</button>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </c:otherwise>
                                     </c:choose>
                                 </td>

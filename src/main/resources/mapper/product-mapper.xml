@@ -52,7 +52,6 @@
         img,
         category
         from product
-        where status = 'Y'
         <if test="keyword != null">
             and LOWER(name) like '%'||#{keyword}||'%'
         </if>
@@ -72,7 +71,7 @@
             category,
             point
         from product
-        where pd_seq=#{pd_seq} and status = 'Y'
+        where pd_seq=#{pd_seq}
     </select>
 
 
@@ -561,7 +560,8 @@
     </update>
 
     <select id="likeYN" resultType="Integer">
-        SELECT count(*) FROM likes WHERE id=#{id} AND pd_seq=#{pd_seq} and status = 'Y'
+<!--        SELECT count(*) FROM likes WHERE id=#{id} AND pd_seq=#{pd_seq} and status = 'Y'-->
+        SELECT count(*) FROM likes WHERE id=#{id} AND pd_seq=#{pd_seq}
     </select>
 
     <insert id="insertLike">
@@ -929,19 +929,21 @@
         #{option},
         'N',
         null,
-        #{count}
+        #{count},
+        null
         )
     </insert>
 
     <insert id="insertPayPd">
-        insert into payProduct(payPd_seq,pay_seq,pd_seq,deliYN,code,count)
+        insert into payProduct(payPd_seq,pay_seq,pd_seq,deliYN,code,count,postNum)
         values(
         payPd_seq.nextval,
         #{pay_seq},
         #{pd_seq},
         'N',
         null,
-        #{count}
+        #{count},
+        null
         )
     </insert>
 
@@ -1117,9 +1119,9 @@
 
     <select id="updDeliveryStatus" resultType="Integer">
         UPDATE
-            (SELECT deliYN,code FROM PAYPRODUCT p WHERE PAYPD_SEQ  =
+            (SELECT deliYN,code,postNum FROM PAYPRODUCT p WHERE PAYPD_SEQ  =
                 ( SELECT payPd_seq FROM sales WHERE sales_seq = #{sales_seq}))
-        SET deliYN = 'M',code = #{code}
+        SET deliYN = 'M',code = #{code},postNum = #{postNum}
     </select>
 
     <select id="getPayProductInfo" resultType="com.example.Spring_Project.dto.PayProductDTO">
@@ -1171,7 +1173,7 @@
         where status = 'Y'
         and LOWER(name) like '%'||#{keyword}||'%'
     </select>
-    
+
     <select id="wOuterCnt" resultType="Integer">
         SELECT count(*)
         FROM PRODUCT p WHERE category = 2 and status = 'Y'
@@ -1191,23 +1193,118 @@
     </select>
 
     <select id="refundPdInfo" resultType="map">
+
         SELECT
-            pi.pay_seq,
-            pp.payPd_seq,
-            pp.pd_seq,
-            pp.options,
-            id,
-            to_char(payDate,'YYYY-MM-DD HH24:MI') AS payDate,payMethod,
-            pp.count
+            a.pay_seq,
+            a.payPd_seq,
+            a.pd_seq,
+            a.OPTIONS,
+            a.payDate,
+            a.payMethod,
+            a.count,
+            p.price,
+            a.id
+        FROM product p JOIN (
+            SELECT
+               pi.pay_seq,
+               pp.payPd_seq,
+               pp.pd_seq,
+               pp.options,
+               id,
+               to_char(payDate,'YYYY-MM-DD HH24:MI') AS payDate,
+               payMethod,
+               pp.count
         FROM payInfo pi JOIN (
-                SELECT
-                    payPd_seq,
-                    pay_seq,
-                    pd_seq,
-                    options,
-                    count
-                FROM payProduct
-                WHERE payPd_seq = #{payPdSeq}) pp
-        on pi.pay_seq = pp.pay_seq
+            SELECT
+                payPd_seq,
+                pay_seq,
+                pd_seq,
+                options,
+                count
+            FROM payProduct
+            WHERE payPd_seq = #{payPdSeq}) pp
+            on pi.pay_seq = pp.pay_seq) a on p.pd_seq = a.pd_seq
     </select>
+
+    <insert id="insertRefund" parameterType="map">
+        insert into refund values(
+            refund_seq.nextval,
+            #{id},
+            #{payPd_seq},
+            #{content},
+            #{deli_seq},
+            'M',
+            sysdate
+        )
+    </insert>
+
+    <select id="refundInfo" resultType="com.example.Spring_Project.dto.RefundDTO">
+        select
+            refund_seq,
+            id,
+            payPd_seq,
+            content,
+            deli_seq,
+            status,
+            applyDate
+        from refund
+        where payPd_seq = #{payPd_seq}
+    </select>
+
+    <select id="refundCount" resultType="Integer">
+        select count(*) from refund
+    </select>
+
+    <select id="refundList" resultType="com.example.Spring_Project.dto.RefundDTO">
+        SELECT
+            refund_seq,
+            id,
+            payPd_seq,
+            content,
+            deli_seq,
+            status,
+            applyDate
+        from( SELECT ROWNUM rn, a.* FROM(
+            select
+                refund_seq,
+                id,
+                payPd_seq,
+                content,
+                deli_seq,
+                status,
+                to_char(applyDate,'YYYY-DD-MM HH24:MI') AS applyDate
+            from refund
+            ORDER BY 7 DESC) a)
+            where rn between #{start} and #{end}
+    </select>
+
+    <select id="payPdInfo" resultType="com.example.Spring_Project.dto.PayProductDTO">
+        select
+             pay_seq,
+             pd_seq,
+             options,
+             deliYN,
+             code,
+             count,
+             postNum
+        from payProduct
+        where payPd_seq = #{payPd_seq}
+    </select>
+
+
+    <select id="refundInfoByPayPd_seq" resultType="com.example.Spring_Project.dto.ShopRefundDTO">
+        select
+            sr_seq,
+            refund_seq,
+            status,
+            code,
+            postNum,
+            deliStatus
+        from shopRefund
+        where refund_seq = #{refund_seq}
+    </select>
+
+    <update id="updRefundStatus">
+        update refund set status = 'Y' where refund_seq = #{refund_seq}
+    </update>
 </mapper>

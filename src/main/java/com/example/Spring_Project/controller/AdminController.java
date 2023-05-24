@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.ss.usermodel.Row;
+import org.dom4j.rule.Mode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -218,15 +219,15 @@ public class AdminController {
 
     //등록한 상품 조회
     @RequestMapping("/registeredPd")
-    public String registeredPd(Model model, Integer cpage,String keyword) throws Exception {
-        if(keyword == null) keyword = null;
+    public String registeredPd(Model model, Integer cpage, String keyword) throws Exception {
+        if (keyword == null) keyword = null;
         if (cpage == null) cpage = 1;
         Integer postCnt = productService.countRegisteredPd(); //상품 개수
         Map<String, Object> paging = productService.paging(cpage, postCnt);
         Integer naviPerPage = 10;
         Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
         Integer end = cpage * naviPerPage; // 끝 글 번호
-        List<ProductDTO> list = productService.getProducts(keyword,start, end); //상품정보
+        List<ProductDTO> list = productService.getProducts(keyword, start, end); //상품정보
         List<OptionDTO> optionDTOList = null;
         List<Map<String, Object>> registeredPd = new ArrayList<>();
         Map<String, Object> tmp = null;
@@ -377,7 +378,7 @@ public class AdminController {
 
 
         List<Object> pdReviewDTOS = new ArrayList<>();
-        List<ParsedReviewDTO> reviewDTOS = pdReviewService.getReviews(start,end); //처음 리뷰 리스트
+        List<ParsedReviewDTO> reviewDTOS = pdReviewService.getReviews(start, end); //처음 리뷰 리스트
         adminService.insertRevSeq(reviewDTOS); //insert
         List<ParsedReviewDTO2> objectList = adminService.reviewByOptList(reviewDTOS);
         List<Map<String, Object>> reviewList = pdReviewService.reviewListByOptions(objectList, paging);//관리자 리뷰 조회에 뿌릴 데이터
@@ -435,6 +436,47 @@ public class AdminController {
         List<ParsedReviewDTO2> objectList = adminService.reviewByOptList(mapList);
         List<Map<String, Object>> reviewList = pdReviewService.reviewListByOptions(objectList, paging);//관리자 리뷰 조회에 뿌릴 데이터
         return reviewList;
+    }
+
+    @RequestMapping("/refund")  //교환 및 반품 조회
+    public String toAdminRefundList(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.refundCount(); //교환/환불 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+
+        List<RefundDTO> refundDTOList = productService.refundList(start,end);
+        List<Object> refundInfoList = productService.getRefundInfo(refundDTOList);
+        model.addAttribute("paging", paging);
+        model.addAttribute("refundInfoList", refundInfoList);
+
+        //     SELECT * FROM PAYINFO p  WHERE PAY_SEQ  IN (SELECT pay_seq FROM PAYPRODUCT p WHERE PAYPD_SEQ = 176); 가격,개수,사용포인트 가져옴
+        // 사용포인트 있으면  사용포인트/개수
+        //현금도 상품원래 가격 - ( 사용포인트/개수) 한거 반환
+        return "/admin/refundList";
+    }
+
+    @PostMapping("/approveRefund") //교환 환불 승인 팝업창 띄움
+    public String approveRefund(Model model, @RequestParam Integer payPd_seq,@RequestParam Integer refund_seq)  throws Exception{
+        List<CourierDTO> courierDTOS = productService.getCourierInfo();
+        model.addAttribute("courierDTOS", courierDTOS);
+        model.addAttribute("payPd_seq",payPd_seq);
+        model.addAttribute("refund_seq",refund_seq);
+        return "/admin/approveRefundPopup";
+    }
+
+    @ResponseBody
+    @PostMapping("/apprRefund") //관리자가 교환 승인할때 db인서트
+    public String apprRefund(@RequestParam Map<String,Object> map) throws Exception{
+        System.out.println("map = " + map);
+        String name = map.get("courier").toString();
+        Integer courierCode = productService.getCourierCode(name);//택배사 코드
+        map.put("code",courierCode);
+        adminService.insertShopRefund(map);
+        //승인처리 db에 인서트
+        return "success";
     }
 }
 

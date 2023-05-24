@@ -3,7 +3,9 @@ package com.example.Spring_Project.controller;
 import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.service.*;
 import com.google.gson.*;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -338,6 +340,9 @@ public class ProductController {
            Integer productPrice = pdPrice * pdArr.get(i).getAsJsonObject().get("count").getAsInt();
            totalPayPrice += productPrice;
            totalPayCount += pdArr.get(i).getAsJsonObject().get("count").getAsInt();
+
+//            //결제하기 후 상품 수량 -
+//            productService.minusPd(pdArr.get(i).getAsJsonObject().get("seq").getAsInt());
         }
 
         String[] arr = buyPdSeq.split(",");
@@ -395,6 +400,7 @@ public class ProductController {
                     Map<String, Object> map = new HashMap<>();
                     String category = list.get(k);
                     String option = String.valueOf(jsonArray.get(k)).replace("\"", "");
+//                    productService.minusOption(,option);
                     map.put(category, option);
                     optionMap.add(map);
                 }
@@ -435,6 +441,8 @@ public class ProductController {
 //        model.addAttribute("usedPoint", usedPoint); // 사용한 포인트
         model.addAttribute("totalPayPrice", totalPayPrice);  // 최종 결제할 금액
         model.addAttribute("totalPayCount", totalPayCount); // 최종 결제할 수량
+
+
         return "/product/payInfo";
     }
 
@@ -1136,17 +1144,21 @@ public class ProductController {
     public String chgDeliveryStatus(@RequestParam Map<String, Object> data) throws Exception {
         Integer sales_seq = Integer.parseInt(data.get("sales_seq").toString()); //sales_seq
         Integer courierCode = productService.getCourierCode(data.get("courier").toString()); //택배사 이름
-        productService.updDeliveryStatus(sales_seq, courierCode); //sales table -> payPdSeq
+        String postNum =  data.get("invoiceNum").toString(); //택배사 이름
+        productService.updDeliveryStatus(sales_seq, courierCode,postNum); //sales table -> payPdSeq
         return "success";
     }
-    
-    
+
+
     @PostMapping("/refundPopup")  //교환 신청 팝업으로 이동
     public String toRefundPopup(Model model,@RequestParam Map<String,Object>map) throws Exception{
         String id = map.get("id").toString();
         Map<String,Object> refundPdInfo  = productService.refundPdInfo(map);//교환할 상품 정보
-        ProductDTO productDTO = productService.getPdInfo(Integer.parseInt(refundPdInfo.get("pd_seq").toString()));
-        if(refundPdInfo.get("options") != null){
+        ProductDTO productDTO = productService.getPdInfo(Integer.parseInt(refundPdInfo.get("PD_SEQ").toString()));
+        Integer pdPrice = Integer.parseInt(refundPdInfo.get("PRICE").toString());
+        Integer count = Integer.parseInt(refundPdInfo.get("COUNT").toString());
+        Integer price = pdPrice*count; //상품가격*개수
+        if(refundPdInfo.get("OPTIONS") != null){
             List<Map<String, Object>> optionList = productService.refundPdWithOpt(refundPdInfo); //옵션 있으면 옵션 정보 가공해서 다시 가져옴
             model.addAttribute("optionList",optionList);
         }
@@ -1159,13 +1171,43 @@ public class ProductController {
         model.addAttribute("productDTO",productDTO);
         model.addAttribute("refundPdInfo",refundPdInfo);
         model.addAttribute("deliDTOList",deliDTOList);
+        model.addAttribute("deliDTOList",deliDTOList);
+        model.addAttribute("price",price);
         return "/product/refundPopup";
     }
 
-    @RequestMapping("applyRefund") // 교환 신청 클릭 시 안내 팝업 띄움
-    public String toNoticePopup(@RequestParam String id) throws Exception{
-        //어드민 - 교환 신청 테이블에 인서트
+    @ResponseBody
+    @PostMapping("/refund")  //refund 테이블에 인서트
+    public String refundPd(@RequestParam Map<String,Object> param) throws Exception{
+        System.out.println("param = " + param);
+        productService.insertRefund(param);
+        return "success";
+    }
+
+    @RequestMapping("noticePopup") // 교환 신청 클릭 시 안내 팝업 띄움
+    public String toNoticePopup() throws Exception{
         return "/product/noticePopup";
+    }
+
+    @ResponseBody
+    @PostMapping("/checkStock")
+    public boolean checkStock(@RequestParam String testArray) throws Exception{
+        boolean result = false;
+        JsonParser jsonParser = new JsonParser();
+        JsonArray jsonObject2 = (JsonArray) jsonParser.parse(testArray);
+        for (int i = 0; i < jsonObject2.size(); i++) {
+            JsonObject jsonObject1 = (JsonObject) jsonObject2.get(i);
+            Integer pdSeq = jsonObject1.get("pdSeq").getAsInt();
+            Integer pdStock = jsonObject1.get("pdStock").getAsInt();
+            Integer productCnt = productService.getPdStock(pdSeq);//해당 상품 재고 가져오기
+            if(pdStock <= productCnt){
+                result =  true;
+            }else{
+                result = false;
+                break;
+            }
+        }
+        return result;
     }
 
 }

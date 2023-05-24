@@ -31,4 +31,5 @@ public interface AdminMapper {
 
     Map<String,Object> getChildCtg(@Param("pd_seq")Integer pd_seq);
     String getParentCtg(@Param("seq") Integer parent_category_seq);
+    void insertShopRefund(Map<String,Object> map);
 }

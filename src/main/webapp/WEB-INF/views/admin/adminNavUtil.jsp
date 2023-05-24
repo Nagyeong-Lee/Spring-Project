@@ -30,6 +30,9 @@
       <a href="/admin/reviews?cpage=1"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 110px;" id="reviews">
            리뷰 조회
       </button></a>
+        <a href="/admin/refund?cpage=1"><button class="btn btn-outline-dark" type="button" style="margin-left: 10px; width: 150px;" id="refund">
+          반품 조회
+      </button></a>
     </div>
   </div>
 </nav>

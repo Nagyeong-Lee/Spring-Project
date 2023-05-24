@@ -11,5 +11,6 @@ public class PayProductDTO {
     private String deliYN;
     private Integer code;
     private Integer count;
+    private String postNum;
 
 }

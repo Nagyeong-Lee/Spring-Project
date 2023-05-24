@@ -291,4 +291,16 @@
     <select id="getParentCtg" resultType="String">
         SELECT name FROM category WHERE CATEGORY_SEQ = #{seq}
     </select>
+
+    <insert id="insertShopRefund" parameterType="map">
+        insert into shopRefund values(
+        sr_seq.nextval,
+        #{refund_seq},
+        'Y',
+        #{code},
+        #{invoiceNum},
+        #{payPd_seq},
+        'N'
+        )
+    </insert>
 </mapper>

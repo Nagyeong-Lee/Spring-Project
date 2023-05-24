@@ -304,4 +304,9 @@ public class AdminService {
         }
         return objectList;
     }
+
+
+    public void insertShopRefund(Map<String,Object> map) throws Exception{
+        adminMapper.insertShopRefund(map);
+    }
 }

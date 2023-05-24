@@ -7,9 +7,10 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
-    <title>교환 신청</title>
+    <title>반품 신청</title>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
@@ -37,36 +38,44 @@
             text-align: center;
         }
 
-        .img {
-            float: left
+        img {
+            width: 100px;
+            height: 100px;
+        }
+
+        textarea {
+            width: 300px;
+            height: 100px;
         }
     </style>
 </head>
 <body>
 <input type="hidden" value="${id}" id="id" name="id">
-<h5>반품/교환 신청</h5>
+<input type="hidden" value="${refundPdInfo.PAYPD_SEQ}" id="payPd_seq" name="payPd_seq">
+<h5>반품 신청</h5>
 <div class="popup">
     <form action="" method="post">
         <div class="img">
             <img src="/resources/img/products/${productDTO.img}">
         </div>
         <div class="pdInfo">
-            상품명 : ${productDTO.name}
+            <div>상품명 : ${productDTO.name}</div>
             <c:if test="${!empty optionList}">
-                옵션 정보
-                <c:forEach var="k" items="${optionList}">
-                    <c:forEach var="j" items="${k}">
-                        <p>${j.key} : ${j.value}</p>
+               옵션 정보<br>
+                    <c:forEach var="k" items="${optionList}">
+                        <c:forEach var="j" items="${k}">
+                            ${j.key} : ${j.value}<br>
+                        </c:forEach>
                     </c:forEach>
-                </c:forEach>
             </c:if>
-            개수 : ${refundPdInfo.count}개
-            결제정보 : ${refundPdInfo.payMethod}
-            결제 시간 : ${refundPdInfo.payDate}
+            <div>개수 : ${refundPdInfo.COUNT}개</div>
+            <div>가격 : <fmt:formatNumber pattern="#,###" value="${price}"/>원</div>
+            <div>결제정보 : ${refundPdInfo.PAYMETHOD}</div>
+            <div>결제 시간 : ${refundPdInfo.PAYDATE}</div>
+            <div>사유 : <textarea id="content" name="content"></textarea></div>
         </div>
-        사유 : <textarea id="content" name="content"></textarea>
         <div class="deliInfo">
-            <h3>배송지 선택</h3>
+            <h5>배송지 선택</h5>
             <button type="button" id="addBtn" class="btn btn-light">배송지 추가</button>
             <br>
             <c:choose>
@@ -78,7 +87,6 @@
                             <c:when test="${i.status eq 'Y'}">기본 배송지</c:when>
                             <c:otherwise>${i.nickname}</c:otherwise>
                         </c:choose>
-
                     </c:forEach>
                     <c:forEach var="i" items="${deliDTOList}">
                         <c:if test="${i.status eq 'Y'}">
@@ -92,11 +100,9 @@
                 </c:when>
             </c:choose>
         </div>
-        <button type="button" id="refundBtn">교환 신청</button>
+        <button type="button" id="refundBtn" class="btn btn-light">반품 신청</button>
+        <button type="button" id="cancle" class="btn btn-light">취소</button>
     </form>
-    <%--    상품이미지 상품명 결제정보 사용 포인트 옵션있으면 옵션정보 사유 교환받을 배송지 입력 신청 버튼
-           교환 신청 클릭 시 해당주소(관리자)로 반품해주세요 팝업띄우기-
-            기존 배송지 주소 띙워놓고 배송지 추가버튼도 만듦--%>
 </div>
 <script>
     var _width = '500';
@@ -107,14 +113,38 @@
     //배송지 추가 클릭 시
     $("#addBtn").click(function () {
         let id = $("#session").val();
-        window.open('/product/addDeli?id=${id}', '',  'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
+        window.open('/product/addDeli?id=${id}', '', 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
     })
 
     //교환 신청 클릭 시
     $("#refundBtn").click(function () {
-        window.open('/product/applyRefund?id=${id}', '', 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
+        let content = $("#content").val();
+        if (content.length == 0) {
+            alert('사유를 입력해주세요.');
+            return false;
+        }
+
+        $.ajax({
+            url: '/product/refund',
+            type: 'post',
+            data: {
+                "payPd_seq": $("#payPd_seq").val(),
+                "id": $("#id").val(),
+                "content":$("#content").val(),
+                "deli_seq":$("input[type='radio']:checked").val()
+            },
+            success:function(data){
+                console.log(data);
+                window.close();
+                window.open('/product/noticePopup', '', 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
+            }
+        })
     })
 
+    //취소
+    $("#cancle").click(function () {
+        window.close();
+    })
 </script>
 </body>
 </html>
