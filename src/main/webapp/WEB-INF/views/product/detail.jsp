@@ -114,10 +114,13 @@
 <input type="hidden" value="${productDTO.stock}" id="originalTotalStock">
 
 <c:choose>
-    <c:when test="${!empty optionList}">
+    <c:when test="${stock <= 0}">
+        <div style="font-weight: bold;  text-align: center;">품절된 상품입니다.</div>
+    </c:when>
+    <c:otherwise>
         <div style="margin-left: 1190px;">
-            <c:choose>
-                <c:when test="${productDTO.stock > 0}">
+<%--            <c:choose>--%>
+<%--                <c:when test="${productDTO.stock > 0}">--%>
                     <c:forEach var="i" items="${optionList}" varStatus="status">
                         <select name="${i.key}">
                             <option value="option" class="option">--option--</option>
@@ -133,17 +136,12 @@
                             </c:forEach>
                         </select>
                     </c:forEach>
-                </c:when>
-                <c:otherwise>
-                    <div style="font-weight: bold;">품절된 상품입니다.</div>
-                </c:otherwise>
-            </c:choose>
+<%--                </c:when>--%>
+<%--                <c:otherwise>--%>
+<%--                    <div style="font-weight: bold;">품절된 상품입니다.</div>--%>
+<%--                </c:otherwise>--%>
+<%--            </c:choose>--%>
         </div>
-    </c:when>
-    <c:otherwise>
-        <c:if test="${productDTO.stock < 0}">
-            <div style="font-weight: bold; ">품절된 상품입니다.</div>
-        </c:if>
     </c:otherwise>
 </c:choose>
 

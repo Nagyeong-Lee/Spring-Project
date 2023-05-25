@@ -83,9 +83,9 @@
     </div>
 </header>
 <!-- Section-->
-<section class="py-5">
+<section class="py-5" style="margin-top: -80px;">
     <div class="container px-4 px-lg-5 mt-5">
-        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center" id="row">
+        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center" id="row" style="margin-bottom: 50px;">
             <c:choose>
                 <c:when test="${!empty productDTOList}">
                     <c:forEach var="i" items="${productDTOList}">

@@ -22,6 +22,7 @@
 </head>
 <body>
 <input type="hidden" value="${id}" id="id" name="id">
+<input type="hidden" value="${point}" id="point" name="point">
 <div class="popup">
     <form action="/product/addDeli" method="post" id="frm">
         <div>이름 <input type="text" name="name" id="name"></div>
@@ -49,6 +50,7 @@
         let phone = $("#phone").val();
         let address = $("#address").val();
         let nickname = $("#nickname").val();
+        let point = $("#point").val();
         let flag = $("#default").is(':checked');  //기본 주소 체크 여부
         let id = $("#id").val();
         if (flag == true) {
@@ -96,10 +98,11 @@
                 "address": address,
                 "nickname": nickname,
                 "def": flag,
-                "id": id
+                "id": id,
+                "point":point
             },
             success: function (data) {
-                if (data == 'success') {
+                if (data != null) {
                     window.close();
                     opener.parent.location.reload();
                 }

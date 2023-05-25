@@ -10,7 +10,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
-    <title>반품 승인 팝업</title>
+    <title>환불 승인 팝업</title>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
@@ -57,7 +57,7 @@
 <body>
 <input type="hidden" value="${payPd_seq}" id="payPd_seq" name="payPd_seq">
 <input type="hidden" value="${refund_seq}" id="refund_seq" name="refund_seq">
-<h5>반품/환불 승인</h5>
+<h5>환불 승인</h5>
 <div class="popup">
 <form action="/admin/apprRefund" method="post">
     <c:if test="${!empty courierDTOS}">

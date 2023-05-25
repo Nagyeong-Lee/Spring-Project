@@ -48,6 +48,7 @@
         <th>상품 이미지</th>
         <th>판매 정보</th>
         <th>남은 재고</th>
+        <th>판매 일자</th>
         <th></th>
         </thead>
         <tbody id="tbody">
@@ -71,6 +72,7 @@
                             </c:if>
                         </td>
                         <td style="text-align: center;">${i.pdStock}개</td>
+                        <td style="text-align: center;">${i.salesDate}</td>
                         <c:choose>
                             <c:when test="${i.deliYN == 'N'}"> <%--배송 안했을때--%>
                                 <td style="text-align: center;">
@@ -152,10 +154,10 @@
     //     });
 
     /*택배사 입력 클릭 시*/
-    $(".selectCourier").click(function () {
+    $(document).on("click",".selectCourier",function(){
         let sales_seq = $(this).parent().parent().find(".sales_seq").val();
         window.open('/admin/chgDeliStatus?sales_seq=' + sales_seq, '', 'width=500, height=500, left=800, top=250');
-    });
+    })
 
     //페이징 다시 그려줌
     function paging(startNavi) {
@@ -206,6 +208,7 @@
         var HTML = '<tr><td><a href="/product/detail?pd_seq=' + pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width:120px; height: 100px;"></a></td>';
         if (item.optionMapList == null) { //옵션 없을때
             HTML += '<td style="text-align: center;"><p>' + item.productDTO.name + item.productDTO.stock + '개</p>';
+            HTML += '<td style="text-align: center;"><p>' + item.salesDTOS.salesDate+'</p>';
         } else if (item.optionMapList != null) { //옵션 있을때
             temp += '<td style="text-align: center;"><p>' + item.productDTO.name + ' ' + item.productDTO.stock + '개</p>';
             for (let i = 0; i < item.optionMapList.length; i++) {
@@ -215,6 +218,7 @@
             HTML = HTML + temp;
         }
         HTML += '<td style="text-align: center;">' + item.productDTO.stock + '개</td>';
+        HTML += '<td style="text-align: center;"><p>' + item.salesDTOS.salesDate+'</p>';
         if (item.deliYN == 'M') {
             HTML += '<td style="text-align: center;">배송중</td>';
         } else if (item.deliYN == 'N') {

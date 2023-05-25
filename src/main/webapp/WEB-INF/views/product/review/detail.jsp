@@ -38,14 +38,19 @@
         html, body {
             height: 100%;
         }
+
         body {
             display: flex;
             flex-direction: column;
         }
-        .cart, .pagingDiv{
+
+        .cart, .pagingDiv {
             flex: 1 0 auto;
         }
-        #footer{  flex-shrink: 0;}
+
+        #footer {
+            flex-shrink: 0;
+        }
 
         .pagingDiv {
             position: fixed;
@@ -65,7 +70,7 @@
         let deleteSeq = [];
 
         function deleteFile(i) {  //사진+x
-            $("#"+i).parent().remove(); //imgDiv 삭제
+            $("#" + i).parent().remove(); //imgDiv 삭제
             $("#" + i).remove();  //x 버튼 삭제
             deleteSeq.push(i);  //status=n으로 변경
         }
@@ -141,31 +146,32 @@
             $("#delBtn").click(function () {
                 let review_seq = $("#review_seq").val();
                 let id = $("#id").val();
-                $.ajax({
-                    url: '/pdReview/deleteReview',
-                    type: 'post',
-                    data: {
-                        "review_seq": review_seq
-                        // "id":id
-                    },
-                    success: function (data) {
-                        if (data === 'success') {
-                            let form = document.createElement("form");
-                            form.setAttribute("method", "post");
-                            form.setAttribute("action", "/product/history");
+                if (confirm('삭제하시겠습니까?')) {
+                    $.ajax({
+                        url: '/pdReview/deleteReview',
+                        type: 'post',
+                        data: {
+                            "review_seq": review_seq
+                            // "id":id
+                        },
+                        success: function (data) {
+                            if (data === 'success') {
+                                let form = document.createElement("form");
+                                form.setAttribute("method", "post");
+                                form.setAttribute("action", "/product/history");
 
-                            let input = document.createElement("input");
-                            input.setAttribute("type", "hidden");
-                            input.setAttribute("name", "id");
-                            input.setAttribute("value", id);
+                                let input = document.createElement("input");
+                                input.setAttribute("type", "hidden");
+                                input.setAttribute("name", "id");
+                                input.setAttribute("value", id);
 
-                            form.appendChild(input);
-                            document.body.append(form);
-                            form.submit();
+                                form.appendChild(input);
+                                document.body.append(form);
+                                form.submit();
+                            }
                         }
-                    }
-                })
-
+                    })
+                }
             })
 
             //파일 변경
@@ -218,10 +224,10 @@
                     , isModal: true
                     , isModalEnd: true
                     , success: function (data) {
-                        if(data === 'success'){
+                        if (data === 'success') {
 
-                          alert('리뷰 수정 완료');
-                            location.href='/product/history?id='+id+'&cpage=1';
+                            alert('리뷰 수정 완료');
+                            location.href = '/product/history?id=' + id + '&cpage=1';
                         }
                     }, error: function (e) {
 
@@ -238,47 +244,51 @@
 <%@ include file="/WEB-INF/views/product/shopUtil.jsp" %>
 <h5>리뷰 작성</h5>
 <div class="revDiv">
-<form action="/pdReview/insertReview" method="post" id="frm">
-<input type="hidden" id="review_seq" name="review_seq" value="${reviewDTO.review_seq}">
-    <c:choose>
-        <c:when test="${!empty reviewDTO}">
-            <div class="star">
-                별점 선택
-                <select name="star">
-                    <c:forEach var="i" begin="1" end="5">
-                        <option value="${i}"<c:out value="${reviewDTO.star == i ? 'selected' : ''}"/>>${i}</option>
-                    </c:forEach>
-                </select>
-            </div>
-            <input type="hidden" name="payPd_seq" id="payPd_seq" value="${reviewDTO.payPd_seq}">
-            <input type="hidden" name="pd_seq" id="pd_seq" value="${reviewDTO.pd_seq}">
-            <input type="hidden" name="loginID" id="loginID" value="${id}">
-            <textarea id="content" name="content" class="summernote">${reviewDTO.content}</textarea>
+    <form action="/pdReview/insertReview" method="post" id="frm">
+        <input type="hidden" id="review_seq" name="review_seq" value="${reviewDTO.review_seq}">
+        <c:choose>
+            <c:when test="${!empty reviewDTO}">
+                <div class="star">
+                    별점 선택
+                    <select name="star">
+                        <c:forEach var="i" begin="1" end="5">
+                            <option value="${i}"<c:out value="${reviewDTO.star == i ? 'selected' : ''}"/>>${i}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+                <input type="hidden" name="payPd_seq" id="payPd_seq" value="${reviewDTO.payPd_seq}">
+                <input type="hidden" name="pd_seq" id="pd_seq" value="${reviewDTO.pd_seq}">
+                <input type="hidden" name="loginID" id="loginID" value="${id}">
+                <textarea id="content" name="content" class="summernote">${reviewDTO.content}</textarea>
 
-            <div class="imgArea">
-                <c:if test="${!empty imgDTOList}">
-                    <c:forEach var="i" items="${imgDTOList}">
-                        <div class="img" style="width:100px; height: 200px; text-align: left;">
-                            <img src="/resources/img/products/pdReview/${i.sysname}" style="width: 100px; height: 100px;"><button type="button" onclick="deleteFile(${i.img_seq})" class="deleteFile" id="${i.img_seq}" >x</button>
-                        </div>
-                    </c:forEach>
-                </c:if>
-            </div>
+                <div class="imgArea">
+                    <c:if test="${!empty imgDTOList}">
+                        <c:forEach var="i" items="${imgDTOList}">
+                            <div class="img" style="width:100px; height: 200px; text-align: left;">
+                                <img src="/resources/img/products/pdReview/${i.sysname}"
+                                     style="width: 100px; height: 100px;">
+                                <button type="button" onclick="deleteFile(${i.img_seq})" class="deleteFile"
+                                        id="${i.img_seq}">x
+                                </button>
+                            </div>
+                        </c:forEach>
+                    </c:if>
+                </div>
 
-            <div class="files">
-                <button type="button" onclick="$('#file').click();">첨부파일</button>
-            </div>
+                <div class="files">
+                    <button type="button" onclick="$('#file').click();">첨부파일</button>
+                </div>
 
-            <div class="fileDiv"></div>
+                <div class="fileDiv"></div>
 
-            <div class="cart__mainbtns btns">
-                <button class="btn btn-light" type="button" id="updBtn">리뷰 수정</button>
-                <button class="btn btn-light" type="button" id="delBtn">삭제</button>
-                <button class="btn btn-light" type="button" id="cancleBtn">취소</button>
-            </div>
-        </c:when>
-    </c:choose>
-</form>
+                <div class="cart__mainbtns btns">
+                    <button class="btn btn-light" type="button" id="updBtn">리뷰 수정</button>
+                    <button class="btn btn-light" type="button" id="delBtn">삭제</button>
+                    <button class="btn btn-light" type="button" id="cancleBtn">취소</button>
+                </div>
+            </c:when>
+        </c:choose>
+    </form>
 </div>
 <footer class="py-5 bg-dark" id="footer">
     <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>

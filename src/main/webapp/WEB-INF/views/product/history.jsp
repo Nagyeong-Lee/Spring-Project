@@ -77,7 +77,7 @@
             <c:when test="${!empty historyList}">
                 <c:set var="paySeq" value="0"/>
                 <c:forEach var="i" items="${historyList}" varStatus="status">
-                    ${i.pay_seq}-${i.count}
+<%--                    ${i.pay_seq}-${i.count}--%>
                     <c:set var="loop_flag" value="false"/>
                     <tr>
                         <td><a href="/product/detail?pd_seq=${i.productDTO.pd_seq}"><img
@@ -129,13 +129,14 @@
                                             </button>
                                             <c:choose>
                                                 <c:when test="${i.refundDTO.status == 'M'}">
-                                                    <button type="button" class="btn btn-light refund" disabled>반품 처리중</button>
+                                                    <button type="button" class="btn btn-light refund" disabled>환불 처리중</button>
                                                 </c:when>
                                                 <c:when test="${i.refundDTO.status == 'Y'}">
-                                                    <button type="button" class="btn btn-light refund" disabled>반품 완료</button>
+                                                    <button type="button" class="btn btn-light refund" disabled>환불 완료</button>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <button type="button" class="btn btn-light refund">반품하기</button>
+                                                    <button type="button" class="btn btn-light refund">환불</button>
+                                                    <button type="button" class="btn btn-light exchange">교환</button>
                                                 </c:otherwise>
                                             </c:choose>
                                         </c:when>
@@ -145,13 +146,14 @@
                                             </button>
                                             <c:choose>
                                                 <c:when test="${i.refundDTO.status == 'M'}">
-                                                    <button type="button" class="btn btn-light refund" disabled>반품 처리중</button>
+                                                    <button type="button" class="btn btn-light refund" disabled>환불 처리중</button>
                                                 </c:when>
                                                 <c:when test="${i.refundDTO.status == 'Y'}">
-                                                    <button type="button" class="btn btn-light refund" disabled>반품 완료</button>
+                                                    <button type="button" class="btn btn-light refund" disabled>환불 완료</button>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <button type="button" class="btn btn-light refund">반품하기</button>
+                                                    <button type="button" class="btn btn-light refund">환불</button>
+                                                    <button type="button" class="btn btn-light exchange">교환</button>
                                                 </c:otherwise>
                                             </c:choose>
                                         </c:otherwise>

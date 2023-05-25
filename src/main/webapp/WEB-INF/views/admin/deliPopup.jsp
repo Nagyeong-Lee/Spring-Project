@@ -71,6 +71,7 @@
 <input type="hidden" value="${id}" id="id" name="id">
 <div class="popup">
   <form action="/product/chgDeliveryStatus" method="post" id="frm">
+    송장번호 : <input type="text" name="invoiceNum" id="invoiceNum" maxlength="13"><br>
     <input type="hidden" value="${sales_seq}" name="sales_seq" id="sales_seq">
     <c:if test="${!empty courierDTOS}">
       <select name="courier">
@@ -78,8 +79,7 @@
           <option value="${i.name}">${i.name}</option>
         </c:forEach>
       </select>
-    </c:if><br>
-    송장번호 : <input type="text" name="invoiceNum" id="invoiceNum" maxlength="13">
+    </c:if>
     <div>
       <button type="button" id="sbn">변경</button> <%--배송중으로 변경--%>
       <button type="button" id="close">취소</button>

@@ -38,8 +38,7 @@
 
 <script>
     $("#close").click(function(){
-        opener.parent().location.reload();
-        window.close();
+        window.close(); // 팝업창 닫기
     });
 </script>
 </body>

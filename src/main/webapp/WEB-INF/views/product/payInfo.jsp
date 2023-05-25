@@ -137,6 +137,111 @@
 <script src="/resources/asset/js/shopUtil.js"></script>
 <script>
 
+    var IMP = window.IMP;
+    IMP.init("imp62163330");
+
+    function requestPay(productArr) {
+        let testArray = [];
+        for (let i = 0; i < productArr.length; i++) {
+            var param = Object.fromEntries(productArr[i]);
+            testArray.push(param);
+        }
+
+        //재고 있는지 확인
+        $.ajax({
+            url:'/product/checkStock',
+            type:'post',
+            async:false,
+            data:{
+                "testArray":JSON.stringify(testArray)
+            },
+            success:function(data){
+                console.log(data);
+                //재고 없으면
+                if(data == false){
+                    alert('재고가 없습니다.');
+                    return false;
+                }
+            }
+        })
+
+        var email = $("#mem_email").val();
+        var name = $("#mem_name").val();
+        var phone = $("#mem_phone").val();
+        var address = $("#defaultAddress").text();
+        var price = $("#totalPrice").val();
+        console.log("price : " + price);
+        if ($("#totalSum").val() != 1) {
+            var title = $(".pdName1").text() + '외 ' + ($("#totalSum").val() - $(".pdCnt1").val());
+        } else {
+            title = $(".pdName1").text();
+        }
+
+        var payInfo = {
+            pg: 'kakaopay',
+            pay_method: 'card',
+            merchant_uid: 'merchant_' + new Date().getTime(),
+            name: title,
+            amount: price,
+            buyer_email: email,
+            buyer_name: name,
+            buyer_tel: phone,
+            buyer_addr: address
+        };
+
+        IMP.request_pay(payInfo, function (rsp) {
+            if (rsp.success) {
+                //결제 내역으로 이동
+                let frm = document.createElement("form");
+                frm.setAttribute("method", "post");
+                frm.setAttribute("action", "/product/paymentDetails");
+                frm.setAttribute("display","none");
+                let newInput = document.createElement("input");
+                let newInput2 = document.createElement("input");
+                let newInput3 = document.createElement("input");
+                let newInput4 = document.createElement("input");
+                let newInput5 = document.createElement("input");
+                let newInput6 = document.createElement("input");
+                let newInput7 = document.createElement("input");
+                newInput.setAttribute("type", "hidden");
+                newInput.setAttribute("value", $("#session").val());
+                newInput.setAttribute("name", "id");
+
+                newInput2.setAttribute("type", "hidden");
+                newInput2.setAttribute("value", $("#totalMoney").val());
+                newInput2.setAttribute("name", "price");
+
+                newInput3.setAttribute("type", "hidden");
+                newInput3.setAttribute("value", $("input[name=address]:checked").val());
+                newInput3.setAttribute("name", "seq");
+
+                newInput4.setAttribute("type", "hidden");
+                newInput4.setAttribute("value", $("#totalSum").val());
+                newInput4.setAttribute("name", "pdTotalSum");
+
+                newInput5.setAttribute("type", "hidden");
+                newInput5.setAttribute("value", $("#point").val());  //입력한 포인트
+                newInput5.setAttribute("name", "usedPoint");
+                newInput7.setAttribute("type", "hidden");
+                newInput7.setAttribute("value", JSON.stringify(testArray));
+                newInput7.setAttribute("name", "testArray");
+                frm.appendChild(newInput);
+                frm.appendChild(newInput2);
+                frm.appendChild(newInput3);
+                frm.appendChild(newInput4);
+                frm.appendChild(newInput5);
+                frm.appendChild(newInput6);
+                frm.appendChild(newInput7);
+                document.body.appendChild(frm);
+                frm.submit();
+                var msg = '결제가 완료되었습니다.';
+            } else {
+                var msg = '결제에 실패했습니다.';
+            }
+            alert(msg);
+        });
+    }
+
     //포인트 사용 클릭 시 -> 서버에서 포인트 쓸 수 있는지 확인
     $("#usePointBtn").on("click", function () {
         let inputPoint = Number($("#point").val());//입력한 포인트
@@ -215,7 +320,12 @@
     //배송지 추가 클릭 시
     $("#addBtn").click(function () {
         let id = $("#session").val();
+        let point = $("#point").val();
+        if(point != 0 ){
+            window.open('/product/addDeli?id=${id}&point='+point, '', 'width=500, height=500, left=800, top=250');
+        }else{
         window.open('/product/addDeli?id=${id}', '', 'width=500, height=500, left=800, top=250');
+        }
     })
 
     //배송지 수정 클릭 시
@@ -283,12 +393,10 @@
         })
     })
 
-
     var pd_sum;
     var pd_price;
     //결제 하기 클릭 -> 결제 상세 페이지로 이동
     $("#pay").on("click", function () {
-        // requestPay();
         console.log($("#point").val());
         if ($('input:radio[name=address]').length === 0) {
             alert('배송지를 추가해주세요');
@@ -301,7 +409,7 @@
         }
 
         let productArr = [];
-        let testArray = [];
+
         $(".itemDiv").each(function(){
             let map = new Map();
             let pdSeq = $(this).find("#pdSeq").val();
@@ -310,153 +418,11 @@
             map.set("pdStock",pdStock);
             productArr.push(map);
         })
-
-        console.log(productArr);
-        //결제 내역으로 이동
-        let frm = document.createElement("form");
-        frm.setAttribute("method", "post");
-        frm.setAttribute("action", "/product/paymentDetails");
-        frm.setAttribute("display","none");
-        let newInput = document.createElement("input");
-        let newInput2 = document.createElement("input");
-        let newInput3 = document.createElement("input");
-        let newInput4 = document.createElement("input");
-        let newInput5 = document.createElement("input");
-        let newInput6 = document.createElement("input");
-        let newInput7 = document.createElement("input");
-        newInput.setAttribute("type", "hidden");
-        newInput.setAttribute("value", $("#session").val());
-        newInput.setAttribute("name", "id");
-
-        newInput2.setAttribute("type", "hidden");
-        newInput2.setAttribute("value", $("#totalMoney").val());
-        newInput2.setAttribute("name", "price");
-
-        newInput3.setAttribute("type", "hidden");
-        newInput3.setAttribute("value", $("input[name=address]:checked").val());
-        newInput3.setAttribute("name", "seq");
-
-        newInput4.setAttribute("type", "hidden");
-        newInput4.setAttribute("value", $("#totalSum").val());
-        newInput4.setAttribute("name", "pdTotalSum");
-
-        newInput5.setAttribute("type", "hidden");
-        newInput5.setAttribute("value", $("#point").val());  //입력한 포인트
-        newInput5.setAttribute("name", "usedPoint");
-
-        for (let i = 0; i < productArr.length; i++) {
-            var param = Object.fromEntries(productArr[i]);
-            testArray.push(param);
-        }
-
-        //재고 있는지 확인
-        $.ajax({
-            url:'/product/checkStock',
-            type:'post',
-            async:false,
-            data:{
-                "testArray":JSON.stringify(testArray)
-            },
-            success:function(data){
-                console.log(data);
-                //재고 없으면
-                if(data == false){
-                    alert('재고가 없습니다.');
-                    return false;
-                }
-            }
-        })
-
-
-
-        newInput7.setAttribute("type", "hidden");
-        newInput7.setAttribute("value", JSON.stringify(testArray));
-        newInput7.setAttribute("name", "testArray");
-        frm.appendChild(newInput);
-        frm.appendChild(newInput2);
-        frm.appendChild(newInput3);
-        frm.appendChild(newInput4);
-        frm.appendChild(newInput5);
-        frm.appendChild(newInput6);
-        frm.appendChild(newInput7);
-        document.body.appendChild(frm);
-        frm.submit();
+        requestPay(productArr);
 
     });
 
-    var IMP = window.IMP;
-    IMP.init("imp62163330");
 
-    function requestPay() {
-
-        // $.ajax({
-        //     url:'/product/getTotal',
-        //     type:'post',
-        //     data:{
-        //         "id": $("#session").val()
-        //     },
-        //     async:false,
-        //     success:function(data){
-        //         pd_price = data.price;
-        //         pd_sum = data.total_sum;
-        //     }
-        // })
-        var email = $("#mem_email").val();
-        var name = $("#mem_name").val();
-        var phone = $("#mem_phone").val();
-        var address = $("#defaultAddress").text();
-        var price = $("#totalPrice").val();
-        console.log("price : " + price);
-        if ($("#totalSum").val() != 1) {
-            var title = $(".pdName1").text() + '외 ' + ($("#totalSum").val() - $(".pdCnt1").val());
-        } else {
-            title = $(".pdName1").text();
-        }
-
-        var payInfo = {
-            pg: 'kakaopay',
-            pay_method: 'card',
-            merchant_uid: 'merchant_' + new Date().getTime(),
-            name: title,
-            amount: price,
-            buyer_email: email,
-            buyer_name: name,
-            buyer_tel: phone,
-            buyer_addr: address
-        };
-
-        IMP.request_pay(payInfo, function (rsp) {
-            // if (rsp.success) {
-            //     var msg = '결제가 완료되었습니다.';
-            //     //결제 내역으로 이동
-            //     let frm = document.createElement("form");
-            //     frm.setAttribute("method", "post");
-            //     frm.setAttribute("action", "/product/paymentDetails");
-            //     let newInput = document.createElement("input");
-            //     let newInput2 = document.createElement("input");
-            //     let newInput3 = document.createElement("input");
-            //     newInput.setAttribute("type", "hidden");
-            //     newInput.setAttribute("value", $("#session").val());
-            //     newInput.setAttribute("name", "id");
-            //
-            //     newInput2.setAttribute("type", "hidden");
-            //     newInput2.setAttribute("value", $("#totalMoney").val());
-            //     newInput2.setAttribute("name", "price");
-            //
-            //     newInput3.setAttribute("type", "hidden");
-            //     newInput3.setAttribute("value", $("input[name=address]:checked").val());
-            //     newInput3.setAttribute("name", "seq");
-            //     frm.appendChild(newInput);
-            //     frm.appendChild(newInput2);
-            //     frm.appendChild(newInput3);
-            //     document.body.appendChild(frm);
-            //     frm.submit();
-            // } else {
-            //     var msg = '결제에 실패했습니다.';
-            // }
-            // alert(msg);
-        });
-    }
 </script>
 </body>
 </html>

@@ -12,6 +12,6 @@ public class SalesDTO {
     private Integer stock;
     private Integer price;
     private String pdOption;
-    private Timestamp salesDate;
+    private String salesDate;
     private Integer payPd_seq;
 }

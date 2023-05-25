@@ -28,14 +28,19 @@
         html, body {
             height: 100%;
         }
+
         body {
             display: flex;
             flex-direction: column;
         }
-        .cart, .pagingDiv{
+
+        .cart, .pagingDiv {
             flex: 1 0 auto;
         }
-        #footer{  flex-shrink: 0;}
+
+        #footer {
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
@@ -71,11 +76,15 @@
                                 <td></td>
                             </c:otherwise>
                         </c:choose>
-                        <td style="text-align: center;"><fmt:formatNumber pattern="#,###" value="${i.productDTO.price}"/>원</td>
+                        <td style="text-align: center;"><fmt:formatNumber pattern="#,###"
+                                                                          value="${i.productDTO.price}"/>원
+                        </td>
                         <td style="text-align: center;">${i.productDTO.stock}개</td>
                         <td style="text-align: center">
-                            <button type="button" class="delBtn btn btn-light" value="${i.productDTO.pd_seq}">삭제</button>
-                            <button type="button" class="updBtn btn btn-light" value="${i.productDTO.pd_seq}">수정</button>
+                            <button type="button" class="delBtn btn btn-light" value="${i.productDTO.pd_seq}">삭제
+                            </button>
+                            <button type="button" class="updBtn btn btn-light" value="${i.productDTO.pd_seq}">수정
+                            </button>
                         </td>
                     </tr>
                 </c:forEach>
@@ -105,7 +114,7 @@
 </div>
 
 <!-- Footer-->
-<footer class="py-5 bg-dark" id="footer" >
+<footer class="py-5 bg-dark" id="footer">
     <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
 </footer>
 
@@ -147,7 +156,7 @@
         console.log("needPrev : " + needPrev);
         console.log("needNext : " + needNext);
         console.log("paging : " + paging);
-        console.log(" registeredPd.length : " +  registeredPd.length);
+        console.log(" registeredPd.length : " + registeredPd.length);
 
         for (let i = 0; i < registeredPd.length; i++) {
             var newHtml = createHtml(registeredPd[i], startNavi);
@@ -178,20 +187,20 @@
         console.log(item);
         var Html = '';
         Html = '<tr><td><a href="/product/detail?pd_seq=' + item.productDTO.pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width: 120px; height: 100px;"></a></td>';
-        Html +='<td style="width: 500px; text-align: center">'+item.productDTO.name+'</td>';
+        Html += '<td style="width: 500px; text-align: center">' + item.productDTO.name + '</td>';
         if (item.optionDTOList == null) { //옵션 없을때
             Html += '<td></td>';
         } else { //옵션 있을때
             Html += '<td style="text-align: center">';
             for (let i = 0; i < item.optionDTOList.length; i++) {
-                Html += '<p>' + item.optionDTOList[i].category + ' : ' + item.optionDTOList[i].name + '-'+item.optionDTOList[i].stock +'개</p>';
+                Html += '<p>' + item.optionDTOList[i].category + ' : ' + item.optionDTOList[i].name + '-' + item.optionDTOList[i].stock + '개</p>';
             }
             Html += '</td>';
         }
-        Html += '<td style="text-align: center;">'+item.productDTO.price.toLocaleString()+'원</td>';
-        Html += '<td style="text-align: center;">'+item.productDTO.stock+'개</td>';
-        Html += '<td style="text-align: center"><button type="button" class="delBtn btn btn-light" value="'+item.productDTO.pd_seq+'">삭제</button>';
-        Html += '<button type="button" class="updBtn btn btn-light" value="'+item.productDTO.pd_seq+'">수정</button></td></tr>';
+        Html += '<td style="text-align: center;">' + item.productDTO.price.toLocaleString() + '원</td>';
+        Html += '<td style="text-align: center;">' + item.productDTO.stock + '개</td>';
+        Html += '<td style="text-align: center"><button type="button" class="delBtn btn btn-light" value="' + item.productDTO.pd_seq + '">삭제</button>';
+        Html += '<button type="button" class="updBtn btn btn-light" value="' + item.productDTO.pd_seq + '">수정</button></td></tr>';
         return Html;
     }
 
@@ -214,7 +223,7 @@
         return html;
     }
 
-    function createNext(endNavi,totalPageCount){
+    function createNext(endNavi, totalPageCount) {
         var html = '';
         html += '<a href="javascript:void(0);" onclick="paging(' + (endNavi + 1) + ');">' + ">" + '</a>';
         html += '<a href="javascript:void(0);" onclick="paging(' + (totalPageCount) + ');">' + "맨끝" + '</a>';
@@ -227,11 +236,10 @@
     });
 
     // 상품 삭제 클릭 시
-    $(document).on("click",".delBtn",function(){
+    $(document).on("click", ".delBtn", function () {
         $this = $(this);
-        let cf = confirm('상품을 삭제하시겠습니까?');
         let pd_seq = $(this).val();
-        if (cf === true) {
+        if (confirm('상품을 삭제하시겠습니까?')) {
             console.log(pd_seq);
             $.ajax({
                 url: '/product/deletePd',
@@ -240,9 +248,7 @@
                     "pd_seq": pd_seq
                 },
                 success: function (data) {
-                    if (data == 'success') {
-                        $this.closest(".itemDiv").remove();
-                    }
+                        $this.closest("tr").remove();
                 }
             })
         }
@@ -250,7 +256,7 @@
 
     //상품 수정 클릭 시
 
-    $(document).on("click",".updBtn",function(){
+    $(document).on("click", ".updBtn", function () {
         let pd_seq = $(this).val();
         location.href = '/admin/updProduct?pd_seq=' + pd_seq;
     })

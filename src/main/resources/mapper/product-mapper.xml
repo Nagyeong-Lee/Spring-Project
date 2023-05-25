@@ -52,8 +52,9 @@
         img,
         category
         from product
+<!--        where status = 'Y'-->
         <if test="keyword != null">
-            where LOWER(name) like '%'||#{keyword}||'%'
+          where LOWER(name) like '%'||#{keyword}||'%'
         </if>
         order by 1 desc
         )a) b WHERE rn BETWEEN #{start} AND #{end}
@@ -376,10 +377,15 @@
     </update>
 
     <select id="getPdStock" resultType="Integer">
+<!--        select-->
+<!--        stock-->
+<!--        from product-->
+<!--        where pd_seq=#{pd_seq} and status = 'Y' FOR UPDATE-->
+
         select
         stock
         from product
-        where pd_seq=#{pd_seq} and status = 'Y'
+        where pd_seq=#{pd_seq}  FOR UPDATE
     </select>
 
     <update id="updatePdStatus">
@@ -744,7 +750,8 @@
         img,
         category
         from product
-        where status = 'Y' and
+        where
+<!--        -->
         LOWER(name) like '%'||#{keyword}||'%') a) b WHERE rn BETWEEN #{start} AND #{end}
     </select>
 
@@ -1052,7 +1059,7 @@
         stock,
         price,
         pdOption,
-        to_char(salesDate,'YYYY-MM-DD hh:mm:ss') AS salesDate
+        to_char(salesDate,'YYYY-MM-DD HH24:MI') AS salesDate
         from( SELECT ROWNUM rn, a.* FROM(select
         sales_seq,
         id,
@@ -1107,8 +1114,9 @@
 
     <select id="productCnt" resultType="Integer">
         select count(*) from product
+        where status = 'Y'
         <if test="keyword != null">
-            where LOWER(name) like '%'||#{keyword}||'%'
+            and LOWER(name) like '%'||#{keyword}||'%'
         </if>
     </select>
 

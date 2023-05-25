@@ -124,6 +124,8 @@
             color: white; /* 글자색상 */
             text-align: center; /* 가운데 정렬 */
             padding: 15px; /* 위아래/좌우 패딩 */
+            /*margin-top: 50px;*/
+            margin-bottom: 10px;
         }
 
         #tbody * {
@@ -155,7 +157,7 @@
 <input type="hidden" value="${keyword}" id="key" name="key">
 <input type="hidden" value="${id}" id="id" name="id">
 <%@ include file="/WEB-INF/views/product/pdListUtil.jsp" %>
-<div class="pagingDiv" style="text-align: center;">
+<div class="pagingDiv" style="text-align: center; ">
     <c:if test="${paging.needPrev eq true}">
         <a href="javascript:void(0); onclick=paging(${paging.startNavi-1}});"><</a>
         <a href="javascript:void(0); onclick=paging(1);">맨 처음</a>

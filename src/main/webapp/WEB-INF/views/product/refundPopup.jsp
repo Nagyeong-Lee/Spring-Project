@@ -10,7 +10,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
-    <title>반품 신청</title>
+    <title>환불 신청</title>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
@@ -52,7 +52,7 @@
 <body>
 <input type="hidden" value="${id}" id="id" name="id">
 <input type="hidden" value="${refundPdInfo.PAYPD_SEQ}" id="payPd_seq" name="payPd_seq">
-<h5>반품 신청</h5>
+<h5>환불 신청</h5>
 <div class="popup">
     <form action="" method="post">
         <div class="img">
@@ -100,7 +100,7 @@
                 </c:when>
             </c:choose>
         </div>
-        <button type="button" id="refundBtn" class="btn btn-light">반품 신청</button>
+        <button type="button" id="refundBtn" class="btn btn-light">환불 신청</button>
         <button type="button" id="cancle" class="btn btn-light">취소</button>
     </form>
 </div>
@@ -136,6 +136,7 @@
             success:function(data){
                 console.log(data);
                 window.close();
+                window.opener.location.reload();
                 window.open('/product/noticePopup', '', 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
             }
         })

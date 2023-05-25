@@ -96,7 +96,7 @@
                                 </c:choose>
                             </td>
                             <td colspan="2">
-                                <div class="count" style="text-align: center">
+                                <div class="count" style="text-align: center; ">
                                     <input type="hidden" value="${i.get("price")}" class="pd_price">
                                     <input type="text" style="width: 20px;" value="${i.get("count")}" class="stock"
                                            readonly>
@@ -110,12 +110,12 @@
                                 </div>
                             </td>
                             <input type="hidden" value="${i.get('price')}" class="productPrice">
-                            <td colspan="2" style="text-align: center" style="text-align: center"><span
+                            <td colspan="2"><span style="text-align: center; margin-right: -50px;"
                                     class="price"><fmt:formatNumber pattern="#,###"
                                                                     value="${i.get('totalPrice')}"/>원</span>
                                 <input type="hidden" class="thisPrice" value="${i.get('totalPrice')}">
                             </td>
-                            <td style="text-align: center">
+                            <td style="text-align: center;" colspan="2">
                                 <input type="checkbox" name="delete" value="${i.get('cart_seq')}">
                             </td>
                         </tr>
@@ -292,6 +292,7 @@
             },
             success: function (data) {
                 //구매 가능한 개수 가져옴
+                console.log('구매 가능 개수 : '+data)
                 if (count > data) {
                     alert('구매 가능한 수량이 아닙니다.');
                     --count

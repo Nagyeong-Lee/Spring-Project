@@ -62,6 +62,11 @@ public class ProductController {
         ProductDTO productDTO = productService.getProductDetail(pd_seq); //상품 상세 정보
         List<OptionDTO> optionDTO = productService.getOptions(pd_seq); //상품 옵션 정보
         productService.checkOptionStock(optionDTO);
+        Integer stock = productService.getPdStock(pd_seq);
+        if(stock == 0){
+            //상품 status n으로
+            productService.updatePdStatus(pd_seq);
+        }
         List<String> category = productService.getCategory(pd_seq);//옵션 카테고리
         Map<String, List<OptionListDTO>> optionList = productService.pdDetail(optionDTO, category, pd_seq);
 
@@ -88,6 +93,7 @@ public class ProductController {
         model.addAttribute("reviewInfoList", reviewInfoList);
         model.addAttribute("dashBoardImgs", dashBoardImgs);
         model.addAttribute("qNaList", qNaList);
+        model.addAttribute("stock", stock);
         return "/product/detail";
     }
 
@@ -341,7 +347,6 @@ public class ProductController {
            Integer productPrice = pdPrice * pdArr.get(i).getAsJsonObject().get("count").getAsInt();
            totalPayPrice += productPrice;
            totalPayCount += pdArr.get(i).getAsJsonObject().get("count").getAsInt();
-
 //            //결제하기 후 상품 수량 -
 //            productService.minusPd(pdArr.get(i).getAsJsonObject().get("seq").getAsInt());
         }
@@ -485,13 +490,12 @@ public class ProductController {
         return "success";
     }
 
-    @RequestMapping("/paymentDetails")
+    @RequestMapping("/paymentDetails")   //결제 후 결제정보 보여주기
     @Transactional
 //    public String paymentDetails(Model model, String id, Integer price, String carts, Integer seq, Integer pdTotalSum, Integer usedPoint, @RequestBody List<Map<String,Object>> productArr) throws Exception {
     public String paymentDetails(Model model, String id, Integer price, String carts, Integer seq, Integer pdTotalSum, @RequestParam(required = false) Integer usedPoint, @RequestParam String testArray) throws Exception {
         if(usedPoint == null) usedPoint = 0 ;
         //productArr - 가격
-        System.out.println("testArray = " + testArray);
         JsonParser jsonParser = new JsonParser();
         JsonArray jsonObject2 = (JsonArray) jsonParser.parse(testArray);
         Integer totalPdPrice = 0;
@@ -523,9 +527,7 @@ public class ProductController {
         payService.insertPayInfo(param);
         Integer pay_seq = productService.currPaySeq();//현재 pay_seq
         Timestamp timestamp = productService.getPayDate(pay_seq);
-
         PayInfoDTO payInfoDTO = payService.getPayInfo(pay_seq);//결제 정보 가져오기
-
 
         JsonArray jsonArray = new JsonArray();
         JsonObject jsonObject = new JsonObject();
@@ -603,11 +605,12 @@ public class ProductController {
         //상품 수량, 옵션 수량 변경
         for (int i = 0; i < cartInfo.size(); i++) {
             Integer pd_seq = cartInfo.get(i).getPd_seq();
+            Integer pdStock = productService.getPdStock(pd_seq);    //상품 재고 체크
+            System.out.println("상품재고체크 = " + pdStock);
             Integer count = cartInfo.get(i).getCount();
             //상품 수량 변경
             productService.chgPdCount(pd_seq, count);
-            //상품 수량이 0일때 status n으로
-            Integer pdStock = productService.getPdStock(pd_seq);
+
             if (cartInfo.get(i).getOptions() != null) {
                 Object object = jsonParser.parse(cartInfo.get(i).getOptions());
                 JsonObject jsonObject1 = (JsonObject) object;
@@ -641,6 +644,7 @@ public class ProductController {
             } else if (cartInfo.get(i).getOptions() == null) {
                 //옵션 없을때
                 if (pdStock <= 0) {
+                    //상품 수량이 0일때 status n으로
                     productService.updatePdStatus(pd_seq);
                 }
             }
@@ -650,6 +654,7 @@ public class ProductController {
         productService.updCartStatus(id);
         model.addAttribute("cart", cart);
         model.addAttribute("totalPrice", totalPrice);
+        model.addAttribute("usedPoint", usedPoint);
         model.addAttribute("price", price);
         model.addAttribute("totalSum", totalSum);
         model.addAttribute("defaultAddr", defaultAddr);
@@ -896,7 +901,9 @@ public class ProductController {
     }
 
     @RequestMapping("/addDeli") //배송지 추가
-    public String addDeli(String id) throws Exception {
+    public String addDeli(Model model,String id,@RequestParam(required = false) Integer point) throws Exception {
+        model.addAttribute("id",id);
+        model.addAttribute("point",point);
         return "/product/popup";
         //회원 배송지 정보 가져오기
     }
@@ -911,7 +918,7 @@ public class ProductController {
 
     @ResponseBody
     @PostMapping("/addDelivery")
-    public String addDeli(@RequestParam Map<String, Object> map) throws Exception {
+    public  Map<String, Object>  addDeli(@RequestParam Map<String, Object> map) throws Exception {
 
         String name = map.get("name").toString();
         String phone = map.get("phone").toString();
@@ -919,6 +926,7 @@ public class ProductController {
         String nickname = map.get("nickname").toString();
         String def = map.get("def").toString();
         String id = map.get("id").toString();
+//        Integer point = Integer.parseInt(map.get("point").toString());
         String flag = "N";
         if (def.equals("true")) flag = "Y";
         Map<String, Object> param = new HashMap<>();
@@ -928,10 +936,11 @@ public class ProductController {
         param.put("nickname", nickname);
         param.put("flag", flag);
         param.put("id", id);
+//        param.put("point", point);
         productService.insertDeli(param);  //배송지 추가
         Integer currval = productService.getCurrval();//seq.currval
         if (flag.equals("Y")) productService.updDeliStatus(currval);  //flag Y일때 나머지 n으로 변경
-        return "success";
+        return param;
         //배달 정보에 insert
     }
 

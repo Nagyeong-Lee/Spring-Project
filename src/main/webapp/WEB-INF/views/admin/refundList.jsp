@@ -10,7 +10,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
-    <title>반품 조회</title>
+    <title>환불 조회</title>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
@@ -75,10 +75,10 @@
 <body>
 <%@include file="/WEB-INF/views/admin/adminNavUtil.jsp" %>
 <form action="/admin/approveRefund">
-    <%--    <select name="category">--%>
-    <%--        <option value="exchange" selected>반품/교환</option>--%>
-    <%--        <option value="refund">환불</option>--%>
-    <%--    </select>--%>
+        <select name="category">
+            <option value="refund">환불</option>
+            <option value="exchange" selected>교환</option>
+        </select>
     <table id="table" class="table table-striped">
         <th>이미지</th>
         <th>상품 정보</th>
@@ -101,9 +101,9 @@
                                 ${i.productDTO.name}
                             <c:if test="${i.optionMapList != null}">
                             <c:forEach var="k" items="${i.optionMapList}">
-                            <c:forEach var="j" items="#{k}">
-                            <p>${j.key} : ${j.value}</p>
-                            </c:forEach>
+                                <c:forEach var="j" items="#{k}">
+                                <p>${j.key} : ${j.value}</p>
+                                </c:forEach>
                             </c:forEach>
                             </c:if><br>
                                 ${i.count}개-<fmt:formatNumber value="${i.price}" pattern="#,###"/>원
