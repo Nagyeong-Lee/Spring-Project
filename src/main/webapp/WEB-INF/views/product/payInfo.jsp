@@ -90,7 +90,7 @@
 
         <div class="pointDiv">
             <input type="hidden" name="usablePoint" id="usablePoint" value="${memberPoint}">
-            사용 가능한 포인트 : <fmt:formatNumber value="${memberPoint}" pattern="#,###"/>점
+            나의 포인트 : <fmt:formatNumber value="${memberPoint}" pattern="#,###"/>점
             <br>
             <input type="number" name="point" id="point" min="1" >
             <button type="button" name="usePointBtn" id="usePointBtn" class="btn btn-light">사용하기</button>
@@ -160,6 +160,13 @@
             }
         })
 
+        //결제 금액보다 포인트 사용 많이하면
+        if($("#totalPrice").val()<inputPoint){
+            alert('사용 포인트가 결제 금액보다 클 수 없습니다.');
+            $("#point").val("");
+            return false;
+        }
+
         if(isPointUsable == false){
             alert('사용가능한 포인트가 아닙니다.');
             $("#point").val("");
@@ -191,6 +198,7 @@
         let newForm = document.createElement("form");
         newForm.setAttribute("method", "post");
         newForm.setAttribute("action", "/product/cart");
+        newForm.setAttribute("display", "none");
         let newInput = document.createElement("input");
         newInput.setAttribute("type", "hidden");
         newInput.setAttribute("name", "id");
@@ -308,6 +316,7 @@
         let frm = document.createElement("form");
         frm.setAttribute("method", "post");
         frm.setAttribute("action", "/product/paymentDetails");
+        frm.setAttribute("display","none");
         let newInput = document.createElement("input");
         let newInput2 = document.createElement("input");
         let newInput3 = document.createElement("input");

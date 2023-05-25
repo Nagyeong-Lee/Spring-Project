@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -105,6 +106,15 @@ public class ProductService {
 
     public List<OptionDTO> getOptions(Integer pd_seq) throws Exception { //상품 옵션 가져오기
         return productMapper.getOptions(pd_seq);
+    }
+
+    //옵션 개수 확인
+    public void checkOptionStock(List<OptionDTO> optionDTO) throws Exception {
+        for (OptionDTO dto : optionDTO) {
+            Integer option_seq = dto.getOption_seq();
+            Integer stock = productMapper.checkOptionStockBySeq(option_seq);
+            if (stock == 0) productMapper.updateOptionStatus(option_seq);  //옵션 재고 0이면 status n으로
+        }
     }
 
     public List<String> getCategory(Integer pd_seq) throws Exception { //상품 옵션 가져오기
@@ -644,11 +654,30 @@ public class ProductService {
             Integer payPd_seq = Integer.parseInt(payInfoDTO.get("PAYPD_SEQ").toString());
             PayProductDTO payProductDTO1 = this.getPayProductInfo(pay_seq, pd_seq);
             RefundDTO refundDTO = refundInfo(payPd_seq);
+
+            // 한 번 구매할때 행수
+            Integer payPdCnt = productMapper.getPayPdCnt(pay_seq);
+
             ReviewDTO reviewDTO = pdReviewService.reviewInfo(payPd_seq);//리뷰 상태
+            String deliStatus = "";
+            if (refundDTO != null) {
+                //구매내역 들어갈때마다 반품 처리 배송 완료 되어있는지 확인
+                // shopRefund status = Y -> refund status = Y로 변경
+                deliStatus = productMapper.getDeliStatusByRefundSeq(refundDTO.getRefund_seq());
+            }
+            if (deliStatus != null) {
+                if (deliStatus.equals("Y")) {
+//                productMapper.updRefundStatus(refundDTO.getRefund_seq());
+                    refundDTO.setStatus("Y");
+                }
+            }
+
             if (reviewDTO != null) {
                 map.put("reviewDTO", reviewDTO);
             }
+
             map.put("productDTO", productDTO);
+            map.put("payPdCnt",payPdCnt);
             map.put("refundDTO", refundDTO);
             map.put("price", price);
             map.put("payMethod", payMethod);
@@ -865,7 +894,7 @@ public class ProductService {
         return productMapper.payPdInfo(payPd_seq);
     }
 
-    public ShopRefundDTO refundInfoByPayPd_seq(Integer refund_seq) throws Exception{
+    public ShopRefundDTO refundInfoByPayPd_seq(Integer refund_seq) throws Exception {
         return productMapper.refundInfoByPayPd_seq(refund_seq);
     }
 
@@ -874,53 +903,72 @@ public class ProductService {
         JsonParser jsonParser = new JsonParser();
         List<Object> refundInfoList = new ArrayList<>();
         List<Map<String, Object>> optionMapList = new ArrayList<>();
-        for (RefundDTO dto : refundList) {
-            Map<String, Object> map = new HashMap<>();
-            Integer payPd_seq = dto.getPayPd_seq();
-            PayProductDTO payProductDTO = payPdInfo(payPd_seq);
-            ProductDTO productDTO = productMapper.getPdInfo(payProductDTO.getPd_seq());
-            DeliDTO deliDTO = productMapper.getDeliInfoBySeq(dto.getDeli_seq());
-            String phone = deliDTO.getPhone().substring(0, 3) + "-" + deliDTO.getPhone().substring(3,7) + "-" + deliDTO.getPhone().substring(7, 11);
-            deliDTO.setPhone(phone);
-            ShopRefundDTO shopRefundDTO = refundInfoByPayPd_seq(dto.getRefund_seq());
-            if(shopRefundDTO != null){
-                if(shopRefundDTO.getDeliStatus().equals("Y")){   //교환 반품 -> 배송완료되면 refundDTO status Y로 변경
-                    productMapper.updRefundStatus(dto.getRefund_seq()); //refundDTO status Y로 변경
-                    //포인트 환불
-                    //
+        if (refundList != null) {
+            for (RefundDTO dto : refundList) {
+                Map<String, Object> map = new HashMap<>();
+                Integer payPd_seq = dto.getPayPd_seq();
+                PayProductDTO payProductDTO = payPdInfo(payPd_seq);
+                ProductDTO productDTO = productMapper.getPdInfo(payProductDTO.getPd_seq());
+                DeliDTO deliDTO = productMapper.getDeliInfoBySeq(dto.getDeli_seq());
+                String phone = deliDTO.getPhone().substring(0, 3) + "-" + deliDTO.getPhone().substring(3, 7) + "-" + deliDTO.getPhone().substring(7, 11);
+                deliDTO.setPhone(phone);
+                ShopRefundDTO shopRefundDTO = refundInfoByPayPd_seq(dto.getRefund_seq());
+//                if (shopRefundDTO != null) {
+//                    if (shopRefundDTO.getDeliStatus().equals("Y")) {   //교환 반품 -> 배송완료되면 refundDTO status Y로 변경
+////                    productMapper.updRefundStatus(dto.getRefund_seq()); //refundDTO status Y로 변경
+//                        //포인트 환불
+//                        //
+//                    }
+//                }
+                RefundDetailDTO refundDetailDTO = productMapper.getRefundDetail(payPd_seq);
+                Integer payTotalSum = refundDetailDTO.getPayTotalSum();  //전체 구매 개수
+                Integer refundPdCount = refundDetailDTO.getRefundPdCount(); //환불 신청한 상품 개수
+                Integer originalPdPrice = refundDetailDTO.getOriginalPdPrice(); //환불 신청한 상품 원래 가격
+                Integer refundPoint = 0; //환불받을 포인트
+                if (refundDetailDTO.getUsedPoint() != 0) {
+                    refundPoint = Math.round(refundDetailDTO.getUsedPoint() / payTotalSum);
                 }
-            }
-            map.put("shopRefundDTO",shopRefundDTO);
-            map.put("content", dto.getContent());
-            map.put("applyDate", dto.getApplyDate());
-            map.put("deliSeq", dto.getDeli_seq());
-            map.put("id", dto.getId());
-            map.put("count", payProductDTO.getCount());
-            map.put("pd_seq", payProductDTO.getPd_seq());
-            map.put("payPd_seq", dto.getPayPd_seq());
-            map.put("refund_seq", dto.getRefund_seq());
-            Integer price = payProductDTO.getCount() * productDTO.getPrice();
-            map.put("price", price);
-            map.put("productDTO", productDTO);
-            map.put("deliDTO", deliDTO);
-            //옵션 있으면
-            Map<String, Object> optionMap = null;
-            if (payProductDTO.getOptions() != null) {
-                Object object = jsonParser.parse((String) payProductDTO.getOptions());
-                JsonObject jsonObject = (JsonObject) object;
-                JsonArray jsonArray = (JsonArray) jsonObject.get("name");
-                for (int i = 0; i < jsonArray.size(); i++) {
-                    optionMap = new HashMap<>();
-                    //size = s
-                    String optName = jsonArray.get(i).toString().replace("\"", "");
-                    String optCategory = this.getOptCategory(payProductDTO.getPd_seq(), optName); //옵션 카테고리 이름 가져오기 (size)
-                    optionMap.put(optCategory, optName);
-                    optionMapList.add(optionMap);
+                Integer refundMoney = originalPdPrice * refundPdCount - refundPoint;
+                map.put("refundPoint", refundPoint); //환불받을 포인트
+                map.put("refundMoney", refundMoney); //환불받을 돈
+                map.put("shopRefundDTO", shopRefundDTO);
+                map.put("content", dto.getContent());
+                map.put("applyDate", dto.getApplyDate());
+                map.put("deliSeq", dto.getDeli_seq());
+                map.put("id", dto.getId());
+                map.put("count", payProductDTO.getCount());
+                map.put("pd_seq", payProductDTO.getPd_seq());
+                map.put("payPd_seq", dto.getPayPd_seq());
+                map.put("refund_seq", dto.getRefund_seq());
+                Integer price = payProductDTO.getCount() * productDTO.getPrice();
+                map.put("price", price);
+                map.put("productDTO", productDTO);
+                map.put("deliDTO", deliDTO);
+
+                //멤버 포인트 다시 증가시킴
+                productMapper.increaseMemPoint(dto.getId(), refundPoint);
+
+                //옵션 있으면
+                Map<String, Object> optionMap = null;
+                if (payProductDTO.getOptions() != null) {
+                    Object object = jsonParser.parse((String) payProductDTO.getOptions());
+                    JsonObject jsonObject = (JsonObject) object;
+                    JsonArray jsonArray = (JsonArray) jsonObject.get("name");
+                    for (int i = 0; i < jsonArray.size(); i++) {
+                        optionMap = new HashMap<>();
+                        //size = s
+                        String optName = jsonArray.get(i).toString().replace("\"", "");
+                        String optCategory = this.getOptCategory(payProductDTO.getPd_seq(), optName); //옵션 카테고리 이름 가져오기 (size)
+                        optionMap.put(optCategory, optName);
+                        optionMapList.add(optionMap);
+                    }
+                    map.put("optionMapList", optionMapList);
                 }
-                map.put("optionMapList", optionMapList);
+                refundInfoList.add(map);
             }
-            refundInfoList.add(map);
         }
+
+
         return refundInfoList;
     }
 }

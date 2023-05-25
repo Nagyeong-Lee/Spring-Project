@@ -77,6 +77,7 @@
             <c:when test="${!empty historyList}">
                 <c:set var="paySeq" value="0"/>
                 <c:forEach var="i" items="${historyList}" varStatus="status">
+                    ${i.pay_seq}-${i.count}
                     <c:set var="loop_flag" value="false"/>
                     <tr>
                         <td><a href="/product/detail?pd_seq=${i.productDTO.pd_seq}"><img
@@ -97,12 +98,12 @@
                         </td>
                         <c:if test="${i.pay_seq != paySeq}">
                             <c:set var="paySeq" value="${i.pay_seq}"/>
-                            <td style="text-align: center;" rowspan="${i.count}">
+                            <td style="text-align: center;" rowspan="${i.payPdCnt}">
                                 <p>받는 사람 : ${i.deliDTO.name}</p>
                                 <p>전화번호 : ${i.deliDTO.phone}</p>
                                 <p>주소 : ${i.deliDTO.address}</p>
                             </td>
-                            <td style="text-align: center" rowspan="${i.count}">
+                            <td style="text-align: center" rowspan="${i.payPdCnt}">
                                 <p>결제 일자 : ${i.payDate}</p>
                                 <p>결제 방법 : ${i.payMethod}</p>
                                 <p>결제 금액 : <fmt:formatNumber pattern="#,###" value="${i.price}"/>원</p>
@@ -126,12 +127,17 @@
                                                     style="font-size: 13px;">
                                                 <input type="hidden" value="${i.reviewDTO.review_seq}">리뷰 수정하기
                                             </button>
-                                            <c:if test="${i.refundDTO.status != 'Y'}">
-                                            <button type="button" class="btn btn-light refund">반품</button>
-                                            </c:if>
-                                            <c:if test="${i.refundDTO.status == 'Y'}">
-                                                <button type="button" class="btn btn-light refund" disabled>반품 처리중</button>
-                                            </c:if>
+                                            <c:choose>
+                                                <c:when test="${i.refundDTO.status == 'M'}">
+                                                    <button type="button" class="btn btn-light refund" disabled>반품 처리중</button>
+                                                </c:when>
+                                                <c:when test="${i.refundDTO.status == 'Y'}">
+                                                    <button type="button" class="btn btn-light refund" disabled>반품 완료</button>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <button type="button" class="btn btn-light refund">반품하기</button>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </c:when>
                                         <c:otherwise>
                                             <button type="button" class="reviewBtn btn btn-light"
@@ -145,7 +151,7 @@
                                                     <button type="button" class="btn btn-light refund" disabled>반품 완료</button>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <button type="button" class="btn btn-light refund">반품</button>
+                                                    <button type="button" class="btn btn-light refund">반품하기</button>
                                                 </c:otherwise>
                                             </c:choose>
                                         </c:otherwise>
@@ -158,7 +164,7 @@
             </c:when>
             <c:otherwise>
                 <tr>
-                    <td colspan="5">구매 내역이 없습니다.</td>
+                    <td colspan="5" style="text-align: center;">구매 내역이 없습니다.</td>
                 </tr>
             </c:otherwise>
         </c:choose>

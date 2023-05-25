@@ -313,7 +313,6 @@ public class AdminController {
             ProductDTO productDTO = productService.getPdInfo(salesDTO.getPd_seq());//상품 관련 정보
             param.put("productDTO", productDTO);
             Integer pdStock = productService.getPdStock(salesDTO.getPd_seq());//판매하고 남은 상품 개수
-            System.out.println("tq = " + pdStock);
             param.put("pdStock", pdStock);
             param.put("deliYN", payProductDTO.getDeliYN());
             param.put("code", payProductDTO.getCode());
@@ -451,8 +450,7 @@ public class AdminController {
         List<Object> refundInfoList = productService.getRefundInfo(refundDTOList);
         model.addAttribute("paging", paging);
         model.addAttribute("refundInfoList", refundInfoList);
-
-        //     SELECT * FROM PAYINFO p  WHERE PAY_SEQ  IN (SELECT pay_seq FROM PAYPRODUCT p WHERE PAYPD_SEQ = 176); 가격,개수,사용포인트 가져옴
+        // SELECT * FROM PAYINFO p  WHERE PAY_SEQ  IN (SELECT pay_seq FROM PAYPRODUCT p WHERE PAYPD_SEQ = 176); 가격,개수,사용포인트 가져옴
         // 사용포인트 있으면  사용포인트/개수
         //현금도 상품원래 가격 - ( 사용포인트/개수) 한거 반환
         return "/admin/refundList";

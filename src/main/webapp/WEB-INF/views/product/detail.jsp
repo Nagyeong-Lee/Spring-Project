@@ -104,7 +104,7 @@
         상품명 : ${productDTO.name}<br>
         상품 소개 : ${productDTO.description}<br>
         가격 : <fmt:formatNumber value="${productDTO.price}" type="number"/>원<br>
-        재고 : <span id="totalStock">${productDTO.stock}</span>개<br>
+<%--        재고 : <span id="totalStock">${productDTO.stock}</span>개<br>--%>
         포인트 적립률 : ${productDTO.point}%
     </div>
 </div>
@@ -117,10 +117,7 @@
     <c:when test="${!empty optionList}">
         <div style="margin-left: 1190px;">
             <c:choose>
-                <c:when test="${productDTO.stock == 0}">
-                    <div style="font-weight: bold">품절된 상품입니다.</div>
-                </c:when>
-                <c:otherwise>
+                <c:when test="${productDTO.stock > 0}">
                     <c:forEach var="i" items="${optionList}" varStatus="status">
                         <select name="${i.key}">
                             <option value="option" class="option">--option--</option>
@@ -136,20 +133,23 @@
                             </c:forEach>
                         </select>
                     </c:forEach>
+                </c:when>
+                <c:otherwise>
+                    <div style="font-weight: bold;">품절된 상품입니다.</div>
                 </c:otherwise>
             </c:choose>
         </div>
     </c:when>
     <c:otherwise>
-        <c:if test="${productDTO.stock == 0}">
-            <div style="font-weight: bold; text-align: center;">품절된 상품입니다.</div>
+        <c:if test="${productDTO.stock < 0}">
+            <div style="font-weight: bold; ">품절된 상품입니다.</div>
         </c:if>
     </c:otherwise>
 </c:choose>
 
 
 <c:choose>
-    <c:when test="${productDTO.stock != 0}">
+    <c:when test="${productDTO.stock > 0}">
         <div class="count" style="margin-left: 1180px;">
             <input type="text" style="width: 40px;" value="0" id="count" readonly>
             <button style="width: 30px;" id="plus" class="btn btn-light">+</button>
@@ -502,6 +502,7 @@
     });
     $("#addItems").on("click", function () {
         let test = false;
+        let pdStock = $("#originalTotalStock").val();
         if ($("#optionYN").val() != 0) {
             if (changFlag == false) {
                 alert('옵션을 선택해주세요.');
@@ -514,6 +515,10 @@
             }
             if ($("#count").val() == 0) { //수량 0일때
                 alert('수량을 1개 이상 선택해주세요.');
+                return;
+            }
+            if($("#count").val() > pdStock){
+                alert('재고보다 수량이 클 수 없습니다.');
                 return;
             }
             let regex = /([A-Za-z0-9]+\(\d+\))/g;

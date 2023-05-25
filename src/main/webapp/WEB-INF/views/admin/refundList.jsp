@@ -75,10 +75,10 @@
 <body>
 <%@include file="/WEB-INF/views/admin/adminNavUtil.jsp" %>
 <form action="/admin/approveRefund">
-<%--    <select name="category">--%>
-<%--        <option value="exchange" selected>반품/교환</option>--%>
-<%--        <option value="refund">환불</option>--%>
-<%--    </select>--%>
+    <%--    <select name="category">--%>
+    <%--        <option value="exchange" selected>반품/교환</option>--%>
+    <%--        <option value="refund">환불</option>--%>
+    <%--    </select>--%>
     <table id="table" class="table table-striped">
         <th>이미지</th>
         <th>상품 정보</th>
@@ -89,8 +89,9 @@
         <th></th>
         <c:choose>
             <c:when test="${!empty refundInfoList}">
-                <tr>
-                    <c:forEach var="i" items="${refundInfoList}">
+
+                <c:forEach var="i" items="${refundInfoList}">
+                    <tr>
                         <input type="hidden" value="${i.payPd_seq}" id="payPd_seq" name="payPd_seq">
                         <input type="hidden" value="${i.refund_seq}" id="refund_seq" name="refund_seq">
                         <td>
@@ -104,14 +105,15 @@
                             <p>${j.key} : ${j.value}</p>
                             </c:forEach>
                             </c:forEach>
-                            </c:if>
+                            </c:if><br>
                                 ${i.count}개-<fmt:formatNumber value="${i.price}" pattern="#,###"/>원
                         <td>
                                 ${i.content}
                         </td>
-                        <%--반환 금액 및 포인트--%>
+                            <%--반환 금액 및 포인트--%>
                         <td>
-
+                            <p>반환 포인트 : ${i.refundPoint}점</p>
+                            <p>반환 금액 : <fmt:formatNumber pattern="#,###" value="${i.refundMoney}"/>원</p>
                         </td>
                         <td>${i.applyDate}</td>
                         <td>
@@ -122,15 +124,16 @@
                         <td>
                             <c:choose>
                                 <c:when test="${i.shopRefundDTO.status == 'Y'}">
-                                    <button type="button" id="cplApproveBtn" class="btn btn-light" disabled>승인 완료</button>
+                                    <button type="button" id="cplApproveBtn" class="btn btn-light" disabled>승인 완료
+                                    </button>
                                 </c:when>
                                 <c:otherwise>
                                     <button type="button" id="approveBtn" class="btn btn-light">승인</button>
                                 </c:otherwise>
                             </c:choose>
                         </td>
-                    </c:forEach>
-                </tr>
+                    </tr>
+                </c:forEach>
             </c:when>
         </c:choose>
     </table>

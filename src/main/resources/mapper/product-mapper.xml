@@ -53,7 +53,7 @@
         category
         from product
         <if test="keyword != null">
-            and LOWER(name) like '%'||#{keyword}||'%'
+            where LOWER(name) like '%'||#{keyword}||'%'
         </if>
         order by 1 desc
         )a) b WHERE rn BETWEEN #{start} AND #{end}
@@ -1307,4 +1307,51 @@
     <update id="updRefundStatus">
         update refund set status = 'Y' where refund_seq = #{refund_seq}
     </update>
+
+    <select id="getDeliStatusByRefundSeq" resultType="String">
+        SELECT deliStatus FROM shopRefund WHERE refund_seq IN  ( SELECT refund_seq FROM refund WHERE refund_seq = #{refund_seq})
+    </select>
+
+    <select id="getRefundDetail" resultType="com.example.Spring_Project.dto.RefundDetailDTO">
+        SELECT
+            pd.price AS originalPdPrice,
+            pay_seq,
+            payTotalPrice,
+            payTotalSum,
+            usedPoint,
+            a.pd_seq,
+            OPTIONS,
+            refundPdCount
+        FROM product pd JOIN (
+            SELECT
+                p.pay_seq,
+                i.price AS payTotalPrice,
+                i.count AS payTotalSum,
+                usedPoint,
+                p.pd_seq,
+                OPTIONS,
+                p.count AS refundPdCount
+        FROM payInfo i JOIN (
+            SELECT
+                pd_seq,
+                OPTIONS,
+                count,
+                pay_seq
+            FROM payProduct  WHERE payPd_seq = #{payPd_seq}) p ON i.pay_seq = p.pay_seq) a ON pd.PD_SEQ  = a.pd_seq
+    </select>
+
+    <update id="increaseMemPoint">
+        update
+            member
+        set point = #{refundPoint}
+        where id = #{id}
+    </update>
+
+    <select id="checkOptionStockBySeq" resultType="Integer">
+        select stock from options where option_seq = #{option_seq}
+    </select>
+
+    <select id="getPayPdCnt" resultType="Integer">
+        SELECT count(*) FROM payProduct WHERE pay_seq = #{pay_seq}
+    </select>
 </mapper>

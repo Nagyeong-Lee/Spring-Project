@@ -61,6 +61,7 @@ public class ProductController {
     public String detail(Model model, Integer pd_seq) throws Exception {
         ProductDTO productDTO = productService.getProductDetail(pd_seq); //상품 상세 정보
         List<OptionDTO> optionDTO = productService.getOptions(pd_seq); //상품 옵션 정보
+        productService.checkOptionStock(optionDTO);
         List<String> category = productService.getCategory(pd_seq);//옵션 카테고리
         Map<String, List<OptionListDTO>> optionList = productService.pdDetail(optionDTO, category, pd_seq);
 

@@ -155,7 +155,7 @@ public class PdReviewService {
         JsonArray jsonArray = new JsonArray();
         List<Map<String, Object>> reviewInfoList = new ArrayList<>();
         List<Map<String, Object>> optionMapList = null;
-//        if (reviewDTO != null) {
+        if (reviewDTO != null) {
             for (ReviewDTO dto : reviewDTO) {
                 Map<String, Object> map = new HashMap<>();
                 Integer review_seq = dto.getReview_seq();
@@ -190,8 +190,9 @@ public class PdReviewService {
                 map.put("imgSysname", imgSysname);
                 reviewInfoList.add(map);
             }
-            return reviewInfoList;
-//        }
+//            return reviewInfoList;
+        }
+        return reviewInfoList;
     }
 
     public String optionCategory(Integer pd_seq, String optName) throws Exception {

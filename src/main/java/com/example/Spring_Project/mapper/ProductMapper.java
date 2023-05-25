@@ -74,6 +74,7 @@ public interface ProductMapper {
 
     OptionDTO getOptionStock(Map<String, Object> map);
 
+    Integer checkOptionStockBySeq(@Param("option_seq") Integer option_seq);
     Integer updateOptionStatus(@Param("option_seq") Integer option_seq);
 
     Integer updatePdStatus(@Param("pd_seq") Integer pd_seq);
@@ -294,4 +295,8 @@ public interface ProductMapper {
     PayProductDTO payPdInfo(@Param("payPd_seq") Integer payPd_seq);
     ShopRefundDTO refundInfoByPayPd_seq(@Param("refund_seq") Integer refund_seq);
     void updRefundStatus(@Param("refund_seq") Integer refund_seq);
+    String getDeliStatusByRefundSeq(@Param("refund_seq") Integer refund_seq);
+    RefundDetailDTO getRefundDetail(@Param("payPd_seq") Integer payPd_seq);
+    void increaseMemPoint(@Param("id") String id,@Param("refundPoint") Integer refundPoint);
+    Integer getPayPdCnt(@Param("pay_seq") Integer pay_seq);
 }
