@@ -369,7 +369,7 @@
             status,
             pd_seq
         from options
-        where pd_seq=#{pd_seq} and name=#{option}
+        where pd_seq=#{pd_seq} and name=#{option} FOR UPDATE
     </select>
 
     <update id="updateOptionStatus">
@@ -1361,5 +1361,13 @@
 
     <select id="getPayPdCnt" resultType="Integer">
         SELECT count(*) FROM payProduct WHERE pay_seq = #{pay_seq}
+    </select>
+
+    <select id="isPdInCart" resultType="Integer">
+        select count(*) from cart where status = 'Y' and id = #{id} and pd_seq = #{pd_seq}
+    </select>
+
+    <select id="isPdInCartWtOpt" resultType="Integer">
+        select count(*) from cart where status = 'Y' and id = #{id} and pd_seq = #{pd_seq} and options = #{options}
     </select>
 </mapper>

@@ -444,24 +444,27 @@
     //옵션,상품 개수 변경
     $("#pay").on("click", function () {
 
-
         var testArr = [];
         var productArr = new Array();
         //List<Map> 뒷단에서 가격 계산
+        let totalPayCnt = 0;
         $(".itemDiv").each(function () {
             let count = $(this).closest(".itemDiv").find(".chgedCnt").val(); //구매할 상품 수량
             let seq = $(this).closest(".itemDiv").find(".seq").val(); //구매할 상품 seq
             let map = new Map();
-            console.log(count);
+
             map.set("count", Number(count));
             map.set("seq", Number(seq));
             testArr.push(map);
         })
 
+
         console.log(testArr);
         for (let i = 0; i < testArr.length; i++) {
             productArr.push(Object.fromEntries(testArr[i]));
         }
+
+        console.log(productArr);
 
         var buyPdSeq = []; //구매할 cart_seq 담을 배열
 

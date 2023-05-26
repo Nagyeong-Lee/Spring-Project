@@ -498,6 +498,8 @@
             }
         }
     });
+
+    //담기
     $("#addItems").on("click", function () {
         let test = false;
         let pdStock = $("#originalTotalStock").val();
@@ -528,6 +530,7 @@
             for (let i = 0; i < numbers.length; i++) {
                 integerArray2.push(numbers[i]);
             }
+
             var cnt = $("#count").val(); //수량
             var id = $("#id").val(); //아이디
             var pd_seq = $("#pd_seq").val(); //상품 seq
@@ -540,10 +543,15 @@
                     "pd_seq": pd_seq,
                     "optionList": integerArray2.toString()
                 },
+                async:false,
                 success: function (data) {
+                    console.log(data);
                     if (data == 'success') {
                         alert('상품을 장바구니에 추가했습니다.');
                         $("#frm").submit();
+                    }else if(data == 'fail'){
+                        alert('이미 장바구니에 추가된 상품입니다.장바구니에서 확인해주세요.');
+                        return false;
                     }
                 }
             });
@@ -567,10 +575,14 @@
                     "id": id,
                     "pd_seq": pd_seq
                 },
+                async:false,
                 success: function (data) {
                     if (data == 'success') {
                         alert('상품을 장바구니에 추가했습니다.');
                         $("#frm").submit();
+                    }else if(data == 'fail'){
+                        alert('이미 장바구니에 추가된 상품입니다.장바구니에서 확인해주세요.');
+                        return false;
                     }
                 }
             });

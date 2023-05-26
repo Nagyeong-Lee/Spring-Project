@@ -146,6 +146,9 @@ public class ProductService {
         productMapper.insertCartWtOption(id, count, pd_seq);
     }
 
+    public Integer isPdInCart(Integer pd_seq,String id) throws Exception{
+        return productMapper.isPdInCart(pd_seq,id);
+    }
     public void minusOption(Integer pd_seq, String optionName) throws Exception {
         productMapper.minusOption(pd_seq, optionName);
     }
@@ -792,6 +795,7 @@ public class ProductService {
     }
 
 
+
     //pd 재고 count
     public Integer count(Map<String, Object> cartOption, Integer cart_seq) throws Exception {
         int stock = 0;
@@ -970,5 +974,9 @@ public class ProductService {
 
 
         return refundInfoList;
+    }
+
+    public Integer isPdInCartWtOpt(Integer pd_seq, String options,String id) throws Exception{
+        return productMapper.isPdInCartWtOpt(pd_seq,options,id);
     }
 }

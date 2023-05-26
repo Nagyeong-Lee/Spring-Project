@@ -216,17 +216,39 @@ public class ProductController {
     @ResponseBody
     @PostMapping("/addProduct")
     public String addProduct(@RequestParam Map<String, Object> map) throws Exception {
+        String result = "";
         Integer count = Integer.parseInt(map.get("count").toString());
         String id = map.get("id").toString();
         Integer pd_seq = Integer.parseInt(map.get("pd_seq").toString());
 
-        if (map.get("optionList") != null) { //옵션 있을때
+
+        //옵션 있을때
+        if (map.get("optionList") != null) {
             Map<String, List<String>> optionList = productService.getOptionList(map);
-            productService.insertCart(id, count, pd_seq, optionList.toString());  //옵션 있을때 장바구니 insert
-        } else if (map.get("optionList") == null) { //옵션 없을때
-            productService.insertCartWtOption(id, count, pd_seq);
+            System.out.println("optionList.toString() " + optionList.toString());
+            //상품seq,옵션 정보 같은거 있으면 fail
+            Integer isPdInCartWtOpt = productService.isPdInCartWtOpt(pd_seq, optionList.toString(), id);
+            if (isPdInCartWtOpt != 0) {
+                result = "fail";
+            }
+            //상품seq,옵션 정보 다르면 success / cart  insert
+            else {
+                productService.insertCart(id, count, pd_seq, optionList.toString());  //옵션 있을때 장바구니 insert
+                result = "success";
+            }
         }
-        return "success";
+        //옵션 없을때
+        else if (map.get("optionList") == null) {
+            // 상품seq 같은거 있으면 fail
+            Integer isPdInCart = productService.isPdInCart(pd_seq, id);
+            if (isPdInCart != 0) {
+                result = "fail";
+            } else {
+                productService.insertCartWtOption(id, count, pd_seq);
+                result = "success";
+            }
+        }
+        return result;
     }
 
     //장바구니로 이동

@@ -299,4 +299,6 @@ public interface ProductMapper {
     RefundDetailDTO getRefundDetail(@Param("payPd_seq") Integer payPd_seq);
     void increaseMemPoint(@Param("id") String id,@Param("refundPoint") Integer refundPoint);
     Integer getPayPdCnt(@Param("pay_seq") Integer pay_seq);
+    Integer isPdInCart(@Param("pd_seq") Integer pd_seq,@Param("id") String id);
+    Integer isPdInCartWtOpt(@Param("pd_seq") Integer pd_seq, @Param("options") String options,@Param("id") String id);
 }
