@@ -111,8 +111,8 @@
                             </td>
                             <input type="hidden" value="${i.get('price')}" class="productPrice">
                             <td colspan="2"><span style="text-align: center; margin-right: -50px;"
-                                    class="price"><fmt:formatNumber pattern="#,###"
-                                                                    value="${i.get('totalPrice')}"/>원</span>
+                                                  class="price"><fmt:formatNumber pattern="#,###"
+                                                                                  value="${i.get('totalPrice')}"/>원</span>
                                 <input type="hidden" class="thisPrice" value="${i.get('totalPrice')}">
                             </td>
                             <td style="text-align: center;" colspan="2">
@@ -137,7 +137,7 @@
     <hr>
     <br>
     <hr id="priceHr">
-    <div class="pointDiv"  style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="pointDiv" style="margin-bottom: 20px; margin-top: 20px;">
         <h5>나의 포인트 : <fmt:formatNumber value="${memPoint}" pattern="#,###"/>점</h5>
     </div>
     <span style="text-align: right" id="sum"> 총 수량 : ${totalSum}개</span><br>
@@ -278,7 +278,8 @@
         var count = $this.closest(".count").find(".stock").val();
         count++
         $this.closest(".count").find(".stock").val(count);
-        updateCnt();
+
+        // updateCnt();
         //가격 변경
         var totalPrice = $this.closest(".count").find(".pd_price").val() * count;
         var price = $this.closest(".itemDiv").find(".price").text(totalPrice.toLocaleString() + '원');
@@ -292,12 +293,15 @@
             },
             success: function (data) {
                 //구매 가능한 개수 가져옴
-                console.log('구매 가능 개수 : '+data)
+                console.log('구매 가능 개수 : ' + data)
                 if (count > data) {
                     alert('구매 가능한 수량이 아닙니다.');
                     --count
                     $this.closest(".count").find(".stock").val(count);
                     $this.hide();
+                    let changedPrice = count * checkedPrice;
+                    $("#sum").text('총 수량 : ' + count + '개');
+                    $("#total").text('총 합계 : ' + changedPrice.toLocaleString() + '원');
                 } else {
                     $this.closest(".itemDiv").find(".chgCnt").text('수량 : ' + count);
                     $this.closest(".itemDiv").find(".chgedCnt").val(count);//해당 상품 수량 변경
@@ -305,6 +309,7 @@
                 }
             }
         });
+        updateCnt();
         //수량 update
         $.ajax({
             url: '/product/updCount',
@@ -314,6 +319,7 @@
                 "cart_seq": cart_seq
             },
             success: function (data) {
+
             }
         });
     })
@@ -324,6 +330,8 @@
         $(".buyPdSeq:checked").each(function () {
             totalMoney += $(this).closest(".itemDiv").find(".productPrice").val() * parseInt($(this).parent().parent().find(".stock").val());  //총 합계
             countTotal += parseInt($(this).parent().parent().find(".stock").val()); //총 수량
+            console.log('totalMoney ' + totalMoney);
+            console.log('countTotal ' + countTotal);
         });
         console.log('토탈 : ' + countTotal);
         console.log('totalMoney : ' + totalMoney);
@@ -435,6 +443,7 @@
     //결제하기 버튼 클릭
     //옵션,상품 개수 변경
     $("#pay").on("click", function () {
+
 
         var testArr = [];
         var productArr = new Array();

@@ -362,12 +362,12 @@
 
     <select id="getOptionStock" resultType="com.example.Spring_Project.dto.OptionDTO">
         select
-        option_seq,
-        category,
-        name,
-        stock,
-        status,
-        pd_seq
+            option_seq,
+            category,
+            name,
+            stock,
+            status,
+            pd_seq
         from options
         where pd_seq=#{pd_seq} and name=#{option}
     </select>

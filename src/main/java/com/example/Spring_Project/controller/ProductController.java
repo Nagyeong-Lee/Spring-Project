@@ -63,10 +63,10 @@ public class ProductController {
         List<OptionDTO> optionDTO = productService.getOptions(pd_seq); //상품 옵션 정보
         productService.checkOptionStock(optionDTO);
         Integer stock = productService.getPdStock(pd_seq);
-        if(stock == 0){
-            //상품 status n으로
-            productService.updatePdStatus(pd_seq);
-        }
+//        if(stock == 0){
+//            //상품 status n으로
+//            productService.updatePdStatus(pd_seq);
+//        }
         List<String> category = productService.getCategory(pd_seq);//옵션 카테고리
         Map<String, List<OptionListDTO>> optionList = productService.pdDetail(optionDTO, category, pd_seq);
 
@@ -299,7 +299,7 @@ public class ProductController {
 
         //나의 포인트 가져오기
         Integer memPoint = productService.getMemPoint(id);
-        model.addAttribute("memPoint",memPoint);
+        model.addAttribute("memPoint", memPoint);
         return "/product/cart";
     }
 
@@ -336,17 +336,17 @@ public class ProductController {
     }
 
     @RequestMapping("/payInfo") //결제하기
-    public String toPayInfo(Model model, String data, Integer price, String buyPdSeq,String productArr) throws Exception { //data : id
+    public String toPayInfo(Model model, String data, Integer price, String buyPdSeq, String productArr) throws Exception { //data : id
         JsonParser jsonParser = new JsonParser();
         System.out.println("productArr = " + productArr);
         JsonArray pdArr = (JsonArray) jsonParser.parse(productArr);
         Integer totalPayPrice = 0;
         Integer totalPayCount = 0;
-        for(int i = 0 ; i<pdArr.size(); i++){
-           Integer pdPrice = productService.getPdPrice(pdArr.get(i).getAsJsonObject().get("seq").getAsInt());
-           Integer productPrice = pdPrice * pdArr.get(i).getAsJsonObject().get("count").getAsInt();
-           totalPayPrice += productPrice;
-           totalPayCount += pdArr.get(i).getAsJsonObject().get("count").getAsInt();
+        for (int i = 0; i < pdArr.size(); i++) {
+            Integer pdPrice = productService.getPdPrice(pdArr.get(i).getAsJsonObject().get("seq").getAsInt());
+            Integer productPrice = pdPrice * pdArr.get(i).getAsJsonObject().get("count").getAsInt();
+            totalPayPrice += productPrice;
+            totalPayCount += pdArr.get(i).getAsJsonObject().get("count").getAsInt();
 //            //결제하기 후 상품 수량 -
 //            productService.minusPd(pdArr.get(i).getAsJsonObject().get("seq").getAsInt());
         }
@@ -381,7 +381,7 @@ public class ProductController {
             totalSum += count;
 
             //포인트 적립
-            point = (double) Math.round(pd_price * productDTO.getPoint() *count / 100);
+            point = (double) Math.round(pd_price * productDTO.getPoint() * count / 100);
             memPoint += point;
             System.out.println("point = " + point);
             System.out.println("memPoint = " + memPoint);
@@ -417,16 +417,20 @@ public class ProductController {
             }
         }
 
+
         MemberDTO memberDTO = memberService.getMemInfo(data);
         //배송지 불러오기 (별칭으로)
         List<DeliDTO> deliDTOList = productService.getDeliveryInfo(data);
-        for(DeliDTO dto : deliDTOList){
-            String phone = dto.getPhone().substring(0,3)+"-"+dto.getPhone().substring(3,7)+"-"+dto.getPhone().substring(7,11);
+        for (
+                DeliDTO dto : deliDTOList) {
+            String phone = dto.getPhone().substring(0, 3) + "-" + dto.getPhone().substring(3, 7) + "-" + dto.getPhone().substring(7, 11);
             dto.setPhone(phone);
         }
+
         List<DeliDTO> deliveryInfo = productService.deliveryInfo(data);
-        for(DeliDTO dto : deliveryInfo){
-            String phone = dto.getPhone().substring(0,3)+"-"+dto.getPhone().substring(3,7)+"-"+dto.getPhone().substring(7,11);
+        for (
+                DeliDTO dto : deliveryInfo) {
+            String phone = dto.getPhone().substring(0, 3) + "-" + dto.getPhone().substring(3, 7) + "-" + dto.getPhone().substring(7, 11);
             dto.setPhone(phone);
         }
 
@@ -448,9 +452,9 @@ public class ProductController {
         model.addAttribute("totalPayPrice", totalPayPrice);  // 최종 결제할 금액
         model.addAttribute("totalPayCount", totalPayCount); // 최종 결제할 수량
 
-
         return "/product/payInfo";
     }
+
 
     //포인트 사용가능한지 검사
     @ResponseBody
@@ -460,9 +464,9 @@ public class ProductController {
         System.out.println("inputPoint = " + inputPoint);
         System.out.println("id = " + id);
         Integer memPoint = productService.getMemPoint(id);
-        if(inputPoint == 0){
+        if (inputPoint == 0) {
             result = false;
-        }else if (memPoint >= inputPoint) {
+        } else if (memPoint >= inputPoint) {
             result = true;
         } else {
             result = false;
@@ -494,7 +498,7 @@ public class ProductController {
     @Transactional
 //    public String paymentDetails(Model model, String id, Integer price, String carts, Integer seq, Integer pdTotalSum, Integer usedPoint, @RequestBody List<Map<String,Object>> productArr) throws Exception {
     public String paymentDetails(Model model, String id, Integer price, String carts, Integer seq, Integer pdTotalSum, @RequestParam(required = false) Integer usedPoint, @RequestParam String testArray) throws Exception {
-        if(usedPoint == null) usedPoint = 0 ;
+        if (usedPoint == null) usedPoint = 0;
         //productArr - 가격
         JsonParser jsonParser = new JsonParser();
         JsonArray jsonObject2 = (JsonArray) jsonParser.parse(testArray);
@@ -507,7 +511,7 @@ public class ProductController {
             Integer pdPrice = productService.getPdPrice(pdSeq);
             totalPdPrice += pdPrice * pdStock;
             double percent = productService.getPercent(pdSeq);
-            totalNewPoint +=  pdStock*pdPrice*percent/100;
+            totalNewPoint += pdStock * pdPrice * percent / 100;
         }
         totalPdPrice -= usedPoint;
         //기본 배송지 수정
@@ -515,7 +519,7 @@ public class ProductController {
         productService.updStatus(seq);
 
         DeliDTO defaultAddr = productService.getDefaultAddr();
-        String phone = defaultAddr.getPhone().substring(0,3)+"-"+defaultAddr.getPhone().substring(3,7)+"-"+defaultAddr.getPhone().substring(7,11);
+        String phone = defaultAddr.getPhone().substring(0, 3) + "-" + defaultAddr.getPhone().substring(3, 7) + "-" + defaultAddr.getPhone().substring(7, 11);
         defaultAddr.setPhone(phone);
         //결제 테이블에 인서트
         Map<String, Object> param = new HashMap<>();
@@ -587,7 +591,7 @@ public class ProductController {
                 cart.add(item);
             } else if (cartInfo.get(i).getOptions() == null) {
                 cart.add(item);
-                productService.insertPayPd(cartInfo.get(i).getPd_seq(), pay_seq,cartInfo.get(i).getCount());//결제한 상품
+                productService.insertPayPd(cartInfo.get(i).getPd_seq(), pay_seq, cartInfo.get(i).getCount());//결제한 상품
             }
 
             //판매 테이블에 인서트할 map (상품당 insert)
@@ -629,7 +633,6 @@ public class ProductController {
                     map.put("count", count);
                     //상품 수량이 0일때 status n으로
                     OptionDTO optionStock = productService.getOptionStock(map);
-
                     if (optionStock.getStock() <= 0) {
                         //옵션 있고 옵션 수량이 0일때
                         productService.updateOptionStatus(optionStock.getOption_seq());
@@ -643,7 +646,8 @@ public class ProductController {
                 }
             } else if (cartInfo.get(i).getOptions() == null) {
                 //옵션 없을때
-                if (pdStock <= 0) {
+                Integer changedPdStock = productService.getPdStock(pd_seq);    //상품 재고 체크
+                if (changedPdStock <= 0) {
                     //상품 수량이 0일때 status n으로
                     productService.updatePdStatus(pd_seq);
                 }
@@ -661,7 +665,7 @@ public class ProductController {
         model.addAttribute("payInfoDTO", payInfoDTO);
         model.addAttribute("totalPdPrice", totalPdPrice); // 총 결제 금액 (포인트뺀거)
 //        Integer memPoint = productService.getMemPoint(id); //멤버 포인트 조회
-        productService.updMemPoint(id,usedPoint,totalNewPoint); // 멤버 포인트 변경
+        productService.updMemPoint(id, usedPoint, totalNewPoint); // 멤버 포인트 변경
 
         //적립될 포인트
         model.addAttribute("totalNewPoint", totalNewPoint);// 적립될 포인트
@@ -901,9 +905,9 @@ public class ProductController {
     }
 
     @RequestMapping("/addDeli") //배송지 추가
-    public String addDeli(Model model,String id,@RequestParam(required = false) Integer point) throws Exception {
-        model.addAttribute("id",id);
-        model.addAttribute("point",point);
+    public String addDeli(Model model, String id, @RequestParam(required = false) Integer point) throws Exception {
+        model.addAttribute("id", id);
+        model.addAttribute("point", point);
         return "/product/popup";
         //회원 배송지 정보 가져오기
     }
@@ -918,7 +922,7 @@ public class ProductController {
 
     @ResponseBody
     @PostMapping("/addDelivery")
-    public  Map<String, Object>  addDeli(@RequestParam Map<String, Object> map) throws Exception {
+    public Map<String, Object> addDeli(@RequestParam Map<String, Object> map) throws Exception {
 
         String name = map.get("name").toString();
         String phone = map.get("phone").toString();
@@ -949,7 +953,7 @@ public class ProductController {
     @PostMapping("/getSeqDeli")
     public DeliDTO getSeqDeli(Integer seq) throws Exception {
         DeliDTO deliDTO = productService.getSeqDeli(seq);
-        String phone = deliDTO.getPhone().substring(0,3)+"-"+deliDTO.getPhone().substring(3,7)+"-"+deliDTO.getPhone().substring(7,11);
+        String phone = deliDTO.getPhone().substring(0, 3) + "-" + deliDTO.getPhone().substring(3, 7) + "-" + deliDTO.getPhone().substring(7, 11);
         deliDTO.setPhone(phone);
         return deliDTO;
     }
@@ -1154,54 +1158,54 @@ public class ProductController {
     public String chgDeliveryStatus(@RequestParam Map<String, Object> data) throws Exception {
         Integer sales_seq = Integer.parseInt(data.get("sales_seq").toString()); //sales_seq
         Integer courierCode = productService.getCourierCode(data.get("courier").toString()); //택배사 이름
-        String postNum =  data.get("invoiceNum").toString(); //택배사 이름
-        productService.updDeliveryStatus(sales_seq, courierCode,postNum); //sales table -> payPdSeq
+        String postNum = data.get("invoiceNum").toString(); //택배사 이름
+        productService.updDeliveryStatus(sales_seq, courierCode, postNum); //sales table -> payPdSeq
         return "success";
     }
 
 
     @PostMapping("/refundPopup")  //교환 신청 팝업으로 이동
-    public String toRefundPopup(Model model,@RequestParam Map<String,Object>map) throws Exception{
+    public String toRefundPopup(Model model, @RequestParam Map<String, Object> map) throws Exception {
         String id = map.get("id").toString();
-        Map<String,Object> refundPdInfo  = productService.refundPdInfo(map);//교환할 상품 정보
+        Map<String, Object> refundPdInfo = productService.refundPdInfo(map);//교환할 상품 정보
         ProductDTO productDTO = productService.getPdInfo(Integer.parseInt(refundPdInfo.get("PD_SEQ").toString()));
         Integer pdPrice = Integer.parseInt(refundPdInfo.get("PRICE").toString());
         Integer count = Integer.parseInt(refundPdInfo.get("COUNT").toString());
-        Integer price = pdPrice*count; //상품가격*개수
-        if(refundPdInfo.get("OPTIONS") != null){
+        Integer price = pdPrice * count; //상품가격*개수
+        if (refundPdInfo.get("OPTIONS") != null) {
             List<Map<String, Object>> optionList = productService.refundPdWithOpt(refundPdInfo); //옵션 있으면 옵션 정보 가공해서 다시 가져옴
-            model.addAttribute("optionList",optionList);
+            model.addAttribute("optionList", optionList);
         }
         //배송지 불러오기 (별칭으로)
         List<DeliDTO> deliDTOList = productService.getDeliveryInfo(id);
-        for(DeliDTO dto : deliDTOList){
-            String phone = dto.getPhone().substring(0,3)+"-"+dto.getPhone().substring(3,7)+"-"+dto.getPhone().substring(7,11);
+        for (DeliDTO dto : deliDTOList) {
+            String phone = dto.getPhone().substring(0, 3) + "-" + dto.getPhone().substring(3, 7) + "-" + dto.getPhone().substring(7, 11);
             dto.setPhone(phone);
         }
-        model.addAttribute("productDTO",productDTO);
-        model.addAttribute("refundPdInfo",refundPdInfo);
-        model.addAttribute("deliDTOList",deliDTOList);
-        model.addAttribute("deliDTOList",deliDTOList);
-        model.addAttribute("price",price);
+        model.addAttribute("productDTO", productDTO);
+        model.addAttribute("refundPdInfo", refundPdInfo);
+        model.addAttribute("deliDTOList", deliDTOList);
+        model.addAttribute("deliDTOList", deliDTOList);
+        model.addAttribute("price", price);
         return "/product/refundPopup";
     }
 
     @ResponseBody
     @PostMapping("/refund")  //refund 테이블에 인서트
-    public String refundPd(@RequestParam Map<String,Object> param) throws Exception{
+    public String refundPd(@RequestParam Map<String, Object> param) throws Exception {
         System.out.println("param = " + param);
         productService.insertRefund(param);
         return "success";
     }
 
     @RequestMapping("noticePopup") // 교환 신청 클릭 시 안내 팝업 띄움
-    public String toNoticePopup() throws Exception{
+    public String toNoticePopup() throws Exception {
         return "/product/noticePopup";
     }
 
     @ResponseBody
     @PostMapping("/checkStock")
-    public boolean checkStock(@RequestParam String testArray) throws Exception{
+    public boolean checkStock(@RequestParam String testArray) throws Exception {
         boolean result = false;
         JsonParser jsonParser = new JsonParser();
         JsonArray jsonObject2 = (JsonArray) jsonParser.parse(testArray);
@@ -1210,9 +1214,9 @@ public class ProductController {
             Integer pdSeq = jsonObject1.get("pdSeq").getAsInt();
             Integer pdStock = jsonObject1.get("pdStock").getAsInt();
             Integer productCnt = productService.getPdStock(pdSeq);//해당 상품 재고 가져오기
-            if(pdStock <= productCnt){
-                result =  true;
-            }else{
+            if (pdStock <= productCnt) {
+                result = true;
+            } else {
                 result = false;
                 break;
             }

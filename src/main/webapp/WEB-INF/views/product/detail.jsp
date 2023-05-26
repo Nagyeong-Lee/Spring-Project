@@ -104,7 +104,7 @@
         상품명 : ${productDTO.name}<br>
         상품 소개 : ${productDTO.description}<br>
         가격 : <fmt:formatNumber value="${productDTO.price}" type="number"/>원<br>
-<%--        재고 : <span id="totalStock">${productDTO.stock}</span>개<br>--%>
+        <%--        재고 : <span id="totalStock">${productDTO.stock}</span>개<br>--%>
         포인트 적립률 : ${productDTO.point}%
     </div>
 </div>
@@ -119,28 +119,28 @@
     </c:when>
     <c:otherwise>
         <div style="margin-left: 1190px;">
-<%--            <c:choose>--%>
-<%--                <c:when test="${productDTO.stock > 0}">--%>
-                    <c:forEach var="i" items="${optionList}" varStatus="status">
-                        <select name="${i.key}">
-                            <option value="option" class="option">--option--</option>
-                            <c:forEach var="k" items="${i.value}">
-                                <c:choose>
-                                    <c:when test="${k.status eq 'N'}"> <%--품절일때--%>
-                                        <option value="${k.name}" disabled="disabled">${k.name}(${k.stock})</option>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <option value="${k.name}">${k.name}(${k.stock})</option>
-                                    </c:otherwise>
-                                </c:choose>
-                            </c:forEach>
-                        </select>
+                <%--            <c:choose>--%>
+                <%--                <c:when test="${productDTO.stock > 0}">--%>
+            <c:forEach var="i" items="${optionList}" varStatus="status">
+                <select name="${i.key}">
+                    <option value="option" class="option">--option--</option>
+                    <c:forEach var="k" items="${i.value}">
+                        <c:choose>
+                            <c:when test="${k.status eq 'N'}"> <%--품절일때--%>
+                                <option value="${k.name}" disabled="disabled">${k.name}(${k.stock})</option>
+                            </c:when>
+                            <c:otherwise>
+                                <option value="${k.name}">${k.name}(${k.stock})</option>
+                            </c:otherwise>
+                        </c:choose>
                     </c:forEach>
-<%--                </c:when>--%>
-<%--                <c:otherwise>--%>
-<%--                    <div style="font-weight: bold;">품절된 상품입니다.</div>--%>
-<%--                </c:otherwise>--%>
-<%--            </c:choose>--%>
+                </select>
+            </c:forEach>
+                <%--                </c:when>--%>
+                <%--                <c:otherwise>--%>
+                <%--                    <div style="font-weight: bold;">품절된 상품입니다.</div>--%>
+                <%--                </c:otherwise>--%>
+                <%--            </c:choose>--%>
         </div>
     </c:otherwise>
 </c:choose>
@@ -501,24 +501,26 @@
     $("#addItems").on("click", function () {
         let test = false;
         let pdStock = $("#originalTotalStock").val();
+
         if ($("#optionYN").val() != 0) {
             if (changFlag == false) {
                 alert('옵션을 선택해주세요.');
-                return;
+                return false;
             }
             let str = optionCount;
             if (str.indexOf("--option--") != -1) {
                 alert('옵션을 모두 선택해주세요');
-                return;
+                return false;
             }
-            if ($("#count").val() == 0) { //수량 0일때
+            if (Number($("#count").val()) == 0) { //수량 0일때
                 alert('수량을 1개 이상 선택해주세요.');
-                return;
+                return false;
             }
-            if($("#count").val() > pdStock){
+            if (Number($("#count").val()) > pdStock) {
                 alert('재고보다 수량이 클 수 없습니다.');
-                return;
+                return false;
             }
+
             let regex = /([A-Za-z0-9]+\(\d+\))/g;
             var numbers = str.match(regex);
             let count = parseInt($("#count").val());
@@ -549,6 +551,10 @@
             if ($("#count").val() == 0) { //수량 0일때
                 alert('수량을 1개 이상 선택해주세요.');
                 return;
+            }
+            if ($("#count").val() > pdStock) {
+                alert('재고보다 많이 구매할 수 없습니다.');
+                return false;
             }
             var cnt = $("#count").val(); //수량
             var id = $("#id").val(); //아이디
