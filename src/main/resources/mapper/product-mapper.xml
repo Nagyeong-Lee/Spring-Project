@@ -91,7 +91,9 @@
     </select>
 
     <select id="getWOuter" resultType="com.example.Spring_Project.dto.ProductDTO">
-        SELECT   name,
+        SELECT
+        pd_seq,
+        name,
         description,
         price,
         stock,
@@ -369,7 +371,7 @@
             status,
             pd_seq
         from options
-        where pd_seq=#{pd_seq} and name=#{option} FOR UPDATE
+        where pd_seq=#{pd_seq} and name=#{option} FOR UPDATE wait 10
     </select>
 
     <update id="updateOptionStatus">
@@ -385,7 +387,7 @@
         select
         stock
         from product
-        where pd_seq=#{pd_seq}  FOR UPDATE
+        where pd_seq=#{pd_seq} FOR UPDATE wait 10
     </select>
 
     <update id="updatePdStatus">
@@ -1240,9 +1242,23 @@
             #{id},
             #{payPd_seq},
             #{content},
+            null,
+            'M',
+            sysdate,
+            'refund'
+        )
+    </insert>
+
+    <insert id="insertExchange" parameterType="map">
+        insert into refund values(
+            refund_seq.nextval,
+            #{id},
+            #{payPd_seq},
+            #{content},
             #{deli_seq},
             'M',
-            sysdate
+            sysdate,
+            'exchange'
         )
     </insert>
 
@@ -1254,13 +1270,21 @@
             content,
             deli_seq,
             status,
-            applyDate
+            applyDate,
+            type
         from refund
-        where payPd_seq = #{payPd_seq}
+        where payPd_seq = #{payPd_seq} and status not in 'N'
     </select>
 
     <select id="refundCount" resultType="Integer">
         select count(*) from refund
+    </select>
+
+    <select id="refundCntByType" resultType="Integer">
+        select count(*) from refund
+        <if test="type != 'all'.toString()">
+            where type = #{type}
+        </if>
     </select>
 
     <select id="refundList" resultType="com.example.Spring_Project.dto.RefundDTO">
@@ -1271,7 +1295,8 @@
             content,
             deli_seq,
             status,
-            applyDate
+            applyDate,
+            type
         from( SELECT ROWNUM rn, a.* FROM(
             select
                 refund_seq,
@@ -1280,11 +1305,50 @@
                 content,
                 deli_seq,
                 status,
-                to_char(applyDate,'YYYY-DD-MM HH24:MI') AS applyDate
+                to_char(applyDate,'YYYY-DD-MM HH24:MI') AS applyDate,
+                type
             from refund
+            where status not in  'N'
             ORDER BY 7 DESC) a)
             where rn between #{start} and #{end}
     </select>
+
+    <select id="refundListByType" resultType="com.example.Spring_Project.dto.RefundDTO">
+        SELECT
+        refund_seq,
+        id,
+        payPd_seq,
+        content,
+        deli_seq,
+        status,
+        applyDate,
+        type
+        from( SELECT ROWNUM rn, a.* FROM(
+        select
+        refund_seq,
+        id,
+        payPd_seq,
+        content,
+        deli_seq,
+        status,
+        to_char(applyDate,'YYYY-DD-MM HH24:MI') AS applyDate,
+        type
+        from refund
+        where status not in  'N'
+        <if test="type != 'all'.toString()">
+            and type = #{type}
+        </if>
+        ORDER BY 7 DESC) a)
+        where rn between #{start} and #{end}
+    </select>
+
+
+
+
+
+
+
+
 
     <select id="payPdInfo" resultType="com.example.Spring_Project.dto.PayProductDTO">
         select
@@ -1309,12 +1373,12 @@
             postNum,
             deliStatus
         from shopRefund
-        where refund_seq = #{refund_seq}
+        where refund_seq = #{refund_seq} and status not in 'N'
     </select>
 
-    <update id="updRefundStatus">
-        update refund set status = 'Y' where refund_seq = #{refund_seq}
-    </update>
+<!--    <update id="updRefundStatus">-->
+<!--        update refund set status = 'Y' where refund_seq = #{refund_seq}-->
+<!--    </update>-->
 
     <select id="getDeliStatusByRefundSeq" resultType="String">
         SELECT deliStatus FROM shopRefund WHERE refund_seq IN  ( SELECT refund_seq FROM refund WHERE refund_seq = #{refund_seq})
@@ -1369,5 +1433,68 @@
 
     <select id="isPdInCartWtOpt" resultType="Integer">
         select count(*) from cart where status = 'Y' and id = #{id} and pd_seq = #{pd_seq} and options = #{options}
+    </select>
+
+    <select id="isRefundApprove" resultType="Integer">
+        select count(*) from shopRefund where refund_seq = #{refund_seq}
+    </select>
+
+    <select id="refundData" resultType="Hashmap">
+        SELECT    a.pay_seq,
+        a.payPd_seq,
+        a.pd_seq,
+        a.OPTIONS,
+        a.payDate,
+        a.payMethod,
+        a.count,
+        a.price,
+        a.id,
+        r.content,
+        r.content,
+        r.applyDate,
+        r.status
+        FROM refund r JOIN (
+        SELECT
+        a.pay_seq,
+        a.payPd_seq,
+        a.pd_seq,
+        a.OPTIONS,
+        a.payDate,
+        a.payMethod,
+        a.count,
+        p.price,
+        a.id
+        FROM product p JOIN (
+        SELECT
+        pi.pay_seq,
+        pp.payPd_seq,
+        pp.pd_seq,
+        pp.options,
+        id,
+        to_char(payDate,'YYYY-MM-DD HH24:MI') AS payDate,
+        payMethod,
+        pp.count
+        FROM payInfo pi JOIN (
+        SELECT
+        payPd_seq,
+        pay_seq,
+        pd_seq,
+        options,
+        count
+        FROM payProduct
+        WHERE payPd_seq = #{payPdSeq}) pp
+        on pi.pay_seq = pp.pay_seq) a on p.pd_seq = a.pd_seq) a ON a.payPd_seq = r.payPd_seq where r.status not in 'N'
+    </select>
+
+    <update id="updRefundStatus">
+        update refund set status = 'N' where payPd_seq = #{payPd_seq}
+    </update>
+
+    <update id="chgRefundStatus">
+        update refund set status = 'Y' where payPd_seq = #{payPd_seq} and refund_seq = #{refund_seq}
+    </update>
+
+    <select id="refundYN" resultType="Integer">
+        select count(*) from refund where payPd_seq = #{payPd_seq} and status not in 'N'
     </select>
 </mapper>

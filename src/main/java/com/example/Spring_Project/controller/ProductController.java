@@ -946,6 +946,7 @@ public class ProductController {
     @PostMapping("/addDelivery")
     public Map<String, Object> addDeli(@RequestParam Map<String, Object> map) throws Exception {
 
+
         String name = map.get("name").toString();
         String phone = map.get("phone").toString();
         String address = map.get("address").toString();
@@ -1039,29 +1040,29 @@ public class ProductController {
     }
 
     @ResponseBody
+    @PostMapping("/historyRepaging")
+    public Map<String, Object> historyRepaging(Integer cpage, String id, String keyword) throws Exception {
+        Map<String, Object> reMap = new HashMap<>();
+        if (cpage == null) cpage = 1;
+        Map<String, Object> paging = productService.historyPaging(cpage, id);
+        Integer naviPerPage = 10;
+        Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage);
+        Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
+        Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
+        //리뷰 상태 가져오기
+        List<Map<String, Object>> historyList = new ArrayList<>();
+        List<Map<String, Object>> payInfoDTOS = productService.getHistory(id, start, end);
+        //옵션 정보 가져오기
+        historyList = productService.pdOptionInfo(payInfoDTOS);
+        reMap.put("historyList", historyList);
+        reMap.put("paging", paging);
+        return reMap;
+    }
+
+    @ResponseBody
     @PostMapping("/rePaging")
     public Map<String, Object> rePaging(Integer cpage, String id, String keyword) throws Exception {
-//        List<Map<String, Object>> historyList = new ArrayList<>();
-//        Integer naviPerPage = 10;
-//        Map<String, Object> pagingStartEnd = productService.pagingStartEnd(cpage, naviPerPage);
-//        Integer start = Integer.parseInt(pagingStartEnd.get("start").toString());
-//        Integer end = Integer.parseInt(pagingStartEnd.get("end").toString());
-
         Map<String, Object> reMap = new HashMap<>();
-//        List<Map<String, Object>> payInfoDTOS = productService.getHistory(id, start, end);
-//        Map<String, Object> paging = productService.historyPaging(cpage,id);
-//        reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));
-//        reMap.put("endNavi", Integer.parseInt(paging.get("endNavi").toString()));
-//        reMap.put("needPrev", Boolean.parseBoolean(paging.get("needPrev").toString()));
-//        reMap.put("needNext", Boolean.parseBoolean(paging.get("needNext").toString()));
-//        reMap.put("paging", paging);
-//        reMap.put("cpage", Integer.parseInt(paging.get("cpage").toString()));
-//
-//        //옵션 정보 가져오기
-//        historyList = productService.pdOptionInfo(payInfoDTOS);
-//        reMap.put("historyList", historyList);
-
-
         Integer postCnt = productService.countRegisteredPd(); //상품 개수
         Map<String, Object> paging = productService.paging(cpage, postCnt);
         Integer naviPerPage = 10;
@@ -1186,7 +1187,7 @@ public class ProductController {
     }
 
 
-    @PostMapping("/refundPopup")  //교환 신청 팝업으로 이동
+    @PostMapping("/refundPopup")  //환불 신청 팝업으로 이동
     public String toRefundPopup(Model model, @RequestParam Map<String, Object> map) throws Exception {
         String id = map.get("id").toString();
         Map<String, Object> refundPdInfo = productService.refundPdInfo(map);//교환할 상품 정보
@@ -1212,11 +1213,129 @@ public class ProductController {
         return "/product/refundPopup";
     }
 
+
+    @PostMapping("/exchangePopup")  //교환 신청 팝업으로 이동
+    public String exchangePopup(Model model, @RequestParam Map<String, Object> map) throws Exception {
+        String id = map.get("id").toString();
+        Map<String, Object> refundPdInfo = productService.refundPdInfo(map);//교환할 상품 정보
+        ProductDTO productDTO = productService.getPdInfo(Integer.parseInt(refundPdInfo.get("PD_SEQ").toString()));
+        Integer pdPrice = Integer.parseInt(refundPdInfo.get("PRICE").toString());
+        Integer count = Integer.parseInt(refundPdInfo.get("COUNT").toString());
+        Integer price = pdPrice * count; //상품가격*개수
+        if (refundPdInfo.get("OPTIONS") != null) {
+            List<Map<String, Object>> optionList = productService.refundPdWithOpt(refundPdInfo); //옵션 있으면 옵션 정보 가공해서 다시 가져옴
+            model.addAttribute("optionList", optionList);
+        }
+        //배송지 불러오기 (별칭으로)
+        List<DeliDTO> deliDTOList = productService.getDeliveryInfo(id);
+        for (DeliDTO dto : deliDTOList) {
+            String phone = dto.getPhone().substring(0, 3) + "-" + dto.getPhone().substring(3, 7) + "-" + dto.getPhone().substring(7, 11);
+            dto.setPhone(phone);
+        }
+        model.addAttribute("productDTO", productDTO);
+        model.addAttribute("refundPdInfo", refundPdInfo);
+        model.addAttribute("deliDTOList", deliDTOList);
+        model.addAttribute("deliDTOList", deliDTOList);
+        model.addAttribute("price", price);
+        return "/product/exchangePopup";
+    }
+
+
+
+    @PostMapping("/cancleRefundPopup") //환불 취소 창으로 이동
+    public String cancleRefundPopup(Model model, @RequestParam Map<String, Object> map) throws Exception {
+        String id = map.get("id").toString();
+        Map<String, Object> refundPdInfo = productService.refundData(map);//교환할 상품 정보
+        ProductDTO productDTO = productService.getPdInfo(Integer.parseInt(refundPdInfo.get("PD_SEQ").toString()));
+        Integer pdPrice = Integer.parseInt(refundPdInfo.get("PRICE").toString());
+        Integer count = Integer.parseInt(refundPdInfo.get("COUNT").toString());
+        Integer price = pdPrice * count; //상품가격*개수
+        if (refundPdInfo.get("OPTIONS") != null) {
+            List<Map<String, Object>> optionList = productService.refundPdWithOpt(refundPdInfo); //옵션 있으면 옵션 정보 가공해서 다시 가져옴
+            model.addAttribute("optionList", optionList);
+        }
+//        //배송지 불러오기 (별칭으로)
+//        List<DeliDTO> deliDTOList = productService.getDeliveryInfo(id);
+//        for (DeliDTO dto : deliDTOList) {
+//            String phone = dto.getPhone().substring(0, 3) + "-" + dto.getPhone().substring(3, 7) + "-" + dto.getPhone().substring(7, 11);
+//            dto.setPhone(phone);
+//        }
+        model.addAttribute("productDTO", productDTO);
+        model.addAttribute("refundPdInfo", refundPdInfo);
+//        model.addAttribute("deliDTOList", deliDTOList);
+        model.addAttribute("price", price);
+        return "/product/cancleRefundPopup";
+    }
+
     @ResponseBody
-    @PostMapping("/refund")  //refund 테이블에 인서트
+    @PostMapping("/cancleRefund")
+    public String cancleRefund( @RequestParam Map<String, Object> param) throws Exception{
+        //환불 신청한거 status n으로 변경
+        Integer payPd_seq  = Integer.parseInt(param.get("payPd_seq").toString());
+        productService.updRefundStatus(payPd_seq);
+        return "success";
+    }
+    @ResponseBody
+    @PostMapping("/refund")  //refund 테이블에 인서트 환불
     public String refundPd(@RequestParam Map<String, Object> param) throws Exception {
         System.out.println("param = " + param);
         productService.insertRefund(param);
+        return "success";
+    }
+
+    @ResponseBody
+    @PostMapping("/cancleExchange")
+    public String cancleExchange( @RequestParam Map<String, Object> param) throws Exception{
+        //환불 신청한거 status n으로 변경
+        Integer payPd_seq  = Integer.parseInt(param.get("payPd_seq").toString());
+        productService.updRefundStatus(payPd_seq);
+        return "success";
+    }
+    @PostMapping("/cancleExchangePopup") //교환 취소 창으로 이동
+    public String cancleExchange(Model model, @RequestParam Map<String, Object> map) throws Exception {
+        String id = map.get("id").toString();
+        Map<String, Object> refundPdInfo = productService.refundData(map);//교환할 상품 정보
+        ProductDTO productDTO = productService.getPdInfo(Integer.parseInt(refundPdInfo.get("PD_SEQ").toString()));
+        Integer pdPrice = Integer.parseInt(refundPdInfo.get("PRICE").toString());
+        Integer count = Integer.parseInt(refundPdInfo.get("COUNT").toString());
+        Integer price = pdPrice * count; //상품가격*개수
+        if (refundPdInfo.get("OPTIONS") != null) {
+            List<Map<String, Object>> optionList = productService.refundPdWithOpt(refundPdInfo); //옵션 있으면 옵션 정보 가공해서 다시 가져옴
+            model.addAttribute("optionList", optionList);
+        }
+        //배송지 불러오기 (별칭으로)
+        List<DeliDTO> deliDTOList = productService.getDeliveryInfo(id);
+        for (DeliDTO dto : deliDTOList) {
+            String phone = dto.getPhone().substring(0, 3) + "-" + dto.getPhone().substring(3, 7) + "-" + dto.getPhone().substring(7, 11);
+            dto.setPhone(phone);
+        }
+        model.addAttribute("productDTO", productDTO);
+        model.addAttribute("refundPdInfo", refundPdInfo);
+        model.addAttribute("deliDTOList", deliDTOList);
+        model.addAttribute("price", price);
+        return "/product/cancleExchangePopup";
+    }
+
+    @ResponseBody
+    @PostMapping("/refundYN")
+    public String refundYN(@RequestParam Map<String, Object> param) throws Exception {
+        String result="";
+        String id = param.get("id").toString();
+        Integer payPd_seq  = Integer.parseInt(param.get("payPdSeq").toString());
+        Integer count = productService.refundYN(payPd_seq);
+        if(count != 0){
+            result = "Y";
+        }else{
+            result = "N";
+        }
+        return result;
+    }
+
+    @ResponseBody
+    @PostMapping("/exchange")  //refund 테이블에 인서트 교환
+    public String exchange(@RequestParam Map<String, Object> param) throws Exception {
+        System.out.println("param = " + param);
+        productService.insertExchange(param);
         return "success";
     }
 

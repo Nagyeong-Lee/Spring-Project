@@ -86,6 +86,7 @@
             text-align: center; /* 가운데 정렬 */
             padding: 15px; /* 위아래/좌우 패딩 */
         }
+
     </style>
 </head>
 <body>

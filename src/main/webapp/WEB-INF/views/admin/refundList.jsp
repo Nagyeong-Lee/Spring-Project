@@ -75,23 +75,25 @@
 <body>
 <%@include file="/WEB-INF/views/admin/adminNavUtil.jsp" %>
 <form action="/admin/approveRefund">
-        <select name="category">
-            <option value="refund">환불</option>
-            <option value="exchange" selected>교환</option>
-        </select>
+    <select name="category" id="type">
+        <option value="all" selected>전체</option>
+        <option value="refund">환불</option>
+        <option value="exchange">교환</option>
+    </select>
     <table id="table" class="table table-striped">
-        <th>이미지</th>
-        <th>상품 정보</th>
-        <th>사유</th>
-        <th>반환 금액/포인트</th>
-        <th>신청 일자</th>
-        <th>배송 정보</th>
-        <th></th>
+        <thead>
+            <th>이미지</th>
+            <th>상품 정보</th>
+            <th>사유</th>
+            <th>반환 금액/포인트</th>
+            <th>신청 일자</th>
+            <th>배송 정보</th>
+            <th></th>
+        </thead>
         <c:choose>
             <c:when test="${!empty refundInfoList}">
-
                 <c:forEach var="i" items="${refundInfoList}">
-                    <tr>
+                    <tr class="data">
                         <input type="hidden" value="${i.payPd_seq}" id="payPd_seq" name="payPd_seq">
                         <input type="hidden" value="${i.refund_seq}" id="refund_seq" name="refund_seq">
                         <td>
@@ -101,9 +103,9 @@
                                 ${i.productDTO.name}
                             <c:if test="${i.optionMapList != null}">
                             <c:forEach var="k" items="${i.optionMapList}">
-                                <c:forEach var="j" items="#{k}">
-                                <p>${j.key} : ${j.value}</p>
-                                </c:forEach>
+                            <c:forEach var="j" items="#{k}">
+                            <p>${j.key} : ${j.value}</p>
+                            </c:forEach>
                             </c:forEach>
                             </c:if><br>
                                 ${i.count}개-<fmt:formatNumber value="${i.price}" pattern="#,###"/>원
@@ -112,14 +114,18 @@
                         </td>
                             <%--반환 금액 및 포인트--%>
                         <td>
-                            <p>반환 포인트 : ${i.refundPoint}점</p>
-                            <p>반환 금액 : <fmt:formatNumber pattern="#,###" value="${i.refundMoney}"/>원</p>
+                            <c:if test="${!empty i.refundPoint}">
+                                <p>반환 포인트 : <fmt:formatNumber pattern="#,###" value="${i.refundPoint}"/>점</p>
+                                <p>반환 금액 : <fmt:formatNumber pattern="#,###" value="${i.refundMoney}"/>원</p>
+                            </c:if>
                         </td>
                         <td>${i.applyDate}</td>
                         <td>
-                            <p>받는 사람 : ${i.deliDTO.name}</p>
-                            <p>전화번호 : ${i.deliDTO.phone}</p>
-                            <p>주소 : ${i.deliDTO.address}</p>
+                            <c:if test="${!empty i.deliDTO}">
+                                <p>받는 사람 : ${i.deliDTO.name}</p>
+                                <p>전화번호 : ${i.deliDTO.phone}</p>
+                                <p>주소 : ${i.deliDTO.address}</p>
+                            </c:if>
                         </td>
                         <td>
                             <c:choose>
@@ -140,7 +146,7 @@
 </form>
 <div class="pagingDiv" style="text-align: center;">
     <c:if test="${paging.needPrev eq true}">
-        <a href="javascript:void(0); onclick=paging(${paging.startNavi-1}});"><</a>
+        <a href="javascript:void(0); onclick=paging (${paging.startNavi-1}});"><</a>
         <a href="javascript:void(0); onclick=paging(1);">맨 처음</a>
     </c:if>
     <c:forEach var="i" begin="${paging.startNavi}" end="${paging.endNavi}" varStatus="var">
@@ -163,6 +169,134 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/resources/asset/js/scripts.js"></script>
 <script>
+    //페이징 다시 그려줌
+    function paging(startNavi) {
+        let type = $("select[id='type'] option:selected").val();
+        $.ajax({
+            url: '/admin/repagingRefundList',
+            type: 'post',
+            data: {
+                "type": type,
+                "cpage": startNavi
+            },
+            success: function (data) {
+                console.log(data);
+                $(".pagingDiv").children().remove();
+                createPaging(data);
+            }
+        })
+    }
+
+    function createPaging(data) {
+        let startNavi = data.paging.startNavi;
+        let endNavi = data.paging.endNavi;
+        let needPrev = data.paging.needPrev;
+        let needNext = data.paging.needNext;
+        let refundInfoList = data.refundInfoList;
+        $("tbody").children().remove();
+        for (let i = 0; i < refundInfoList.length; i++) {
+            var newHtml = createHtml(refundInfoList[i], startNavi);
+            $("tbody").append(newHtml);
+        }
+        if (needPrev) {
+            var html = createPrev(startNavi);
+            $(".pagingDiv").append(html);
+        }
+        for (let k = startNavi; k <= endNavi; k++) {
+            if (startNavi == k) {
+                var html = createNewPage1(k);
+                $(".pagingDiv").append(html);
+            } else {
+                var html = createNewPage2(k);
+                $(".pagingDiv").append(html);
+            }
+        }
+        if (needNext) {
+            var html = createNext(endNavi, totalPageCount);
+            $(".pagingDiv").append(html);
+        }
+    }
+
+
+    //셀렉트 박스 바뀔때
+    $(document).on("change", "#type", function () {
+        let type = $("select[id='type'] option:selected").val();
+        $.ajax({
+            url: '/admin/repagingRefundList',
+            type: 'post',
+            data: {
+                "type": type,
+                "cpage": 1
+            },
+            success: function (data) {
+                console.log(data);
+                $(".pagingDiv").children().remove();
+                createPaging(data);
+            }
+        })
+    })
+
+    function createHtml(item, cpage) {
+        var HTML = ' <tr><input type="hidden" value="' + item.payPd_seq + '" id="payPd_seq" name="payPd_seq"><input type="hidden" value="' + item.refund_seq + '" id="refund_seq" name="refund_seq">';
+        HTML += '<td><img class="card-img-top img" src="/resources/img/products/' + item.productDTO.img + '" style="width: 100px; height: 100px;"></td>';
+        HTML += '<td>'+item.productDTO.name;
+        // 옵션 출력
+        if (Object.keys(item).includes('optionMapList')) {  //key가 optionMapList 있으면 출력
+            for (let k = 0; k < item.optionMapList.length; k++) {
+                console.log(Object.keys(item.optionMapList[k]) + ":" + Object.values(item.optionMapList[k]));
+                HTML += '<p>' + Object.keys(item.optionMapList[k]) + ":" + Object.values(item.optionMapList[k]) + '</p>';
+            }
+        }
+        HTML += '<br>'+item.count+'개'+'-'+item.price.toLocaleString()+'원</td>';
+        HTML += '<td>'+item.content+'</td>';
+        if(item.refundPoint != null){
+            HTML += '<td><p>반환 포인트 : '+item.refundPoint.toLocaleString()+'점</p>';
+            HTML += '<p>반환 금액 : '+item.refundMoney.toLocaleString()+'원</p></td>';
+        }else{
+            HTML +='<td></td>';
+        }
+        HTML += '<td>'+item.applyDate+'</td>';
+        if(item.deliDTO != null){
+            HTML += '<td><p>받는 사람 : '+item.deliDTO.name+'</p>';
+            HTML += '<p>전화번호 : '+item.deliDTO.phone+'</p>';
+            HTML += '<p>주소 : '+item.deliDTO.address+'</p></td>';
+        }else{
+            HTML += '<td></td>';
+        }
+        if(item.shopRefundDTO.status == 'Y'){
+            HTML += '<td><button type="button" id="cplApproveBtn" class="btn btn-light" disabled>승인 완료</button></td></tr>';
+        }else{
+            HTML += '<td><button type="button" id="approveBtn" class="btn btn-light">승인</button></td></tr>';
+        }
+        return HTML;
+    }
+
+    function createPrev(startNavi) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (startNavi - 1) + ');">' + "<" + '</a>';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (1) + ');">' + "맨 처음" + '</a>';
+        return html;
+    }
+
+    function createNewPage1(k) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + k + ')"> ' + k + ' </a>';
+        return html;
+    }
+
+    function createNewPage2(k) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + k + ')" style="font-weight: bold;"> ' + k + ' </a>';
+        return html;
+    }
+
+    function createNext(endNavi, totalPageCount) {
+        var html = '';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (endNavi + 1) + ');">' + ">" + '</a>';
+        html += '<a href="javascript:void(0);" onclick="paging(' + (totalPageCount) + ');">' + "맨끝" + '</a>';
+        return html;
+    }
+
     $(document).on("click", "#approveBtn", function () {
         let payPd_seq = $(this).closest("tr").find("#payPd_seq").val();
         let refund_seq = $(this).closest("tr").find("#refund_seq").val();
@@ -195,94 +329,6 @@
         myForm.method = "post";
         myForm.target = "newFrm";
         myForm.submit();
-
-        //페이징 다시 그려줌
-        function paging(startNavi) {
-            $.ajax({
-                url: '/admin/repagingRefundList',
-                type: 'post',
-                data: {
-                    "cpage": startNavi
-                },
-                success: function (data) {
-                    $(".pagingDiv").children().remove();
-                    createPaging(data);
-                }
-            })
-        }
-
-        function createPaging(data) {
-            console.log(data);
-            let startNavi = data.startNavi;
-            let endNavi = data.endNavi;
-            let needPrev = data.needPrev;
-            let needNext = data.needNext;
-            let productDTOList = data.productDTOList;
-            $("#row").children().remove();
-            for (let i = 0; i < productDTOList.length; i++) {
-                console.log(productDTOList[i]);
-                console.log(startNavi);
-                var newHtml = createHtml(productDTOList[i], startNavi);
-                $("#row").append(newHtml);
-            }
-
-            if (needPrev) {
-                var html = createPrev(startNavi);
-                $(".pagingDiv").append(html);
-            }
-            for (let k = startNavi; k <= endNavi; k++) {
-                if (startNavi == k) {
-                    var html = createNewPage1(k);
-                    $(".pagingDiv").append(html);
-                } else {
-                    var html = createNewPage2(k);
-                    $(".pagingDiv").append(html);
-                }
-            }
-            if (needNext) {
-                var html = createNext(endNavi, totalPageCount);
-                $(".pagingDiv").append(html);
-            }
-        }
-
-        function createHtml(item, cpage) {
-            // let pdName = item.name;
-            // let pd_seq = item.pd_seq;
-            // var HTML = '<div class="col mb-5"><div class="card h-100">';
-            // HTML += '<img class="card-img-top img" src="/resources/img/products/' + item.img + '" style="width: 225px;">';
-            // HTML += '<div class="card-body p-4"><div class="text-center"><h5 class="fw-bolder">';
-            // HTML += '<a href="/product/detail?pd_seq=' + pd_seq + '">' + pdName + '</a></h5>';
-            // HTML += item.price.toLocaleString() + '원';
-            // HTML += '</div></div></div></div>';
-            // console.log(HTML);
-            // return HTML;
-        }
-
-        function createPrev(startNavi) {
-            var html = '';
-            html += '<a href="javascript:void(0);" onclick="paging(' + (startNavi - 1) + ');">' + "<" + '</a>';
-            html += '<a href="javascript:void(0);" onclick="paging(' + (1) + ');">' + "맨 처음" + '</a>';
-            return html;
-        }
-
-        function createNewPage1(k) {
-            var html = '';
-            html += '<a href="javascript:void(0);" onclick="paging(' + k + ')"> ' + k + ' </a>';
-            return html;
-        }
-
-        function createNewPage2(k) {
-            var html = '';
-            html += '<a href="javascript:void(0);" onclick="paging(' + k + ')" style="font-weight: bold;"> ' + k + ' </a>';
-            return html;
-        }
-
-        function createNext(endNavi, totalPageCount) {
-            var html = '';
-            html += '<a href="javascript:void(0);" onclick="paging(' + (endNavi + 1) + ');">' + ">" + '</a>';
-            html += '<a href="javascript:void(0);" onclick="paging(' + (totalPageCount) + ');">' + "맨끝" + '</a>';
-            return html;
-        }
     })
 </script>
 </body>

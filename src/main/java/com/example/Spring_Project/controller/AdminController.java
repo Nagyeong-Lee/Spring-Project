@@ -437,6 +437,23 @@ public class AdminController {
         return reviewList;
     }
 
+    @ResponseBody
+    @PostMapping("repagingRefundList")
+    public Map<String, Object> repagingRefundList(@RequestParam String type, @RequestParam  Integer cpage) throws Exception {
+        Map<String, Object> remap = new HashMap<>();
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.refundCntByType(type); //교환/환불 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+        List<RefundDTO> refundDTOList = productService.refundListByType(start,end,type);
+        List<Object> refundInfoList = productService.getRefundInfo(refundDTOList);
+        remap.put("paging", paging);
+        remap.put("refundInfoList", refundInfoList);
+        return remap;
+    }
+
     @RequestMapping("/refund")  //교환 및 반품 조회
     public String toAdminRefundList(Model model, Integer cpage) throws Exception {
         if (cpage == null) cpage = 1;
@@ -446,7 +463,7 @@ public class AdminController {
         Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
         Integer end = cpage * naviPerPage; // 끝 글 번호
 
-        List<RefundDTO> refundDTOList = productService.refundList(start,end);
+        List<RefundDTO> refundDTOList = productService.refundList(start, end);
         List<Object> refundInfoList = productService.getRefundInfo(refundDTOList);
         model.addAttribute("paging", paging);
         model.addAttribute("refundInfoList", refundInfoList);
@@ -457,23 +474,27 @@ public class AdminController {
     }
 
     @PostMapping("/approveRefund") //교환 환불 승인 팝업창 띄움
-    public String approveRefund(Model model, @RequestParam Integer payPd_seq,@RequestParam Integer refund_seq)  throws Exception{
+    public String approveRefund(Model model, @RequestParam Integer payPd_seq, @RequestParam Integer refund_seq) throws Exception {
         List<CourierDTO> courierDTOS = productService.getCourierInfo();
         model.addAttribute("courierDTOS", courierDTOS);
-        model.addAttribute("payPd_seq",payPd_seq);
-        model.addAttribute("refund_seq",refund_seq);
+        model.addAttribute("payPd_seq", payPd_seq);
+        model.addAttribute("refund_seq", refund_seq);
         return "/admin/approveRefundPopup";
     }
 
     @ResponseBody
     @PostMapping("/apprRefund") //관리자가 교환 승인할때 db인서트
-    public String apprRefund(@RequestParam Map<String,Object> map) throws Exception{
+    public String apprRefund(@RequestParam Map<String, Object> map) throws Exception {
         System.out.println("map = " + map);
         String name = map.get("courier").toString();
         Integer courierCode = productService.getCourierCode(name);//택배사 코드
-        map.put("code",courierCode);
-        adminService.insertShopRefund(map);
+        map.put("code", courierCode);
         //승인처리 db에 인서트
+        adminService.insertShopRefund(map);
+        Integer payPd_seq = Integer.parseInt(map.get("payPd_seq").toString());
+        Integer refund_seq = Integer.parseInt(map.get("refund_seq").toString());
+        //해당 payPd_seq reufund status y로 변경
+        productService.chgRefundStatus(payPd_seq, refund_seq);
         return "success";
     }
 }

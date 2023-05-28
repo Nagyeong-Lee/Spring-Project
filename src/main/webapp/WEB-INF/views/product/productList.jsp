@@ -115,32 +115,6 @@
             width: 200px;
             heigth: 200px;
         }
-
-        .pagingDiv {
-            position: fixed;
-            left: 0;
-            bottom: 100px;
-            width: 100%;
-            color: white; /* 글자색상 */
-            text-align: center; /* 가운데 정렬 */
-            padding: 15px; /* 위아래/좌우 패딩 */
-            /*margin-top: 50px;*/
-            margin-bottom: 10px;
-        }
-
-        #tbody * {
-            text-align: center;
-        }
-
-        html, body {
-            height: 100%;
-        }
-
-        /*body {*/
-        /*    display: flex;*/
-        /*    flex-direction: column;*/
-        /*}*/
-
         #footer {
             position: fixed;
             left: 0;
@@ -151,6 +125,25 @@
             text-align: center; /* 가운데 정렬 */
             padding: 15px; /* 위아래/좌우 패딩 */
         }
+
+
+        .pagingDiv {
+            position: fixed;
+            left: 0;
+            bottom: 100px;
+            width: 100%;
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            padding:15px; /* 위아래/좌우 패딩 */
+        }
+        #tbody * {
+            text-align: center;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
     </style>
 </head>
 <body>

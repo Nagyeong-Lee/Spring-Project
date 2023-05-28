@@ -146,9 +146,10 @@ public class ProductService {
         productMapper.insertCartWtOption(id, count, pd_seq);
     }
 
-    public Integer isPdInCart(Integer pd_seq,String id) throws Exception{
-        return productMapper.isPdInCart(pd_seq,id);
+    public Integer isPdInCart(Integer pd_seq, String id) throws Exception {
+        return productMapper.isPdInCart(pd_seq, id);
     }
+
     public void minusOption(Integer pd_seq, String optionName) throws Exception {
         productMapper.minusOption(pd_seq, optionName);
     }
@@ -634,6 +635,11 @@ public class ProductService {
         return productMapper.refundInfo(payPd_seq);
     }
 
+    //관리자가 환불 승인했는지
+    public Integer isRefundApprove(Integer refund_seq) throws Exception {
+        return productMapper.isRefundApprove(refund_seq);
+    }
+
     //구매한 상품,옵션 정보 가져오기
     public List<Map<String, Object>> pdOptionInfo(List<Map<String, Object>> payInfoDTOS) throws Exception {
         List<Map<String, Object>> historyList = new ArrayList<>();
@@ -657,6 +663,11 @@ public class ProductService {
             Integer payPd_seq = Integer.parseInt(payInfoDTO.get("PAYPD_SEQ").toString());
             PayProductDTO payProductDTO1 = this.getPayProductInfo(pay_seq, pd_seq);
             RefundDTO refundDTO = refundInfo(payPd_seq);
+            //관리자가 환불 승인했는지
+            Integer isRefundApprove = 0;
+            if (refundDTO != null) {
+                isRefundApprove = isRefundApprove(refundDTO.getRefund_seq());
+            }
 
             // 한 번 구매할때 행수
             Integer payPdCnt = productMapper.getPayPdCnt(pay_seq);
@@ -679,8 +690,10 @@ public class ProductService {
                 map.put("reviewDTO", reviewDTO);
             }
 
+
+            map.put("isRefundApprove", isRefundApprove);
             map.put("productDTO", productDTO);
-            map.put("payPdCnt",payPdCnt);
+            map.put("payPdCnt", payPdCnt);
             map.put("refundDTO", refundDTO);
             map.put("price", price);
             map.put("payMethod", payMethod);
@@ -743,6 +756,10 @@ public class ProductService {
         return productMapper.getCourierCode(name);
     }
 
+    public void chgRefundStatus(Integer payPd_seq, Integer refund_seq) throws Exception {
+        productMapper.chgRefundStatus(payPd_seq, refund_seq);
+    }
+
     public void deliveryStatus(Integer code, Integer sales_seq) throws Exception {
         productMapper.deliveryStatus(code, sales_seq);
     }
@@ -793,7 +810,6 @@ public class ProductService {
         }
         return optionList;
     }
-
 
 
     //pd 재고 count
@@ -859,6 +875,13 @@ public class ProductService {
         return refundPdInfo;
     }
 
+    public Map<String, Object> refundData(Map<String, Object> map) throws Exception {
+        Integer payPdSeq = Integer.parseInt(map.get("payPdSeq").toString());
+        String id = map.get("id").toString();
+        Map<String, Object> refundPdInfo = productMapper.refundData(payPdSeq);
+        return refundPdInfo;
+    }
+
     public List<Map<String, Object>> refundPdWithOpt(Map<String, Object> refundPdInfo) throws Exception {
         System.out.println("refundPdInfo = " + refundPdInfo);
         JsonParser jsonParser = new JsonParser();
@@ -884,14 +907,33 @@ public class ProductService {
         productMapper.insertRefund(param);
     }
 
+    //교환 테이블 인서트
+    public void insertExchange(Map<String, Object> param) throws Exception {
+        productMapper.insertExchange(param);
+    }
+
+    public void updRefundStatus(Integer payPd_seq) throws Exception {
+        productMapper.updRefundStatus(payPd_seq);
+    }
+
     //환불 교환 개수
     public Integer refundCount() throws Exception {
         return productMapper.refundCount();
     }
 
+    //타입별 환불 교환 개수
+    public Integer refundCntByType(String type) throws Exception {
+        return productMapper.refundCntByType(type);
+    }
+
     //환불 교환 리스트
     public List<RefundDTO> refundList(Integer start, Integer end) throws Exception {
         return productMapper.refundList(start, end);
+    }
+
+    //타입별 환불 교환 리스트
+    public List<RefundDTO> refundListByType(Integer start, Integer end,String type) throws Exception {
+        return productMapper.refundListByType(start, end,type);
     }
 
     public PayProductDTO payPdInfo(Integer payPd_seq) throws Exception {
@@ -913,9 +955,12 @@ public class ProductService {
                 Integer payPd_seq = dto.getPayPd_seq();
                 PayProductDTO payProductDTO = payPdInfo(payPd_seq);
                 ProductDTO productDTO = productMapper.getPdInfo(payProductDTO.getPd_seq());
-                DeliDTO deliDTO = productMapper.getDeliInfoBySeq(dto.getDeli_seq());
-                String phone = deliDTO.getPhone().substring(0, 3) + "-" + deliDTO.getPhone().substring(3, 7) + "-" + deliDTO.getPhone().substring(7, 11);
-                deliDTO.setPhone(phone);
+                if(dto.getType().equals("exchange")){
+                    DeliDTO deliDTO = productMapper.getDeliInfoBySeq(dto.getDeli_seq());
+                    String phone = deliDTO.getPhone().substring(0, 3) + "-" + deliDTO.getPhone().substring(3, 7) + "-" + deliDTO.getPhone().substring(7, 11);
+                    deliDTO.setPhone(phone);
+                    map.put("deliDTO", deliDTO);
+                }
                 ShopRefundDTO shopRefundDTO = refundInfoByPayPd_seq(dto.getRefund_seq());
 //                if (shopRefundDTO != null) {
 //                    if (shopRefundDTO.getDeliStatus().equals("Y")) {   //교환 반품 -> 배송완료되면 refundDTO status Y로 변경
@@ -925,16 +970,22 @@ public class ProductService {
 //                    }
 //                }
                 RefundDetailDTO refundDetailDTO = productMapper.getRefundDetail(payPd_seq);
-                Integer payTotalSum = refundDetailDTO.getPayTotalSum();  //전체 구매 개수
-                Integer refundPdCount = refundDetailDTO.getRefundPdCount(); //환불 신청한 상품 개수
-                Integer originalPdPrice = refundDetailDTO.getOriginalPdPrice(); //환불 신청한 상품 원래 가격
-                Integer refundPoint = 0; //환불받을 포인트
-                if (refundDetailDTO.getUsedPoint() != 0) {
-                    refundPoint = Math.round(refundDetailDTO.getUsedPoint() / payTotalSum);
+                if(dto.getType().equals("refund")) {
+                    Integer payTotalSum = refundDetailDTO.getPayTotalSum();  //전체 구매 개수
+                    Integer refundPdCount = refundDetailDTO.getRefundPdCount(); //환불 신청한 상품 개수
+                    Integer originalPdPrice = refundDetailDTO.getOriginalPdPrice(); //환불 신청한 상품 원래 가격
+                    Integer refundPoint = 0; //환불받을 포인트
+                    if (refundDetailDTO.getUsedPoint() != 0) {
+                        refundPoint = Math.round(refundDetailDTO.getUsedPoint() / payTotalSum);
+                    }
+                    Integer refundMoney = originalPdPrice * refundPdCount - refundPoint;
+                    map.put("refundPoint", refundPoint); //환불받을 포인트
+                    map.put("refundMoney", refundMoney); //환불받을 돈
+                    //멤버 포인트 다시 증가시킴
+                    productMapper.increaseMemPoint(dto.getId(), refundPoint);
+
                 }
-                Integer refundMoney = originalPdPrice * refundPdCount - refundPoint;
-                map.put("refundPoint", refundPoint); //환불받을 포인트
-                map.put("refundMoney", refundMoney); //환불받을 돈
+
                 map.put("shopRefundDTO", shopRefundDTO);
                 map.put("content", dto.getContent());
                 map.put("applyDate", dto.getApplyDate());
@@ -947,10 +998,7 @@ public class ProductService {
                 Integer price = payProductDTO.getCount() * productDTO.getPrice();
                 map.put("price", price);
                 map.put("productDTO", productDTO);
-                map.put("deliDTO", deliDTO);
-
-                //멤버 포인트 다시 증가시킴
-                productMapper.increaseMemPoint(dto.getId(), refundPoint);
+                map.put("refundDTO", dto);
 
                 //옵션 있으면
                 Map<String, Object> optionMap = null;
@@ -971,12 +1019,14 @@ public class ProductService {
                 refundInfoList.add(map);
             }
         }
-
-
         return refundInfoList;
     }
 
-    public Integer isPdInCartWtOpt(Integer pd_seq, String options,String id) throws Exception{
-        return productMapper.isPdInCartWtOpt(pd_seq,options,id);
+    public Integer isPdInCartWtOpt(Integer pd_seq, String options, String id) throws Exception {
+        return productMapper.isPdInCartWtOpt(pd_seq, options, id);
+    }
+
+    public Integer refundYN(Integer payPd_seq) throws Exception {
+        return productMapper.refundYN(payPd_seq);
     }
 }

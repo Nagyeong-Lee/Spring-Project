@@ -77,7 +77,7 @@
             <c:when test="${!empty historyList}">
                 <c:set var="paySeq" value="0"/>
                 <c:forEach var="i" items="${historyList}" varStatus="status">
-<%--                    ${i.pay_seq}-${i.count}--%>
+                    <%--                    ${i.pay_seq}-${i.count}--%>
                     <c:set var="loop_flag" value="false"/>
                     <tr>
                         <td><a href="/product/detail?pd_seq=${i.productDTO.pd_seq}"><img
@@ -122,18 +122,64 @@
                                 <td style="text-align: center;">
                                     배송 완료
                                     <c:choose>
+                                        <%-- 리뷰 있을때 --%>
                                         <c:when test="${i.reviewDTO.status == 'Y'}">
                                             <button type="button" class="updReviewBtn btn btn-light"
                                                     style="font-size: 13px;">
                                                 <input type="hidden" value="${i.reviewDTO.review_seq}">리뷰 수정하기
                                             </button>
                                             <c:choose>
-                                                <c:when test="${i.refundDTO.status == 'M'}">
-                                                    <button type="button" class="btn btn-light refund" disabled>환불 처리중</button>
+                                                <%-- 환불/교환 신청했을때 --%>
+                                                <c:when test="${!empty i.refundDTO}">
+                                                    <c:if test="${i.refundDTO.type == 'exchange'}">
+                                                        <c:choose>
+                                                            <c:when test="${i.refundDTO.status == 'M' and i.isRefundApprove == 0}">
+                                                                <button type="button" class="btn btn-light refund">환불
+                                                                </button>
+                                                                <button type="button"
+                                                                        class="btn btn-light cancleExchange">교환 취소
+                                                                </button>
+                                                            </c:when>
+                                                            <c:when test="${i.refundDTO.status == 'Y' and i.isRefundApprove == 1}">
+                                                                <button type="button" class="btn btn-light refund"
+                                                                        disabled>교환 완료
+                                                                </button>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <button type="button" class="btn btn-light refund">환불
+                                                                </button>
+                                                                <button type="button" class="btn btn-light exchange">
+                                                                    교환
+                                                                </button>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </c:if>
+                                                    <c:if test="${i.refundDTO.type == 'refund'}">
+                                                        <c:choose>
+                                                            <c:when test="${i.refundDTO.status == 'M' and i.isRefundApprove == 0}">
+                                                                <button type="button"
+                                                                        class="btn btn-light cancleRefund">환불 취소
+                                                                </button>
+                                                                <button type="button" class="btn btn-light exchange">
+                                                                    교환
+                                                                </button>
+                                                            </c:when>
+                                                            <c:when test="${i.refundDTO.status == 'Y' and i.isRefundApprove == 1}">
+                                                                <button type="button" class="btn btn-light refund"
+                                                                        disabled>환불 완료
+                                                                </button>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <button type="button" class="btn btn-light refund">환불
+                                                                </button>
+                                                                <button type="button" class="btn btn-light exchange">
+                                                                    교환
+                                                                </button>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </c:if>
                                                 </c:when>
-                                                <c:when test="${i.refundDTO.status == 'Y'}">
-                                                    <button type="button" class="btn btn-light refund" disabled>환불 완료</button>
-                                                </c:when>
+                                                <%-- 환불/교환 신청 안했을때 --%>
                                                 <c:otherwise>
                                                     <button type="button" class="btn btn-light refund">환불</button>
                                                     <button type="button" class="btn btn-light exchange">교환</button>
@@ -145,12 +191,57 @@
                                                     style="font-size: 13px;">리뷰 작성하기
                                             </button>
                                             <c:choose>
-                                                <c:when test="${i.refundDTO.status == 'M'}">
-                                                    <button type="button" class="btn btn-light refund" disabled>환불 처리중</button>
+                                                <%-- 환불/교환 신청했을때 --%>
+                                                <c:when test="${!empty i.refundDTO}">
+                                                    <c:if test="${i.refundDTO.type == 'exchange'}">
+                                                        <c:choose>
+                                                            <c:when test="${i.refundDTO.status == 'M' and i.isRefundApprove == 0}">
+                                                                <button type="button" class="btn btn-light refund">환불
+                                                                </button>
+                                                                <button type="button"
+                                                                        class="btn btn-light cancleExchange">교환 취소
+                                                                </button>
+                                                            </c:when>
+                                                            <c:when test="${i.refundDTO.status == 'Y' and i.isRefundApprove == 1}">
+                                                                <button type="button" class="btn btn-light refund"
+                                                                        disabled>교환 완료
+                                                                </button>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <button type="button" class="btn btn-light refund">환불
+                                                                </button>
+                                                                <button type="button" class="btn btn-light exchange">
+                                                                    교환
+                                                                </button>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </c:if>
+                                                    <c:if test="${i.refundDTO.type == 'refund'}">
+                                                        <c:choose>
+                                                            <c:when test="${i.refundDTO.status == 'M' and i.isRefundApprove == 0}">
+                                                                <button type="button"
+                                                                        class="btn btn-light cancleRefund">환불 취소
+                                                                </button>
+                                                                <button type="button" class="btn btn-light exchange">
+                                                                    교환
+                                                                </button>
+                                                            </c:when>
+                                                            <c:when test="${i.refundDTO.status == 'Y' and i.isRefundApprove == 1}">
+                                                                <button type="button" class="btn btn-light refund"
+                                                                        disabled>환불 완료
+                                                                </button>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <button type="button" class="btn btn-light refund">환불
+                                                                </button>
+                                                                <button type="button" class="btn btn-light exchange">
+                                                                    교환
+                                                                </button>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </c:if>
                                                 </c:when>
-                                                <c:when test="${i.refundDTO.status == 'Y'}">
-                                                    <button type="button" class="btn btn-light refund" disabled>환불 완료</button>
-                                                </c:when>
+                                                <%-- 환불/교환 신청 안했을때 --%>
                                                 <c:otherwise>
                                                     <button type="button" class="btn btn-light refund">환불</button>
                                                     <button type="button" class="btn btn-light exchange">교환</button>
@@ -202,8 +293,8 @@
 <script src="/resources/asset/js/shopUtil.js"></script>
 <script>
 
-    //교환/반품 클릭 시
-    $(".refund").on("click",function(){
+    //환불 취소
+    $(document).on("click", ".cancleRefund", function () {
         let id = $("#id").val();
         let payPdSeq = $(this).closest("tr").find(".payPd_seq").val();
         var _width = '500';
@@ -214,12 +305,13 @@
 
         let newForm = document.createElement("form");
         newForm.setAttribute("method", "post");
-        newForm.setAttribute("action", "/product/refundPopup");
+        newForm.setAttribute("action", "/product/cancleRefundPopup");
 
         let input1 = document.createElement("input");
         input1.setAttribute("type", "hidden");
         input1.setAttribute("value", id);
         input1.setAttribute("name", "id");
+
         let input2 = document.createElement("input");
         input2.setAttribute("type", "hidden");
         input2.setAttribute("value", payPdSeq);
@@ -229,17 +321,154 @@
         newForm.append(input2);
         document.body.append(newForm);
 
-        window.open("/product/refundPopup", "newForm", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
+        window.open("/product/cancleRefundPopup", "newForm", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
         let newForm1 = newForm;
         newForm1.method = "post";
         newForm1.target = "newForm";
         newForm1.submit();
     })
 
+    //교환 취소
+    $(document).on("click", ".cancleExchange", function () {
+        let id = $("#id").val();
+        let payPdSeq = $(this).closest("tr").find(".payPd_seq").val();
+        var _width = '500';
+        var _height = '400';
+
+        var _left = Math.ceil((window.screen.width - _width) / 2);
+        var _top = Math.ceil((window.screen.height - _height) / 2);
+
+        let newForm = document.createElement("form");
+        newForm.setAttribute("method", "post");
+        newForm.setAttribute("action", "/product/cancleExchangePopup");
+
+        let input1 = document.createElement("input");
+        input1.setAttribute("type", "hidden");
+        input1.setAttribute("value", id);
+        input1.setAttribute("name", "id");
+
+        let input2 = document.createElement("input");
+        input2.setAttribute("type", "hidden");
+        input2.setAttribute("value", payPdSeq);
+        input2.setAttribute("name", "payPdSeq");
+
+        newForm.append(input1);
+        newForm.append(input2);
+        document.body.append(newForm);
+
+        window.open("/product/cancleExchangePopup", "newForm", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
+        let newForm1 = newForm;
+        newForm1.method = "post";
+        newForm1.target = "newForm";
+        newForm1.submit();
+    })
+
+    //환불 클릭 시
+    $(document).on("click", ".refund", function () {
+        let id = $("#id").val();
+        let payPdSeq = $(this).closest("tr").find(".payPd_seq").val();
+        $.ajax({
+            url: '/product/refundYN',
+            type: 'post',
+            data: {
+                "id": id,
+                "payPdSeq": payPdSeq
+            },
+            async: false,
+            success: function (data) {
+                console.log(data);
+                if (data == 'Y') {
+                    alert('교환을 취소하고 진행해주세요.');
+                    return;
+                } else {
+                    var _width = '500';
+                    var _height = '400';
+
+                    var _left = Math.ceil((window.screen.width - _width) / 2);
+                    var _top = Math.ceil((window.screen.height - _height) / 2);
+
+                    let newForm = document.createElement("form");
+                    newForm.setAttribute("method", "post");
+                    newForm.setAttribute("action", "/product/refundPopup");
+
+                    let input1 = document.createElement("input");
+                    input1.setAttribute("type", "hidden");
+                    input1.setAttribute("value", id);
+                    input1.setAttribute("name", "id");
+                    let input2 = document.createElement("input");
+                    input2.setAttribute("type", "hidden");
+                    input2.setAttribute("value", payPdSeq);
+                    input2.setAttribute("name", "payPdSeq");
+
+                    newForm.append(input1);
+                    newForm.append(input2);
+                    document.body.append(newForm);
+
+                    window.open("/product/refundPopup", "newForm", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
+                    let newForm1 = newForm;
+                    newForm1.method = "post";
+                    newForm1.target = "newForm";
+                    newForm1.submit();
+                }
+            }
+        })
+    })
+
+    //교환 클릭 시
+    $(document).on("click", ".exchange", function () {
+        let id = $("#id").val();
+        let payPdSeq = $(this).closest("tr").find(".payPd_seq").val();
+        $.ajax({
+            url: '/product/refundYN',
+            type: 'post',
+            data: {
+                "id": id,
+                "payPdSeq": payPdSeq
+            },
+            async: false,
+            success: function (data) {
+                console.log(data);
+                if (data == 'Y') {
+                    alert('환불을 취소하고 진행해주세요.');
+                    return;
+                } else {
+                    var _width = '500';
+                    var _height = '400';
+
+                    var _left = Math.ceil((window.screen.width - _width) / 2);
+                    var _top = Math.ceil((window.screen.height - _height) / 2);
+
+                    let newForm = document.createElement("form");
+                    newForm.setAttribute("method", "post");
+                    newForm.setAttribute("action", "/product/exchangePopup");
+
+                    let input1 = document.createElement("input");
+                    input1.setAttribute("type", "hidden");
+                    input1.setAttribute("value", id);
+                    input1.setAttribute("name", "id");
+                    let input2 = document.createElement("input");
+                    input2.setAttribute("type", "hidden");
+                    input2.setAttribute("value", payPdSeq);
+                    input2.setAttribute("name", "payPdSeq");
+
+                    newForm.append(input1);
+                    newForm.append(input2);
+                    document.body.append(newForm);
+
+                    window.open("/product/exchangePopup", "newForm", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
+                    let newForm1 = newForm;
+                    newForm1.method = "post";
+                    newForm1.target = "newForm";
+                    newForm1.submit();
+                }
+            }
+        })
+    })
+
     //페이징 다시 그려줌
     function paging(startNavi) {
         $.ajax({
-            url: '/product/rePaging',
+            url: '/product/historyRepaging',
             type: 'post',
             data: {
                 "cpage": startNavi,
@@ -247,17 +476,17 @@
             },
             success: function (data) {
                 console.log(data);
-                // $(".pagingDiv").children().remove();
-                // createPaging(data);
+                $(".pagingDiv").children().remove();
+                createPaging(data);
             }
         })
     }
 
     function createPaging(data) {
-        let startNavi = data.startNavi;
-        let endNavi = data.endNavi;
-        let needPrev = data.needPrev;
-        let needNext = data.needNext;
+        let startNavi = data.paging.startNavi;
+        let endNavi = data.paging.endNavi;
+        let needPrev = data.paging.needPrev;
+        let needNext = data.paging.needNext;
         let paging = data.paging;
         let historyList = data.historyList;
         let cpage = data.cpage;
@@ -294,6 +523,8 @@
         }
     }
 
+    let paySeq = 0;
+
     function createHtml(item, cpage) {
         console.log(item.productDTO.pd_seq);
         console.log(cpage);
@@ -312,20 +543,79 @@
             temp += '<input type="hidden" value="' + item.payPd_seq + '" name="payPd_seq" class="payPd_seq"><input type="hidden" value="' + item.productDTO.pd_seq + '" name="pd_seq" class="pd_seq"></td>';
             newTable = newTable + temp;
         }
-        newTable += '<td style="text-align: center"><p>받는 사람 : ' + item.deliDTO.name + '</p><p>전화번호 : ' + item.deliDTO.phone + '</p><p>주소 : ' + item.deliDTO.address + '</p></td>';
-        newTable += '<td style="text-align: center"><p>결제 일자 : ' + item.payDate + '</p><p>결제 방법 : ' + item.payMethod + '</p><p>결제 금액 : ' + item.price.toLocaleString() + '원</p></td>';
+        if (item.pay_seq != paySeq) {
+            paySeq = item.pay_seq;
+            newTable += '<td style="text-align: center" rowspan="' + item.payPdCnt + '"><p>받는 사람 : ' + item.deliDTO.name + '</p><p>전화번호 : ' + item.deliDTO.phone + '</p><p>주소 : ' + item.deliDTO.address + '</p></td>';
+            newTable += '<td style="text-align: center" rowspan="' + item.payPdCnt + '"><p>결제 일자 : ' + item.payDate + '</p><p>결제 방법 : ' + item.payMethod + '</p><p>결제 금액 : ' + item.price.toLocaleString() + '원</p></td>';
+        }
         if (item.deliYN == 'N') {
             newTable += '<td style="text-align: center;">배송전</td></tr>';
         } else if (item.deliYN == 'M') {
             newTable += '<td style="text-align: center;">배송중</td></tr>';
-        } else {
-            // newTable += '<td style="text-align: center;">배송 완료<button type="button" class="reviewBtn btn btn-light" style="font-size: 13px;">리뷰 작성하기</button></td></tr>';
+        }
+        //배송완료일때
+        else {
             newTable += '<td style="text-align: center;">배송 완료';
             if (item.reviewDTO != null) {
                 if (item.reviewDTO.status == 'Y') {
-                    newTable += '<button type="button" class="updReviewBtn btn btn-light" style="font-size: 13px;"><input type="hidden" value="' + item.reviewDTO.review_seq + '">리뷰 수정하기</button></td>';
-                } else {
-                    newTable += '<button type="button" class="reviewBtn btn btn-light" style="font-size: 13px;">리뷰 작성하기</button></td>';
+                    newTable += '<button type="button" class="updReviewBtn btn btn-light" style="font-size: 13px;"><input type="hidden" value="' + item.reviewDTO.review_seq + '">리뷰 수정하기</button>';
+                    //교환 환불 신청했을때
+                    if (item.refundDTO != null) {
+                        //교환일때
+                        if (item.refundDTO.type == 'exchange') {
+                            if (item.refundDTO.status == 'M' && item.isRefundApprove == 0) {
+                                newTable += '<button type="button" class="btn btn-light refund">환불</button>';
+                                newTable += '<button type="buttonclass="btn btn-light cancleExchange">교환 취소</button></td>';
+                            } else if (item.refundDTO.status == 'Y' && item.isRefundApprove == 1) {
+                                newTable += '<button type="button" class="btn btn-light refund" disabled>교환 완료</button></td>';
+                            } else {
+                                newTable += '<button type="button" class="btn btn-light refund">환불</button><button type="button" class="btn btn-light exchange">교환</button></td>';
+                            }
+                        }
+                        //환불일때
+                        else if (item.refundDTO.type == 'refund') {
+                            if (item.refundDTO.status == 'M' && item.isRefundApprove == 0) {
+                                newTable += '<button type="button" class="btn btn-light cancleRefund">환불 취소</button>';
+                                newTable += '<button type="buttonclass="btn btn-light exchange">교환</button></td>';
+                            } else if (item.refundDTO.status == 'Y' && item.isRefundApprove == 1) {
+                                newTable += '<button type="button" class="btn btn-light refund" disabled>환불 완료</button></td>';
+                            } else {
+                                newTable += '<button type="button" class="btn btn-light refund">환불</button><button type="button" class="btn btn-light exchange">교환</button></td>';
+                            }
+                        }
+                    } //교환 환불 신청안했을때
+                    else {
+                        newTable += '<button type="button" class="btn btn-light refund">환불</button><button type="button" class="btn btn-light exchange">교환</button></td>';
+                    }
+                }
+            } else {
+                newTable += '<button type="button" class="reviewBtn btn btn-light" style="font-size: 13px;">리뷰 작성하기</button>';
+                if (item.refundDTO != null) {
+                    //교환일때
+                    if (item.refundDTO.type == 'exchange') {
+                        if (item.refundDTO.status == 'M' && item.isRefundApprove == 0) {
+                            newTable += '<button type="button" class="btn btn-light refund">환불</button>';
+                            newTable += '<button type="buttonclass="btn btn-light cancleExchange">교환 취소</button></td>';
+                        } else if (item.refundDTO.status == 'Y' && item.isRefundApprove == 1) {
+                            newTable += '<button type="button" class="btn btn-light refund" disabled>교환 완료</button></td>';
+                        } else {
+                            newTable += '<button type="button" class="btn btn-light refund">환불</button><button type="button" class="btn btn-light exchange">교환</button></td>';
+                        }
+                    }
+                    //환불일때
+                    else if (item.refundDTO.type == 'refund') {
+                        if (item.refundDTO.status == 'M' && item.isRefundApprove == 0) {
+                            newTable += '<button type="button" class="btn btn-light cancleRefund">환불 취소</button>';
+                            newTable += '<button type="buttonclass="btn btn-light exchange">교환</button></td>';
+                        } else if (item.refundDTO.status == 'Y' && item.isRefundApprove == 1) {
+                            newTable += '<button type="button" class="btn btn-light refund" disabled>환불 완료</button></td>';
+                        } else {
+                            newTable += '<button type="button" class="btn btn-light refund">환불</button><button type="button" class="btn btn-light exchange">교환</button></td>';
+                        }
+                    }
+                } //교환 환불 신청안했을때
+                else {
+                    newTable += '<button type="button" class="btn btn-light refund">환불</button><button type="button" class="btn btn-light exchange">교환</button></td>';
                 }
             }
         }
@@ -379,7 +669,7 @@
     })
 
     //리뷰 작성하기 클릭 시
-    $(".reviewBtn").click(function () {
+    $(document).on("click", ".reviewBtn", function () {
         let pd_seq = $(this).parent().parent().find(".pd_seq").val();
         let payPd_seq = $(this).parent().parent().find(".payPd_seq").val();
 
@@ -422,6 +712,11 @@
         document.body.append(newForm);
         newForm.submit();
     });
+
+    // $(document).on("click",".exchange",function(){
+    //     alert('환불 취소 후 교환 신청이 가능합니다.');
+    //     return;
+    // })
 </script>
 </body>
 </html>

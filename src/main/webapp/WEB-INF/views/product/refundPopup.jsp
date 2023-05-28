@@ -74,32 +74,32 @@
             <div>결제 시간 : ${refundPdInfo.PAYDATE}</div>
             <div>사유 : <textarea id="content" name="content"></textarea></div>
         </div>
-        <div class="deliInfo">
-            <h5>배송지 선택</h5>
-            <button type="button" id="addBtn" class="btn btn-light">배송지 추가</button>
-            <br>
-            <c:choose>
-                <c:when test="${!empty deliDTOList}">
-                    <c:forEach var="i" items="${deliDTOList}">
-                        <input type="radio" class="select_add_radio" name="address" value="${i.seq}" <c:out
-                                value="${i.status eq 'Y' ? 'checked' : ''}"/>>
-                        <c:choose>
-                            <c:when test="${i.status eq 'Y'}">기본 배송지</c:when>
-                            <c:otherwise>${i.nickname}</c:otherwise>
-                        </c:choose>
-                    </c:forEach>
-                    <c:forEach var="i" items="${deliDTOList}">
-                        <c:if test="${i.status eq 'Y'}">
-                            <div class="deliInfo">
-                                <p id="select_name">이름 : ${i.name}</p>
-                                <p id="select_address">주소 : ${i.address}</p>
-                                <p id="select_phone">전화번호 : ${i.phone}</p>
-                            </div>
-                        </c:if>
-                    </c:forEach>
-                </c:when>
-            </c:choose>
-        </div>
+<%--        <div class="deliInfo">--%>
+<%--            <h5>배송지 선택</h5>--%>
+<%--            <button type="button" id="addBtn" class="btn btn-light">배송지 추가</button>--%>
+<%--            <br>--%>
+<%--            <c:choose>--%>
+<%--                <c:when test="${!empty deliDTOList}">--%>
+<%--                    <c:forEach var="i" items="${deliDTOList}">--%>
+<%--                        <input type="radio" class="select_add_radio" name="address" value="${i.seq}" <c:out--%>
+<%--                                value="${i.status eq 'Y' ? 'checked' : ''}"/>>--%>
+<%--                        <c:choose>--%>
+<%--                            <c:when test="${i.status eq 'Y'}">기본 배송지</c:when>--%>
+<%--                            <c:otherwise>${i.nickname}</c:otherwise>--%>
+<%--                        </c:choose>--%>
+<%--                    </c:forEach>--%>
+<%--                    <c:forEach var="i" items="${deliDTOList}">--%>
+<%--                        <c:if test="${i.status eq 'Y'}">--%>
+<%--                            <div class="deliInfo">--%>
+<%--                                <p id="select_name">이름 : ${i.name}</p>--%>
+<%--                                <p id="select_address">주소 : ${i.address}</p>--%>
+<%--                                <p id="select_phone">전화번호 : ${i.phone}</p>--%>
+<%--                            </div>--%>
+<%--                        </c:if>--%>
+<%--                    </c:forEach>--%>
+<%--                </c:when>--%>
+<%--            </c:choose>--%>
+<%--        </div>--%>
         <button type="button" id="refundBtn" class="btn btn-light">환불 신청</button>
         <button type="button" id="cancle" class="btn btn-light">취소</button>
     </form>
@@ -116,28 +116,27 @@
         window.open('/product/addDeli?id=${id}', '', 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
     })
 
-    //교환 신청 클릭 시
+    //환불 클릭 시
     $("#refundBtn").click(function () {
         let content = $("#content").val();
         if (content.length == 0) {
             alert('사유를 입력해주세요.');
             return false;
         }
-
         $.ajax({
             url: '/product/refund',
             type: 'post',
             data: {
                 "payPd_seq": $("#payPd_seq").val(),
                 "id": $("#id").val(),
-                "content":$("#content").val(),
-                "deli_seq":$("input[type='radio']:checked").val()
+                "content":$("#content").val()
+                // "deli_seq":$("input[type='radio']:checked").val()
             },
             success:function(data){
                 console.log(data);
                 window.close();
                 window.opener.location.reload();
-                window.open('/product/noticePopup', '', 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
+                // window.open('/product/noticePopup', '', 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
             }
         })
     })
