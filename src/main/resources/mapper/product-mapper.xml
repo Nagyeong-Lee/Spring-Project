@@ -6,29 +6,29 @@
 
     <select id="getProducts" resultType="com.example.Spring_Project.dto.ProductDTO">
 
-<!--        SELECT pd_seq,-->
-<!--        name,-->
-<!--        description,-->
-<!--        price,-->
-<!--        stock,-->
-<!--        status,-->
-<!--        img,-->
-<!--        category-->
-<!--        FROM (-->
-<!--        SELECT ROWNUM rn, a.*-->
-<!--        FROM-->
-<!--        (select-->
-<!--        pd_seq,-->
-<!--        name,-->
-<!--        description,-->
-<!--        price,-->
-<!--        stock,-->
-<!--        status,-->
-<!--        img,-->
-<!--        category-->
-<!--        from product-->
-<!--        where status = 'Y' ORDER BY 1 desc) a)-->
-<!--        WHERE rn BETWEEN #{start} AND #{end}-->
+        <!--        SELECT pd_seq,-->
+        <!--        name,-->
+        <!--        description,-->
+        <!--        price,-->
+        <!--        stock,-->
+        <!--        status,-->
+        <!--        img,-->
+        <!--        category-->
+        <!--        FROM (-->
+        <!--        SELECT ROWNUM rn, a.*-->
+        <!--        FROM-->
+        <!--        (select-->
+        <!--        pd_seq,-->
+        <!--        name,-->
+        <!--        description,-->
+        <!--        price,-->
+        <!--        stock,-->
+        <!--        status,-->
+        <!--        img,-->
+        <!--        category-->
+        <!--        from product-->
+        <!--        where status = 'Y' ORDER BY 1 desc) a)-->
+        <!--        WHERE rn BETWEEN #{start} AND #{end}-->
 
         SELECT
         pd_seq,
@@ -52,9 +52,9 @@
         img,
         category
         from product
-<!--        where status = 'Y'-->
+        <!--        where status = 'Y'-->
         <if test="keyword != null">
-          where LOWER(name) like '%'||#{keyword}||'%'
+            where LOWER(name) like '%'||#{keyword}||'%'
         </if>
         order by 1 desc
         )a) b WHERE rn BETWEEN #{start} AND #{end}
@@ -62,15 +62,15 @@
 
     <select id="getProductDetail" resultType="com.example.Spring_Project.dto.ProductDTO">
         select
-            pd_seq,
-            name,
-            description,
-            price,
-            stock,
-            status,
-            img,
-            category,
-            point
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category,
+        point
         from product
         where pd_seq=#{pd_seq}
     </select>
@@ -87,7 +87,10 @@
         img,
         category
         FROM PRODUCT p WHERE category IN (
-        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ =1 and status = 'Y' ) order by 1
+        SELECT category_seq FROM category
+        WHERE PARENT_CATEGORY_SEQ =1
+        <!--        and status = 'Y' -->
+        ) order by 1
     </select>
 
     <select id="getWOuter" resultType="com.example.Spring_Project.dto.ProductDTO">
@@ -364,12 +367,12 @@
 
     <select id="getOptionStock" resultType="com.example.Spring_Project.dto.OptionDTO">
         select
-            option_seq,
-            category,
-            name,
-            stock,
-            status,
-            pd_seq
+        option_seq,
+        category,
+        name,
+        stock,
+        status,
+        pd_seq
         from options
         where pd_seq=#{pd_seq} and name=#{option} FOR UPDATE wait 10
     </select>
@@ -379,10 +382,10 @@
     </update>
 
     <select id="getPdStock" resultType="Integer">
-<!--        select-->
-<!--        stock-->
-<!--        from product-->
-<!--        where pd_seq=#{pd_seq} and status = 'Y' FOR UPDATE-->
+        <!--        select-->
+        <!--        stock-->
+        <!--        from product-->
+        <!--        where pd_seq=#{pd_seq} and status = 'Y' FOR UPDATE-->
 
         select
         stock
@@ -568,7 +571,7 @@
     </update>
 
     <select id="likeYN" resultType="Integer">
-<!--        SELECT count(*) FROM likes WHERE id=#{id} AND pd_seq=#{pd_seq} and status = 'Y'-->
+        <!--        SELECT count(*) FROM likes WHERE id=#{id} AND pd_seq=#{pd_seq} and status = 'Y'-->
         SELECT count(*) FROM likes WHERE id=#{id} AND pd_seq=#{pd_seq}
     </select>
 
@@ -635,15 +638,15 @@
 
     <select id="getPdInfo" resultType="com.example.Spring_Project.dto.ProductDTO">
         select
-            pd_seq,
-            name,
-            description,
-            price,
-            stock,
-            status,
-            img,
-            category,
-            point
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category,
+        point
         from product
         where pd_seq = #{pd_seq}
     </select>
@@ -717,18 +720,18 @@
     </update>
 
     <select id="getProductsByKeyword" resultType="com.example.Spring_Project.dto.ProductDTO">
-<!--        select-->
-<!--        pd_seq,-->
-<!--        name,-->
-<!--        description,-->
-<!--        price,-->
-<!--        stock,-->
-<!--        status,-->
-<!--        img,-->
-<!--        category-->
-<!--        from product-->
-<!--        where status = 'Y'-->
-<!--        and LOWER(name) like '%'||#{keyword}||'%'-->
+        <!--        select-->
+        <!--        pd_seq,-->
+        <!--        name,-->
+        <!--        description,-->
+        <!--        price,-->
+        <!--        stock,-->
+        <!--        status,-->
+        <!--        img,-->
+        <!--        category-->
+        <!--        from product-->
+        <!--        where status = 'Y'-->
+        <!--        and LOWER(name) like '%'||#{keyword}||'%'-->
 
         SELECT
         pd_seq,
@@ -753,7 +756,7 @@
         category
         from product
         where
-<!--        -->
+        <!--        -->
         LOWER(name) like '%'||#{keyword}||'%') a) b WHERE rn BETWEEN #{start} AND #{end}
     </select>
 
@@ -964,7 +967,8 @@
 
     <select id="getHistory" resultType="java.util.Map">
 
-        SELECT pd_seq,payPd_seq,deli_seq,price,TO_CHAR(PAYDATE,'YYYY-MM-DD HH:MI') AS PAYDATE,PAYMETHOD,OPTIONS,totalPayPdCnt,payPdCnt,pay_seq,usedPoint
+        SELECT pd_seq,payPd_seq,deli_seq,price,TO_CHAR(PAYDATE,'YYYY-MM-DD HH:MI') AS
+        PAYDATE,PAYMETHOD,OPTIONS,totalPayPdCnt,payPdCnt,pay_seq,usedPoint
         from( SELECT ROWNUM rn, a.* FROM(SELECT
         pd_seq,
         payPd_seq,
@@ -985,23 +989,23 @@
         where rn between #{start} AND #{end}
 
 
-<!--        SELECT pd_seq,payPd_seq,deli_seq,price,TO_CHAR(PAYDATE,'YYYY-MM-DD HH:MI') AS PAYDATE,PAYMETHOD,OPTIONS,COUNT, deliYN,code-->
-<!--        from( SELECT ROWNUM rn, a.* FROM(SELECT-->
-<!--        pd_seq,-->
-<!--        payPd_seq,-->
-<!--        deli_seq,-->
-<!--        price,-->
-<!--        PAYDATE,-->
-<!--        PAYMETHOD,-->
-<!--        OPTIONS,-->
-<!--        count,-->
-<!--        deliYN,-->
-<!--        code-->
-<!--        FROM payInfo p JOIN PAYPRODUCT pp-->
-<!--        ON p.PAY_SEQ = pp.pay_seq-->
-<!--        WHERE p.id = #{id}-->
-<!--        ORDER BY PAYDATE DESC) a)-->
-<!--        where rn between #{start} and #{end}-->
+        <!--        SELECT pd_seq,payPd_seq,deli_seq,price,TO_CHAR(PAYDATE,'YYYY-MM-DD HH:MI') AS PAYDATE,PAYMETHOD,OPTIONS,COUNT, deliYN,code-->
+        <!--        from( SELECT ROWNUM rn, a.* FROM(SELECT-->
+        <!--        pd_seq,-->
+        <!--        payPd_seq,-->
+        <!--        deli_seq,-->
+        <!--        price,-->
+        <!--        PAYDATE,-->
+        <!--        PAYMETHOD,-->
+        <!--        OPTIONS,-->
+        <!--        count,-->
+        <!--        deliYN,-->
+        <!--        code-->
+        <!--        FROM payInfo p JOIN PAYPRODUCT pp-->
+        <!--        ON p.PAY_SEQ = pp.pay_seq-->
+        <!--        WHERE p.id = #{id}-->
+        <!--        ORDER BY PAYDATE DESC) a)-->
+        <!--        where rn between #{start} and #{end}-->
 
     </select>
 
@@ -1077,9 +1081,9 @@
 
     <select id="getCourierInfo" resultType="com.example.Spring_Project.dto.CourierDTO">
         select
-         name,
-         code,
-         orders
+        name,
+        code,
+        orders
         from courier
     </select>
 
@@ -1095,7 +1099,7 @@
 
     <select id="getCourierCode" resultType="Integer">
         select
-         code
+        code
         from courier
         where name = #{name}
     </select>
@@ -1129,8 +1133,8 @@
 
     <select id="updDeliveryStatus" resultType="Integer">
         UPDATE
-            (SELECT deliYN,code,postNum FROM PAYPRODUCT p WHERE PAYPD_SEQ  =
-                ( SELECT payPd_seq FROM sales WHERE sales_seq = #{sales_seq}))
+        (SELECT deliYN,code,postNum FROM PAYPRODUCT p WHERE PAYPD_SEQ =
+        ( SELECT payPd_seq FROM sales WHERE sales_seq = #{sales_seq}))
         SET deliYN = 'M',code = #{code},postNum = #{postNum}
     </select>
 
@@ -1151,34 +1155,34 @@
     </select>
 
     <select id="pdCategorySeq" resultType="Integer">
-        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ  = #{seq} AND name = #{option}
+        SELECT category_seq FROM category WHERE PARENT_CATEGORY_SEQ = #{seq} AND name = #{option}
     </select>
 
     <select id="revCategory" resultType="map">
         SELECT
-            cc.name AS parentCategory,
-            pc.name AS childCategory
+        cc.name AS parentCategory,
+        pc.name AS childCategory
         FROM (
-            SELECT
-                name,
-                category_seq,
-                parent_category_seq
+        SELECT
+        name,
+        category_seq,
+        parent_category_seq
         FROM CATEGORY c
-            WHERE CATEGORY_SEQ = #{cSeq}) cc
-            JOIN
-            (
-            SELECT
-                name,
-                category_seq,
-                parent_category_seq
-            FROM category
-            WHERE category_seq = #{pSeq}) pc
-            ON cc.parent_category_seq = pc.category_seq
+        WHERE CATEGORY_SEQ = #{cSeq}) cc
+        JOIN
+        (
+        SELECT
+        name,
+        category_seq,
+        parent_category_seq
+        FROM category
+        WHERE category_seq = #{pSeq}) pc
+        ON cc.parent_category_seq = pc.category_seq
     </select>
 
     <select id="searchPdCnt" resultType="Integer">
         select
-          count(*)
+        count(*)
         from product
         where status = 'Y'
         and LOWER(name) like '%'||#{keyword}||'%'
@@ -1186,7 +1190,82 @@
 
     <select id="wOuterCnt" resultType="Integer">
         SELECT count(*)
-        FROM PRODUCT p WHERE category = 2 and status = 'Y'
+        FROM PRODUCT p WHERE category = 2
+        <!--        and status = 'Y'-->
+    </select>
+
+    <select id="wCnt" resultType="Integer">
+        SELECT count(*)
+        FROM PRODUCT p WHERE category in (2,3,4,5)
+        <!--        and status = 'Y'-->
+    </select>
+    <select id="mCnt" resultType="Integer">
+        SELECT count(*)
+        FROM PRODUCT p WHERE category in (7,8,9,10)
+        <!--        and status = 'Y'-->
+    </select>
+    <select id="nCnt" resultType="Integer">
+        SELECT count(*)
+        FROM PRODUCT p WHERE category in (12,13,14,15)
+        <!--        and status = 'Y'-->
+    </select>
+
+    <select id="wTopCnt" resultType="Integer">
+        SELECT count(*)
+        FROM PRODUCT p WHERE category = 3
+        <!--        and status = 'Y'-->
+    </select>
+
+    <select id="wPantsCnt" resultType="Integer">
+        SELECT count(*)
+        FROM PRODUCT p WHERE category = 4
+        <!--        and status = 'Y'-->
+    </select>
+
+    <select id="wAccCnt" resultType="Integer">
+        SELECT count(*)
+        FROM PRODUCT p WHERE category = 5
+        <!--        and status = 'Y'-->
+    </select>
+
+    <select id="mOuter" resultType="Integer">
+        SELECT count(*)
+        FROM PRODUCT p WHERE category = 7
+    </select>
+    <select id="mTop" resultType="Integer">
+        SELECT count(*)
+        FROM PRODUCT p WHERE category = 8
+    </select>
+    <select id="mPants" resultType="Integer">
+        SELECT count(*)
+        FROM PRODUCT p WHERE category = 9
+    </select>
+    <select id="mAcc" resultType="Integer">
+        SELECT count(*)
+        FROM PRODUCT p WHERE category = 10
+    </select>
+    <select id="nOuter" resultType="Integer">
+        SELECT count(*)
+        FROM PRODUCT p WHERE category = 12
+    </select>
+    <select id="nTop" resultType="Integer">
+        SELECT count(*)
+        FROM PRODUCT p WHERE category = 13
+    </select>
+    <select id="nPants" resultType="Integer">
+        SELECT count(*)
+        FROM PRODUCT p WHERE category = 14
+    </select>
+    <select id="nAcc" resultType="Integer">
+        SELECT count(*)
+        FROM PRODUCT p WHERE category = 15
+    </select>
+
+    <select id="pdCountByMen" resultType="Integer">
+        SELECT count(*) FROM product WHERE category in (7,8,9,10)
+    </select>
+    <select id="pdCountByNew" resultType="Integer">
+        SELECT count(*) FROM product WHERE category in (12,13,14,15)
     </select>
 
     <update id="updMemPoint">
@@ -1199,79 +1278,79 @@
 
 
     <select id="getPercent" resultType="double">
-     select point from product where pd_seq = #{pd_seq}
+        select point from product where pd_seq = #{pd_seq}
     </select>
 
     <select id="refundPdInfo" resultType="map">
 
         SELECT
-            a.pay_seq,
-            a.payPd_seq,
-            a.pd_seq,
-            a.OPTIONS,
-            a.payDate,
-            a.payMethod,
-            a.count,
-            p.price,
-            a.id
+        a.pay_seq,
+        a.payPd_seq,
+        a.pd_seq,
+        a.OPTIONS,
+        a.payDate,
+        a.payMethod,
+        a.count,
+        p.price,
+        a.id
         FROM product p JOIN (
-            SELECT
-               pi.pay_seq,
-               pp.payPd_seq,
-               pp.pd_seq,
-               pp.options,
-               id,
-               to_char(payDate,'YYYY-MM-DD HH24:MI') AS payDate,
-               payMethod,
-               pp.count
+        SELECT
+        pi.pay_seq,
+        pp.payPd_seq,
+        pp.pd_seq,
+        pp.options,
+        id,
+        to_char(payDate,'YYYY-MM-DD HH24:MI') AS payDate,
+        payMethod,
+        pp.count
         FROM payInfo pi JOIN (
-            SELECT
-                payPd_seq,
-                pay_seq,
-                pd_seq,
-                options,
-                count
-            FROM payProduct
-            WHERE payPd_seq = #{payPdSeq}) pp
-            on pi.pay_seq = pp.pay_seq) a on p.pd_seq = a.pd_seq
+        SELECT
+        payPd_seq,
+        pay_seq,
+        pd_seq,
+        options,
+        count
+        FROM payProduct
+        WHERE payPd_seq = #{payPdSeq}) pp
+        on pi.pay_seq = pp.pay_seq) a on p.pd_seq = a.pd_seq
     </select>
 
     <insert id="insertRefund" parameterType="map">
         insert into refund values(
-            refund_seq.nextval,
-            #{id},
-            #{payPd_seq},
-            #{content},
-            null,
-            'M',
-            sysdate,
-            'refund'
+        refund_seq.nextval,
+        #{id},
+        #{payPd_seq},
+        #{content},
+        null,
+        'M',
+        sysdate,
+        'refund'
         )
     </insert>
 
     <insert id="insertExchange" parameterType="map">
         insert into refund values(
-            refund_seq.nextval,
-            #{id},
-            #{payPd_seq},
-            #{content},
-            #{deli_seq},
-            'M',
-            sysdate,
-            'exchange'
+        refund_seq.nextval,
+        #{id},
+        #{payPd_seq},
+        #{content},
+        #{deli_seq},
+        'M',
+        sysdate,
+        'exchange'
         )
     </insert>
 
     <select id="refundInfo" resultType="com.example.Spring_Project.dto.RefundDTO">
         select
-            refund_seq,
-            id,
-            payPd_seq,
-            content,
-            deli_seq,
-            status,
-            applyDate,
-            type
+        refund_seq,
+        id,
+        payPd_seq,
+        content,
+        deli_seq,
+        status,
+        applyDate,
+        type
         from refund
         where payPd_seq = #{payPd_seq} and status not in 'N'
     </select>
@@ -1289,28 +1368,28 @@
 
     <select id="refundList" resultType="com.example.Spring_Project.dto.RefundDTO">
         SELECT
-            refund_seq,
-            id,
-            payPd_seq,
-            content,
-            deli_seq,
-            status,
-            applyDate,
-            type
+        refund_seq,
+        id,
+        payPd_seq,
+        content,
+        deli_seq,
+        status,
+        applyDate,
+        type
         from( SELECT ROWNUM rn, a.* FROM(
-            select
-                refund_seq,
-                id,
-                payPd_seq,
-                content,
-                deli_seq,
-                status,
-                to_char(applyDate,'YYYY-DD-MM HH24:MI') AS applyDate,
-                type
-            from refund
-            where status not in  'N'
-            ORDER BY 7 DESC) a)
-            where rn between #{start} and #{end}
+        select
+        refund_seq,
+        id,
+        payPd_seq,
+        content,
+        deli_seq,
+        status,
+        to_char(applyDate,'YYYY-DD-MM HH24:MI') AS applyDate,
+        type
+        from refund
+        where status not in 'N'
+        ORDER BY 7 DESC) a)
+        where rn between #{start} and #{end}
     </select>
 
     <select id="refundListByType" resultType="com.example.Spring_Project.dto.RefundDTO">
@@ -1334,7 +1413,7 @@
         to_char(applyDate,'YYYY-DD-MM HH24:MI') AS applyDate,
         type
         from refund
-        where status not in  'N'
+        where status not in 'N'
         <if test="type != 'all'.toString()">
             and type = #{type}
         </if>
@@ -1343,22 +1422,15 @@
     </select>
 
 
-
-
-
-
-
-
-
     <select id="payPdInfo" resultType="com.example.Spring_Project.dto.PayProductDTO">
         select
-             pay_seq,
-             pd_seq,
-             options,
-             deliYN,
-             code,
-             count,
-             postNum
+        pay_seq,
+        pd_seq,
+        options,
+        deliYN,
+        code,
+        count,
+        postNum
         from payProduct
         where payPd_seq = #{payPd_seq}
     </select>
@@ -1366,55 +1438,56 @@
 
     <select id="refundInfoByPayPd_seq" resultType="com.example.Spring_Project.dto.ShopRefundDTO">
         select
-            sr_seq,
-            refund_seq,
-            status,
-            code,
-            postNum,
-            deliStatus
+        sr_seq,
+        refund_seq,
+        status,
+        code,
+        postNum,
+        deliStatus
         from shopRefund
         where refund_seq = #{refund_seq} and status not in 'N'
     </select>
 
-<!--    <update id="updRefundStatus">-->
-<!--        update refund set status = 'Y' where refund_seq = #{refund_seq}-->
-<!--    </update>-->
+    <!--    <update id="updRefundStatus">-->
+    <!--        update refund set status = 'Y' where refund_seq = #{refund_seq}-->
+    <!--    </update>-->
 
     <select id="getDeliStatusByRefundSeq" resultType="String">
-        SELECT deliStatus FROM shopRefund WHERE refund_seq IN  ( SELECT refund_seq FROM refund WHERE refund_seq = #{refund_seq})
+        SELECT deliStatus FROM shopRefund WHERE refund_seq IN ( SELECT refund_seq FROM refund WHERE refund_seq =
+        #{refund_seq})
     </select>
 
     <select id="getRefundDetail" resultType="com.example.Spring_Project.dto.RefundDetailDTO">
         SELECT
-            pd.price AS originalPdPrice,
-            pay_seq,
-            payTotalPrice,
-            payTotalSum,
-            usedPoint,
-            a.pd_seq,
-            OPTIONS,
-            refundPdCount
+        pd.price AS originalPdPrice,
+        pay_seq,
+        payTotalPrice,
+        payTotalSum,
+        usedPoint,
+        a.pd_seq,
+        OPTIONS,
+        refundPdCount
         FROM product pd JOIN (
-            SELECT
-                p.pay_seq,
-                i.price AS payTotalPrice,
-                i.count AS payTotalSum,
-                usedPoint,
-                p.pd_seq,
-                OPTIONS,
-                p.count AS refundPdCount
+        SELECT
+        p.pay_seq,
+        i.price AS payTotalPrice,
+        i.count AS payTotalSum,
+        usedPoint,
+        p.pd_seq,
+        OPTIONS,
+        p.count AS refundPdCount
         FROM payInfo i JOIN (
-            SELECT
-                pd_seq,
-                OPTIONS,
-                count,
-                pay_seq
-            FROM payProduct  WHERE payPd_seq = #{payPd_seq}) p ON i.pay_seq = p.pay_seq) a ON pd.PD_SEQ  = a.pd_seq
+        SELECT
+        pd_seq,
+        OPTIONS,
+        count,
+        pay_seq
+        FROM payProduct WHERE payPd_seq = #{payPd_seq}) p ON i.pay_seq = p.pay_seq) a ON pd.PD_SEQ = a.pd_seq
     </select>
 
     <update id="increaseMemPoint">
         update
-            member
+        member
         set point = #{refundPoint}
         where id = #{id}
     </update>
@@ -1440,7 +1513,7 @@
     </select>
 
     <select id="refundData" resultType="Hashmap">
-        SELECT    a.pay_seq,
+        SELECT a.pay_seq,
         a.payPd_seq,
         a.pd_seq,
         a.OPTIONS,
@@ -1496,5 +1569,120 @@
 
     <select id="refundYN" resultType="Integer">
         select count(*) from refund where payPd_seq = #{payPd_seq} and status not in 'N'
+    </select>
+
+    <select id="getParentCategorySeq" resultType="Integer">
+        SELECT category_seq FROM category WHERE name = #{parentCategory}
+    </select>
+
+
+    <select id="getChildCategorySeq" resultType="Integer">
+        SELECT category_seq FROM category WHERE name = #{childCategory} AND PARENT_CATEGORY_SEQ = #{parent_category_seq}
+    </select>
+
+    <select id="pdCntByCategory" resultType="Integer">
+        SELECT count(*) FROM product WHERE category = #{child_category_seq}
+    </select>
+
+    <select id="pdCountByParent_category" resultType="Integer">
+        SELECT count(*) FROM product WHERE category in (2,3,4,5)
+    </select>
+
+
+    <select id="pdListByCategory" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category FROM (
+        SELECT rownum rn, a.*
+        from
+        ( SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category = #{child_category_seq} and status = 'Y') a) WHERE rn BETWEEN #{start} AND #{end}
+    </select>
+
+
+    <select id="pdListByParentCategory" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category FROM (
+        SELECT rownum rn, a.*
+        from
+        ( SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category in (2,3,4,5)) a) WHERE rn BETWEEN #{start} AND #{end}
+    </select>
+
+    <select id="pdListByMen" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category FROM (
+        SELECT rownum rn, a.*
+        from
+        ( SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category in (7,8,9,10)) a) WHERE rn BETWEEN #{start} AND #{end}
+    </select>
+
+    <select id="pdListByNew" resultType="com.example.Spring_Project.dto.ProductDTO">
+        SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category FROM (
+        SELECT rownum rn, a.*
+        from
+        ( SELECT
+        pd_seq,
+        name,
+        description,
+        price,
+        stock,
+        status,
+        img,
+        category
+        FROM PRODUCT p WHERE category in (12,13,14,15)) a) WHERE rn BETWEEN #{start} AND #{end}
     </select>
 </mapper>

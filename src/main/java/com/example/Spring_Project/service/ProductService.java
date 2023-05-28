@@ -47,6 +47,62 @@ public class ProductService {
         return productMapper.wOuterCnt();
     }
 
+    public Integer wCnt() throws Exception {
+        return productMapper.wCnt();
+    }
+
+    public Integer wTopCnt() throws Exception {
+        return productMapper.wTopCnt();
+    }
+
+    public Integer wPantsCnt() throws Exception {
+        return productMapper.wPantsCnt();
+    }
+
+    public Integer wAccCnt() throws Exception {
+        return productMapper.wAccCnt();
+    }
+
+    public Integer mOuter() throws Exception {
+        return productMapper.mOuter();
+    }
+
+    public Integer mTop() throws Exception {
+        return productMapper.mTop();
+    }
+
+    public Integer mPants() throws Exception {
+        return productMapper.mPants();
+    }
+
+    public Integer mAcc() throws Exception {
+        return productMapper.mAcc();
+    }
+
+    public Integer nOuter() throws Exception {
+        return productMapper.nOuter();
+    }
+
+    public Integer nTop() throws Exception {
+        return productMapper.nTop();
+    }
+
+    public Integer nPants() throws Exception {
+        return productMapper.nPants();
+    }
+
+    public Integer nAcc() throws Exception {
+        return productMapper.nAcc();
+    }
+
+    public Integer mCnt() throws Exception {
+        return productMapper.mCnt();
+    }
+
+    public Integer nCnt() throws Exception {
+        return productMapper.nCnt();
+    }
+
     public List<ProductDTO> getWOuter(Integer start, Integer end) throws Exception { //여자 아우터
         return productMapper.getWOuter(start, end);
     }
@@ -932,8 +988,8 @@ public class ProductService {
     }
 
     //타입별 환불 교환 리스트
-    public List<RefundDTO> refundListByType(Integer start, Integer end,String type) throws Exception {
-        return productMapper.refundListByType(start, end,type);
+    public List<RefundDTO> refundListByType(Integer start, Integer end, String type) throws Exception {
+        return productMapper.refundListByType(start, end, type);
     }
 
     public PayProductDTO payPdInfo(Integer payPd_seq) throws Exception {
@@ -955,7 +1011,7 @@ public class ProductService {
                 Integer payPd_seq = dto.getPayPd_seq();
                 PayProductDTO payProductDTO = payPdInfo(payPd_seq);
                 ProductDTO productDTO = productMapper.getPdInfo(payProductDTO.getPd_seq());
-                if(dto.getType().equals("exchange")){
+                if (dto.getType().equals("exchange")) {
                     DeliDTO deliDTO = productMapper.getDeliInfoBySeq(dto.getDeli_seq());
                     String phone = deliDTO.getPhone().substring(0, 3) + "-" + deliDTO.getPhone().substring(3, 7) + "-" + deliDTO.getPhone().substring(7, 11);
                     deliDTO.setPhone(phone);
@@ -970,7 +1026,7 @@ public class ProductService {
 //                    }
 //                }
                 RefundDetailDTO refundDetailDTO = productMapper.getRefundDetail(payPd_seq);
-                if(dto.getType().equals("refund")) {
+                if (dto.getType().equals("refund")) {
                     Integer payTotalSum = refundDetailDTO.getPayTotalSum();  //전체 구매 개수
                     Integer refundPdCount = refundDetailDTO.getRefundPdCount(); //환불 신청한 상품 개수
                     Integer originalPdPrice = refundDetailDTO.getOriginalPdPrice(); //환불 신청한 상품 원래 가격
@@ -1028,5 +1084,45 @@ public class ProductService {
 
     public Integer refundYN(Integer payPd_seq) throws Exception {
         return productMapper.refundYN(payPd_seq);
+    }
+
+    public Integer getParentCategorySeq(String parentCategory) throws Exception {
+        return productMapper.getParentCategorySeq(parentCategory);
+    }
+
+    public Integer getChildCategorySeq(Integer parent_category_seq, String childCategory) throws Exception {
+        return productMapper.getChildCategorySeq(parent_category_seq, childCategory);
+    }
+
+    public Integer pdCntByCategory(Integer child_category_seq) throws Exception {
+        return productMapper.pdCntByCategory(child_category_seq);
+    }
+
+    public Integer pdCountByParent_category() throws Exception {
+        return productMapper.pdCountByParent_category();
+    }
+
+    public Integer pdCountByMen() throws Exception {
+        return productMapper.pdCountByMen();
+    }
+
+    public Integer pdCountByNew() throws Exception {
+        return productMapper.pdCountByNew();
+    }
+
+    public List<ProductDTO> pdListByCategory(Integer start, Integer end, Integer child_category_seq) throws Exception {
+        return productMapper.pdListByCategory(start, end, child_category_seq);
+    }
+
+    public List<ProductDTO> pdListByParentCategory(Integer start, Integer end) throws Exception {
+        return productMapper.pdListByParentCategory(start, end);
+    }
+
+    public List<ProductDTO> pdListByMen(Integer start, Integer end) throws Exception {
+        return productMapper.pdListByMen(start, end);
+    }
+
+    public List<ProductDTO> pdListByNew(Integer start, Integer end) throws Exception {
+        return productMapper.pdListByNew(start, end);
     }
 }

@@ -99,9 +99,16 @@ public class ProductController {
 
     //여성 카테고리
     @RequestMapping("/women")
-    public String wProduct(Model model) throws Exception {
+    public String wProduct(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.wCnt(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
         List<ProductDTO> productDTOList = productService.getWProduct();
         model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("paging", paging);
         return "/product/women";
     }
 
@@ -119,96 +126,256 @@ public class ProductController {
         return "/product/women/outer";
     }
 
+    @ResponseBody
+    @PostMapping("repagingList") //상위 하위 카테고리
+    public Map<String, Object> repagingList(@RequestParam String parentCategory, @RequestParam String childCategory, @RequestParam Integer cpage) throws Exception {
+        Map<String, Object> remap = new HashMap<>();
+        Integer parent_category_seq = productService.getParentCategorySeq(parentCategory);
+        Integer child_category_seq = productService.getChildCategorySeq(parent_category_seq, childCategory);
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.pdCntByCategory(child_category_seq); //교환/환불 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+        List<ProductDTO> productDTOList = productService.pdListByCategory(start, end, child_category_seq);
+        remap.put("paging", paging);
+        remap.put("productDTOList", productDTOList);
+        return remap;
+    }
+
+    @ResponseBody
+    @PostMapping("repagingPcategory") // 상위 카테고리 여성
+    public Map<String, Object> repagingPcategory(@RequestParam String parentCategory, @RequestParam Integer cpage) throws Exception {
+        Map<String, Object> remap = new HashMap<>();
+        Integer parent_category_seq = productService.getParentCategorySeq(parentCategory);
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.pdCountByParent_category();
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+        List<ProductDTO> productDTOList = productService.pdListByParentCategory(start, end);
+        remap.put("paging", paging);
+        remap.put("productDTOList", productDTOList);
+        return remap;
+    }
+
+    @ResponseBody
+    @PostMapping("repagingMen") // 상위 카테고리 남성
+    public Map<String, Object> repagingMen(@RequestParam String parentCategory, @RequestParam Integer cpage) throws Exception {
+        Map<String, Object> remap = new HashMap<>();
+        Integer parent_category_seq = productService.getParentCategorySeq(parentCategory);
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.pdCountByMen();
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+        List<ProductDTO> productDTOList = productService.pdListByMen(start, end);
+        remap.put("paging", paging);
+        remap.put("productDTOList", productDTOList);
+        return remap;
+    }
+
+    @ResponseBody
+    @PostMapping("repagingNew") // 상위 카테고리 신상품
+    public Map<String, Object> repagingNew(@RequestParam String parentCategory, @RequestParam Integer cpage) throws Exception {
+        Map<String, Object> remap = new HashMap<>();
+        Integer parent_category_seq = productService.getParentCategorySeq(parentCategory);
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.pdCountByNew();
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+        List<ProductDTO> productDTOList = productService.pdListByNew(start, end);
+        remap.put("paging", paging);
+        remap.put("productDTOList", productDTOList);
+        return remap;
+    }
+
     @RequestMapping("/women/top")
-    public String wTop(Model model) throws Exception {
+    public String wTop(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.wTopCnt(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
         List<ProductDTO> productDTOList = productService.getWTop();
         model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("paging", paging);
         return "/product/women/top";
     }
 
     @RequestMapping("/women/pants")
-    public String wPants(Model model) throws Exception {
+    public String wPants(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.wPantsCnt(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
         List<ProductDTO> productDTOList = productService.getWPants();
         model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("paging", paging);
         return "/product/women/pants";
     }
 
     @RequestMapping("/women/accessories")
-    public String wAccessories(Model model) throws Exception {
+    public String wAccessories(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.wAccCnt(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
         List<ProductDTO> productDTOList = productService.getWAccessories();
         model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("paging", paging);
         return "/product/women/accessories";
     }
 
     //남성 카테고리
     @RequestMapping("/men")
-    public String mProduct(Model model) throws Exception {
+    public String mProduct(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.mCnt(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
         List<ProductDTO> productDTOList = productService.getMProduct();
         model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("paging", paging);
         return "/product/men";
     }
 
     @RequestMapping("/men/outer")
-    public String mOuter(Model model) throws Exception {
+    public String mOuter(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.mOuter(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
         List<ProductDTO> productDTOList = productService.getMOuter();
         model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("paging", paging);
         return "/product/men/outer";
     }
 
     @RequestMapping("/men/top")
-    public String mTop(Model model) throws Exception {
+    public String mTop(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.mTop(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
         List<ProductDTO> productDTOList = productService.getMTop();
         model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("paging", paging);
         return "/product/men/top";
     }
 
     @RequestMapping("/men/pants")
-    public String mPants(Model model) throws Exception {
+    public String mPants(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.mPants(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
         List<ProductDTO> productDTOList = productService.getMPants();
         model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("paging", paging);
         return "/product/men/pants";
     }
 
     @RequestMapping("/men/accessories")
-    public String mAccessories(Model model) throws Exception {
+    public String mAccessories(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.mAcc(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
         List<ProductDTO> productDTOList = productService.getMAccessories();
         model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("paging", paging);
         return "/product/men/accessories";
     }
 
     //신상품 카테고리
     @RequestMapping("/new")
-    public String newProduct(Model model) throws Exception {
+    public String newProduct(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.nCnt(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
         List<ProductDTO> productDTOList = productService.getNewProduct();
         model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("paging", paging);
         return "/product/new";
     }
 
     @RequestMapping("/new/outer")
-    public String newOuter(Model model) throws Exception {
+    public String newOuter(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.nOuter(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
         List<ProductDTO> productDTOList = productService.getNewOuter();
         model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("paging", paging);
         return "/product/new/outer";
     }
 
     @RequestMapping("/new/top")
-    public String newTop(Model model) throws Exception {
+    public String newTop(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.nTop(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
         List<ProductDTO> productDTOList = productService.getNewTop();
         model.addAttribute("productDTOList", productDTOList);
-        return "/product/new/pants";
-    }
-
-    @RequestMapping("/new/pants")
-    public String newPants(Model model) throws Exception {
-        List<ProductDTO> productDTOList = productService.getNewPants();
-        model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("paging", paging);
         return "/product/new/top";
     }
 
+    @RequestMapping("/new/pants")
+    public String newPants(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.nPants(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
+        List<ProductDTO> productDTOList = productService.getNewPants();
+        model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("paging", paging);
+        return "/product/new/pants";
+    }
+
     @RequestMapping("/new/accessories")
-    public String newAccessories(Model model) throws Exception {
+    public String newAccessories(Model model, Integer cpage) throws Exception {
+        if (cpage == null) cpage = 1;
+        Integer postCnt = productService.nAcc(); //상품 개수
+        Map<String, Object> paging = productService.paging(cpage, postCnt);
+        Integer naviPerPage = 10;
+        Integer start = cpage * naviPerPage - (naviPerPage - 1); //시작 글 번호
+        Integer end = cpage * naviPerPage; // 끝 글 번호
         List<ProductDTO> productDTOList = productService.getNewAccessories();
         model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("paging", paging);
         return "/product/new/accessories";
     }
 
@@ -1241,7 +1408,6 @@ public class ProductController {
     }
 
 
-
     @PostMapping("/cancleRefundPopup") //환불 취소 창으로 이동
     public String cancleRefundPopup(Model model, @RequestParam Map<String, Object> map) throws Exception {
         String id = map.get("id").toString();
@@ -1269,12 +1435,13 @@ public class ProductController {
 
     @ResponseBody
     @PostMapping("/cancleRefund")
-    public String cancleRefund( @RequestParam Map<String, Object> param) throws Exception{
+    public String cancleRefund(@RequestParam Map<String, Object> param) throws Exception {
         //환불 신청한거 status n으로 변경
-        Integer payPd_seq  = Integer.parseInt(param.get("payPd_seq").toString());
+        Integer payPd_seq = Integer.parseInt(param.get("payPd_seq").toString());
         productService.updRefundStatus(payPd_seq);
         return "success";
     }
+
     @ResponseBody
     @PostMapping("/refund")  //refund 테이블에 인서트 환불
     public String refundPd(@RequestParam Map<String, Object> param) throws Exception {
@@ -1285,12 +1452,13 @@ public class ProductController {
 
     @ResponseBody
     @PostMapping("/cancleExchange")
-    public String cancleExchange( @RequestParam Map<String, Object> param) throws Exception{
+    public String cancleExchange(@RequestParam Map<String, Object> param) throws Exception {
         //환불 신청한거 status n으로 변경
-        Integer payPd_seq  = Integer.parseInt(param.get("payPd_seq").toString());
+        Integer payPd_seq = Integer.parseInt(param.get("payPd_seq").toString());
         productService.updRefundStatus(payPd_seq);
         return "success";
     }
+
     @PostMapping("/cancleExchangePopup") //교환 취소 창으로 이동
     public String cancleExchange(Model model, @RequestParam Map<String, Object> map) throws Exception {
         String id = map.get("id").toString();
@@ -1319,13 +1487,13 @@ public class ProductController {
     @ResponseBody
     @PostMapping("/refundYN")
     public String refundYN(@RequestParam Map<String, Object> param) throws Exception {
-        String result="";
+        String result = "";
         String id = param.get("id").toString();
-        Integer payPd_seq  = Integer.parseInt(param.get("payPdSeq").toString());
+        Integer payPd_seq = Integer.parseInt(param.get("payPdSeq").toString());
         Integer count = productService.refundYN(payPd_seq);
-        if(count != 0){
+        if (count != 0) {
             result = "Y";
-        }else{
+        } else {
             result = "N";
         }
         return result;

@@ -129,6 +129,17 @@
       text-align: center; /* 가운데 정렬 */
       padding: 15px; /* 위아래/좌우 패딩 */
     }
+
+    .pagingDiv {
+      position: fixed;
+      left: 0;
+      bottom: 130px;
+      width: 100%;
+      color: white; /* 글자색상 */
+      text-align: center; /* 가운데 정렬 */
+      /*padding: 15px; !* 위아래/좌우 패딩 *!*/
+    }
+
   </style>
 </head>
 <body>
@@ -185,6 +196,93 @@
     document.body.append(newForm);
     newForm.submit();
   })
+
+  //페이징 다시 그려줌
+  function paging(startNavi) {
+    let parentCategory = '여성';
+    let childCategory = '아우터';
+    $.ajax({
+      url: '/product/repagingList',
+      type: 'post',
+      data: {
+        "parentCategory": parentCategory,
+        "childCategory": childCategory,
+        "cpage": startNavi
+      },
+      success: function (data) {
+        $(".pagingDiv").children().remove();
+        createPaging(data);
+      }
+    })
+  }
+
+  function createPaging(data) {
+    let startNavi = data.paging.startNavi;
+    let endNavi = data.paging.endNavi;
+    let needPrev = data.paging.needPrev;
+    let needNext = data.paging.needNext;
+    let productDTOList = data.productDTOList;
+    $("#row").children().remove();
+    for (let i = 0; i < productDTOList.length; i++) {
+      var newHtml = createHtml(productDTOList[i], startNavi);
+      $("#row").append(newHtml);
+    }
+    if (needPrev) {
+      var html = createPrev(startNavi);
+      $(".pagingDiv").append(html);
+    }
+    for (let k = startNavi; k <= endNavi; k++) {
+      if (startNavi == k) {
+        var html = createNewPage1(k);
+        $(".pagingDiv").append(html);
+      } else {
+        var html = createNewPage2(k);
+        $(".pagingDiv").append(html);
+      }
+    }
+    if (needNext) {
+      var html = createNext(endNavi, totalPageCount);
+      $(".pagingDiv").append(html);
+    }
+  }
+
+  function createHtml(item, cpage) {
+    let pdName = item.name;
+    let pd_seq = item.pd_seq;
+    var HTML = '<div class="col mb-5"><div class="card h-100">';
+    HTML += '<img class="card-img-top img" src="/resources/img/products/' + item.img + '" style="width: 225px;">';
+    HTML += '<div class="card-body p-4"><div class="text-center"><h5 class="fw-bolder">';
+    HTML += '<a href="/product/detail?pd_seq=' + pd_seq + '">' + pdName + '</a></h5>';
+    HTML += item.price.toLocaleString() + '원';
+    HTML += '</div></div></div></div>';
+    return HTML;
+  }
+
+  function createPrev(startNavi) {
+    var html = '';
+    html += '<a href="javascript:void(0);" onclick="paging(' + (startNavi - 1) + ');">' + "<" + '</a>';
+    html += '<a href="javascript:void(0);" onclick="paging(' + (1) + ');">' + "맨 처음" + '</a>';
+    return html;
+  }
+
+  function createNewPage1(k) {
+    var html = '';
+    html += '<a href="javascript:void(0);" onclick="paging(' + k + ')"> ' + k + ' </a>';
+    return html;
+  }
+
+  function createNewPage2(k) {
+    var html = '';
+    html += '<a href="javascript:void(0);" onclick="paging(' + k + ')" style="font-weight: bold;"> ' + k + ' </a>';
+    return html;
+  }
+
+  function createNext(endNavi, totalPageCount) {
+    var html = '';
+    html += '<a href="javascript:void(0);" onclick="paging(' + (endNavi + 1) + ');">' + ">" + '</a>';
+    html += '<a href="javascript:void(0);" onclick="paging(' + (totalPageCount) + ');">' + "맨끝" + '</a>';
+    return html;
+  }
 </script>
 </body>
 </html>

@@ -28,7 +28,35 @@ public interface ProductMapper {
 
     List<ProductDTO> getWOuter(@Param("start") Integer start, @Param("end") Integer end); //여자 아우터
 
+    Integer wCnt();
+
     Integer wOuterCnt();
+
+    Integer wTopCnt();
+
+    Integer wPantsCnt();
+
+    Integer wAccCnt();
+
+    Integer mOuter();
+
+    Integer mTop();
+
+    Integer mPants();
+
+    Integer mAcc();
+
+    Integer nOuter();
+
+    Integer nTop();
+
+    Integer nPants();
+
+    Integer nAcc();
+
+    Integer mCnt();
+    Integer nCnt();
+
 
     List<ProductDTO> getWTop(); //여자 상의
 
@@ -75,6 +103,7 @@ public interface ProductMapper {
     OptionDTO getOptionStock(Map<String, Object> map);
 
     Integer checkOptionStockBySeq(@Param("option_seq") Integer option_seq);
+
     Integer updateOptionStatus(@Param("option_seq") Integer option_seq);
 
     Integer updatePdStatus(@Param("pd_seq") Integer pd_seq);
@@ -284,28 +313,60 @@ public interface ProductMapper {
     Integer searchPdCnt(@Param("keyword") String keyword);
 
     Map<String, Object> refundPdInfo(@Param("payPdSeq") Integer payPdSeq);
+
     Map<String, Object> refundData(@Param("payPdSeq") Integer payPdSeq);
 
     void insertRefund(Map<String, Object> param);
+
     void insertExchange(Map<String, Object> param);
 
     RefundDTO refundInfo(@Param("payPd_seq") Integer payPd_seq);
+
     Integer isRefundApprove(@Param("refund_seq") Integer refund_seq);
 
     Integer refundCount();
+
     Integer refundCntByType(@Param("type") String type);
 
     List<RefundDTO> refundList(@Param("start") Integer start, @Param("end") Integer end);
-    List<RefundDTO> refundListByType(@Param("start") Integer start, @Param("end") Integer end,@Param("type") String type);
+
+    List<RefundDTO> refundListByType(@Param("start") Integer start, @Param("end") Integer end, @Param("type") String type);
+
     PayProductDTO payPdInfo(@Param("payPd_seq") Integer payPd_seq);
+
     ShopRefundDTO refundInfoByPayPd_seq(@Param("refund_seq") Integer refund_seq);
+
     void updRefundStatus(Integer payPd_seq);
+
     String getDeliStatusByRefundSeq(@Param("refund_seq") Integer refund_seq);
+
     RefundDetailDTO getRefundDetail(@Param("payPd_seq") Integer payPd_seq);
-    void increaseMemPoint(@Param("id") String id,@Param("refundPoint") Integer refundPoint);
+
+    void increaseMemPoint(@Param("id") String id, @Param("refundPoint") Integer refundPoint);
+
     Integer getPayPdCnt(@Param("pay_seq") Integer pay_seq);
-    void chgRefundStatus(@Param("payPd_seq") Integer payPd_seq,@Param("refund_seq") Integer refund_seq);
-    Integer isPdInCart(@Param("pd_seq") Integer pd_seq,@Param("id") String id);
-    Integer isPdInCartWtOpt(@Param("pd_seq") Integer pd_seq, @Param("options") String options,@Param("id") String id);
+
+    void chgRefundStatus(@Param("payPd_seq") Integer payPd_seq, @Param("refund_seq") Integer refund_seq);
+
+    Integer isPdInCart(@Param("pd_seq") Integer pd_seq, @Param("id") String id);
+
+    Integer isPdInCartWtOpt(@Param("pd_seq") Integer pd_seq, @Param("options") String options, @Param("id") String id);
+
     Integer refundYN(@Param("payPd_seq") Integer payPd_seq);
+
+    Integer getParentCategorySeq(@Param("parentCategory") String parentCategory);
+
+    Integer getChildCategorySeq(@Param("parent_category_seq") Integer parent_category_seq, @Param("childCategory") String childCategory);
+
+    Integer pdCntByCategory(@Param("child_category_seq") Integer child_category_seq);
+
+    Integer pdCountByParent_category();
+    Integer pdCountByMen();
+    Integer pdCountByNew();
+
+    List<ProductDTO> pdListByCategory(@Param("start") Integer start, @Param("end") Integer end, @Param("child_category_seq") Integer child_category_seq);
+
+    List<ProductDTO> pdListByParentCategory(@Param("start") Integer start, @Param("end") Integer end);
+    List<ProductDTO> pdListByMen(@Param("start") Integer start, @Param("end") Integer end);
+    List<ProductDTO> pdListByNew(@Param("start") Integer start, @Param("end") Integer end);
 }
