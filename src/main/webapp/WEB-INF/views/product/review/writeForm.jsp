@@ -30,7 +30,6 @@
     <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
 
     <style>
-
         .pagingDiv {
             position: fixed;
             left: 0;
@@ -68,7 +67,8 @@
 
             $('.summernote').summernote({
                 minHeight: 500,             // 최소 높이
-                maxHeight: null,             // 최대 높이
+                maxHeight: null,
+                // width:1500,
                 focus: true,                  // 에디터 로딩후 포커스를 맞출지 여부
                 lang: "ko-KR", // 한글 설정
                 callbacks: {

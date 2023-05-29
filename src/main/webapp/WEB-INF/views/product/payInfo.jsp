@@ -419,7 +419,6 @@
             productArr.push(map);
         })
         requestPay(productArr);
-
     });
 
 
