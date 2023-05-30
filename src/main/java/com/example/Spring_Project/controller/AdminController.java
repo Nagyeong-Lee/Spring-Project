@@ -469,23 +469,35 @@ public class AdminController {
         model.addAttribute("refundInfoList", refundInfoList);
         // SELECT * FROM PAYINFO p  WHERE PAY_SEQ  IN (SELECT pay_seq FROM PAYPRODUCT p WHERE PAYPD_SEQ = 176); 가격,개수,사용포인트 가져옴
         // 사용포인트 있으면  사용포인트/개수
-        //현금도 상품원래 가격 - ( 사용포인트/개수) 한거 반환
+        //현금도 상품원래 가격 - ( 사용포인트/개수) 반환
         return "/admin/refundList";
     }
 
-    @PostMapping("/approveRefund") //교환 환불 승인 팝업창 띄움
+    @PostMapping("/approveExchg") //교환 승인 팝업
     public String approveRefund(Model model, @RequestParam Integer payPd_seq, @RequestParam Integer refund_seq) throws Exception {
         List<CourierDTO> courierDTOS = productService.getCourierInfo();
         model.addAttribute("courierDTOS", courierDTOS);
         model.addAttribute("payPd_seq", payPd_seq);
         model.addAttribute("refund_seq", refund_seq);
-        return "/admin/approveRefundPopup";
+        return "/admin/approveExchgPopup";
+    }
+    @ResponseBody
+    @PostMapping("/approveRfd") //환불 완료하면 멤버 포인트 증가
+    public String insertRefund(Model model, @RequestParam Integer payPd_seq, @RequestParam Integer refund_seq) throws Exception {
+        productService.increaseMemPoint(payPd_seq,refund_seq); //멤버 포인트 증가
+        adminService.insertSRefund(payPd_seq,refund_seq); // shopRefund 테이블 인서트
+        //해당 payPd_seq reufund status y로 변경
+        productService.chgRefundStatus(payPd_seq, refund_seq);
+
+        //상품 재고 , 옵션 재고 증가
+        //productService.increasePdStock(payPd_seq);
+
+        return "success";
     }
 
     @ResponseBody
-    @PostMapping("/apprRefund") //관리자가 교환 승인할때 db인서트
+    @PostMapping("/appreExchg") //관리자가 교환 승인할때 db인서트
     public String apprRefund(@RequestParam Map<String, Object> map) throws Exception {
-        System.out.println("map = " + map);
         String name = map.get("courier").toString();
         Integer courierCode = productService.getCourierCode(name);//택배사 코드
         map.put("code", courierCode);

@@ -4,10 +4,15 @@ import com.example.Spring_Project.dto.*;
 import com.example.Spring_Project.service.*;
 import com.google.gson.*;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,6 +44,12 @@ public class ProductController {
 
     @Autowired
     private QnAService qnAService;
+
+    @Autowired
+    private SqlSession sqlSession;
+
+    @Autowired
+    private DataSourceTransactionManager transactionManager;
 
     @RequestMapping("/list") //전체 상품 리스트
     public String productList(Model model, Integer cpage, String keyword) throws Exception {
@@ -524,7 +535,7 @@ public class ProductController {
         return "success";
     }
 
-    @RequestMapping("/payInfo") //결제하기
+    @RequestMapping("/payInfo") //결제 상세 페이지
     public String toPayInfo(Model model, String data, Integer price, String buyPdSeq, String productArr) throws Exception { //data : id
         JsonParser jsonParser = new JsonParser();
         System.out.println("productArr = " + productArr);
@@ -558,6 +569,14 @@ public class ProductController {
         double memPoint = 0; //총 적립될 포인트
         double point = 0; //상품당 적립될 포인트
         for (Integer i = 0; i < buyList.size(); i++) {
+            //상품 재고 체크
+            // 상품 체크 서비스
+//
+//            if (true) { //있을경우
+//
+//            } else {//없을경우
+//
+//            }
             //count,pd_seq,options
             Integer pd_seq = productService.getPdSeq(buyList.get(i));
             ProductDTO productDTO = productService.getPdInfo(pd_seq);
@@ -683,9 +702,8 @@ public class ProductController {
         return "success";
     }
 
-    @RequestMapping("/paymentDetails")   //결제 후 결제정보 보여주기
+    @RequestMapping("/paymentDetails")   //결제 테이블 인서트, 결제정보 보여주기
     @Transactional
-//    public String paymentDetails(Model model, String id, Integer price, String carts, Integer seq, Integer pdTotalSum, Integer usedPoint, @RequestBody List<Map<String,Object>> productArr) throws Exception {
     public String paymentDetails(Model model, String id, Integer price, String carts, Integer seq, Integer pdTotalSum, @RequestParam(required = false) Integer usedPoint, @RequestParam String testArray) throws Exception {
         if (usedPoint == null) usedPoint = 0;
         //productArr - 가격
@@ -693,6 +711,22 @@ public class ProductController {
         JsonArray jsonObject2 = (JsonArray) jsonParser.parse(testArray);
         Integer totalPdPrice = 0;
         double totalNewPoint = 0.0;
+
+//        for (int i = 0; i < jsonObject2.size(); i++) {
+//            JsonObject jsonObject1 = (JsonObject) jsonObject2.get(i);
+//            Integer pdSeq = jsonObject1.get("pdSeq").getAsInt();
+//            Integer pdStock = jsonObject1.get("pdStock").getAsInt();
+//            Integer pdPrice = productService.getPdPrice(pdSeq);
+//            totalPdPrice += pdPrice * pdStock;
+//            double percent = productService.getPercent(pdSeq);
+//            totalNewPoint += pdStock * pdPrice * percent / 100;
+//        }
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+
+        def.setName("example-transaction");
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        TransactionStatus status = transactionManager.getTransaction(def);
+
         for (int i = 0; i < jsonObject2.size(); i++) {
             JsonObject jsonObject1 = (JsonObject) jsonObject2.get(i);
             Integer pdSeq = jsonObject1.get("pdSeq").getAsInt();
@@ -701,7 +735,73 @@ public class ProductController {
             totalPdPrice += pdPrice * pdStock;
             double percent = productService.getPercent(pdSeq);
             totalNewPoint += pdStock * pdPrice * percent / 100;
+
+//            Integer pd_stock = productService.productStock(pdSeq);    //상품 재고 체크
+//            System.out.println("상품재고체크 = " + pd_stock);
+//
+//            //상품 수량 변경
+//            productService.chgPdCount(pdSeq, pdStock);
+
+            //옵션 있을때
+            Integer productCnt = 0;
+            JsonObject jsonObject = (JsonObject) jsonObject1.get(String.valueOf(i));
+            Integer seq1 = jsonObject1.get("pdSeq").getAsInt();
+            Integer count = jsonObject1.get("pdStock").getAsInt();
+            if (jsonObject1.has("optionArr")) {
+                JsonArray jsonArray = (JsonArray) jsonParser.parse(jsonObject1.get("optionArr").toString());
+                for (int k = 0; k < jsonArray.size(); k++) {
+                    String[] option = jsonArray.get(k).getAsString().split("=");
+                    String category = option[0].replace("\"", "");
+                    String name = option[1].replace("\"", "");
+                    productCnt = productService.productOptionStock(category, name, seq1); //옵션 있을때 수량 체크
+                    OptionDTO optionDTO = productService.optionInfo(seq1, name, category);
+                    if (count > productCnt) {  //재고보다 많을때
+                        //수동 커밋
+                        transactionManager.commit(status);
+                        return "redirect:/product/error";
+                    } else if (productCnt <= 0) { //재고가 0보다 작을때 status n으로
+                        productService.updateOptionStatus(optionDTO.getOption_seq());
+                        return "redirect:/product/error";
+                    } else {
+                        //상품 재고 -
+                        productService.chgPdCount(seq1, count);
+                        //수량 감소하고 재고가 0이 될 경우 status n
+                        Integer stock = productService.getPdStock(seq1);
+                        if (stock == 0) {
+                            productService.updatePdStatus(seq1);
+                        }
+                        //옵션 재고 -
+                        productService.chgOptCount(category, name, seq1, count);
+                        //옵션 감소하고 재고가 0이 될 경우 status n
+                        OptionDTO optionDTO1 = productService.optionInfo(seq1, name, category);
+                        if (optionDTO1.getStock() == 0) {
+                            productService.updateOptionStatus(optionDTO1.getOption_seq());
+                        }
+                    }
+                }
+            }
+            //옵션 없을때
+            else {
+                Integer changedPdStock = productService.productStock(seq1);    //상품 재고 체크
+                if (count > changedPdStock) { //재고보다 많을때
+                    //수동 커밋
+                    transactionManager.commit(status);
+                    return "redirect:/product/error";
+                } else if (changedPdStock <= 0) { //재고가 0보다 작을때 status n으로
+                    productService.updatePdStatus(seq1);
+                    return "redirect:/product/error";
+                } else {
+                    //상품 수량 -
+                    productService.chgPdCount(seq1, count);
+                    //수량 감소하고 재고가 0이 될 경우 status n
+                    Integer stock = productService.getPdStock(seq1);
+                    if (stock == 0) {
+                        productService.updatePdStatus(seq1);
+                    }
+                }
+            }
         }
+
         totalPdPrice -= usedPoint;
         //기본 배송지 수정
         productService.updDeliStatus(seq);
@@ -710,6 +810,7 @@ public class ProductController {
         DeliDTO defaultAddr = productService.getDefaultAddr();
         String phone = defaultAddr.getPhone().substring(0, 3) + "-" + defaultAddr.getPhone().substring(3, 7) + "-" + defaultAddr.getPhone().substring(7, 11);
         defaultAddr.setPhone(phone);
+
         //결제 테이블에 인서트
         Map<String, Object> param = new HashMap<>();
         param.put("id", id);
@@ -730,7 +831,8 @@ public class ProductController {
         Integer totalPrice = 0;  //상품 총 합계
         Integer totalSum = 0;  //상품 총 개수
 
-        for (Integer i = 0; i < cartInfo.size(); i++) {
+        for (
+                Integer i = 0; i < cartInfo.size(); i++) {
             Map<String, Object> item = new HashMap<>();
             item.put("id", cartInfo.get(i).getId());
             item.put("count", cartInfo.get(i).getCount());
@@ -767,6 +869,7 @@ public class ProductController {
                 Object object = jsonParser.parse(cartInfo.get(i).getOptions());
                 jsonObject = (JsonObject) object;
                 jsonArray = (JsonArray) jsonObject.get("name");
+
                 list = productService.getOptionCategory(cartInfo.get(i).getCart_seq());
                 List<Map<String, Object>> optionMap = new ArrayList<>();
                 for (Integer k = 0; k < list.size(); k++) {
@@ -795,53 +898,54 @@ public class ProductController {
             productService.insertSales(salesParam);
         }
 
-        //상품 수량, 옵션 수량 변경
-        for (int i = 0; i < cartInfo.size(); i++) {
-            Integer pd_seq = cartInfo.get(i).getPd_seq();
-            Integer pdStock = productService.getPdStock(pd_seq);    //상품 재고 체크
-            System.out.println("상품재고체크 = " + pdStock);
-            Integer count = cartInfo.get(i).getCount();
-            //상품 수량 변경
-            productService.chgPdCount(pd_seq, count);
-
-            if (cartInfo.get(i).getOptions() != null) {
-                Object object = jsonParser.parse(cartInfo.get(i).getOptions());
-                JsonObject jsonObject1 = (JsonObject) object;
-                JsonArray jsonArray1 = (JsonArray) jsonObject1.get("name");
-                //상품 옵션 수량 변경
-                if (pdStock <= 0) {
-                    productService.updatePdStatus(pd_seq);
-                }
-                for (int k = 0; k < jsonArray1.size(); k++) {
-
-                    String option = String.valueOf(jsonArray1.get(k)).replace("\"", "");
-
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("pd_seq", pd_seq);
-                    map.put("option", option);
-                    map.put("count", count);
-                    //상품 수량이 0일때 status n으로
-                    OptionDTO optionStock = productService.getOptionStock(map);
-                    if (optionStock.getStock() <= 0) {
-                        //옵션 있고 옵션 수량이 0일때
-                        productService.updateOptionStatus(optionStock.getOption_seq());
-                        productService.chgOptionCount(map);
-                        //재고가 음수일떄 0으로 update해주기
-                        productService.updOptionStock(optionStock.getOption_seq(), optionStock.getPd_seq());
-                    } else if (optionStock.getStock() > 0) {
-                        //옵션 있고 옵션 수량 0이 아닐때
-                        productService.chgOptionCount(map);
-                    }
-                }
-            } else if (cartInfo.get(i).getOptions() == null) {
-                //옵션 없을때
-                Integer changedPdStock = productService.getPdStock(pd_seq);    //상품 재고 체크
-                if (changedPdStock <= 0) {
-                    //상품 수량이 0일때 status n으로
-                    productService.updatePdStatus(pd_seq);
-                }
-            }
-        }
+//        //상품 수량, 옵션 수량 변경
+//        //for update
+//        for (int i = 0; i < cartInfo.size(); i++) {
+//            Integer pd_seq = cartInfo.get(i).getPd_seq();
+//            Integer pdStock = productService.getPdStock(pd_seq);    //상품 재고 체크
+//            System.out.println("상품재고체크 = " + pdStock);
+//            Integer count = cartInfo.get(i).getCount();
+//            //상품 수량 변경
+//            productService.chgPdCount(pd_seq, count);
+//
+//            if (cartInfo.get(i).getOptions() != null) {
+//                Object object = jsonParser.parse(cartInfo.get(i).getOptions());
+//                JsonObject jsonObject1 = (JsonObject) object;
+//                JsonArray jsonArray1 = (JsonArray) jsonObject1.get("name");
+//                //상품 옵션 수량 변경
+//                if (pdStock <= 0) {
+//                    productService.updatePdStatus(pd_seq);
+//                }
+//                for (int k = 0; k < jsonArray1.size(); k++) {
+//
+//                    String option = String.valueOf(jsonArray1.get(k)).replace("\"", "");
+//
+//                    Map<String, Object> map = new HashMap<>();
+//                    map.put("pd_seq", pd_seq);
+//                    map.put("option", option);
+//                    map.put("count", count);
+//                    //상품 수량이 0일때 status n으로
+//                    OptionDTO optionStock = productService.getOptionStock(map);
+//                    if (optionStock.getStock() <= 0) {
+//                        //옵션 있고 옵션 수량이 0일때
+//                        productService.updateOptionStatus(optionStock.getOption_seq());
+//                        productService.chgOptionCount(map);
+//                        //재고가 음수일떄 0으로 update해주기
+//                        productService.updOptionStock(optionStock.getOption_seq(), optionStock.getPd_seq());
+//                    } else if (optionStock.getStock() > 0) {
+//                        //옵션 있고 옵션 수량 0이 아닐때
+//                        productService.chgOptionCount(map);
+//                    }
+//                }
+//            } else if (cartInfo.get(i).getOptions() == null) {
+//                //옵션 없을때
+//                Integer changedPdStock = productService.getPdStock(pd_seq);    //상품 재고 체크
+//                if (changedPdStock <= 0) {
+//                    //상품 수량이 0일때 status n으로
+//                    productService.updatePdStatus(pd_seq);
+//                }
+//            }
+//        }
 
         //장바구니 비우기
         productService.updCartStatus(id);
@@ -1515,22 +1619,26 @@ public class ProductController {
     @ResponseBody
     @PostMapping("/checkStock")
     public boolean checkStock(@RequestParam String testArray) throws Exception {
-        boolean result = false;
         JsonParser jsonParser = new JsonParser();
         JsonArray jsonObject2 = (JsonArray) jsonParser.parse(testArray);
-        for (int i = 0; i < jsonObject2.size(); i++) {
-            JsonObject jsonObject1 = (JsonObject) jsonObject2.get(i);
-            Integer pdSeq = jsonObject1.get("pdSeq").getAsInt();
-            Integer pdStock = jsonObject1.get("pdStock").getAsInt();
-            Integer productCnt = productService.getPdStock(pdSeq);//해당 상품 재고 가져오기
-            if (pdStock <= productCnt) {
-                result = true;
-            } else {
-                result = false;
-                break;
-            }
-        }
+        boolean result = productService.checkStock(jsonObject2);
         return result;
     }
+
+    @ResponseBody
+    @PostMapping("/checkStockInCart")
+    public boolean checkStockInCart(@RequestParam String testArray) throws Exception {
+        JsonParser jsonParser = new JsonParser();
+        JsonArray jsonObject2 = (JsonArray) jsonParser.parse(testArray);
+        boolean result = productService.checkStockInCart(jsonObject2);
+        return result;
+    }
+
+    @RequestMapping("/error")
+    public String toErrorPage() throws Exception{
+        return "/product/error";
+    }
+
+
 
 }

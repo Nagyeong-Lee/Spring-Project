@@ -59,7 +59,7 @@
     let q_seq = $("#q_seq").val();
     let content = $("#content").val();
     if (content.length === 0) {
-      alert('질문을 작성해주세요.');
+      alert('답변을 작성해주세요.');
       return;
     }
 

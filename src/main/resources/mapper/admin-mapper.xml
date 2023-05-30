@@ -303,4 +303,16 @@
         'N'
         )
     </insert>
+
+    <insert id="insertSRefund" >
+        insert into shopRefund values(
+        sr_seq.nextval,
+        #{refund_seq},
+        'Y',
+        null,
+        null,
+        #{payPd_seq},
+        'N'
+        )
+    </insert>
 </mapper>

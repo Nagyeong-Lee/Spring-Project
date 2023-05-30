@@ -4,9 +4,11 @@ import com.example.Spring_Project.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
+import javax.swing.text.html.Option;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +57,7 @@ public interface ProductMapper {
     Integer nAcc();
 
     Integer mCnt();
+
     Integer nCnt();
 
 
@@ -109,6 +112,13 @@ public interface ProductMapper {
     Integer updatePdStatus(@Param("pd_seq") Integer pd_seq);
 
     Integer getPdStock(@Param("pd_seq") Integer pd_seq);
+    Integer productStock(@Param("pd_seq") Integer pd_seq);
+    Integer checkPdStock(@Param("pd_seq") Integer pd_seq);
+
+    Integer getPdOptStock(@Param("category") String category, @Param("name") String name, @Param("pd_seq") Integer pd_seq);
+    Integer productOptionStock(@Param("category") String category, @Param("name") String name, @Param("pd_seq") Integer pd_seq);
+
+    Integer checkOptStock(@Param("category") String category, @Param("name") String name, @Param("pd_seq") Integer pd_seq);
 
     List<CartDTO> getCartInfo(@Param("id") String id);
 
@@ -151,8 +161,10 @@ public interface ProductMapper {
     void updCartStatus(@Param("id") String id);
 
     void chgPdCount(@Param("pd_seq") Integer pd_seq, @Param("count") Integer count);
+    void chgOptCount(@Param("pd_seq")  String category, @Param("name")  String name, @Param("pd_seq")Integer pd_seq, @Param("count") Integer count);
 
     void chgOptionCount(Map<String, Object> map);
+    OptionDTO optionInfo(@Param("pd_seq") Integer pd_seq,@Param("name") String name,@Param("category") String category);
 
     Integer getPdSeq(@Param("cart_seq") Integer cart_seq);
 
@@ -177,6 +189,9 @@ public interface ProductMapper {
     List<OptionDTO> getOptByGroup(@Param("pd_seq") Integer pd_seq);
 
     void deletePd(@Param("pd_seq") Integer pd_seq);
+
+    @Update("update product set status = 'Y' where status = 'N' and pd_seq = #{pd_seq}")
+    void updatePdStatusToY(@Param("pd_seq") Integer pd_seq);
 
     ProductDTO getPdInfo(@Param("pd_seq") Integer pd_seq);
 
@@ -348,6 +363,19 @@ public interface ProductMapper {
 
     void chgRefundStatus(@Param("payPd_seq") Integer payPd_seq, @Param("refund_seq") Integer refund_seq);
 
+    PayProductDTO getPayProductDTO(@Param("payPd_seq") Integer payPd_seq);
+
+    void updPdStock(@Param("pd_seq") Integer pd_seq, @Param("count") Integer count);
+
+    void updPdOptionStock(@Param("pd_seq") Integer pd_seq, @Param("optName") String optionName, @Param("optCategory") String optionCategory, @Param("count") Integer count);
+
+    OptionDTO getOptionDTO(@Param("pd_seq") Integer pd_seq, @Param("optName") String optionName, @Param("optCategory") String optionCategory);
+
+    @Update("update options set status = 'Y' where option_seq = #{option_seq}")
+    void updatePdOptStatusToY(@Param("option_seq") Integer option_seq);
+
+    //    @Select("select stock from product where pd_seq = #{pd_seq}")
+//    Integer pdStock(@Param("pd_seq") Integer pd_seq);
     Integer isPdInCart(@Param("pd_seq") Integer pd_seq, @Param("id") String id);
 
     Integer isPdInCartWtOpt(@Param("pd_seq") Integer pd_seq, @Param("options") String options, @Param("id") String id);
@@ -361,12 +389,16 @@ public interface ProductMapper {
     Integer pdCntByCategory(@Param("child_category_seq") Integer child_category_seq);
 
     Integer pdCountByParent_category();
+
     Integer pdCountByMen();
+
     Integer pdCountByNew();
 
     List<ProductDTO> pdListByCategory(@Param("start") Integer start, @Param("end") Integer end, @Param("child_category_seq") Integer child_category_seq);
 
     List<ProductDTO> pdListByParentCategory(@Param("start") Integer start, @Param("end") Integer end);
+
     List<ProductDTO> pdListByMen(@Param("start") Integer start, @Param("end") Integer end);
+
     List<ProductDTO> pdListByNew(@Param("start") Integer start, @Param("end") Integer end);
 }

@@ -61,6 +61,12 @@
             text-align: center; /* 가운데 정렬 */
             padding: 15px; /* 위아래/좌우 패딩 */
         }
+
+        /*.img{*/
+        /*    display: flex;*/
+        /*    align-items: center;*/
+        /*}*/
+
     </style>
     <script>
 
@@ -268,7 +274,7 @@
                                 <img src="/resources/img/products/pdReview/${i.sysname}"
                                      style="width: 100px; height: 100px;">
                                 <button type="button" onclick="deleteFile(${i.img_seq})" class="deleteFile"
-                                        id="${i.img_seq}">x
+                                        id="${i.img_seq}">삭제
                                 </button>
                             </div>
                         </c:forEach>

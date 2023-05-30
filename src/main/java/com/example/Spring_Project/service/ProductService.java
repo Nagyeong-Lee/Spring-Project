@@ -230,6 +230,26 @@ public class ProductService {
         return productMapper.getPdStock(pd_seq);
     }
 
+    public Integer productStock(Integer pd_seq) throws Exception {
+        return productMapper.productStock(pd_seq);
+    }
+
+    public Integer checkPdStock(Integer pd_seq) throws Exception {
+        return productMapper.checkPdStock(pd_seq);
+    }
+
+    public Integer getPdOptStock(String category, String name, Integer pd_seq) throws Exception {
+        return productMapper.getPdOptStock(category, name, pd_seq);
+    }
+
+    public Integer productOptionStock(String category, String name, Integer pd_seq) throws Exception {
+        return productMapper.productOptionStock(category, name, pd_seq);
+    }
+
+    public Integer checkOptStock(String category, String name, Integer pd_seq) throws Exception {
+        return productMapper.checkOptStock(category, name, pd_seq);
+    }
+
     public List<CartDTO> getCartInfo(String id) throws Exception {
         return productMapper.getCartInfo(id);
     }
@@ -316,6 +336,13 @@ public class ProductService {
         productMapper.chgPdCount(pd_seq, count);
     }
 
+    public void chgOptCount(String category, String name, Integer pd_seq, Integer count) throws Exception {  //상품 수량 변경
+        productMapper.chgOptCount(category,name,pd_seq, count);
+    }
+
+    public OptionDTO optionInfo(Integer pd_seq,String name,String category) throws Exception{
+        return productMapper.optionInfo(pd_seq,name,category);
+    }
     public void chgOptionCount(Map<String, Object> map) throws Exception {  //상품 옵션 수량 변경
         productMapper.chgOptionCount(map);
     }
@@ -804,6 +831,23 @@ public class ProductService {
         return productMapper.getCourierInfo();
     }
 
+    public void increaseMemPoint(Integer payPd_seq, Integer refund_seq) throws Exception {
+        RefundDetailDTO refundDetailDTO = productMapper.getRefundDetail(payPd_seq);
+        Map<String, Object> map = new HashMap<>();
+        Integer payTotalSum = refundDetailDTO.getPayTotalSum();  //전체 구매 개수
+        Integer refundPdCount = refundDetailDTO.getRefundPdCount(); //환불 신청한 상품 개수
+        Integer originalPdPrice = refundDetailDTO.getOriginalPdPrice(); //환불 신청한 상품 원래 가격
+        Integer refundPoint = 0; //환불받을 포인트
+        if (refundDetailDTO.getUsedPoint() != 0) {
+            refundPoint = Math.round(refundDetailDTO.getUsedPoint() / payTotalSum);
+        }
+        Integer refundMoney = originalPdPrice * refundPdCount - refundPoint;
+        map.put("refundPoint", refundPoint); //환불받을 포인트
+        map.put("refundMoney", refundMoney); //환불받을 돈
+        //멤버 포인트 다시 증가시킴
+        productMapper.increaseMemPoint(refundDetailDTO.getId(), refundPoint);
+    }
+
     public void insert(Integer code, String name) throws Exception {
         productMapper.insert(code, name);
     }
@@ -814,6 +858,52 @@ public class ProductService {
 
     public void chgRefundStatus(Integer payPd_seq, Integer refund_seq) throws Exception {
         productMapper.chgRefundStatus(payPd_seq, refund_seq);
+    }
+
+    public PayProductDTO getPayProductDTO(Integer payPd_seq) throws Exception {
+        return productMapper.getPayProductDTO(payPd_seq);
+    }
+
+    @Transactional
+    public void increasePdStock(Integer payPd_seq) throws Exception {
+        PayProductDTO payProductDTO = getPayProductDTO(payPd_seq);
+        JsonParser jsonParser = new JsonParser();
+        //상품 재고 업데이트
+        Integer pd_seq = payProductDTO.getPd_seq();
+        Integer count = payProductDTO.getCount();
+        productMapper.updPdStock(pd_seq, count);
+        //상품 재고 1개 이상
+        //status가 n이면 y로
+        ProductDTO productDTO = productMapper.getPdInfo(pd_seq);
+        if (productDTO.getStatus().equals("N")) {
+            if (productDTO.getStock() >= 1) {
+                productMapper.updatePdStatusToY(pd_seq);
+            }
+        }
+
+        //옵션 있으면 -> 옵션 재고 업데이트
+        if (payProductDTO.getOptions() != null) {
+            Object object = jsonParser.parse(payProductDTO.getOptions());
+            JsonObject jsonObject = (JsonObject) object;
+            JsonArray jsonArray = (JsonArray) jsonObject.get("name");
+            List<Map<String, Object>> optionMapList = new ArrayList<>();
+            Map<String, Object> optionMap = null;
+            for (int i = 0; i < jsonArray.size(); i++) {
+                optionMap = new HashMap<>();
+                //size = s
+                String optName = jsonArray.get(i).toString().replace("\"", "");
+                String optCategory = this.getOptCategory(payProductDTO.getPd_seq(), optName); //옵션 카테고리 이름 가져오기 (size)
+                productMapper.updPdOptionStock(pd_seq, optName, optCategory, count);
+                //option stock 1이상이면 status Y로 변경
+                OptionDTO optionDTO = productMapper.getOptionDTO(pd_seq, optName, optCategory);
+                //status가 n이면 y로
+                if (optionDTO.getStatus().equals("N")) {
+                    if (optionDTO.getStock() >= 1) {
+                        productMapper.updatePdOptStatusToY(optionDTO.getOption_seq());
+                    }
+                }
+            }
+        }
     }
 
     public void deliveryStatus(Integer code, Integer sales_seq) throws Exception {
@@ -1004,9 +1094,9 @@ public class ProductService {
     public List<Object> getRefundInfo(List<RefundDTO> refundList) throws Exception {
         JsonParser jsonParser = new JsonParser();
         List<Object> refundInfoList = new ArrayList<>();
-        List<Map<String, Object>> optionMapList = new ArrayList<>();
         if (refundList != null) {
             for (RefundDTO dto : refundList) {
+                List<Map<String, Object>> optionMapList = new ArrayList<>();
                 Map<String, Object> map = new HashMap<>();
                 Integer payPd_seq = dto.getPayPd_seq();
                 PayProductDTO payProductDTO = payPdInfo(payPd_seq);
@@ -1037,9 +1127,8 @@ public class ProductService {
                     Integer refundMoney = originalPdPrice * refundPdCount - refundPoint;
                     map.put("refundPoint", refundPoint); //환불받을 포인트
                     map.put("refundMoney", refundMoney); //환불받을 돈
-                    //멤버 포인트 다시 증가시킴
-                    productMapper.increaseMemPoint(dto.getId(), refundPoint);
-
+//                    //멤버 포인트 다시 증가시킴
+//                    productMapper.increaseMemPoint(dto.getId(), refundPoint);
                 }
 
                 map.put("shopRefundDTO", shopRefundDTO);
@@ -1125,4 +1214,75 @@ public class ProductService {
     public List<ProductDTO> pdListByNew(Integer start, Integer end) throws Exception {
         return productMapper.pdListByNew(start, end);
     }
+
+    public boolean checkStock(JsonArray jsonObject2) throws Exception {
+        boolean result = false;
+        JsonParser jsonParser = new JsonParser();
+        for (int i = 0; i < jsonObject2.size(); i++) {
+            Integer productCnt = 0;
+            JsonObject jsonObject1 = (JsonObject) jsonObject2.get(i);
+            Integer pdSeq = jsonObject1.get("pdSeq").getAsInt();
+            Integer pdStock = jsonObject1.get("pdStock").getAsInt();
+            if (jsonObject1.has("optionArr")) {
+                JsonArray jsonArray = (JsonArray) jsonParser.parse(jsonObject1.get("optionArr").toString());
+                for (int k = 0; k < jsonArray.size(); k++) {
+                    String[] option = jsonArray.get(k).getAsString().split("=");
+                    String category = option[0].replace("\"", "");
+                    String name = option[1].replace("\"", "");
+                    productCnt = this.getPdOptStock(category, name, pdSeq); //옵션 있을때 수량 체크
+                    if (pdStock <= productCnt) {
+                        result = true;
+                    } else {
+                        result = false;
+                        break;
+                    }
+                }
+            } else {
+                productCnt = this.getPdStock(pdSeq);//해당 상품 재고 가져오기
+                if (pdStock <= productCnt) {
+                    result = true;
+                } else {
+                    result = false;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    public boolean checkStockInCart(JsonArray jsonObject2) throws Exception {
+        boolean result = false;
+        JsonParser jsonParser = new JsonParser();
+        for (int i = 0; i < jsonObject2.size(); i++) {
+            Integer productCnt = 0;
+            JsonObject jsonObject1 = (JsonObject) jsonObject2.get(i);
+            Integer seq = jsonObject1.get("seq").getAsInt();
+            Integer count = jsonObject1.get("count").getAsInt();
+            if (jsonObject1.has("optionArr")) {
+                JsonArray jsonArray = (JsonArray) jsonParser.parse(jsonObject1.get("optionArr").toString());
+                for (int k = 0; k < jsonArray.size(); k++) {
+                    String[] option = jsonArray.get(k).getAsString().split("=");
+                    String category = option[0].replace("\"", "");
+                    String name = option[1].replace("\"", "");
+                    productCnt = this.checkOptStock(category, name, seq); //옵션 있을때 수량 체크
+                    if (count <= productCnt) {
+                        result = true;
+                    } else {
+                        result = false;
+                        break;
+                    }
+                }
+            } else {
+                productCnt = this.checkPdStock(seq);//해당 상품 재고 가져오기
+                if (count <= productCnt) {
+                    result = true;
+                } else {
+                    result = false;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
 }

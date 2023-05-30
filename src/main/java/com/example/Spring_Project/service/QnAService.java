@@ -97,6 +97,9 @@ public class QnAService {
         qnAMapper.updAns(param);
     }
 
+    public void deleteAns(Integer q_seq) throws Exception{
+        qnAMapper.deleteAns(q_seq);
+    }
     public Integer countQuestion() throws Exception {
         return qnAMapper.countQuestion();
     }

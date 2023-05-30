@@ -309,4 +309,7 @@ public class AdminService {
     public void insertShopRefund(Map<String,Object> map) throws Exception{
         adminMapper.insertShopRefund(map);
     }
+    public void insertSRefund(Integer payPd_seq,Integer refund_seq) throws Exception{
+        adminMapper.insertSRefund(payPd_seq,refund_seq);
+    }
 }

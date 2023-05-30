@@ -149,7 +149,7 @@
 <c:choose>
     <c:when test="${productDTO.stock > 0}">
         <div class="count" style="margin-left: 1180px;">
-            <input type="text" style="width: 40px;" value="0" id="count" readonly>
+            <input type="text" style="width: 40px;" value="1" id="count" readonly>
             <button style="width: 30px;" id="plus" class="btn btn-light">+</button>
             <button style="width: 30px;" id="minus" class="btn btn-light">-</button>
             <button type="button" id="addItems" class="btn btn-dark">담기</button>
@@ -399,7 +399,7 @@
     $("select").change(function () {
         optionCount = $("select option:selected").text();
         //옵션 변경 시 초기화
-        $("#count").val(0);
+        $("#count").val(1);
         $("#totalStock").text($("#originalTotalStock").val());
         changFlag = true;
     });
@@ -411,6 +411,7 @@
         if ($("#optionYN").val() != 0) {
             if (str == 0) {
                 alert('옵션을 먼저 선택해주세요');
+                $("#count").val(1);
                 return;
             }
             let numbers = str.match(/\d+/g);
@@ -436,6 +437,7 @@
                 // }
             } else if (!(count >= 0 && count < min)) {
                 alert('개수를 다시 선택해주세요');
+                $("#count").val(1);
             }
         } else {
             let count = parseInt($("#count").val());
@@ -471,6 +473,7 @@
             let min = Math.min.apply(Math, integerArray);
             if (count == 0) {
                 alert('수량을 1개 이상 선택해주세요.');
+                $("#count").val(1);
             } else if (count >= 0) {
                 count--
                 $("#count").val(count);
@@ -493,7 +496,7 @@
             $("#totalStock").text(totalStock);
             if (count <= -1) {
                 alert('수량은 1개 이상 선택 가능합니다.');
-                $("#count").val(0);
+                $("#count").val(1);
                 $("#totalStock").text(--totalStock);
             }
         }
@@ -503,7 +506,8 @@
     $("#addItems").on("click", function () {
         let test = false;
         let pdStock = $("#originalTotalStock").val();
-
+        let inputCnt = $("#count").val();
+        let seq = $("#pd_seq").val();
         if ($("#optionYN").val() != 0) {
             if (changFlag == false) {
                 alert('옵션을 선택해주세요.');
@@ -516,8 +520,72 @@
             }
             if (Number($("#count").val()) == 0) { //수량 0일때
                 alert('수량을 1개 이상 선택해주세요.');
+                $("#count").val(1);
                 return false;
             }
+            // let pdArr = [];
+            //
+            // if ($("select").length > 0) {
+            //     let optionArr = [];
+            //     let size = $("select").length;
+            //     console.log('size');
+            //     console.log(size);
+            //     for (let i = 0; i < size; i++) {
+            //         let map = new Map();
+            //         let option = $("select").eq(i).val();
+            //         map.set("seq", seq);
+            //         map.set("option", option);
+            //         map.set("inputCnt", inputCnt);
+            //         pdArr.push(option);
+            //     }
+            //
+            //     //재고 있는지 확인
+            //     $.ajax({
+            //         url: '/product/checkStockInDetail',
+            //         type: 'post',
+            //         async: false,
+            //         data: {
+            //             "testArray": JSON.stringify(testArray)
+            //         },
+            //         success: function (data) {
+            //             console.log(data);
+            //             //재고 없으면
+            //             if (data == false) {
+            //                 alert('재고가 없습니다.');
+            //                 return;
+            //             }
+            //         }
+            //     })
+            // }else{
+            //     let seq = $("#pd_seq").val();
+            //     //재고 있는지 확인
+            //     $.ajax({
+            //         url: '/product/chkStockInDetail',
+            //         type: 'post',
+            //         async: false,
+            //         data: {
+            //             "seq": seq
+            //         },
+            //         success: function (data) {
+            //             console.log(data);
+            //             //재고 없으면
+            //             if (data == false) {
+            //                 alert('재고가 없습니다.');
+            //                 return;
+            //             }
+            //         }
+            //     })
+            // }
+            //
+            // let testArray = [];
+            // for (let i = 0; i < pdArr.length; i++) {
+            //     var param = Object.fromEntries(pdArr[i]);
+            //     testArray.push(param);
+            // }
+            //
+
+
+
             if (Number($("#count").val()) > pdStock) {
                 alert('재고보다 수량이 클 수 없습니다.');
                 return false;
@@ -543,13 +611,13 @@
                     "pd_seq": pd_seq,
                     "optionList": integerArray2.toString()
                 },
-                async:false,
+                async: false,
                 success: function (data) {
                     console.log(data);
                     if (data == 'success') {
                         alert('상품을 장바구니에 추가했습니다.');
                         $("#frm").submit();
-                    }else if(data == 'fail'){
+                    } else if (data == 'fail') {
                         alert('이미 장바구니에 추가된 상품입니다.장바구니에서 확인해주세요.');
                         return false;
                     }
@@ -558,6 +626,7 @@
         } else {
             if ($("#count").val() == 0) { //수량 0일때
                 alert('수량을 1개 이상 선택해주세요.');
+                $("#count").val(1);
                 return;
             }
             if ($("#count").val() > pdStock) {
@@ -575,19 +644,20 @@
                     "id": id,
                     "pd_seq": pd_seq
                 },
-                async:false,
+                async: false,
                 success: function (data) {
                     if (data == 'success') {
                         alert('상품을 장바구니에 추가했습니다.');
                         $("#frm").submit();
-                    }else if(data == 'fail'){
+                    } else if (data == 'fail') {
                         alert('이미 장바구니에 추가된 상품입니다.장바구니에서 확인해주세요.');
                         return false;
                     }
                 }
             });
         }
-    });
+    })
+    ;
     $("#toCart").on("click", function () {
         $("#frm").submit();
     });

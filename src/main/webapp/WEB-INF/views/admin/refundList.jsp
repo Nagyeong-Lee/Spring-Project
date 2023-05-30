@@ -82,13 +82,14 @@
     </select>
     <table id="table" class="table table-striped">
         <thead>
-            <th>이미지</th>
-            <th>상품 정보</th>
-            <th>사유</th>
-            <th>반환 금액/포인트</th>
-            <th>신청 일자</th>
-            <th>배송 정보</th>
-            <th></th>
+        <th>ID</th>
+        <th>이미지</th>
+        <th>상품 정보</th>
+        <th>사유</th>
+        <th>반환 금액/포인트</th>
+        <th>신청 일자</th>
+        <th>배송 정보</th>
+        <th></th>
         </thead>
         <c:choose>
             <c:when test="${!empty refundInfoList}">
@@ -96,6 +97,8 @@
                     <tr class="data">
                         <input type="hidden" value="${i.payPd_seq}" id="payPd_seq" name="payPd_seq">
                         <input type="hidden" value="${i.refund_seq}" id="refund_seq" name="refund_seq">
+                        <input type="hidden" value="${i.refundDTO.type}" class="refundType" name="refundType">
+                        <td>${i.id}</td>
                         <td>
                             <img src="/resources/img/products/${i.productDTO.img}" style="width: 100px; height: 100px;">
                         </td>
@@ -130,11 +133,11 @@
                         <td>
                             <c:choose>
                                 <c:when test="${i.shopRefundDTO.status == 'Y'}">
-                                    <button type="button" id="cplApproveBtn" class="btn btn-light" disabled>승인 완료
+                                    <button type="button" class="btn btn-light cplApproveBtn"  disabled>승인 완료
                                     </button>
                                 </c:when>
                                 <c:otherwise>
-                                    <button type="button" id="approveBtn" class="btn btn-light">승인</button>
+                                    <button type="button"  class="btn btn-ligh approveBtn">승인</button>
                                 </c:otherwise>
                             </c:choose>
                         </td>
@@ -238,8 +241,10 @@
 
     function createHtml(item, cpage) {
         var HTML = ' <tr><input type="hidden" value="' + item.payPd_seq + '" id="payPd_seq" name="payPd_seq"><input type="hidden" value="' + item.refund_seq + '" id="refund_seq" name="refund_seq">';
+        HTML += '<td>' + item.id;
+        +'</td>'
         HTML += '<td><img class="card-img-top img" src="/resources/img/products/' + item.productDTO.img + '" style="width: 100px; height: 100px;"></td>';
-        HTML += '<td>'+item.productDTO.name;
+        HTML += '<td>' + item.productDTO.name;
         // 옵션 출력
         if (Object.keys(item).includes('optionMapList')) {  //key가 optionMapList 있으면 출력
             for (let k = 0; k < item.optionMapList.length; k++) {
@@ -247,25 +252,25 @@
                 HTML += '<p>' + Object.keys(item.optionMapList[k]) + ":" + Object.values(item.optionMapList[k]) + '</p>';
             }
         }
-        HTML += '<br>'+item.count+'개'+'-'+item.price.toLocaleString()+'원</td>';
-        HTML += '<td>'+item.content+'</td>';
-        if(item.refundPoint != null){
-            HTML += '<td><p>반환 포인트 : '+item.refundPoint.toLocaleString()+'점</p>';
-            HTML += '<p>반환 금액 : '+item.refundMoney.toLocaleString()+'원</p></td>';
-        }else{
-            HTML +='<td></td>';
-        }
-        HTML += '<td>'+item.applyDate+'</td>';
-        if(item.deliDTO != null){
-            HTML += '<td><p>받는 사람 : '+item.deliDTO.name+'</p>';
-            HTML += '<p>전화번호 : '+item.deliDTO.phone+'</p>';
-            HTML += '<p>주소 : '+item.deliDTO.address+'</p></td>';
-        }else{
+        HTML += '<br>' + item.count + '개' + '-' + item.price.toLocaleString() + '원</td>';
+        HTML += '<td>' + item.content + '</td>';
+        if (item.refundPoint != null) {
+            HTML += '<td><p>반환 포인트 : ' + item.refundPoint.toLocaleString() + '점</p>';
+            HTML += '<p>반환 금액 : ' + item.refundMoney.toLocaleString() + '원</p></td>';
+        } else {
             HTML += '<td></td>';
         }
-        if(item.shopRefundDTO.status == 'Y'){
+        HTML += '<td>' + item.applyDate + '</td>';
+        if (item.deliDTO != null) {
+            HTML += '<td><p>받는 사람 : ' + item.deliDTO.name + '</p>';
+            HTML += '<p>전화번호 : ' + item.deliDTO.phone + '</p>';
+            HTML += '<p>주소 : ' + item.deliDTO.address + '</p></td>';
+        } else {
+            HTML += '<td></td>';
+        }
+        if (item.refundDTO.status == 'Y') {
             HTML += '<td><button type="button" id="cplApproveBtn" class="btn btn-light" disabled>승인 완료</button></td></tr>';
-        }else{
+        } else {
             HTML += '<td><button type="button" id="approveBtn" class="btn btn-light">승인</button></td></tr>';
         }
         return HTML;
@@ -297,38 +302,63 @@
         return html;
     }
 
-    $(document).on("click", "#approveBtn", function () {
-        let payPd_seq = $(this).closest("tr").find("#payPd_seq").val();
-        let refund_seq = $(this).closest("tr").find("#refund_seq").val();
+    //승인 클릭 시
+    $(document).on("click", ".approveBtn", function () {
+        let type = $(this).closest(".data").find(".refundType").val();
+        console.log(type)
+        //교환일때
+        if (type == 'exchange') {
+            let payPd_seq = $(this).closest("tr").find("#payPd_seq").val();
+            let refund_seq = $(this).closest("tr").find("#refund_seq").val();
 
-        var _width = '500';
-        var _height = '400';
-        var _left = Math.ceil((window.screen.width - _width) / 2);
-        var _top = Math.ceil((window.screen.height - _height) / 2);
+            var _width = '500';
+            var _height = '400';
+            var _left = Math.ceil((window.screen.width - _width) / 2);
+            var _top = Math.ceil((window.screen.height - _height) / 2);
 
-        let newFrm = document.createElement("form");
-        newFrm.setAttribute("method", "post");
-        newFrm.setAttribute("action", "/admin/approveRefund");
+            let newFrm = document.createElement("form");
+            newFrm.setAttribute("method", "post");
+            newFrm.setAttribute("action", "/admin/approveRefund");
 
-        let input1 = document.createElement("input");
-        input1.setAttribute("type", "hidden");
-        input1.setAttribute("value", payPd_seq);
-        input1.setAttribute("name", "payPd_seq");
+            let input1 = document.createElement("input");
+            input1.setAttribute("type", "hidden");
+            input1.setAttribute("value", payPd_seq);
+            input1.setAttribute("name", "payPd_seq");
 
-        let input2 = document.createElement("input");
-        input2.setAttribute("type", "hidden");
-        input2.setAttribute("value", refund_seq);
-        input2.setAttribute("name", "refund_seq");
+            let input2 = document.createElement("input");
+            input2.setAttribute("type", "hidden");
+            input2.setAttribute("value", refund_seq);
+            input2.setAttribute("name", "refund_seq");
 
-        newFrm.append(input1);
-        newFrm.append(input2);
-        document.body.append(newFrm);
+            newFrm.append(input1);
+            newFrm.append(input2);
+            document.body.append(newFrm);
 
-        window.open("/admin/approveRefund", "newFrm", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
-        var myForm = newFrm;
-        myForm.method = "post";
-        myForm.target = "newFrm";
-        myForm.submit();
+            window.open("/admin/approveExchg", "newFrm", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
+            var myForm = newFrm;
+            myForm.method = "post";
+            myForm.target = "newFrm";
+            myForm.submit();
+        }
+        //환불일때
+        else if (type == 'refund') {
+            let payPd_seq = $(this).closest("tr").find("#payPd_seq").val();
+            let refund_seq = $(this).closest("tr").find("#refund_seq").val();
+            $.ajax({
+                url: '/admin/approveRfd',
+                type: 'post',
+                data: {
+                    "payPd_seq": payPd_seq,
+                    "refund_seq": refund_seq
+                },
+                success: function (data) {
+                    console.log(data);
+                    location.reload();
+                    // $(".pagingDiv").children().remove();
+                    // createPaging(data);
+                }
+            })
+        }
     })
 </script>
 </body>

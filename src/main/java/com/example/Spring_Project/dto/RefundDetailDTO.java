@@ -12,4 +12,5 @@ public class RefundDetailDTO {
     private Integer pd_seq;
     private String options;
     private Integer refundPdCount;
+    private String id;
 }

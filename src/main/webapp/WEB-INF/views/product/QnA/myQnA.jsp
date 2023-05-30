@@ -146,8 +146,7 @@
                             <td></td>
                             <td></td>
                             <td class="aText">
-                                <i class="fa-solid fa-pen"></i>
-                                    ${i.answerDTO.answer}
+                                ㄴ${i.answerDTO.answer}
                             </td>
                             <td>${i.answerDTO.writer}</td>
                             <td>${i.answerDTO.writeDate}</td>
@@ -375,7 +374,7 @@
         HTML += '<td>' + item.questionDTO.id + '</td><td></td></tr>';
         if (item.answerYN == 'Y') {
             HTML += '<tr class="answer_' + i + ' answer" style="display:none;"><td></td><td></td>';
-            HTML += '<td class="aText"><i class="fa-solid fa-pen"></i>' + item.answerDTO.answer + '</td>';
+            HTML += '<td class="aText">ㄴ' + item.answerDTO.answer + '</td>';
             HTML += '<td>' + item.answerDTO.writer + '</td>';
             HTML += '<td>' + item.answerDTO.writeDate + '</td><td></td></tr>';
         }

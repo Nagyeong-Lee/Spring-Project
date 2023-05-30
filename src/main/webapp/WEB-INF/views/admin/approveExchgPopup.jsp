@@ -10,7 +10,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
-    <title>환불 승인 팝업</title>
+    <title>교환 승인 팝업</title>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
     </script>
@@ -57,9 +57,10 @@
 <body>
 <input type="hidden" value="${payPd_seq}" id="payPd_seq" name="payPd_seq">
 <input type="hidden" value="${refund_seq}" id="refund_seq" name="refund_seq">
-<h5>환불 승인</h5>
+<h5>교환 승인</h5>
 <div class="popup">
 <form action="/admin/apprRefund" method="post">
+    송장번호 : <input type="text" name="invoiceNum" id="invoiceNum" maxlength="13"><br>
     <c:if test="${!empty courierDTOS}">
         <select name="courier">
             <c:forEach items="${courierDTOS}" var="i">
@@ -67,7 +68,7 @@
             </c:forEach>
         </select>
     </c:if><br>
-    송장번호 : <input type="text" name="invoiceNum" id="invoiceNum" maxlength="13"><br>
+
     <button type="button" id="approveBtn" class="btn btn-light">승인</button>
     <button type="button" id="cancleBtn" class="btn btn-light">취소</button>
 </form>
@@ -98,7 +99,7 @@
             return false;
         } else {
             $.ajax({
-                url: '/admin/apprRefund',
+                url: '/admin/appreExchg',
                 type: 'post',
                 data: {
                     "courier": name,

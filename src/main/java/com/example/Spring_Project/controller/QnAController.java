@@ -121,4 +121,12 @@ public class QnAController {
         return "success";
 
     }
+
+    @ResponseBody
+    @PostMapping("/deleteAns")  //답변 삭제
+    public String deleteAns(@RequestParam Integer q_seq) throws Exception {
+        qnAService.deleteAns(q_seq);
+        return "success";
+
+    }
 }

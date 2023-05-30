@@ -135,6 +135,7 @@
                             <c:choose>
                                 <c:when test="${i.answerYN != 'N'}">
                                     <button type="button" class="updAnsBtn btn btn-light">답변 수정</button>
+                                    <button type="button" class="delAnsBtn btn btn-light">답변 삭제</button>
                                 </c:when>
                                 <c:otherwise>
                                     <button type="button" class="ansWriteBtn btn btn-light">답변 작성</button>
@@ -159,8 +160,7 @@
                             <td></td>
                             <td></td>
                             <td class="aText">
-                                <i class="fa-solid fa-pen"></i>
-                                    ${i.answerDTO.answer}</td>
+                                ㄴ${i.answerDTO.answer}</td>
                             <td>${i.answerDTO.writer}</td>
                             <td>${i.answerDTO.writeDate}</td>
                             <td></td>
@@ -268,6 +268,25 @@
 
     })
 
+    //답변 삭제
+    $(document).on("click", ".delAnsBtn", function () {
+        if (confirm('삭제하시겠습니까?')) {
+            let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
+            $.ajax({
+                url: '/QnA/deleteAns',
+                type: 'post',
+                data: {
+                    "q_seq": q_seq
+                },
+                success: function (data) {
+                    console.log(data)
+                    location.reload();
+                }
+            })
+        }
+
+    });
+
     //답변 수정
     $(document).on("click", ".updAnsBtn", function () {
 
@@ -312,7 +331,6 @@
     });
     //삭제
     $(document).on("click", ".delQBtn", function () {
-
         if (confirm('삭제하시겠습니까?')) {
             let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
             $.ajax({
@@ -415,7 +433,7 @@
         HTML += '<input type="hidden" value="' + item.cpage + '" class="cpage">';
         HTML += '<td>';
         if (item.answerYN != 'N') {
-            HTML += '<button type="button" class="updAnsBtn btn btn-light">답변 수정</button>';
+            HTML += '<button type="button" class="updAnsBtn btn btn-light">답변 수정</button><button type="button" class="delAnsBtn btn btn-light">답변 삭제</button>';
         } else {
             HTML += '<button type="button" class="ansWriteBtn btn btn-light">답변 작성</button>';
         }
@@ -426,7 +444,7 @@
         HTML += '<td>' + item.questionDTO.id + '</td><td></td></tr>';
         if (item.answerYN == 'Y') {
             HTML += '<tr class="answer_' + i + ' answer" style="display:none;"><td></td><td></td>';
-            HTML += '<td class="aText"><i class="fa-solid fa-pen"></i>' + item.answerDTO.answer + '</td>';
+            HTML += '<td class="aText">ㄴ' + item.answerDTO.answer + '</td>';
             HTML += '<td>' + item.answerDTO.writer + '</td>';
             HTML += '<td>' + item.answerDTO.writeDate + '</td><td></td></tr>';
         }

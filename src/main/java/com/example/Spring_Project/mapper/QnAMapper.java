@@ -22,7 +22,7 @@ public interface QnAMapper {
 
     List<QuestionDTO> getQuestions(@Param("pd_seq") Integer pd_seq);
 
-    @Select("select count(*) from answer where q_seq = #{q_seq}")
+    @Select("select count(*) from answer where q_seq = #{q_seq} and status = 'Y'")
     Integer isAnswerExist(@Param("q_seq") Integer q_seq);
 
     AnswerDTO getAnswer(@Param("q_seq") Integer q_seq);
@@ -40,6 +40,7 @@ public interface QnAMapper {
     List<QuestionDTO> qNaList(@Param("start") Integer start,@Param("end") Integer end);
     void insertAns(Map<String,Object> param);
     void updAns(Map<String,Object> param);
+    void deleteAns(@Param("q_seq") Integer q_seq);
     ProductDTO pdInfo(@Param("pd_seq")Integer pd_seq);
 
     @Select("select count(*) from question where status = 'Y'")

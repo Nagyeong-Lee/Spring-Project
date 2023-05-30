@@ -366,15 +366,41 @@
     </update>
 
     <select id="getOptionStock" resultType="com.example.Spring_Project.dto.OptionDTO">
-        select
-        option_seq,
-        category,
-        name,
-        stock,
-        status,
-        pd_seq
-        from options
-        where pd_seq=#{pd_seq} and name=#{option} FOR UPDATE wait 10
+                select
+                option_seq,
+                category,
+                name,
+                stock,
+                status,
+                pd_seq
+                from options
+                where pd_seq=#{pd_seq} and name=#{option} FOR UPDATE wait 10
+    </select>
+
+    <select id="getPdOptStock" resultType="Integer">
+<!--        SELECT-->
+<!--        stock-->
+<!--        FROM OPTIONS-->
+<!--        WHERE pd_seq = #{pd_seq} AND name = #{name} AND category = #{category}-->
+<!--        FOR UPDATE wait 10-->
+        SELECT
+        stock
+        FROM OPTIONS
+        WHERE pd_seq = #{pd_seq} AND name = #{name} AND category = #{category}
+    </select>
+    <select id="productOptionStock" resultType="Integer">
+        SELECT
+        stock
+        FROM OPTIONS
+        WHERE pd_seq = #{pd_seq} AND name = #{name} AND category = #{category}
+        FOR UPDATE wait 100
+    </select>
+
+    <select id="checkOptStock" resultType="Integer">
+        SELECT
+        stock
+        FROM OPTIONS
+        WHERE pd_seq = #{pd_seq} AND name = #{name} AND category = #{category}
     </select>
 
     <update id="updateOptionStatus">
@@ -382,16 +408,42 @@
     </update>
 
     <select id="getPdStock" resultType="Integer">
-        <!--        select-->
-        <!--        stock-->
-        <!--        from product-->
-        <!--        where pd_seq=#{pd_seq} and status = 'Y' FOR UPDATE-->
-
+<!--        select-->
+<!--        stock-->
+<!--        from product-->
+<!--        where pd_seq=#{pd_seq} FOR UPDATE wait 10-->
         select
         stock
         from product
-        where pd_seq=#{pd_seq} FOR UPDATE wait 10
+        where pd_seq=#{pd_seq}
     </select>
+
+    <select id="productStock" resultType="Integer">
+        select
+        stock
+        from product
+        where pd_seq=#{pd_seq} FOR UPDATE wait 100
+    </select>
+
+    <select id="checkPdStock" resultType="Integer">
+        select
+        stock
+        from product
+        where pd_seq=#{pd_seq}
+    </select>
+<!--    <select id="productOptionStock" resultType="Integer">-->
+<!--        select-->
+<!--        stock-->
+<!--        from product-->
+<!--        where pd_seq=#{pd_seq} FOR UPDATE wait 10-->
+<!--    </select>-->
+
+<!--    <select id="checkOptStock" resultType="Integer">-->
+<!--        select-->
+<!--        stock-->
+<!--        from product-->
+<!--        where pd_seq=#{pd_seq}-->
+<!--    </select>-->
 
     <update id="updatePdStatus">
         update product set status='N' where pd_seq=#{pd_seq}
@@ -560,6 +612,11 @@
 
     <update id="chgOptionCount">
         update options set stock = stock - #{count} where pd_seq = #{pd_seq} and name = #{option}
+    </update>
+
+
+    <update id="chgOptCount">
+        update options set stock = stock - #{count} where pd_seq = #{pd_seq} and name = #{option} and category = #{category}
     </update>
 
     <select id="getPdSeq" resultType="Integer">
@@ -1466,7 +1523,8 @@
         usedPoint,
         a.pd_seq,
         OPTIONS,
-        refundPdCount
+        refundPdCount,
+        a.id
         FROM product pd JOIN (
         SELECT
         p.pay_seq,
@@ -1475,7 +1533,8 @@
         usedPoint,
         p.pd_seq,
         OPTIONS,
-        p.count AS refundPdCount
+        p.count AS refundPdCount,
+        id
         FROM payInfo i JOIN (
         SELECT
         pd_seq,
@@ -1684,5 +1743,50 @@
         img,
         category
         FROM PRODUCT p WHERE category in (12,13,14,15)) a) WHERE rn BETWEEN #{start} AND #{end}
+    </select>
+
+    <select id="getPayProductDTO" resultType="com.example.Spring_Project.dto.PayProductDTO">
+        select
+            payPd_seq,
+            pay_seq,
+            pd_seq,
+            options,
+            count
+        from payProduct where payPd_seq = #{payPd_seq}
+    </select>
+
+    <update id="updPdStock">
+        update product set stock = stock + #{count}
+        where pd_seq = #{pd_seq}
+    </update>
+
+    <update id="updPdOptionStock">
+        update
+          options
+        set stock = stock + #{count}
+        where pd_seq = #{pd_seq} and category = #{optCategory} and name = #{optName}
+    </update>
+
+    <select id="getOptionDTO" resultType="com.example.Spring_Project.dto.OptionDTO">
+        select
+            option_seq,
+            category,
+            name,
+            stock,
+            pd_seq,
+            status
+        from options
+        where pd_seq = #{pd_seq} and category = #{optCategory} and name = #{optName}
+    </select>
+    <select id="optionInfo" resultType="com.example.Spring_Project.dto.OptionDTO">
+        select
+            option_seq,
+            category,
+            name,
+            stock,
+            pd_seq,
+            status
+        from options
+        where pd_seq = #{pd_seq} and category = #{category} and name = #{name}
     </select>
 </mapper>

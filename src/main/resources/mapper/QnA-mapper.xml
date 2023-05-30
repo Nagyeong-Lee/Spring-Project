@@ -38,7 +38,7 @@
             answer,
             to_char(writeDate,'YYYY-MM-DD HH24:MI') AS writeDate
         from answer
-        where q_seq = #{q_seq}
+        where q_seq = #{q_seq} and status = 'Y'
     </select>
 
     <select id="getMyQnAs" resultType="com.example.Spring_Project.dto.QuestionDTO">
@@ -218,4 +218,8 @@
             </when>
         </choose>
     </select>
+
+    <update id="deleteAns">
+        update answer set status = 'N' , ansYN = 'N' where q_seq = #{q_seq}
+    </update>
 </mapper>
