@@ -265,7 +265,6 @@
     $(document).on("click",".delQuestion",function(){
         if (confirm('삭제하시겠습니까?')) {
             let q_seq = $(this).parent().closest("tr").find(".q_seq").val();
-            console.log(q_seq)
             $.ajax({
                 url: '/QnA/delete',
                 type: "post",
@@ -290,7 +289,6 @@
                 "id": $("#id").val()
             },
             success: function (data) {
-                console.log(data);
                 $(".pagingDiv").children().remove();
                 createPaging(data);
             }
@@ -331,7 +329,6 @@
     }
 
     function createNewPage1(k) {
-        console.log(k)
         var html = '';
         html += '<a href="javascript:void(0);" onclick="paging(' + k + ')"> ' + k + ' </a>';
         return html;

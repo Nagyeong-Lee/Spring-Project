@@ -176,14 +176,11 @@
     function remove(key) {
         let newArr = [];
         for (let i = 0; i < optionArr.length; i++) {
-            console.log(optionArr[i]);
-            console.log(optionArr[i].get('key'));
             if (optionArr[i].get('key') != key) {
                 newArr.push(optionArr[i]);
             }
         }
         optionArr = newArr;
-        console.log(JSON.stringify(optionArr));
     }
 
     //삭제 클릭 시
@@ -209,20 +206,12 @@
     $("#addPdBtn").on("click", function () {
 
         let optStockSum = 0;
-        console.log($(".optionBox").length);
         for (let i = 0; i < $(".optionBox").length; i++) {
             let optionBox = $(".optionBox")[i];
             let optionStock = $(optionBox).find(".optionStock")[0];
             let optionCategory = $(optionBox).find(".optionCategory")[0];
-            console.log("optionCategory");
-            console.log($(optionCategory).val());
-            console.log($(optionStock).val());
             optStockSum += Number($(optionStock).val());
-            console.log('옵션 재고 : ');
-            console.log(optionStock);
         }
-        console.log("optStockSum");
-        console.log(optStockSum);
 
         let pdStock = $("#stock").val(); //상품 재고
         // //상품재고보다 옵션재고 많을때
@@ -247,10 +236,16 @@
             alert('재고를 숫자로 입력하세요');
             return;
         }
+        if($("#point").val() <= 0){
+            alert('퍼센티지를 다시 입력해주세요.');
+            return false;
+        }
+
         if ($("#img").val().length == 0) {
             alert('이미지를 추가해주세요');
             return;
         }
+
         //파일 확장자 안맞을때
         if (extension == false) {
             return false;
@@ -261,8 +256,6 @@
             testArray.push(param);
         }
 
-        console.log("testARR");
-        console.log(testArray);
 
         let name = $("#name").val();
         let description = $("#description").val();

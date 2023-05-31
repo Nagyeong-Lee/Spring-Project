@@ -132,8 +132,6 @@
                 "id": $("#id").val()
             },
             success: function (data) {
-                console.log('데이터');
-                console.log(data);
                 $(".itemDiv").children().remove();
                 $(".pagingDiv").children().remove();
                 createPaging(data);
@@ -150,13 +148,6 @@
         let registeredPd = data.registeredPd;
         let cpage = data.cpage;
         // debugger;
-
-        console.log("startNavi : " + startNavi);
-        console.log("endNavi : " + endNavi);
-        console.log("needPrev : " + needPrev);
-        console.log("needNext : " + needNext);
-        console.log("paging : " + paging);
-        console.log(" registeredPd.length : " + registeredPd.length);
 
         for (let i = 0; i < registeredPd.length; i++) {
             var newHtml = createHtml(registeredPd[i], startNavi);
@@ -183,8 +174,6 @@
     }
 
     function createHtml(item, cpage) {
-        console.log('아이템')
-        console.log(item);
         var Html = '';
         Html = '<tr><td><a href="/product/detail?pd_seq=' + item.productDTO.pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width: 120px; height: 100px;"></a></td>';
         Html += '<td style="width: 500px; text-align: center">' + item.productDTO.name + '</td>';
@@ -240,7 +229,6 @@
         $this = $(this);
         let pd_seq = $(this).val();
         if (confirm('상품을 삭제하시겠습니까?')) {
-            console.log(pd_seq);
             $.ajax({
                 url: '/product/deletePd',
                 type: 'post',

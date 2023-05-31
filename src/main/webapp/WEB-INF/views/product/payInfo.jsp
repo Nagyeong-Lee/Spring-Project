@@ -107,7 +107,6 @@
                     <c:when test="${i.status eq 'Y'}">기본 배송지</c:when>
                     <c:otherwise>${i.nickname}</c:otherwise>
                 </c:choose>
-
             </c:forEach>
             <c:forEach var="i" items="${deliDTOList}">
                 <c:if test="${i.status eq 'Y'}">
@@ -146,7 +145,6 @@
             var param = Object.fromEntries(productArr[i]);
             testArray.push(param);
         }
-
         //재고 있는지 확인
         $.ajax({
             url: '/product/checkStock',
@@ -156,18 +154,17 @@
                 "testArray": JSON.stringify(testArray)
             },
             success: function (data) {
-                console.log(data);
                 //재고 없으면
                 if (data == false) {
                     alert('재고가 없습니다.');
                     return;
                 }else{
+                    //재고 있으면 결제 실행
                     var email = $("#mem_email").val();
                     var name = $("#mem_name").val();
                     var phone = $("#mem_phone").val();
                     var address = $("#defaultAddress").text();
                     var price = $("#totalPrice").val();
-                    console.log("price : " + price);
                     if ($("#totalSum").val() != 1) {
                         var title = $(".pdName1").text() + '외 ' + ($("#totalSum").val() - $(".pdCnt1").val());
                     } else {
@@ -187,18 +184,18 @@
                     };
 
                     IMP.request_pay(payInfo, function (rsp) {
+                        //결제 성공
                         if (rsp.success) {
-                            //결제 실행
                             let frm = document.createElement("form");
                             frm.setAttribute("method", "post");
-                            frm.setAttribute("action", "/product/paymentDetails");
+                            frm.setAttribute("action", "/product/paymentDetails"); //결제 성공 시 결제 결과 페이지로
                             frm.setAttribute("display", "none");
                             let newInput = document.createElement("input");
                             let newInput2 = document.createElement("input");
                             let newInput3 = document.createElement("input");
                             let newInput4 = document.createElement("input");
                             let newInput5 = document.createElement("input");
-                            let newInput6 = document.createElement("input");
+                            // let newInput6 = document.createElement("input");
                             let newInput7 = document.createElement("input");
                             newInput.setAttribute("type", "hidden");
                             newInput.setAttribute("value", $("#session").val());
@@ -227,12 +224,12 @@
                             frm.appendChild(newInput3);
                             frm.appendChild(newInput4);
                             frm.appendChild(newInput5);
-                            frm.appendChild(newInput6);
+                            // frm.appendChild(newInput6);
                             frm.appendChild(newInput7);
                             document.body.appendChild(frm);
                             frm.submit();
                             var msg = '결제가 완료되었습니다.';
-                        } else {
+                        } else { //결제 실패
                             var msg = '결제에 실패했습니다.';
                         }
                         alert(msg);
@@ -242,14 +239,12 @@
         })
     }
 
+
     //포인트 사용 클릭 시 -> 서버에서 포인트 쓸 수 있는지 확인
     $("#usePointBtn").on("click", function () {
+        let isPointUsable = false;
         let inputPoint = Number($("#point").val());//입력한 포인트
         let usablePoint = $("#usablePoint").val();//나의 포인트
-        let isPointUsable = false;
-        console.log(inputPoint);
-        console.log(usablePoint);
-
         $.ajax({
             url: '/product/checkPoint',
             type: 'post',
@@ -260,12 +255,12 @@
             },
             success: function (data) {
                 if (data == true) {
-                    isPointUsable = data;
+                    isPointUsable = true;
                 }
             }
         })
 
-        //결제 금액보다 포인트 사용 많이하면
+        //결제 금액 < 포인트
         if ($("#totalPrice").val() < inputPoint) {
             alert('사용 포인트가 결제 금액보다 클 수 없습니다.');
             $("#point").val("");
@@ -285,7 +280,6 @@
             let totalHtml = totalPrice.toLocaleString() + '원 결제하기';
             $("#pay").text(totalHtml);
         }
-
     })
 
     $("#keyword").val($("#key").val());
@@ -341,7 +335,6 @@
     //배송지 삭제 클릭 시
     $("#delBtn").click(function () {
         let seq = $("input[name=address]:checked").val();
-        console.log(seq);
         let defaultSeq = 0;
         //기본 배송지 seq 가져오기
         $.ajax({
@@ -350,7 +343,6 @@
             async: false,
             success: function (data) {
                 defaultSeq = data;
-                console.log(data);
                 if (seq == data) {
                     alert('기본 배송지를 삭제할 수 없습니다.');
                     return false;
@@ -368,7 +360,6 @@
                 },
                 success: function (data) {
                     location.reload();
-                    console.log(data);
                 }
             })
         }
@@ -377,7 +368,6 @@
     //라디오 버튼 바뀔때
     $("input[type=radio]").on("change", function () {
         let seq = $(this).val();
-        console.log(seq);
         $.ajax({
             url: '/product/getSeqDeli', //해당 seq 배달정보
             type: 'post',
@@ -385,7 +375,6 @@
                 "seq": seq
             },
             success: function (data) {
-                console.log(data);
                 $("#select_name").text('이름 : ' + data.name);
                 $("#select_address").text('주소 : ' + data.address);
                 $("#select_phone").text('전화번호 : ' + data.phone);
@@ -400,7 +389,7 @@
     //결제 성공 시 -> 결제 결과 페이지
     // 결제 실패 시 -> 결제 상세 페이지 그대로
     $("#pay").on("click", function () {
-        console.log($("#point").val());
+
         if ($('input:radio[name=address]').length === 0) {
             alert('배송지를 추가해주세요');
             return false;
@@ -425,7 +414,6 @@
                 let size = $(this).find(".option").length;
                 for(let i = 0 ; i<size; i++){
                     let option = $(this).find(".option").eq(i).val();
-                    console.log(option);
                     optionArr.push(option);
                 }
                 map.set("optionArr",optionArr);

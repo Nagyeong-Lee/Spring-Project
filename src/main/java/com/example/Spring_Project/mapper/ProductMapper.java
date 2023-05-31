@@ -161,7 +161,7 @@ public interface ProductMapper {
     void updCartStatus(@Param("id") String id);
 
     void chgPdCount(@Param("pd_seq") Integer pd_seq, @Param("count") Integer count);
-    void chgOptCount(@Param("pd_seq")  String category, @Param("name")  String name, @Param("pd_seq")Integer pd_seq, @Param("count") Integer count);
+    void chgOptCount(@Param("category")  String category, @Param("name")  String name, @Param("pd_seq")Integer pd_seq, @Param("count") Integer count);
 
     void chgOptionCount(Map<String, Object> map);
     OptionDTO optionInfo(@Param("pd_seq") Integer pd_seq,@Param("name") String name,@Param("category") String category);
@@ -302,7 +302,8 @@ public interface ProductMapper {
 
     Integer productCnt(@Param("keyword") String keyword);
 
-    PayProductDTO getDeliYN(@Param("salesSeq") Integer salesSeq);
+//    PayProductDTO getDeliYN(@Param("salesSeq") Integer salesSeq);
+    String getDeliYN(@Param("salesSeq") Integer salesSeq);
 
     void updDeliveryStatus(@Param("sales_seq") Integer sales_seq, @Param("code") Integer courierCode, @Param("postNum") String postNum);
 

@@ -1010,7 +1010,6 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
-                console.log("list길이 : " + data.items.length);
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
@@ -1018,8 +1017,6 @@
                 let cpage = data.currentPage;
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
-                console.log('data.cpage : ' + data.currentPage);
-                console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $(".tbody").append(html);
@@ -1074,7 +1071,6 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
-                console.log("list길이 : " + data.items.length);
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
@@ -1082,8 +1078,6 @@
                 let cpage = data.currentPage;
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
-                console.log('data.cpage : ' + data.currentPage);
-                console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $(".tbody").append(html);
@@ -1138,7 +1132,6 @@
                 "holidayClose": result.holidayClose
             },
             success: function (data) {
-                console.log("list길이 : " + data.items.length);
                 $(".tbody").children().remove();
                 $(".pagingDiv").children().remove();
                 let items = data.items;
@@ -1146,8 +1139,6 @@
                 let cpage = data.currentPage;
                 let cnt = data.count;
                 let pageTotalCnt = data.pageTotalCount;
-                console.log('data.cpage : ' + data.currentPage);
-                console.log('data.cnt : ' + data.count);
                 if (data.items.length == 0) {
                     var html = noDataHtml();
                     $(".tbody").append(html);

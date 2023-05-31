@@ -281,8 +281,6 @@ public class PdReviewService {
             map.put("productDTO", productDTO);
             map.put("parsedReviewDTO2", parsedReviewDTO2);
             map.put("totalPrice", parsedReviewDTO2.getPrice() * parsedReviewDTO2.getStock());
-            System.out.println("parsedReviewDTO2.getPrice() = " + parsedReviewDTO2.getPrice());
-            System.out.println("parsedReviewDTO2.getPrice() = " + parsedReviewDTO2.getStock());
 
             Map<String, Object> reMap = new HashMap<>();
             reMap.put("startNavi", Integer.parseInt(paging.get("startNavi").toString()));

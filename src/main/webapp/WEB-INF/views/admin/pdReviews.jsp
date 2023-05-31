@@ -252,8 +252,6 @@
 
     //동적 html
     function createHtml(data) {
-        console.log('데이터');
-        console.log(data);
         //카테고리 출력
         var html = '';
         if (data.length !== 0) {
@@ -270,7 +268,6 @@
                 // 옵션 출력
                 if (Object.keys(data[i]).includes('optionMapList')) {  //key가 optionMapList 있으면 출력
                     for (let k = 0; k < data[i].optionMapList.length; k++) {
-                        console.log(Object.keys(data[i].optionMapList[k]) + ":" + Object.values(data[i].optionMapList[k]));
                         html += '<p>' + Object.keys(data[i].optionMapList[k]) + ":" + Object.values(data[i].optionMapList[k]) + '</p>';
                     }
                 }
@@ -363,14 +360,12 @@
             type: 'post',
             data: data,
             success: function (data) {
-                console.log(data);
                 //뿌리기
                 $("#tbody").children().remove();
                 if (data.length !== 0) {
                     var html = createHtml(data);
                 }
                 $("#tbody").append(html);
-                console.log(data);
                 createPaging(data);
             }
         })
@@ -443,22 +438,18 @@
     function paging(startNavi) {
         $(".pagingDiv").children().remove();
         let data = chgOptions();
-        console.log(data);
         data.cpage = startNavi;
         $.ajax({
             url: '/admin/reviewsByOption',
             type: 'post',
             data: data,
             success: function (data) {
-                console.log('페이징');
-                console.log(data);
                 //뿌리기
                 $("#tbody").children().remove();
                 if (data.length !== 0) {
                     var html = createHtml(data);
                 }
                 $("#tbody").append(html);
-                console.log(data);
                 createPaging(data);
             }
         })

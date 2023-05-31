@@ -92,7 +92,6 @@
         var str = $(this).val();
         var fileName = str.split('\\').pop().toLowerCase();
         $("#img_name").val(fileName);
-        console.log($("#img_name").val());
         checkFileName(fileName);
 
         //이미지 미리보기
@@ -152,7 +151,6 @@
 
     //옵션 삭제 키워드
     function remove(key, e) {
-        console.log('key : ' + key);
         let optionCategory = $(e).closest(".optionBox").find(".optionCategory").val();
         let optionName = $(e).closest(".optionBox").find(".optionName").val();
         let optionStock = $(e).closest(".optionBox").find(".optionStock").val();
@@ -184,10 +182,6 @@
         let optionName = $(this).closest(".optionBox").find(".optionName").val();
         let optionStock = $(this).closest(".optionBox").find(".optionStock").val();
 
-        console.log(optionCategory);
-        console.log(optionName);
-        console.log(optionStock);
-
         if (optionCategory.length != 0 && optionName.length != 0 && optionStock.length != 0) {
             let map = new Map();
             map.set("key", key);
@@ -210,7 +204,6 @@
             }
         }
         alert("옵션 추가 완료");
-        console.log(optionArr);
         key--;
     });
 
@@ -228,21 +221,13 @@
     $("#updBtn").on("click", function () {
 
         let optStockSum = 0;
-        console.log($(".optionBox").length);
         for (let i = 0; i < $(".optionBox").length; i++) {
             let optionBox = $(".optionBox")[i];
             let optionStock = $(optionBox).find(".optionStock")[0];
             let optionCategory = $(optionBox).find(".optionCategory")[0];
-            console.log("optionCategory");
-            console.log($(optionCategory).val());
-            console.log($(optionStock).val());
             optStockSum += Number($(optionStock).val());
-            console.log('옵션 재고 : ');
-            console.log(optionStock);
 
         }
-        console.log("optStockSum");
-        console.log(optStockSum);
 
         let pdStock = $("#stock").val(); //상품 재고
         //상품재고보다 옵션재고 많을때
@@ -300,14 +285,6 @@
         let img = $("#img_name").val();
         let category1 = $("#category1 option:selected").val();
         let category2 = $("#category2 option:selected").val();
-
-        console.log(name);
-        console.log(description);
-        console.log(price);
-        console.log(stock);
-        console.log(img);
-        console.log(category1);
-        console.log(category2);
 
         let frm = $('#frm')[0];
         let data = new FormData(frm);

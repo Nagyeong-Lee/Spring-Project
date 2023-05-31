@@ -133,7 +133,6 @@
                 // "deli_seq":$("input[type='radio']:checked").val()
             },
             success:function(data){
-                console.log(data);
                 window.close();
                 window.opener.location.reload();
                 // window.open('/product/noticePopup', '', 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);

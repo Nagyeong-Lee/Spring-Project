@@ -141,7 +141,6 @@ public class QnAService {
         //현재 페이지
 //        Integer postCount = salesPdCount(); //판매 상품수
         Integer postCount = postCnt; //판매 상품수
-        System.out.println("postCount = " + postCount);
         Integer postPerPage = 10; //페이지 당 글 개수
         Integer naviPerPage = 10; //페이지 당 내비 수
         Integer totalPageCount = 0; //전체 페이지 수

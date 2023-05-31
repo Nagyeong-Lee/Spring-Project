@@ -258,7 +258,6 @@ public class AdminService {
     }
 
     public List<ParsedReviewDTO2> reviewByOptList(List<ParsedReviewDTO> mapList) throws Exception {
-        System.out.println("mapList = " + mapList);
         JsonParser jsonParser = new JsonParser();
         List<ParsedReviewDTO2> objectList = new ArrayList<>();
         for (ParsedReviewDTO parsedReviewDTO : mapList) {

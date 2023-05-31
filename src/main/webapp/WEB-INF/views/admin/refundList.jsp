@@ -183,7 +183,6 @@
                 "cpage": startNavi
             },
             success: function (data) {
-                console.log(data);
                 $(".pagingDiv").children().remove();
                 createPaging(data);
             }
@@ -232,7 +231,6 @@
                 "cpage": 1
             },
             success: function (data) {
-                console.log(data);
                 $(".pagingDiv").children().remove();
                 createPaging(data);
             }
@@ -248,7 +246,6 @@
         // 옵션 출력
         if (Object.keys(item).includes('optionMapList')) {  //key가 optionMapList 있으면 출력
             for (let k = 0; k < item.optionMapList.length; k++) {
-                console.log(Object.keys(item.optionMapList[k]) + ":" + Object.values(item.optionMapList[k]));
                 HTML += '<p>' + Object.keys(item.optionMapList[k]) + ":" + Object.values(item.optionMapList[k]) + '</p>';
             }
         }
@@ -305,7 +302,6 @@
     //승인 클릭 시
     $(document).on("click", ".approveBtn", function () {
         let type = $(this).closest(".data").find(".refundType").val();
-        console.log(type)
         //교환일때
         if (type == 'exchange') {
             let payPd_seq = $(this).closest("tr").find("#payPd_seq").val();
@@ -318,7 +314,7 @@
 
             let newFrm = document.createElement("form");
             newFrm.setAttribute("method", "post");
-            newFrm.setAttribute("action", "/admin/approveRefund");
+            newFrm.setAttribute("action", "/admin/approveExchg");
 
             let input1 = document.createElement("input");
             input1.setAttribute("type", "hidden");
@@ -352,7 +348,6 @@
                     "refund_seq": refund_seq
                 },
                 success: function (data) {
-                    console.log(data);
                     location.reload();
                     // $(".pagingDiv").children().remove();
                     // createPaging(data);

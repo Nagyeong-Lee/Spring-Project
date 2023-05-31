@@ -303,7 +303,9 @@ public class AdminController {
                 }
                 if (optionMapList.size() != 0) param.put("optionMapList", optionMapList);
             }
-            PayProductDTO payProductDTO = productService.getDeliYN(salesDTO.getSales_seq()); // deliYN, CODE 가져오기
+//            PayProductDTO payProductDTO = productService.getDeliYN(salesDTO.getSales_seq()); // deliYN, CODE 가져오기
+//            PayProductDTO payProductDTO = productService.getDeliYN(salesDTO.getSales_seq()); // deliYN, CODE 가져오기
+            String deliYN = productService.getDeliYN(salesDTO.getSales_seq()); // deliYN, CODE 가져오기
             param.put("id", salesDTO.getId());
             param.put("stock", salesDTO.getStock());
             param.put("price", salesDTO.getPrice());
@@ -314,9 +316,12 @@ public class AdminController {
             param.put("productDTO", productDTO);
             Integer pdStock = productService.getPdStock(salesDTO.getPd_seq());//판매하고 남은 상품 개수
             param.put("pdStock", pdStock);
-            param.put("deliYN", payProductDTO.getDeliYN());
-            param.put("code", payProductDTO.getCode());
+            param.put("deliYN", deliYN);
+//            if( payProductDTO.getCode() != null){
+//                param.put("code", payProductDTO.getCode());
+//            }
 //            param.put("optionMapList",optionMapList);
+            System.out.println("param ': " + param.get("deliYN"));
             paramList.add(param);
         }
         model.addAttribute("paramList", paramList);
@@ -426,7 +431,6 @@ public class AdminController {
         String time = data.get("time").toString();
 
         Integer postCnt = qnAService.filteredReviewCnt(pcArr, chCArr, starArr, selectType, keyword);//필터링된 리뷰 개수
-        System.out.println("필터링 = " + postCnt);
 
         Map<String, Object> paging = productService.paging(cpage, postCnt);
 

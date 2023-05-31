@@ -37,7 +37,6 @@ public class QnAController {
 
     @RequestMapping("") //나의 Q&A 조회로
     public String toMyQnA(Model model, String id, Integer cpage) throws Exception {
-        System.out.println("cpage = " + cpage);
         if (cpage == null) {
             cpage = 1;
         }

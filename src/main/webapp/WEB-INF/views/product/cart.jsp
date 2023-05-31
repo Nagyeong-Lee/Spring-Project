@@ -319,7 +319,6 @@
                 "cart_seq": cart_seq
             },
             success: function (data) {
-
             }
         });
     })
@@ -441,10 +440,9 @@
     //     }
     // });
 
-    //결제하기 버튼 클릭
+    //결제하기 버튼 클릭 -> 재고 있으면 결제 상세 페이지로 이동 (payInfo)
     //옵션,상품 개수 변경
     $("#pay").on("click", function () {
-
         var testArr = [];
         var productArr = new Array();
         //List<Map> 뒷단에서 가격 계산
@@ -455,6 +453,7 @@
             let seq = $(this).closest(".itemDiv").find(".seq").val(); //구매할 상품 seq
             map.set("count", Number(count));
             map.set("seq", Number(seq));
+            //옵션 있을 때 옵션 put
             if ($(this).find(".option").length > 0) {
                 let optionArr = [];
                 let size = $(this).find(".option").length;
@@ -473,7 +472,6 @@
             productArr.push(Object.fromEntries(testArr[i]));
         }
 
-
         var buyPdSeq = []; //구매할 cart_seq 담을 배열
 
         $("input[name=buyPdSeq]:checked").each(function () {
@@ -483,6 +481,7 @@
         if (buyPdSeq.length == 0) {
             alert('구매할 상품을 선택하세요.');
         }
+
         //재고 있는지 확인
         $.ajax({
             url: '/product/checkStockInCart',
@@ -497,7 +496,7 @@
                 if (data == false) {
                     alert('재고가 없습니다.');
                     return;
-                } else {
+                } else { //재고 있으면 결제 상세페이지로 이동 (payInfo)
                     console.log($("#hiddenTotalPrice").val());
                     console.log($("#discount option:selected").val());
                     var newForm = document.createElement("form");
@@ -542,6 +541,7 @@
         var t_sum = 0;
         var t_count = 0;
         var pdPrice = 0;
+
         //구매 체크박스
         $(".buyPdSeq").on("change", function () {
             if ($(".buyPdSeq:checked").length == 0) {
@@ -581,6 +581,7 @@
                 })
             }
         })
+
         $(".buyPdSeq:checked").each(function () {
             let checkedPrice = $(this).closest(".itemDiv").find(".productPrice").val();
             console.log('선택된 것들 : ' + $(this).val() + " : " + checkedPrice);

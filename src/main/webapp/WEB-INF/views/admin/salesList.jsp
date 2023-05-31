@@ -27,17 +27,87 @@
     <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
 
     <style>
+        /*html, body {*/
+        /*    height: 100%;*/
+        /*}*/
+        /*body {*/
+        /*    display: flex;*/
+        /*    flex-direction: column;*/
+        /*}*/
+        /*.cart,.pagingDiv {*/
+        /*    flex: 1 0 auto;*/
+        /*}*/
+        /*#footer{  flex-shrink: 0;}*/
+
+        /*.pagingDiv {*/
+        /*    position: fixed;*/
+        /*    left: 0;*/
+        /*    bottom: 110px;*/
+        /*    width: 100%;*/
+        /*    color: white; !* 글자색상 *!*/
+        /*    text-align: center; !* 가운데 정렬 *!*/
+        /*    !*margin-top: 20px; !* 위아래/좌우 패딩 *!*!*/
+        /*    padding: 15px;*/
+        /*}*/
+
+        .pagingDiv {
+            position: fixed;
+            left: 0;
+            bottom: 100px;
+            width: 100%;
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            padding:15px; /* 위아래/좌우 패딩 */
+        }
+
+        #tbody * {
+            text-align: center;
+        }
+
+        .content, .question.qText, .aText {
+            width: 600px;
+        }
+
+        /*table {*/
+        /*    table-layout: fixed;*/
+        /*}*/
+
+        .question {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .qText, .aText {
+            word-break: break-all
+        }
+
         html, body {
             height: 100%;
         }
+
         body {
             display: flex;
             flex-direction: column;
         }
-        .cart,.pagingDiv {
+
+        .cart {
             flex: 1 0 auto;
         }
-        #footer{  flex-shrink: 0;}
+
+        /*#footer {*/
+        /*    flex-shrink: 0;*/
+        /*}*/
+        #footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40; /* 배경색상 */
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            padding: 15px; /* 위아래/좌우 패딩 */
+        }
     </style>
 </head>
 <body>
@@ -120,6 +190,12 @@
     <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
 </footer>
 
+
+<div class="cart">
+    <table></table>
+</div>
+<div class="pagingDiv"></div>
+<footer></footer>
 <script>
     // /*택배사 db 저장*/
     // $(".selectCourier").click(function () {
@@ -169,7 +245,7 @@
                 "id": $("#id").val()
             },
             success: function (data) {
-                console.log(data);
+                console.log(data)
                 $(".pagingDiv").children().remove();
                 createPaging(data);
             }
@@ -205,12 +281,11 @@
     function createHtml(item, cpage) {
         let pd_seq = item.productDTO.pd_seq;
         var temp = '';
-        var HTML = '<tr><td><a href="/product/detail?pd_seq=' + pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width:120px; height: 100px;"></a></td>';
+        var HTML = '<tr><td><a href="/product/detail?pd_seq=' + pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width:120px; height: 100px;"></a><input type="hidden" value="'+item.salesDTOS.sales_seq+'" class="sales_seq"></td>';
         if (item.optionMapList == null) { //옵션 없을때
-            HTML += '<td style="text-align: center;"><p>' + item.productDTO.name + item.productDTO.stock + '개</p>';
-            HTML += '<td style="text-align: center;"><p>' + item.salesDTOS.salesDate+'</p>';
+            HTML += '<td style="text-align: center;"><p>' + item.productDTO.name +  item.salesDTOS.stock + '개</p>';
         } else if (item.optionMapList != null) { //옵션 있을때
-            temp += '<td style="text-align: center;"><p>' + item.productDTO.name + ' ' + item.productDTO.stock + '개</p>';
+            temp += '<td style="text-align: center;"><p>' + item.productDTO.name + ' ' + item.salesDTOS.stock + '개</p>';
             for (let i = 0; i < item.optionMapList.length; i++) {
                 temp += '<p>' + Object.keys(item.optionMapList[i])[0] + ' : ' + item.optionMapList[i][Object.keys(item.optionMapList[i])[0]] + '</p>';
             }

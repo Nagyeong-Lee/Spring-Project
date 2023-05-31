@@ -197,7 +197,6 @@
     }
 
     function createPaging(data) {
-        console.log(data);
         let startNavi = data.startNavi;
         let endNavi = data.endNavi;
         let needPrev = data.needPrev;
@@ -205,8 +204,6 @@
         let productDTOList = data.productDTOList;
         $("#row").children().remove();
         for (let i = 0; i < productDTOList.length; i++) {
-            console.log(productDTOList[i]);
-            console.log(startNavi);
             var newHtml = createHtml(productDTOList[i], startNavi);
             $("#row").append(newHtml);
         }
@@ -239,7 +236,6 @@
         HTML += '<a href="/product/detail?pd_seq=' + pd_seq + '">' + pdName + '</a></h5>';
         HTML += item.price.toLocaleString() + '원';
         HTML += '</div></div></div></div>';
-        console.log(HTML);
         return HTML;
     }
 

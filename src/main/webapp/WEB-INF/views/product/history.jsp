@@ -376,7 +376,6 @@
             },
             async: false,
             success: function (data) {
-                console.log(data);
                 if (data == 'Y') {
                     alert('교환을 취소하고 진행해주세요.');
                     return;
@@ -427,7 +426,6 @@
             },
             async: false,
             success: function (data) {
-                console.log(data);
                 if (data == 'Y') {
                     alert('환불을 취소하고 진행해주세요.');
                     return;
@@ -475,7 +473,6 @@
                 "id": $("#id").val()
             },
             success: function (data) {
-                console.log(data);
                 $(".pagingDiv").children().remove();
                 createPaging(data);
             }
@@ -491,12 +488,6 @@
         let historyList = data.historyList;
         let cpage = data.cpage;
 
-        console.log("startNavi : " + startNavi);
-        console.log("endNavi : " + endNavi);
-        console.log("needPrev : " + needPrev);
-        console.log("needNext : " + needNext);
-        console.log("paging : " + paging);
-        console.log("historyList " + historyList);
 
         $("#tbody").children().remove();
         for (let i = 0; i < historyList.length; i++) {
@@ -526,8 +517,6 @@
     let paySeq = 0;
 
     function createHtml(item, cpage) {
-        console.log(item.productDTO.pd_seq);
-        console.log(cpage);
         var newTable = '';
         var temp = '';
         newTable = '<tr><td><a href="/product/detail?pd_seq=' + item.productDTO.pd_seq + '"><img src="/resources/img/products/' + item.productDTO.img + '" style="width:120px; height: 100px;"></a></td>';

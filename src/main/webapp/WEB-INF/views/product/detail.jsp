@@ -584,8 +584,6 @@
             // }
             //
 
-
-
             if (Number($("#count").val()) > pdStock) {
                 alert('재고보다 수량이 클 수 없습니다.');
                 return false;
@@ -629,7 +627,10 @@
                 $("#count").val(1);
                 return;
             }
-            if ($("#count").val() > pdStock) {
+            if (Number($("#count").val()) > Number(pdStock)) {
+                console.log('pdStock : ' +pdStock);
+                console.log('count" : ' +$("#count").val());
+                console.log(Number($("#count").val()) > Number(pdStock));
                 alert('재고보다 많이 구매할 수 없습니다.');
                 return false;
             }

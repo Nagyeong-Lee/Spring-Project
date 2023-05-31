@@ -579,7 +579,6 @@ public class ProductService {
     //페이징
     public Map<String, Object> pagingPdList(Integer cpage, String keyword) throws Exception {
         //현재 페이지
-        System.out.println("cpage = " + cpage);
         Integer postCount = productCnt(keyword); //전체 상품수
         Integer postPerPage = 10; //페이지 당 글 개수
         Integer naviPerPage = 10; //페이지 당 내비 수
@@ -626,7 +625,6 @@ public class ProductService {
         //현재 페이지
 //        Integer postCount = salesPdCount(); //판매 상품수
         Integer postCount = postCnt; //판매 상품수
-        System.out.println("postCount = " + postCount);
         Integer postPerPage = 10; //페이지 당 글 개수
         Integer naviPerPage = 10; //페이지 당 내비 수
         Integer totalPageCount = 0; //전체 페이지 수
@@ -732,7 +730,6 @@ public class ProductService {
         JsonArray jsonArray = new JsonArray();
 
         for (Map<String, Object> payInfoDTO : payInfoDTOS) {
-            System.out.println("payInfoDTOS = " + payInfoDTOS);
             Map<String, Object> map = new HashMap<>();
             ProductDTO productDTO = this.getPdInfo(Integer.parseInt(payInfoDTO.get("PD_SEQ").toString())); //상품 정보
             Integer price = Integer.parseInt(payInfoDTO.get("PRICE").toString());  //결제 금액
@@ -917,10 +914,16 @@ public class ProductService {
     public Integer getCurrPayPdSeq() throws Exception {
         return productMapper.getCurrPayPdSeq();
     }
+//
+//    public PayProductDTO getDeliYN(Integer salesSeq) throws Exception {
+//        return productMapper.getDeliYN(salesSeq);
+//    }
 
-    public PayProductDTO getDeliYN(Integer salesSeq) throws Exception {
+
+    public String getDeliYN(Integer salesSeq) throws Exception {
         return productMapper.getDeliYN(salesSeq);
     }
+
 
     public void updDeliveryStatus(Integer sales_seq, Integer courierCode, String postNum) throws Exception {
         productMapper.updDeliveryStatus(sales_seq, courierCode, postNum);
@@ -1029,7 +1032,6 @@ public class ProductService {
     }
 
     public List<Map<String, Object>> refundPdWithOpt(Map<String, Object> refundPdInfo) throws Exception {
-        System.out.println("refundPdInfo = " + refundPdInfo);
         JsonParser jsonParser = new JsonParser();
         Object object = jsonParser.parse((String) refundPdInfo.get("OPTIONS"));
         JsonObject jsonObject = (JsonObject) object;

@@ -34,16 +34,16 @@
     <link href="/resources/asset/css/styles.css" rel="stylesheet"/>
 
     <style>
-        /*.pagingDiv {*/
-        /*    position: fixed;*/
-        /*    left: 0;*/
-        /*    !*bottom: 150px;*!*/
-        /*    width: 100%;*/
-        /*    color: white; !* 글자색상 *!*/
-        /*    text-align: center; !* 가운데 정렬 *!*/
-        /*    !*margin-top: 20px; !* 위아래/좌우 패딩 *!*!*/
-        /*    padding: 15px;*/
-        /*}*/
+        .pagingDiv {
+            position: fixed;
+            left: 0;
+            bottom: 110px;
+            width: 100%;
+            color: white; /* 글자색상 */
+            text-align: center; /* 가운데 정렬 */
+            /*margin-top: 20px; !* 위아래/좌우 패딩 *!*/
+            padding: 15px;
+        }
 
         #tbody * {
             text-align: center;
@@ -53,9 +53,9 @@
             width: 600px;
         }
 
-        /*table {*/
-        /*    table-layout: fixed;*/
-        /*}*/
+        table {
+            table-layout: fixed;
+        }
 
         .question {
             text-overflow: ellipsis;
@@ -70,7 +70,9 @@
         html, body {
             height: 100%;
         }
-
+        table {
+            table-layout: fixed;
+        }
         body {
             display: flex;
             flex-direction: column;
@@ -90,6 +92,10 @@
             text-align: center; /* 가운데 정렬 */
             padding: 15px; /* 위아래/좌우 패딩 */
         }
+
+
+
+
     </style>
 </head>
 <body>

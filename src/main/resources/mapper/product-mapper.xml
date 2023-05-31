@@ -365,24 +365,20 @@
         update product set stock=stock-1 where pd_seq=#{pd_seq}
     </update>
 
-    <select id="getOptionStock" resultType="com.example.Spring_Project.dto.OptionDTO">
-                select
-                option_seq,
-                category,
-                name,
-                stock,
-                status,
-                pd_seq
-                from options
-                where pd_seq=#{pd_seq} and name=#{option} FOR UPDATE wait 10
-    </select>
+<!--    <select id="getOptionStock" resultType="com.example.Spring_Project.dto.OptionDTO">-->
+<!--                select-->
+<!--                    option_seq,-->
+<!--                    category,-->
+<!--                    name,-->
+<!--                    stock,-->
+<!--                    status,-->
+<!--                    pd_seq-->
+<!--                from options-->
+<!--                where pd_seq=#{pd_seq}-->
+<!--                and name=#{option} FOR UPDATE wait 10-->
+<!--    </select>-->
 
     <select id="getPdOptStock" resultType="Integer">
-<!--        SELECT-->
-<!--        stock-->
-<!--        FROM OPTIONS-->
-<!--        WHERE pd_seq = #{pd_seq} AND name = #{name} AND category = #{category}-->
-<!--        FOR UPDATE wait 10-->
         SELECT
         stock
         FROM OPTIONS
@@ -390,10 +386,12 @@
     </select>
     <select id="productOptionStock" resultType="Integer">
         SELECT
-        stock
+            stock
         FROM OPTIONS
-        WHERE pd_seq = #{pd_seq} AND name = #{name} AND category = #{category}
-        FOR UPDATE wait 100
+        WHERE pd_seq = #{pd_seq}
+            AND   name = #{name}
+            AND   category = #{category}
+        FOR UPDATE wait 10
     </select>
 
     <select id="checkOptStock" resultType="Integer">
@@ -408,21 +406,17 @@
     </update>
 
     <select id="getPdStock" resultType="Integer">
-<!--        select-->
-<!--        stock-->
-<!--        from product-->
-<!--        where pd_seq=#{pd_seq} FOR UPDATE wait 10-->
         select
-        stock
+            stock
         from product
         where pd_seq=#{pd_seq}
     </select>
 
     <select id="productStock" resultType="Integer">
         select
-        stock
+            stock
         from product
-        where pd_seq=#{pd_seq} FOR UPDATE wait 100
+        where pd_seq=#{pd_seq} FOR UPDATE wait 10
     </select>
 
     <select id="checkPdStock" resultType="Integer">
@@ -616,7 +610,7 @@
 
 
     <update id="chgOptCount">
-        update options set stock = stock - #{count} where pd_seq = #{pd_seq} and name = #{option} and category = #{category}
+        update options set stock = stock - #{count} where pd_seq = #{pd_seq} and name = #{name} and category = #{category}
     </update>
 
     <select id="getPdSeq" resultType="Integer">
@@ -1183,10 +1177,22 @@
         </if>
     </select>
 
-    <select id="getDeliYN" resultType="com.example.Spring_Project.dto.PayProductDTO">
-        SELECT deliYN,code FROM payProduct WHERE payPd_seq = (
+<!--    <select id="getDeliYN" resultType="com.example.Spring_Project.dto.PayProductDTO">-->
+<!--&lt;!&ndash;        SELECT deliYN,code FROM payProduct WHERE payPd_seq = (&ndash;&gt;-->
+<!--&lt;!&ndash;        SELECT payPd_seq FROM sales WHERE sales_seq = #{salesSeq})&ndash;&gt;-->
+
+<!--        SELECT deliYN FROM payProduct WHERE payPd_seq = (-->
+<!--        SELECT payPd_seq FROM sales WHERE sales_seq = #{salesSeq})-->
+<!--    </select>-->
+
+    <select id="getDeliYN" resultType="String">
+        <!--        SELECT deliYN,code FROM payProduct WHERE payPd_seq = (-->
+        <!--        SELECT payPd_seq FROM sales WHERE sales_seq = #{salesSeq})-->
+
+        SELECT deliYN FROM payProduct WHERE payPd_seq = (
         SELECT payPd_seq FROM sales WHERE sales_seq = #{salesSeq})
     </select>
+
 
     <select id="updDeliveryStatus" resultType="Integer">
         UPDATE
@@ -1340,8 +1346,42 @@
 
     <select id="refundPdInfo" resultType="map">
 
-        SELECT
-        a.pay_seq,
+<!--        SELECT-->
+<!--        a.pay_seq,-->
+<!--        a.payPd_seq,-->
+<!--        a.pd_seq,-->
+<!--        a.OPTIONS,-->
+<!--        a.payDate,-->
+<!--        a.payMethod,-->
+<!--        a.count,-->
+<!--        p.price,-->
+<!--        a.id-->
+<!--        FROM product p JOIN (-->
+<!--        SELECT-->
+<!--        pi.pay_seq,-->
+<!--        pp.payPd_seq,-->
+<!--        pp.pd_seq,-->
+<!--        pp.options,-->
+<!--        id,-->
+<!--        to_char(payDate,'YYYY-MM-DD HH24:MI') AS payDate,-->
+<!--        payMethod,-->
+<!--        pp.count-->
+<!--        FROM payInfo pi JOIN (-->
+<!--        SELECT-->
+<!--        payPd_seq,-->
+<!--        pay_seq,-->
+<!--        pd_seq,-->
+<!--        options,-->
+<!--        count-->
+<!--        FROM payProduct-->
+<!--        WHERE payPd_seq = #{payPdSeq}) pp-->
+<!--        on pi.pay_seq = pp.pay_seq) a on p.pd_seq = a.pd_seq-->
+
+
+
+
+
+        select  a.pay_seq,
         a.payPd_seq,
         a.pd_seq,
         a.OPTIONS,
@@ -1349,7 +1389,8 @@
         a.payMethod,
         a.count,
         p.price,
-        a.id
+        a.id,
+        usedPoint
         FROM product p JOIN (
         SELECT
         pi.pay_seq,
@@ -1359,7 +1400,8 @@
         id,
         to_char(payDate,'YYYY-MM-DD HH24:MI') AS payDate,
         payMethod,
-        pp.count
+        pp.count,
+        usedPoint
         FROM payInfo pi JOIN (
         SELECT
         payPd_seq,
